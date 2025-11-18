@@ -1,0 +1,15 @@
+{
+  "id": "mongoose",
+  "name": "Mongoose (MongoDB)",
+  "description": "MongoDB database integration using Mongoose ODM",
+  "type": "database",
+  "dependencies": {
+    "mongoose": "^8.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {},
+  "envVars": {
+    "MONGODB_URI": "mongodb://localhost:27017/myapp"
+  },
+  "templateFiles": []
+}

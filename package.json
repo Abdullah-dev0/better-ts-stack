@@ -1,0 +1,46 @@
+{
+  "name": "better-ts-stack",
+  "version": "1.0.0",
+  "description": "CLI tool to scaffold production-ready backend projects from templates",
+  "main": "dist/index.js",
+  "bin": {
+    "better-ts-stack": "./bin/better-ts-stack.js"
+  },
+  "scripts": {
+    "dev": "tsx  src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "cli",
+    "scaffold",
+    "backend",
+    "typescript",
+    "express",
+    "prisma",
+    "template"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "inquirer": "^8.2.5",
+    "fs-extra": "^11.1.1",
+    "chalk": "^4.1.2",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "@types/node": "^20.10.5",
+    "@types/inquirer": "^8.2.10",
+    "@types/fs-extra": "^11.0.4",
+    "tsx": "^4.7.0",
+    "eslint": "^8.56.0",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "prettier": "^3.1.1"
+  }
+}

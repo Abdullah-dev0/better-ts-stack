@@ -21,10 +21,11 @@ import { copyModuleFiles, processTemplateFiles } from './fileProcessor';
 import { installDependencies } from './dependencyInstaller';
 import { initializeGitRepository } from './gitInitializer';
 import { generateNextSteps } from '../output/nextSteps';
+import { buildTemplateContext, TemplateContext } from './templateContext';
 
 /**
  * Main scaffolding function
- * Orchestrates the entire project scaffolding process
+ * Orchestrates the entire project scaffolding process (14 steps)
  * @param config - Project configuration from prompts
  * @returns Promise resolving to scaffold result with success status and next steps
  */
@@ -82,11 +83,23 @@ export async function scaffold(config: ProjectConfig): Promise<ScaffoldResult> {
       )
     );
 
-    // Step 5: Merge configurations from all modules
-    console.log(chalk.gray('Merging module configurations...'));
-    const mergedConfig = mergeConfigurations(modules.map((m) => m.config));
+    // Step 5: Build template context from project configuration
+    console.log(chalk.gray('Building template context...'));
+    const templateContext: TemplateContext = buildTemplateContext(config);
+    console.log(chalk.green('✓ Template context built'));
 
-    // Step 6: Copy files from all selected modules to target directory
+    // Step 6: Process script variables in module configurations
+    console.log(chalk.gray('Processing script variables...'));
+    // Script processing happens inside mergeConfigurations
+
+    // Step 7: Merge configurations from all modules
+    console.log(chalk.gray('Merging module configurations...'));
+    const mergedConfig = mergeConfigurations(
+      modules.map((m) => m.config),
+      templateContext
+    );
+
+    // Step 8: Copy files from all selected modules to target directory
     console.log(chalk.gray('\nCopying module files...'));
     try {
       for (const module of modules) {
@@ -104,11 +117,11 @@ export async function scaffold(config: ProjectConfig): Promise<ScaffoldResult> {
       );
     }
 
-    // Step 7: Process .hbs template files
-    console.log(chalk.gray('\nProcessing template files...'));
+    // Step 9: Process .hbs template files with Handlebars
+    console.log(chalk.gray('Processing template files...'));
     try {
+      // Collect all template files from all modules
       const allTemplateFiles: string[] = [];
-
       for (const module of modules) {
         if (module.config.templateFiles && module.config.templateFiles.length > 0) {
           allTemplateFiles.push(...module.config.templateFiles);
@@ -116,8 +129,10 @@ export async function scaffold(config: ProjectConfig): Promise<ScaffoldResult> {
       }
 
       if (allTemplateFiles.length > 0) {
-        await processTemplateFiles(absoluteTargetDir, config, allTemplateFiles);
-        console.log(chalk.green(`✓ Processed ${allTemplateFiles.length} template files`));
+        await processTemplateFiles(absoluteTargetDir, templateContext, allTemplateFiles);
+        console.log(chalk.green(`✓ Processed ${allTemplateFiles.length} template file(s)`));
+      } else {
+        console.log(chalk.gray('  No template files to process'));
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
@@ -128,7 +143,7 @@ export async function scaffold(config: ProjectConfig): Promise<ScaffoldResult> {
       );
     }
 
-    // Step 8: Generate final package.json from merged configuration
+    // Step 10: Generate final package.json from merged configuration
     console.log(chalk.gray('\nGenerating package.json...'));
     try {
       await generatePackageJson(absoluteTargetDir, mergedConfig, config);
@@ -142,7 +157,7 @@ export async function scaffold(config: ProjectConfig): Promise<ScaffoldResult> {
       );
     }
 
-    // Step 9: Generate final .env.example and .env from merged env vars
+    // Step 11: Generate final .env.example and .env from merged env vars
     console.log(chalk.gray('Generating environment files...'));
     try {
       await generateEnvFile(absoluteTargetDir, mergedConfig.envVars);
@@ -156,7 +171,7 @@ export async function scaffold(config: ProjectConfig): Promise<ScaffoldResult> {
       );
     }
 
-    // Step 10: Conditionally install dependencies if user opted in
+    // Step 12: Conditionally install dependencies if user opted in
     let depsInstalled = false;
     if (config.installDeps) {
       try {
@@ -170,7 +185,7 @@ export async function scaffold(config: ProjectConfig): Promise<ScaffoldResult> {
       }
     }
 
-    // Step 11: Conditionally initialize git if user opted in
+    // Step 13: Conditionally initialize git if user opted in
     if (config.initGit) {
       try {
         initializeGitRepository(absoluteTargetDir);
@@ -183,7 +198,7 @@ export async function scaffold(config: ProjectConfig): Promise<ScaffoldResult> {
       }
     }
 
-    // Step 12: Generate next steps
+    // Step 14: Generate next steps
     const nextSteps = generateNextSteps(config, depsInstalled);
 
     console.log(chalk.green('\n✨ Project scaffolding completed successfully!\n'));

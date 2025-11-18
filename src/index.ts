@@ -13,13 +13,11 @@ export async function main(): Promise<void> {
     // Display welcome message
     console.log(chalk.bold.cyan('\n╔════════════════════════════════════════╗'));
     console.log(chalk.bold.cyan('║                                        ║'));
-    console.log(chalk.bold.cyan('║      🚀 better-ts-stack �             ║'));
+    console.log(chalk.bold.cyan('║      🚀 better-ts-stack                ║'));
     console.log(chalk.bold.cyan('║                                        ║'));
     console.log(chalk.bold.cyan('║  Scaffold production-ready backends    ║'));
     console.log(chalk.bold.cyan('║                                        ║'));
     console.log(chalk.bold.cyan('╚════════════════════════════════════════╝\n'));
-
-    // Collect user choices through interactive prompts
     console.log(chalk.bold("Let's set up your project:\n"));
     const config = await collectUserChoices();
 

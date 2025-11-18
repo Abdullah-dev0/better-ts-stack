@@ -109,6 +109,89 @@ The CLI will guide you through setup with questions like:
 - Development and production environments
 - .dockerignore file
 
+## 📝 Template System for Module Creators
+
+The scaffolder uses **Handlebars** for dynamic file generation, enabling modules to create flexible, reusable templates that adapt to each project's configuration.
+
+### Available Template Variables
+
+When creating template files, you have access to the following variables:
+
+- **`{{projectName}}`** - The name of the project being scaffolded
+- **`{{packageManager}}`** - Selected package manager (npm, pnpm, or bun)
+- **`{{database}}`** - Selected database (prisma, mongoose, or none)
+- **`{{port}}`** - Application port (default: 3000)
+
+### Creating a Template File
+
+To add a dynamic template to your module:
+
+1. **Create a `.hbs` file** in your module directory with Handlebars syntax:
+
+```yaml
+# templates/modules/docker/docker-compose.yml.hbs
+version: '3.8'
+
+services:
+  {{projectName}}:
+    build: .
+    ports:
+      - "{{port}}:{{port}}"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+```
+
+2. **Register the template** in your module's `config.json`:
+
+```json
+{
+  "name": "docker",
+  "scripts": {
+    "docker:build": "docker build -t {{projectName}} .",
+    "docker:up": "docker-compose up -d"
+  },
+  "templateFiles": ["docker-compose.yml.hbs"]
+}
+```
+
+3. **Variables are automatically replaced** during scaffolding:
+   - The `.hbs` extension is removed from the output filename
+   - All `{{variable}}` placeholders are replaced with actual values
+   - The rendered file is written to the project directory
+
+### Example: Docker Module
+
+The Docker module demonstrates template usage:
+
+- **Input**: `docker-compose.yml.hbs` with `{{projectName}}` and `{{port}}` variables
+- **Processing**: Handlebars renders the template with project-specific values
+- **Output**: `docker-compose.yml` with actual project name and port
+
+For a project named "my-api" on port 3000:
+
+```yaml
+# Generated docker-compose.yml
+version: '3.8'
+
+services:
+  my-api:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+```
+
+### Best Practices for Templates
+
+- Use descriptive variable names in templates
+- Document required variables in your module's README
+- Test templates with various project names and configurations
+- Keep templates focused on a single concern
+- Use Handlebars conditionals for optional features (e.g., `{{#if database}}...{{/if}}`)
+
 ## 🏗️ Project Structure
 
 ```

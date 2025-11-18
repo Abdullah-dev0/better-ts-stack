@@ -49,7 +49,7 @@ async function loadModuleConfig(modulePath: string): Promise<ModuleConfig> {
  */
 export async function getModule(id: string): Promise<Module> {
   const modulePath = resolveModulePath(id);
-  console.log(modulePath);
+
   // Check if module directory exists
   const exists = await fs.pathExists(modulePath);
 
@@ -59,7 +59,6 @@ export async function getModule(id: string): Promise<Module> {
 
   // Load module configuration
   const config = await loadModuleConfig(modulePath);
-  console.log(config);
 
   return {
     config,

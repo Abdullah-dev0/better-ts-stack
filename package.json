@@ -1,7 +1,7 @@
 {
   "name": "better-ts-stack",
   "version": "1.0.0",
-  "description": "CLI tool to scaffold production-ready backend projects from templates",
+  "description": "A powerful CLI tool that generates fully configured TypeScript projects with backend, frontend, database integration, Docker support, and more—all through an interactive setup.s",
   "main": "dist/index.js",
   "bin": {
     "better-ts-stack": "./bin/better-ts-stack.js"
@@ -27,20 +27,21 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "inquirer": "^8.2.5",
-    "fs-extra": "^11.1.1",
     "chalk": "^4.1.2",
+    "fs-extra": "^11.1.1",
+    "handlebars": "^4.7.8",
+    "inquirer": "^8.2.5",
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "typescript": "^5.3.3",
-    "@types/node": "^20.10.5",
-    "@types/inquirer": "^8.2.10",
     "@types/fs-extra": "^11.0.4",
-    "tsx": "^4.7.0",
-    "eslint": "^8.56.0",
+    "@types/inquirer": "^8.2.10",
+    "@types/node": "^20.10.5",
     "@typescript-eslint/eslint-plugin": "^6.15.0",
     "@typescript-eslint/parser": "^6.15.0",
-    "prettier": "^3.1.1"
+    "eslint": "^8.56.0",
+    "prettier": "^3.1.1",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
   }
 }

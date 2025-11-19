@@ -126,11 +126,11 @@ export async function collectUserChoices(cwd: string = process.cwd()): Promise<P
 }
 
 /**
- * Confirms the scaffolding with the user by displaying a summary
+ * Confirms the building with the user by displaying a summary
  * @param config - The project configuration to confirm
  * @returns Promise resolving to true if confirmed, false otherwise
  */
-export async function confirmScaffold(config: ProjectConfig): Promise<boolean> {
+export async function confirmBuild(config: ProjectConfig): Promise<boolean> {
   console.log('\n' + chalk.bold.underline('Project Summary:'));
   console.log(`  ${chalk.cyan('Project Name:')}    ${config.projectName}`);
   console.log(`  ${chalk.cyan('Target Dir:')}      ${config.targetDir}`);
@@ -145,7 +145,7 @@ export async function confirmScaffold(config: ProjectConfig): Promise<boolean> {
     {
       type: 'confirm',
       name: 'confirm',
-      message: 'Looks good? Ready to scaffold?',
+      message: 'Looks good? Ready to build?',
       default: true,
     },
   ]);

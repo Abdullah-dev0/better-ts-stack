@@ -1,5 +1,5 @@
 /**
- * Core type definitions for the CLI scaffolder
+ * Core type definitions for the CLI builder
  */
 
 /**
@@ -25,7 +25,7 @@ export interface Dependencies {
 }
 
 /**
- * Single unified configuration object used throughout the scaffolding pipeline
+ * Single unified configuration object used throughout the building pipeline
  * Replaces: UserChoices, CompositionContext, NextStepsContext, GeneratorContext
  */
 export interface ProjectConfig {
@@ -41,7 +41,7 @@ export interface ProjectConfig {
   // Tooling
   packageManager: PackageManager;
 
-  // Post-scaffold options
+  // Post-build options
   initGit: boolean;
   installDeps: boolean;
 }
@@ -82,52 +82,48 @@ export interface MergedConfig {
 }
 
 /**
- * Result of scaffolding operation
+ * Result of building operation
  */
-export interface ScaffoldResult {
+export interface BuildResult {
   success: boolean;
   projectPath: string;
   nextSteps: string[];
 }
 
 /**
- * Custom error for scaffolding operations
+ * Custom error for building operations
  */
-export interface ScaffoldError extends Error {
+export interface BuildError extends Error {
   code: string;
   exitCode: number;
 }
 
 /**
- * Factory function to create ScaffoldError instances
+ * Factory function to create BuildError instances
  * Uses Object.assign to avoid type assertions
  * @param message - Error message
  * @param code - Error code for categorization
  * @param exitCode - Process exit code (default: 1)
- * @returns ScaffoldError object
+ * @returns BuildError object
  */
-export function createScaffoldError(
-  message: string,
-  code: string,
-  exitCode: number = 1
-): ScaffoldError {
+export function createBuildError(message: string, code: string, exitCode: number = 1): BuildError {
   const error = new Error(message);
   return Object.assign(error, { code, exitCode });
 }
 
 /**
- * Type guard to check if an error is a ScaffoldError
+ * Type guard to check if an error is a BuildError
  * @param error - Error to check
- * @returns true if error is a ScaffoldError
+ * @returns true if error is a BuildError
  */
-export function isScaffoldError(error: unknown): error is ScaffoldError {
+export function isBuildError(error: unknown): error is BuildError {
   return (
     error instanceof Error &&
     typeof error === 'object' &&
     error !== null &&
     'code' in error &&
     'exitCode' in error &&
-    typeof (error as ScaffoldError).code === 'string' &&
-    typeof (error as ScaffoldError).exitCode === 'number'
+    typeof (error as BuildError).code === 'string' &&
+    typeof (error as BuildError).exitCode === 'number'
   );
 }

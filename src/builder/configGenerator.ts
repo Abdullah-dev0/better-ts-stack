@@ -6,7 +6,7 @@
 import fs from 'fs-extra';
 import path from 'path';
 import Handlebars from 'handlebars';
-import { ProjectConfig, MergedConfig, ModuleConfig, createScaffoldError } from '../types';
+import { ProjectConfig, MergedConfig, ModuleConfig, createBuildError } from '../types';
 import { TemplateContext } from './templateContext';
 
 /**
@@ -19,7 +19,7 @@ import { TemplateContext } from './templateContext';
  * @param scripts - Record of script names to script commands (may contain {{variables}})
  * @param context - Template context with all available variables
  * @returns Record of script names to processed script commands (variables replaced)
- * @throws {ScaffoldError} If template compilation fails or undefined variables are encountered
+ * @throws {BuildError} If template compilation fails or undefined variables are encountered
  * @example
  * ```typescript
  * const scripts = {
@@ -51,7 +51,7 @@ export function processScriptVariables(
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      throw createScaffoldError(
+      throw createBuildError(
         `Failed to process script "${scriptName}": ${errorMessage}`,
         'TEMPLATE_SCRIPT_ERROR'
       );
@@ -142,7 +142,7 @@ export async function generatePackageJson(
     await fs.writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n', 'utf-8');
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    throw createScaffoldError(
+    throw createBuildError(
       `Failed to generate package.json: ${errorMessage}`,
       'PACKAGE_JSON_ERROR'
     );
@@ -177,7 +177,7 @@ export async function generateEnvFile(
     await fs.copy(envExamplePath, envPath);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    throw createScaffoldError(
+    throw createBuildError(
       `Failed to generate environment files: ${errorMessage}`,
       'ENV_FILE_ERROR'
     );

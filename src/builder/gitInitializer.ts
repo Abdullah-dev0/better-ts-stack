@@ -88,14 +88,14 @@ export function initializeGitRepository(cwd: string): boolean {
   // Initialize git repository
   const gitInitSuccess = initGit(cwd);
   if (!gitInitSuccess) {
-    console.log(chalk.gray('Continuing with scaffolding...\n'));
+    console.log(chalk.gray('Continuing with building...\n'));
     return false;
   }
 
   // Create initial commit
   const commitSuccess = createInitialCommit(cwd);
   if (!commitSuccess) {
-    console.log(chalk.gray('Continuing with scaffolding...\n'));
+    console.log(chalk.gray('Continuing with building...\n'));
     return false;
   }
 

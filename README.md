@@ -1,6 +1,6 @@
 # better-ts-stack
 
-> Scaffold production-ready full-stack projects in seconds
+> Build production-ready full-stack projects in seconds
 
 A powerful CLI tool that generates fully configured TypeScript projects with backend, frontend (coming soon), database integration, Docker support, and more—all through an interactive setup.
 
@@ -111,13 +111,13 @@ The CLI will guide you through setup with questions like:
 
 ## 📝 Template System for Module Creators
 
-The scaffolder uses **Handlebars** for dynamic file generation, enabling modules to create flexible, reusable templates that adapt to each project's configuration.
+The builder uses **Handlebars** for dynamic file generation, enabling modules to create flexible, reusable templates that adapt to each project's configuration.
 
 ### Available Template Variables
 
 When creating template files, you have access to the following variables:
 
-- **`{{projectName}}`** - The name of the project being scaffolded
+- **`{{projectName}}`** - The name of the project being built
 - **`{{packageManager}}`** - Selected package manager (npm, pnpm, or bun)
 - **`{{database}}`** - Selected database (prisma, mongoose, or none)
 - **`{{port}}`** - Application port (default: 3000)
@@ -155,7 +155,7 @@ services:
 }
 ```
 
-3. **Variables are automatically replaced** during scaffolding:
+3. **Variables are automatically replaced** during building:
    - The `.hbs` extension is removed from the output filename
    - All `{{variable}}` placeholders are replaced with actual values
    - The rendered file is written to the project directory
@@ -240,7 +240,7 @@ $ npx better-ts-stack
 ? Do you want to initialize a git repository? Yes
 ? Do you want to install dependencies now? Yes
 
-✓ Project scaffolded successfully!
+✓ Project built successfully!
 ✓ Dependencies installed
 ✓ Git repository initialized
 
@@ -283,10 +283,10 @@ MIT
 
 ## �️ Roadmapd
 
-- ✅ Backend scaffolding with Express.js
+- ✅ Backend building with Express.js
 - ✅ Database integration (Prisma, Mongoose)
 - ✅ Docker support
-- 🚧 Frontend scaffolding (React, Next.js)
+- 🚧 Frontend building (React, Next.js)
 - 🚧 JWT authentication module
 - 🚧 Full-stack templates with integrated frontend/backend
 - 🚧 CI/CD templates

@@ -8,7 +8,7 @@ import { ProjectConfig } from '../types';
 /**
  * Template context interface containing all variables available in Handlebars templates
  *
- * @property projectName - Name of the project being scaffolded
+ * @property projectName - Name of the project being built
  * @property packageManager - Package manager choice (npm, pnpm, or bun)
  * @property database - Database selection (none, prisma, or mongoose)
  * @property port - Port number for the application (defaults to 3000)
@@ -74,7 +74,7 @@ export function kebabCase(str: string): string {
  * Build template context from project configuration
  *
  * Creates a context object with all variables and helper functions for Handlebars templates.
- * This context is used to render .hbs template files during the scaffolding process.
+ * This context is used to render .hbs template files during the building process.
  *
  * @param config - Project configuration containing user choices and settings
  * @returns Template context with all variables and helpers ready for Handlebars rendering

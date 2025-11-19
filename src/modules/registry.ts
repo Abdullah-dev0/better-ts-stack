@@ -5,7 +5,7 @@
 
 import path from 'path';
 import fs from 'fs-extra';
-import { ModuleConfig, Module, createScaffoldError } from '../types';
+import { ModuleConfig, Module, createBuildError } from '../types';
 
 /**
  * Resolve the path to a module directory
@@ -34,7 +34,7 @@ async function loadModuleConfig(modulePath: string): Promise<ModuleConfig> {
     return config;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    throw createScaffoldError(
+    throw createBuildError(
       `Failed to load module config from ${configPath}: ${errorMessage}`,
       'MODULE_CONFIG_ERROR'
     );
@@ -54,7 +54,7 @@ export async function getModule(id: string): Promise<Module> {
   const exists = await fs.pathExists(modulePath);
 
   if (!exists) {
-    throw createScaffoldError(`Module not found: ${id}`, 'MODULE_NOT_FOUND');
+    throw createBuildError(`Module not found: ${id}`, 'MODULE_NOT_FOUND');
   }
 
   // Load module configuration

@@ -1,8 +1,8 @@
 import chalk from 'chalk';
-import { collectUserChoices, confirmScaffold } from './prompts';
-import { scaffold } from './scaffolder';
+import { collectUserChoices, confirmBuild } from './prompts';
+import { build } from './builder';
 import { displayNextSteps } from './output/nextSteps';
-import { isScaffoldError } from './types';
+import { isBuildError } from './types';
 
 /**
  * Main CLI function
@@ -15,22 +15,22 @@ export async function main(): Promise<void> {
     console.log(chalk.bold.cyan('║                                        ║'));
     console.log(chalk.bold.cyan('║      🚀 better-ts-stack                ║'));
     console.log(chalk.bold.cyan('║                                        ║'));
-    console.log(chalk.bold.cyan('║  Scaffold production-ready backends    ║'));
+    console.log(chalk.bold.cyan('║  Build production-ready backends       ║'));
     console.log(chalk.bold.cyan('║                                        ║'));
     console.log(chalk.bold.cyan('╚════════════════════════════════════════╝\n'));
     console.log(chalk.bold("Let's set up your project:\n"));
     const config = await collectUserChoices();
 
-    // Confirm choices before scaffolding
-    const confirmed = await confirmScaffold(config);
+    // Confirm choices before building
+    const confirmed = await confirmBuild(config);
 
     if (!confirmed) {
-      console.log(chalk.yellow('\n⚠ Scaffolding cancelled by user.\n'));
+      console.log(chalk.yellow('\n⚠ Building cancelled by user.\n'));
       process.exit(0);
     }
 
-    // Call scaffolder with ProjectConfig directly
-    const result = await scaffold(config);
+    // Call builder with ProjectConfig directly
+    const result = await build(config);
 
     // Display next steps on success
     if (result.success) {
@@ -38,12 +38,12 @@ export async function main(): Promise<void> {
       console.log(chalk.green(nextStepsMessage));
       process.exit(0);
     } else {
-      console.error(chalk.red('\n❌ Scaffolding failed\n'));
+      console.error(chalk.red('\n❌ Building failed\n'));
       process.exit(1);
     }
   } catch (error) {
     // Handle errors and display error messages
-    if (isScaffoldError(error)) {
+    if (isBuildError(error)) {
       console.error(chalk.red(`\n❌ Error: ${error.message}`));
       console.error(chalk.gray(`   Code: ${error.code}\n`));
       process.exit(error.exitCode);

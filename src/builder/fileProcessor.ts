@@ -5,7 +5,7 @@
 import fs from 'fs-extra';
 import path from 'path';
 import Handlebars from 'handlebars';
-import { createScaffoldError } from '../types';
+import { createBuildError } from '../types';
 import { TemplateContext } from './templateContext';
 
 /**
@@ -29,7 +29,7 @@ export async function copyModuleFiles(moduleDir: string, targetDir: string): Pro
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    throw createScaffoldError(
+    throw createBuildError(
       `Failed to copy module files from ${moduleDir}: ${errorMessage}`,
       'FILE_COPY_ERROR'
     );
@@ -42,7 +42,7 @@ export async function copyModuleFiles(moduleDir: string, targetDir: string): Pro
  * @param content - Template content string with Handlebars syntax
  * @param context - Template context containing variables and helpers
  * @returns Rendered template string with all variables replaced
- * @throws {ScaffoldError} If template compilation fails due to syntax errors
+ * @throws {BuildError} If template compilation fails due to syntax errors
  */
 export function compileTemplate(content: string, context: TemplateContext): string {
   try {
@@ -58,7 +58,7 @@ export function compileTemplate(content: string, context: TemplateContext): stri
     return template(context);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    throw createScaffoldError(
+    throw createBuildError(
       `Failed to compile Handlebars template: ${errorMessage}`,
       'TEMPLATE_SYNTAX_ERROR'
     );
@@ -92,7 +92,7 @@ export async function processTemplateFiles(
  *
  * @param filePath - Absolute path to the template file
  * @param context - Template context with variables for replacement
- * @throws {ScaffoldError} If file reading, template compilation, or writing fails
+ * @throws {BuildError} If file reading, template compilation, or writing fails
  */
 export async function processTemplateFile(
   filePath: string,
@@ -122,14 +122,14 @@ export async function processTemplateFile(
       await fs.remove(filePath);
     }
   } catch (error) {
-    // Re-throw ScaffoldErrors as-is
+    // Re-throw BuildErrors as-is
     if (error && typeof error === 'object' && 'code' in error) {
       throw error;
     }
 
     // Wrap other errors
     const errorMessage = error instanceof Error ? error.message : String(error);
-    throw createScaffoldError(
+    throw createBuildError(
       `Failed to process template file ${filePath}: ${errorMessage}`,
       'TEMPLATE_WRITE_ERROR'
     );

@@ -17,7 +17,7 @@
   },
   "keywords": [
     "cli",
-    "scaffold",
+    "builder",
     "backend",
     "typescript",
     "express",

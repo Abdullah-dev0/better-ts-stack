@@ -38,7 +38,7 @@ export function installDependencies(packageManager: PackageManager, cwd: string)
     console.log(chalk.green('✓ Dependencies installed successfully\n'));
     return true;
   } catch (error) {
-    // Display helpful error message but don't throw - allow scaffolding to continue
+    // Display helpful error message but don't throw - allow building to continue
     console.log(chalk.yellow('\n⚠ Warning: Failed to install dependencies'));
     console.log(chalk.gray(`Error: ${error instanceof Error ? error.message : String(error)}`));
     console.log(

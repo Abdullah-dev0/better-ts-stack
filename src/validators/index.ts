@@ -8,7 +8,7 @@ import * as path from 'path';
 /**
  * Zod schema for project name validation
  * - Must be at least 1 character
- * - Can be "." to scaffold in current directory
+ * - Can be "." to build in current directory
  * - Otherwise must be lowercase with only letters, numbers, and hyphens
  * - Cannot start or end with a hyphen
  * - Must be a valid npm package name

@@ -15,7 +15,7 @@ import { copyModuleFiles, processTemplateFiles } from './fileProcessor';
 import { installDependencies } from './dependencyInstaller';
 import { initializeGitRepository } from './gitInitializer';
 import { generateNextSteps } from '../output/nextSteps';
-import { buildTemplateContext, TemplateContext } from './templateContext';
+import { buildTemplateContext } from './templateContext';
 
 /**
  * Main building function
@@ -75,7 +75,7 @@ export async function build(config: ProjectConfig): Promise<BuildResult> {
 
     // Step 5: Build template context from project configuration
     console.log(chalk.gray('Building template context...'));
-    const templateContext: TemplateContext = buildTemplateContext(config);
+    const templateContext = buildTemplateContext(config);
     console.log(chalk.green('✓ Template context built'));
 
     // Step 6: Process script variables in module configurations

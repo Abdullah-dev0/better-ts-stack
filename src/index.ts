@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { collectUserChoices } from './prompts';
+import { collectUserChoices, confirmScaffold } from './prompts';
 import { scaffold } from './scaffolder';
 import { displayNextSteps } from './output/nextSteps';
 import { isScaffoldError } from './types';
@@ -20,6 +20,14 @@ export async function main(): Promise<void> {
     console.log(chalk.bold.cyan('╚════════════════════════════════════════╝\n'));
     console.log(chalk.bold("Let's set up your project:\n"));
     const config = await collectUserChoices();
+
+    // Confirm choices before scaffolding
+    const confirmed = await confirmScaffold(config);
+
+    if (!confirmed) {
+      console.log(chalk.yellow('\n⚠ Scaffolding cancelled by user.\n'));
+      process.exit(0);
+    }
 
     // Call scaffolder with ProjectConfig directly
     const result = await scaffold(config);

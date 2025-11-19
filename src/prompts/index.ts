@@ -4,6 +4,7 @@
 
 import inquirer from 'inquirer';
 import path from 'path';
+import chalk from 'chalk';
 import { ProjectConfig } from '../types';
 import { validateProjectName } from '../validators';
 
@@ -122,4 +123,32 @@ export async function collectUserChoices(cwd: string = process.cwd()): Promise<P
     ...answers,
     targetDir,
   };
+}
+
+/**
+ * Confirms the scaffolding with the user by displaying a summary
+ * @param config - The project configuration to confirm
+ * @returns Promise resolving to true if confirmed, false otherwise
+ */
+export async function confirmScaffold(config: ProjectConfig): Promise<boolean> {
+  console.log('\n' + chalk.bold.underline('Project Summary:'));
+  console.log(`  ${chalk.cyan('Project Name:')}    ${config.projectName}`);
+  console.log(`  ${chalk.cyan('Target Dir:')}      ${config.targetDir}`);
+  console.log(`  ${chalk.cyan('Database:')}        ${config.database}`);
+  console.log(`  ${chalk.cyan('Auth:')}            ${config.useAuth ? 'Yes' : 'No'}`);
+  console.log(`  ${chalk.cyan('Docker:')}          ${config.useDocker ? 'Yes' : 'No'}`);
+  console.log(`  ${chalk.cyan('Package Mgr:')}     ${config.packageManager}`);
+  console.log(`  ${chalk.cyan('Git Init:')}        ${config.initGit ? 'Yes' : 'No'}`);
+  console.log(`  ${chalk.cyan('Install Deps:')}    ${config.installDeps ? 'Yes' : 'No'}\n`);
+
+  const { confirm } = await inquirer.prompt<{ confirm: boolean }>([
+    {
+      type: 'confirm',
+      name: 'confirm',
+      message: 'Looks good? Ready to scaffold?',
+      default: true,
+    },
+  ]);
+
+  return confirm;
 }

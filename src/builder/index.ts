@@ -1,8 +1,3 @@
-/**
- * Builder orchestration engine
- * Orchestrates the entire project building process
- */
-
 import path from 'path';
 import fs from 'fs-extra';
 import chalk from 'chalk';
@@ -76,14 +71,9 @@ export async function build(config: ProjectConfig): Promise<BuildResult> {
     // Step 5: Build template context from project configuration
     console.log(chalk.gray('Building template context...'));
     const templateContext = buildTemplateContext(config);
-    console.log(chalk.green('✓ Template context built'));
 
-    // Step 6: Process script variables in module configurations
-    console.log(chalk.gray('Processing script variables...'));
-    // Script processing happens inside mergeConfigurations
+    // Step 6: Merge configurations from all modules
 
-    // Step 7: Merge configurations from all modules
-    console.log(chalk.gray('Merging module configurations...'));
     const mergedConfig = mergeConfigurations(
       modules.map((m) => m.config),
       templateContext

@@ -5,8 +5,7 @@
 import fs from 'fs-extra';
 import path from 'path';
 import Handlebars from 'handlebars';
-import { createBuildError } from '../types';
-import { TemplateContext } from './templateContext';
+import { createBuildError, TemplateContext } from '../types';
 
 /**
  * Copy files from a module directory to the target directory

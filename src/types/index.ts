@@ -127,3 +127,29 @@ export function isBuildError(error: unknown): error is BuildError {
     typeof (error as BuildError).exitCode === 'number'
   );
 }
+
+/**
+ * Template context interface containing all variables available in Handlebars templates
+ *
+ * @property projectName - Name of the project being built
+ * @property packageManager - Package manager choice (npm, pnpm, or bun)
+ * @property database - Database selection (none, prisma, or mongoose)
+ * @property port - Port number for the application (defaults to 3000)
+ * @property useDocker - Whether Docker support is enabled
+ * @property useAuth - Whether authentication module is enabled
+ * @property helpers - Helper functions available in templates for string transformations
+ */
+
+export interface TemplateContext {
+  projectName: string;
+  packageManager: string;
+  database: string;
+  port: number;
+  useDocker: boolean;
+  useAuth: boolean;
+  helpers: {
+    lowercase: (str: string) => string;
+    uppercase: (str: string) => string;
+    kebabCase: (str: string) => string;
+  };
+}

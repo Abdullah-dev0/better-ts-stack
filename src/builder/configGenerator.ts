@@ -4,10 +4,15 @@
  */
 
 import fs from 'fs-extra';
-import path from 'path';
 import Handlebars from 'handlebars';
-import { ProjectConfig, MergedConfig, ModuleConfig, createBuildError } from '../types';
-import { TemplateContext } from './templateContext';
+import path from 'path';
+import {
+  MergedConfig,
+  ModuleConfig,
+  ProjectConfig,
+  TemplateContext,
+  createBuildError,
+} from '../types';
 
 /**
  * Process script variables using Handlebars template engine

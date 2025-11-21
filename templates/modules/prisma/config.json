@@ -13,7 +13,7 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
-    "prisma:seed": "tsx prisma/seed.ts"
+    "prisma:seed": "{{#if (eq packageManager 'bun')}}bun prisma/seed.ts{{else}}tsx prisma/seed.ts{{/if}}"
   },
   "envVars": {
     "DATABASE_URL": "postgresql://user:password@localhost:5432/mydb?schema=public"

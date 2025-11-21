@@ -41,19 +41,22 @@ export function processScriptVariables(
   scripts: Record<string, string>,
   context: TemplateContext
 ): Record<string, string> {
+  const helpers = {
+    eq: (a: string, b: string) => a === b,
+    runner: () => {
+      if (context.packageManager === 'bun') return 'bun';
+      if (context.packageManager === 'pnpm') return 'pnpm';
+      return 'node';
+    },
+    ...context.helpers,
+  };
+
   const processedScripts: Record<string, string> = {};
 
   for (const [scriptName, scriptCommand] of Object.entries(scripts)) {
     try {
-      // Check if script contains variables ({{...}})
-      if (scriptCommand.includes('{{')) {
-        // Compile and render the script as a Handlebars template
-        const template = Handlebars.compile(scriptCommand, { strict: true });
-        processedScripts[scriptName] = template(context);
-      } else {
-        // No variables, pass through unchanged
-        processedScripts[scriptName] = scriptCommand;
-      }
+      const template = Handlebars.compile(scriptCommand, { noEscape: true });
+      processedScripts[scriptName] = template(context, { helpers });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       throw createBuildError(

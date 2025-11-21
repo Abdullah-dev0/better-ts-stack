@@ -16,7 +16,7 @@ module.exports = {
     node: true,
     es6: true,
   },
-  ignorePatterns: ['dist', 'node_modules', '.eslintrc.js', 'templates/**/*'],
+  ignorePatterns: ['dist', 'node_modules', '.eslintrc.js', 'templates/**/*', 'bin/**/*'],
   rules: {
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/no-explicit-any': 'warn',

@@ -6,7 +6,7 @@
  */
 
 // Import the main CLI function from the compiled dist directory
-const { main } = require('../dist/index.js');
+import { main } from '../dist/index.js';
 
 // Execute the main CLI function
 main().catch((error) => {

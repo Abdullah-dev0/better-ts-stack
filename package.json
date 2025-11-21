@@ -4,7 +4,7 @@
   "description": "A powerful CLI tool that generates fully configured TypeScript projects with backend, frontend, database integration, Docker support, and more—all through an interactive setup.s",
   "main": "dist/index.js",
   "bin": {
-    "better-ts-stack": "./bin/better-ts-stack.js"
+    "create-ts-stack": "./dist/index.js"
   },
   "scripts": {
     "dev": "tsx  src/index.ts",

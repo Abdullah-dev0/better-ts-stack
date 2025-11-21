@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import consola from 'consola';
 import { collectUserChoices, confirmBuild } from './prompts';
 import { build } from './builder';
@@ -11,7 +13,7 @@ import { cwd } from 'process';
  * Main CLI function
  * Orchestrates the entire CLI workflow from welcome message to completion
  */
-export async function main(): Promise<void> {
+async function main(): Promise<void> {
   try {
     // Display welcome message
     // Note: Intro is now handled in collectUserChoices

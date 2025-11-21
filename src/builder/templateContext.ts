@@ -79,6 +79,12 @@ export function buildTemplateContext(config: ProjectConfig) {
       lowercase,
       uppercase,
       kebabCase,
+      eq: (a: string, b: string) => a === b,
+      runner: () => {
+        if (config.packageManager === 'bun') return 'bun';
+        if (config.packageManager === 'pnpm') return 'pnpm';
+        return 'node';
+      },
     },
   };
 }

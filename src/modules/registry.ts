@@ -9,13 +9,16 @@ import { ModuleConfig, Module, createBuildError } from '../types';
 
 /**
  * Resolve the path to a module directory
- * @param id - Module ID
+ * Supports both base templates (e.g., 'backend/express') and modules (e.g., 'prisma')
+ * @param id - Module ID or path (e.g., 'backend/express', 'prisma', 'docker')
  * @returns Absolute path to the module directory
  */
 function resolveModulePath(id: string) {
-  if (id === 'express-base') {
-    return path.join(__dirname, '../../templates/express-base');
+  // If id contains a slash, it's a base template path like 'backend/express'
+  if (id.includes('/')) {
+    return path.join(__dirname, `../../templates/${id}`);
   }
+  // Otherwise, it's a module in templates/modules/
   return path.join(__dirname, `../../templates/modules/${id}`);
 }
 
@@ -43,7 +46,7 @@ async function loadModuleConfig(modulePath: string): Promise<ModuleConfig> {
 
 /**
  * Get a module by ID tecnically its a name
- * @param id - Module ID ('express-base', 'prisma', 'mongoose', 'docker', 'auth')
+ * @param id - Module ID ('express', 'prisma', 'mongoose', 'docker', 'auth')
  * @returns Promise resolving to the module with config and path
  * @throws Error if module is not found or config cannot be loaded
  */

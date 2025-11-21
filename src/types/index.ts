@@ -12,6 +12,8 @@ export type PackageManager = 'npm' | 'pnpm' | 'bun';
  */
 export type DatabaseOption = 'none' | 'prisma' | 'mongoose';
 
+export type applicationTypes = 'frontend' | 'backend';
+
 /**
  * Module type classification
  */
@@ -31,13 +33,10 @@ export interface Dependencies {
 export interface ProjectConfig {
   // Project basics
   projectName: string;
-  targetDir: string;
-
-  // Module selection
+  applicationType: applicationTypes;
   database: DatabaseOption;
   useDocker: boolean;
   useAuth: boolean;
-
   // Tooling
   packageManager: PackageManager;
 

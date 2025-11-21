@@ -1,8 +1,11 @@
-import chalk from 'chalk';
+import consola from 'consola';
 import { collectUserChoices, confirmBuild } from './prompts';
 import { build } from './builder';
 import { displayNextSteps } from './output/nextSteps';
 import { isBuildError } from './types';
+import { outro } from '@clack/prompts';
+import path from 'path';
+import { cwd } from 'process';
 
 /**
  * Main CLI function
@@ -11,50 +14,48 @@ import { isBuildError } from './types';
 export async function main(): Promise<void> {
   try {
     // Display welcome message
-    console.log(chalk.bold.cyan('\n╔════════════════════════════════════════╗'));
-    console.log(chalk.bold.cyan('║                                        ║'));
-    console.log(chalk.bold.cyan('║      🚀 better-ts-stack                ║'));
-    console.log(chalk.bold.cyan('║                                        ║'));
-    console.log(chalk.bold.cyan('║  Build production-ready backends       ║'));
-    console.log(chalk.bold.cyan('║                                        ║'));
-    console.log(chalk.bold.cyan('╚════════════════════════════════════════╝\n'));
-    console.log(chalk.bold("Let's set up your project:\n"));
+    // Note: Intro is now handled in collectUserChoices
+
     const config = await collectUserChoices();
 
+    const targetDir = path.resolve(cwd(), config.projectName);
+
     // Confirm choices before building
-    const confirmed = await confirmBuild(config);
+    const confirmed = await confirmBuild(config, targetDir);
 
     if (!confirmed) {
-      console.log(chalk.yellow('\n⚠ Building cancelled by user.\n'));
+      // This path is largely handled by confirmBuild's cancellation check,
+      // but keeping it for safety if logic changes.
       process.exit(0);
     }
 
     // Call builder with ProjectConfig directly
-    const result = await build(config);
+    const result = await build(config, targetDir);
 
     // Display next steps on success
     if (result.success) {
       const nextStepsMessage = displayNextSteps(config.projectName, result.nextSteps);
-      console.log(chalk.green(nextStepsMessage));
+      consola.success(nextStepsMessage);
+      outro('Happy coding!');
       process.exit(0);
     } else {
-      console.error(chalk.red('\n❌ Building failed\n'));
+      consola.error('\n❌ Building failed\n');
       process.exit(1);
     }
   } catch (error) {
     // Handle errors and display error messages
     if (isBuildError(error)) {
-      console.error(chalk.red(`\n❌ Error: ${error.message}`));
-      console.error(chalk.gray(`   Code: ${error.code}\n`));
+      consola.error(`\n❌ Error: ${error.message}`);
+      consola.info(`   Code: ${error.code}\n`);
       process.exit(error.exitCode);
     }
 
     // Handle unknown errors
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error(chalk.red(`\n❌ Unexpected error: ${errorMessage}\n`));
+    consola.error(`\n❌ Unexpected error: ${errorMessage}\n`);
 
     if (error instanceof Error && error.stack) {
-      console.error(chalk.gray(error.stack));
+      consola.debug(error.stack);
     }
 
     process.exit(1);
@@ -62,5 +63,5 @@ export async function main(): Promise<void> {
 }
 
 main().catch((err) => {
-  console.error('❌ Error:', err);
+  consola.error('❌ Error:', err);
 });

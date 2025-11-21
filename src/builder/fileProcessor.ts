@@ -46,9 +46,9 @@ export async function copyModuleFiles(moduleDir: string, targetDir: string): Pro
 export function compileTemplate(content: string, context: TemplateContext): string {
   try {
     // Register helper functions with Handlebars
-    Handlebars.registerHelper('lowercase', context.helpers.lowercase);
-    Handlebars.registerHelper('uppercase', context.helpers.uppercase);
-    Handlebars.registerHelper('kebabCase', context.helpers.kebabCase);
+    Object.entries(context.helpers).forEach(([name, fn]) => {
+      Handlebars.registerHelper(name, fn);
+    });
 
     // Compile the template
     const template = Handlebars.compile(content);

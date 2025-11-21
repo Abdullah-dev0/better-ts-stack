@@ -1,5 +1,5 @@
 {
-  "id": "express-base",
+  "id": "express",
   "name": "Express Base",
   "description": "Base Express server with TypeScript, middleware, and best practices",
   "type": "base",

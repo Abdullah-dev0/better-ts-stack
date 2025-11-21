@@ -42,12 +42,6 @@ export function processScriptVariables(
   context: TemplateContext
 ): Record<string, string> {
   const helpers = {
-    eq: (a: string, b: string) => a === b,
-    runner: () => {
-      if (context.packageManager === 'bun') return 'bun';
-      if (context.packageManager === 'pnpm') return 'pnpm';
-      return 'node';
-    },
     ...context.helpers,
   };
 
@@ -136,7 +130,7 @@ export async function generatePackageJson(
     const packageJson = {
       name: config.projectName,
       version: '1.0.0',
-      description: `Backend project created with better-ts-stack`,
+      description: `Project created with better-ts-stack using ${config.database !== 'none' ? config.database : 'no database'}`,
       main: 'dist/index.js',
       scripts: mergedConfig.scripts,
       keywords: ['backend', 'typescript', 'express'],

@@ -1,5 +1,5 @@
 import { execSync } from 'child_process';
-import chalk from 'chalk';
+import consola from 'consola';
 
 /**
  * Check if git is available on the system
@@ -21,7 +21,7 @@ function isGitAvailable(): boolean {
  * @returns true if git init succeeded, false if it failed
  */
 function initGit(cwd: string): boolean {
-  console.log(chalk.blue('\n🔧 Initializing git repository...'));
+  consola.info('Initializing git repository...');
 
   try {
     execSync('git init', {
@@ -29,11 +29,11 @@ function initGit(cwd: string): boolean {
       stdio: 'ignore',
     });
 
-    console.log(chalk.green('✓ Git repository initialized'));
+    consola.success('Git repository initialized');
     return true;
   } catch (error) {
-    console.log(chalk.yellow('⚠ Warning: Failed to initialize git repository'));
-    console.log(chalk.gray(`Error: ${error instanceof Error ? error.message : String(error)}`));
+    consola.warn('Failed to initialize git repository');
+    consola.debug(`Error: ${error instanceof Error ? error.message : String(error)}`);
     return false;
   }
 }
@@ -44,7 +44,7 @@ function initGit(cwd: string): boolean {
  * @returns true if commit succeeded, false if it failed
  */
 function createInitialCommit(cwd: string): boolean {
-  console.log(chalk.blue('📝 Creating initial commit...'));
+  consola.info('Creating initial commit...');
 
   try {
     // Add all files
@@ -59,12 +59,12 @@ function createInitialCommit(cwd: string): boolean {
       stdio: 'ignore',
     });
 
-    console.log(chalk.green('✓ Initial commit created\n'));
+    consola.success('Initial commit created');
     return true;
   } catch (error) {
-    console.log(chalk.yellow('⚠ Warning: Failed to create initial commit'));
-    console.log(chalk.gray(`Error: ${error instanceof Error ? error.message : String(error)}`));
-    console.log(chalk.gray('You can create the initial commit manually later\n'));
+    consola.warn('Failed to create initial commit');
+    consola.debug(`Error: ${error instanceof Error ? error.message : String(error)}`);
+    consola.info('You can create the initial commit manually later');
     return false;
   }
 }
@@ -78,24 +78,22 @@ function createInitialCommit(cwd: string): boolean {
 export function initializeGitRepository(cwd: string): boolean {
   // Check if git is available
   if (!isGitAvailable()) {
-    console.log(chalk.yellow('\n⚠ Warning: Git is not installed or not available in PATH'));
-    console.log(
-      chalk.gray('Skipping git initialization. You can initialize git manually later.\n')
-    );
+    consola.warn('Git is not installed or not available in PATH');
+    consola.info('Skipping git initialization. You can initialize git manually later.');
     return false;
   }
 
   // Initialize git repository
   const gitInitSuccess = initGit(cwd);
   if (!gitInitSuccess) {
-    console.log(chalk.gray('Continuing with building...\n'));
+    consola.info('Continuing with building...');
     return false;
   }
 
   // Create initial commit
   const commitSuccess = createInitialCommit(cwd);
   if (!commitSuccess) {
-    console.log(chalk.gray('Continuing with building...\n'));
+    consola.info('Continuing with building...');
     return false;
   }
 

@@ -1,128 +1,90 @@
 /**
- * Inquirer prompt definitions and prompt manager
+ * Clack prompt definitions and prompt manager
  */
 
-import inquirer from 'inquirer';
-import path from 'path';
-import chalk from 'chalk';
-import { ProjectConfig } from '../types';
+import { intro, text, select, confirm, isCancel, cancel, group } from '@clack/prompts';
+import consola from 'consola';
+import { ProjectConfig, applicationTypes, DatabaseOption, PackageManager } from '../types';
 import { validateProjectName } from '../validators';
-
-/**
- * Project name input prompt with validation
- */
-const projectNamePrompt: inquirer.InputQuestion = {
-  type: 'input',
-  name: 'projectName',
-  message: 'Project name:',
-  validate: (input: string) => {
-    const result = validateProjectName(input);
-    return result;
-  },
-};
-
-/**
- * Database selection prompt
- */
-
-const databasePrompt: inquirer.ListQuestion = {
-  type: 'list',
-  name: 'database', // This variable name is fine
-  message: 'How would you like to interact with the database?', // More accurate
-  choices: [
-    {
-      name: 'None (Skip database setup)',
-      value: 'none',
-    },
-    {
-      name: 'Prisma (Type-safe ORM)', // Cleaner
-      value: 'prisma',
-    },
-    {
-      name: 'Mongoose (Standard MongoDB ODM)',
-      value: 'mongoose',
-    },
-  ],
-  default: 'none',
-};
-/**
- * Package manager selection prompt
- */
-const packageManagerPrompt: inquirer.ListQuestion = {
-  type: 'list',
-  name: 'packageManager',
-  message: 'Select a package manager:',
-  choices: [
-    { name: 'npm', value: 'npm' },
-    { name: 'pnpm', value: 'pnpm' },
-    { name: 'bun', value: 'bun' },
-  ],
-  default: 'npm',
-};
-
-/**
- * Docker confirmation prompt
- */
-const dockerPrompt: inquirer.ConfirmQuestion = {
-  type: 'confirm',
-  name: 'useDocker',
-  message: 'Use Docker?',
-  default: false,
-};
-
-/**
- * Auth confirmation prompt
- */
-const authPrompt: inquirer.ConfirmQuestion = {
-  type: 'confirm',
-  name: 'useAuth',
-  message: 'Add authentication?',
-  default: false,
-};
-
-/**
- * Git initialization confirmation prompt
- */
-const gitPrompt: inquirer.ConfirmQuestion = {
-  type: 'confirm',
-  name: 'initGit',
-  message: 'Init git?',
-  default: true,
-};
-
-/**
- * Dependency installation confirmation prompt
- */
-const installDepsPrompt: inquirer.ConfirmQuestion = {
-  type: 'confirm',
-  name: 'installDeps',
-  message: 'Install dependencies now?',
-  default: true,
-};
 
 /**
  * Collects all user choices through interactive prompts
  * @param cwd - Current working directory (defaults to process.cwd())
  * @returns Promise resolving to ProjectConfig object with all selections
  */
-export async function collectUserChoices(cwd: string = process.cwd()): Promise<ProjectConfig> {
-  const answers = await inquirer.prompt<Omit<ProjectConfig, 'targetDir'>>([
-    projectNamePrompt,
-    databasePrompt,
-    packageManagerPrompt,
-    dockerPrompt,
-    authPrompt,
-    gitPrompt,
-    installDepsPrompt,
-  ]);
+export async function collectUserChoices() {
+  intro('🚀 better-ts-stack');
 
-  // Calculate targetDir based on projectName and current working directory
-  const targetDir = path.resolve(cwd, answers.projectName);
+  const project = await group(
+    {
+      applicationType: () =>
+        select<{ value: applicationTypes; label: string }[], applicationTypes>({
+          message: 'Application type:',
+          options: [
+            { value: 'frontend' as const, label: 'Frontend' },
+            { value: 'backend' as const, label: 'Backend' },
+          ],
+          initialValue: 'backend',
+        }),
+      projectName: () =>
+        text({
+          message: 'Project name:',
+          placeholder: 'my-awesome-project',
+          validate: (value): string | void => {
+            return validateProjectName(value);
+          },
+        }),
 
-  return {
-    ...answers,
-    targetDir,
-  };
+      database: () =>
+        select<{ value: DatabaseOption; label: string }[], DatabaseOption>({
+          message: 'How would you like to interact with the database?',
+          options: [
+            { value: 'none' as const, label: 'None (Skip database setup)' },
+            { value: 'prisma' as const, label: 'Prisma (Type-safe ORM)' },
+            { value: 'mongoose' as const, label: 'Mongoose (Standard MongoDB ODM)' },
+          ],
+          initialValue: 'none',
+        }),
+      packageManager: () =>
+        select<{ value: PackageManager; label: string }[], PackageManager>({
+          message: 'Select a package manager:',
+          options: [
+            { value: 'npm' as const, label: 'npm' },
+            { value: 'pnpm' as const, label: 'pnpm' },
+            { value: 'bun' as const, label: 'bun' },
+          ],
+          initialValue: 'npm',
+        }),
+      useDocker: () =>
+        confirm({
+          message: 'Use Docker?',
+          initialValue: false,
+        }),
+      useAuth: () =>
+        confirm({
+          message: 'Add authentication?',
+          initialValue: false,
+        }),
+      initGit: () =>
+        confirm({
+          message: 'Init git?',
+          initialValue: true,
+        }),
+      installDeps: () =>
+        confirm({
+          message: 'Install dependencies now?',
+          initialValue: false,
+        }),
+    },
+    {
+      onCancel: () => {
+        cancel('Operation cancelled.');
+        process.exit(0);
+      },
+    }
+  );
+
+  return project;
 }
 
 /**
@@ -130,25 +92,34 @@ export async function collectUserChoices(cwd: string = process.cwd()): Promise<P
  * @param config - The project configuration to confirm
  * @returns Promise resolving to true if confirmed, false otherwise
  */
-export async function confirmBuild(config: ProjectConfig): Promise<boolean> {
-  console.log('\n' + chalk.bold.underline('Project Summary:'));
-  console.log(`  ${chalk.cyan('Project Name:')}    ${config.projectName}`);
-  console.log(`  ${chalk.cyan('Target Dir:')}      ${config.targetDir}`);
-  console.log(`  ${chalk.cyan('Database:')}        ${config.database}`);
-  console.log(`  ${chalk.cyan('Auth:')}            ${config.useAuth ? 'Yes' : 'No'}`);
-  console.log(`  ${chalk.cyan('Docker:')}          ${config.useDocker ? 'Yes' : 'No'}`);
-  console.log(`  ${chalk.cyan('Package Mgr:')}     ${config.packageManager}`);
-  console.log(`  ${chalk.cyan('Git Init:')}        ${config.initGit ? 'Yes' : 'No'}`);
-  console.log(`  ${chalk.cyan('Install Deps:')}    ${config.installDeps ? 'Yes' : 'No'}\n`);
+export async function confirmBuild(config: ProjectConfig, targetDir: string) {
+  consola.info('Project Summary:');
 
-  const { confirm } = await inquirer.prompt<{ confirm: boolean }>([
-    {
-      type: 'confirm',
-      name: 'confirm',
-      message: 'Looks good? Ready to build?',
-      default: true,
-    },
-  ]);
+  consola.box(
+    `Project Name:    ${config.projectName}\n` +
+      `Target Dir:      ${targetDir}\n` +
+      `Database:        ${config.database}\n` +
+      `Auth:            ${config.useAuth ? 'Yes' : 'No'}\n` +
+      `Docker:          ${config.useDocker ? 'Yes' : 'No'}\n` +
+      `Package Mgr:     ${config.packageManager}\n` +
+      `Git Init:        ${config.initGit ? 'Yes' : 'No'}\n` +
+      `Install Deps:    ${config.installDeps ? 'Yes' : 'No'}`
+  );
 
-  return confirm;
+  const shouldContinue = await confirm({
+    message: 'Looks good? Ready to build?',
+    initialValue: true,
+  });
+
+  if (isCancel(shouldContinue)) {
+    cancel('Operation cancelled.');
+    process.exit(0);
+  }
+
+  if (!shouldContinue) {
+    cancel('Building cancelled by user.');
+    return false;
+  }
+
+  return true;
 }

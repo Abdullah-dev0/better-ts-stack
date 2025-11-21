@@ -1,5 +1,5 @@
 import { execSync } from 'child_process';
-import chalk from 'chalk';
+import consola from 'consola';
 import type { PackageManager } from '../types';
 
 /**
@@ -26,8 +26,8 @@ function getInstallCommand(packageManager: PackageManager): string {
 export function installDependencies(packageManager: PackageManager, cwd: string): boolean {
   const command = getInstallCommand(packageManager);
 
-  console.log(chalk.blue(`\n📦 Installing dependencies with ${packageManager}...`));
-  console.log(chalk.gray(`Running: ${command}`));
+  consola.info(`Installing dependencies with ${packageManager}...`);
+  consola.debug(`Running: ${command}`);
 
   try {
     execSync(command, {
@@ -35,15 +35,13 @@ export function installDependencies(packageManager: PackageManager, cwd: string)
       stdio: 'inherit', // Show installation progress in real-time
     });
 
-    console.log(chalk.green('✓ Dependencies installed successfully\n'));
+    consola.success('Dependencies installed successfully');
     return true;
   } catch (error) {
     // Display helpful error message but don't throw - allow building to continue
-    console.log(chalk.yellow('\n⚠ Warning: Failed to install dependencies'));
-    console.log(chalk.gray(`Error: ${error instanceof Error ? error.message : String(error)}`));
-    console.log(
-      chalk.yellow(`You can install dependencies manually later by running: ${command}\n`)
-    );
+    consola.warn('Failed to install dependencies');
+    consola.debug(`Error: ${error instanceof Error ? error.message : String(error)}`);
+    consola.info(`You can install dependencies manually later by running: ${command}`);
     return false;
   }
 }

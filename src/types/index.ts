@@ -27,6 +27,21 @@ export interface Dependencies {
 }
 
 /**
+ * Available backend frameworks
+ */
+export type BackendFramework = 'express' | 'hono' | 'nest';
+
+/**
+ * Available frontend frameworks
+ */
+export type FrontendFramework = 'react';
+
+/**
+ * Unified framework type
+ */
+export type Framework = BackendFramework | FrontendFramework;
+
+/**
  * Single unified configuration object used throughout the building pipeline
  * Replaces: UserChoices, CompositionContext, NextStepsContext, GeneratorContext
  */
@@ -34,6 +49,7 @@ export interface ProjectConfig {
   // Project basics
   projectName: string;
   applicationType: applicationTypes;
+  framework: Framework;
   database: DatabaseOption;
   useDocker: boolean;
   useAuth: boolean;

@@ -26,6 +26,27 @@ export async function collectUserChoices() {
           ],
           initialValue: 'backend',
         }),
+      framework: ({ results }) => {
+        const isBackend = results.applicationType === 'backend';
+
+        if (isBackend) {
+          return select({
+            message: 'Select a backend framework:',
+            options: [
+              { value: 'express' as const, label: 'Express' },
+              { value: 'hono' as const, label: 'Hono' },
+              { value: 'nest' as const, label: 'NestJS' },
+            ],
+            initialValue: 'express',
+          });
+        }
+
+        return select({
+          message: 'Select a frontend framework:',
+          options: [{ value: 'react' as const, label: 'React' }],
+          initialValue: 'react',
+        });
+      },
       projectName: () =>
         text({
           message: 'Project name:',
@@ -98,6 +119,8 @@ export async function confirmBuild(config: ProjectConfig, targetDir: string) {
   consola.box(
     `Project Name:    ${config.projectName}\n` +
       `Target Dir:      ${targetDir}\n` +
+      `App Type:        ${config.applicationType}\n` +
+      `Framework:       ${config.framework}\n` +
       `Database:        ${config.database}\n` +
       `Auth:            ${config.useAuth ? 'Yes' : 'No'}\n` +
       `Docker:          ${config.useDocker ? 'Yes' : 'No'}\n` +

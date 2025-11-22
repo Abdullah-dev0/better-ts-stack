@@ -11,8 +11,11 @@ export function selectModules(config: ProjectConfig): {
   base: string;
   modules: string[];
 } {
-  // Select base framework based on application type
-  const base = config.applicationType === 'backend' ? 'backend/express' : 'frontend/react';
+  // Select base framework based on application type and framework choice
+  const base =
+    config.applicationType === 'backend'
+      ? `backend/${config.framework}`
+      : `frontend/${config.framework}`;
 
   const modules: string[] = [];
 

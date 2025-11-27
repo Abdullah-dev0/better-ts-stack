@@ -21,8 +21,8 @@ export async function collectUserChoices() {
         select<{ value: applicationTypes; label: string }[], applicationTypes>({
           message: 'Application type:',
           options: [
-            { value: 'frontend' as const, label: 'Frontend' },
-            { value: 'backend' as const, label: 'Backend' },
+            { value: 'frontend', label: 'Frontend' },
+            { value: 'backend', label: 'Backend' },
           ],
           initialValue: 'backend',
         }),
@@ -33,9 +33,9 @@ export async function collectUserChoices() {
           return select({
             message: 'Select a backend framework:',
             options: [
-              { value: 'express' as const, label: 'Express' },
-              { value: 'hono' as const, label: 'Hono' },
-              { value: 'nest' as const, label: 'NestJS' },
+              { value: 'express', label: 'Express' },
+              { value: 'hono', label: 'Hono' },
+              { value: 'nest', label: 'NestJS' },
             ],
             initialValue: 'express',
           });
@@ -43,7 +43,7 @@ export async function collectUserChoices() {
 
         return select({
           message: 'Select a frontend framework:',
-          options: [{ value: 'react' as const, label: 'React' }],
+          options: [{ value: 'react', label: 'React' }],
           initialValue: 'react',
         });
       },
@@ -60,9 +60,9 @@ export async function collectUserChoices() {
         select<{ value: DatabaseOption; label: string }[], DatabaseOption>({
           message: 'How would you like to interact with the database?',
           options: [
-            { value: 'none' as const, label: 'None (Skip database setup)' },
-            { value: 'prisma' as const, label: 'Prisma (Type-safe ORM)' },
-            { value: 'mongoose' as const, label: 'Mongoose (Standard MongoDB ODM)' },
+            { value: 'none', label: 'None (Skip database setup)' },
+            { value: 'prisma', label: 'Prisma (Type-safe ORM)' },
+            { value: 'mongoose', label: 'Mongoose (Standard MongoDB ODM)' },
           ],
           initialValue: 'none',
         }),
@@ -70,9 +70,9 @@ export async function collectUserChoices() {
         select<{ value: PackageManager; label: string }[], PackageManager>({
           message: 'Select a package manager:',
           options: [
-            { value: 'npm' as const, label: 'npm' },
-            { value: 'pnpm' as const, label: 'pnpm' },
-            { value: 'bun' as const, label: 'bun' },
+            { value: 'npm', label: 'npm' },
+            { value: 'pnpm', label: 'pnpm' },
+            { value: 'bun', label: 'bun' },
           ],
           initialValue: 'npm',
         }),
@@ -105,7 +105,7 @@ export async function collectUserChoices() {
     }
   );
 
-  return project;
+  return project as ProjectConfig;
 }
 
 /**

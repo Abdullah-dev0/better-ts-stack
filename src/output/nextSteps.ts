@@ -1,8 +1,3 @@
-/**
- * Next steps generator
- * Generates contextual next steps based on user choices and building results
- */
-
 import { ProjectConfig } from '../types';
 
 /**

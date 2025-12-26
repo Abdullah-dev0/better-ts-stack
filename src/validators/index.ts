@@ -32,13 +32,13 @@ export const projectNameSchema = z
 /**
  * Validates a project name against npm package naming rules
  * @param name - The project name to validate
- * @returns void if valid, or an error message string if invalid
+ * @returns undefined if valid, or an error message string if invalid
  */
-export function validateProjectName(name: string): string | void {
+export function validateProjectName(name: string): string | undefined {
   const result = projectNameSchema.safeParse(name);
 
   if (result.success) {
-    return;
+    return undefined;
   }
 
   // Return the first error message

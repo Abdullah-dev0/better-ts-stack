@@ -1,10 +1,25 @@
 {
   "name": "better-ts-stack",
   "version": "1.0.0",
-  "description": "A powerful CLI tool that generates fully configured TypeScript projects with backend, frontend, database integration, Docker support, and more—all through an interactive setup.s",
+  "description": "A powerful CLI tool that generates fully configured TypeScript projects with backend, frontend, database integration, Docker support, and more—all through an interactive setup.",
   "main": "dist/index.js",
   "bin": {
     "create-ts-stack": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "templates"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Abdullah-dev0/better-ts-stack"
+  },
+  "homepage": "https://github.com/Abdullah-dev0/better-ts-stack#readme",
+  "bugs": {
+    "url": "https://github.com/Abdullah-dev0/better-ts-stack/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "scripts": {
     "dev": "tsx  src/index.ts",
@@ -27,10 +42,10 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@clack/prompts": "^0.11.0",
     "consola": "^3.2.3",
     "fs-extra": "^11.1.1",
     "handlebars": "^4.7.8",
-    "@clack/prompts": "^0.7.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {

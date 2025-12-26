@@ -4,13 +4,7 @@
 
 import { intro, text, select, confirm, isCancel, cancel, group } from '@clack/prompts';
 import consola from 'consola';
-import {
-  ProjectConfig,
-  applicationTypes,
-  DatabaseOption,
-  PackageManager,
-  BackendFramework,
-} from '../types';
+import { ProjectConfig, ApplicationType, DatabaseOption, BackendFramework, PackageManager } from '../types';
 import { validateProjectName } from '../validators';
 
 // Type-safe option definitions
@@ -47,54 +41,60 @@ const authOptions = [
  * @param cwd - Current working directory (defaults to process.cwd())
  * @returns Promise resolving to ProjectConfig object with all selections
  */
-export async function collectUserChoices(): Promise<ProjectConfig> {
+export async function collectUserChoices() {
   intro('🚀 better-ts-stack');
 
   const project = await group(
     {
-      applicationType: async (): Promise<applicationTypes> => {
-        // eslint-disable-next-line
-        while (true) {
-          const selection = await select({
+      applicationType: async () => {
+        let selection: ApplicationType | undefined;
+
+        while (!selection) {
+          const result = await select<ApplicationType>({
             message: 'Application type:',
             options: applicationTypeOptions,
-            initialValue: 'backend' as const,
+            initialValue: 'backend',
           });
 
-          if (isCancel(selection)) {
+          if (isCancel(result)) {
             cancel('Operation cancelled.');
             process.exit(0);
           }
 
-          if (selection === 'frontend') {
+          if (result === 'frontend') {
             consola.warn('Frontend is coming soon! Please select Backend for now.');
             continue;
           }
 
-          return selection;
+          selection = result;
         }
+
+        return selection;
       },
-      framework: async (): Promise<BackendFramework> => {
-        // eslint-disable-next-line
-        while (true) {
-          const selection = await select({
+      framework: async () => {
+        let selection: BackendFramework | undefined;
+
+        while (!selection) {
+          const result = await select<BackendFramework>({
             message: 'Select a backend framework:',
             options: frameworkOptions,
-            initialValue: 'express' as const,
+            initialValue: 'express',
           });
 
-          if (isCancel(selection)) {
+          if (isCancel(result)) {
             cancel('Operation cancelled.');
             process.exit(0);
           }
 
-          if (selection === 'hono' || selection === 'nest') {
+          if (result === 'hono' || result === 'nest') {
             consola.warn('This framework is coming soon! Please select another option.');
             continue;
           }
 
-          return selection;
+          selection = result;
         }
+
+        return selection;
       },
       projectName: () =>
         text({
@@ -103,11 +103,11 @@ export async function collectUserChoices(): Promise<ProjectConfig> {
           validate: (value) => validateProjectName(value),
         }),
 
-      database: async (): Promise<DatabaseOption> => {
-        const selection = await select({
+      database: async () => {
+        const selection = await select<DatabaseOption>({
           message: 'How would you like to interact with the database?',
           options: databaseOptions,
-          initialValue: 'none' as const,
+          initialValue: 'none',
         });
 
         if (isCancel(selection)) {
@@ -117,11 +117,11 @@ export async function collectUserChoices(): Promise<ProjectConfig> {
 
         return selection;
       },
-      packageManager: async (): Promise<PackageManager> => {
-        const selection = await select({
+      packageManager: async () => {
+        const selection = await select<PackageManager>({
           message: 'Select a package manager:',
           options: packageManagerOptions,
-          initialValue: 'npm' as const,
+          initialValue: 'npm',
         });
 
         if (isCancel(selection)) {
@@ -136,27 +136,23 @@ export async function collectUserChoices(): Promise<ProjectConfig> {
           message: 'Use Docker?',
           initialValue: false,
         }),
-      useAuth: async (): Promise<boolean> => {
-        // eslint-disable-next-line
-        while (true) {
-          const selection = await select({
-            message: 'Add authentication?',
-            options: authOptions,
-            initialValue: false as const,
-          });
+      useAuth: async () => {
+        const selection = await select({
+          message: 'Add authentication?',
+          options: authOptions,
+          initialValue: false,
+        });
 
-          if (isCancel(selection)) {
-            cancel('Operation cancelled.');
-            process.exit(0);
-          }
-
-          if (selection === true) {
-            consola.warn('Authentication is coming soon! Please select No for now.');
-            continue;
-          }
-
-          return selection;
+        if (isCancel(selection)) {
+          cancel('Operation cancelled.');
+          process.exit(0);
         }
+
+        if (selection === true) {
+          consola.warn('Authentication is coming soon!');
+        }
+
+        return selection;
       },
       initGit: () =>
         confirm({
@@ -177,7 +173,7 @@ export async function collectUserChoices(): Promise<ProjectConfig> {
     }
   );
 
-  return project as ProjectConfig;
+  return project;
 }
 
 /**

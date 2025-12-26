@@ -10,7 +10,8 @@ function isGitAvailable(): boolean {
   try {
     execSync('git --version', { stdio: 'ignore' });
     return true;
-  } catch (error) {
+  } catch {
+    consola.warn('Git is not installed or not available in PATH');
     return false;
   }
 }
@@ -31,9 +32,8 @@ function initGit(cwd: string): boolean {
 
     consola.success('Git repository initialized');
     return true;
-  } catch (error) {
+  } catch {
     consola.warn('Failed to initialize git repository');
-    consola.debug(`Error: ${error instanceof Error ? error.message : String(error)}`);
     return false;
   }
 }

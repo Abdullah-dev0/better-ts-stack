@@ -2,7 +2,7 @@ import consola from 'consola';
 import fs from 'fs-extra';
 import { getModule } from '../modules/registry';
 import { generateNextSteps } from '../output/nextSteps';
-import { Module, ProjectConfig, createBuildError, isBuildError } from '../types';
+import { Module, ProjectConfig, BuildResult, createBuildError, isBuildError } from '../types';
 import { validateDirectoryEmpty } from '../validators';
 import { generateEnvFile, generatePackageJson, mergeConfigurations } from './configGenerator';
 import { installDependencies } from './dependencyInstaller';
@@ -17,7 +17,7 @@ import { buildTemplateContext } from './templateContext';
  * @param config - Project configuration from prompts
  * @returns Promise resolving to build result with success status and next steps
  */
-export async function build(config: ProjectConfig, targetDir: string) {
+export async function build(config: ProjectConfig, targetDir: string): Promise<BuildResult> {
   const absoluteTargetDir = targetDir;
 
   consola.start('Starting project building...');
@@ -154,7 +154,7 @@ export async function build(config: ProjectConfig, targetDir: string) {
     if (config.installDeps) {
       try {
         depsInstalled = installDependencies(config.packageManager, absoluteTargetDir);
-      } catch (error) {
+      } catch {
         // Dependency installation errors are already handled in installDependencies
         // Just log and continue
         consola.warn('Continuing with building despite dependency installation issues');
@@ -165,7 +165,7 @@ export async function build(config: ProjectConfig, targetDir: string) {
     if (config.initGit) {
       try {
         initializeGitRepository(absoluteTargetDir);
-      } catch (error) {
+      } catch {
         // Git initialization errors are already handled in initializeGitRepository
         // Just log and continue
         consola.warn('Continuing with building despite git initialization issues');

@@ -6,13 +6,12 @@
  * Available package managers
  */
 export type PackageManager = 'npm' | 'pnpm' | 'bun';
-
 /**
  * Available database options
  */
 export type DatabaseOption = 'none' | 'prisma' | 'mongoose';
 
-export type applicationTypes = 'frontend' | 'backend';
+export type ApplicationType = 'frontend' | 'backend';
 
 /**
  * Module type classification
@@ -48,7 +47,7 @@ export type Framework = BackendFramework | FrontendFramework;
 export interface ProjectConfig {
   // Project basics
   projectName: string;
-  applicationType: applicationTypes;
+  applicationType: ApplicationType;
   framework: Framework;
   database: DatabaseOption;
   useDocker: boolean;

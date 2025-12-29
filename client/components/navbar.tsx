@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import { Github, Moon, Sun, Menu, X, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { NAVBAR_CONFIG } from "@/lib/constants";
+import { MotionDiv, MotionHeader } from "./motion";
 
 export const Navbar = () => {
 	const [scrolled, setScrolled] = useState(false);
@@ -22,7 +23,7 @@ export const Navbar = () => {
 	}, [isDark]);
 
 	return (
-		<motion.header
+		<MotionHeader
 			initial={{ y: -20, opacity: 0 }}
 			animate={{ y: 0, opacity: 1 }}
 			transition={{ duration: 0.4 }}
@@ -33,9 +34,9 @@ export const Navbar = () => {
 			<div className="bg-primary/10 border-b border-primary/20 py-1.5 px-4 text-center">
 				<span className="text-xs md:text-sm font-medium text-foreground/80 flex items-center justify-center gap-2">
 					<Zap className="w-3.5 h-3.5 text-primary" />
-					<span>Built by developers who hate boilerplate</span>
+					<span>{NAVBAR_CONFIG.banner.text}</span>
 					<span className="hidden md:inline text-muted-foreground">•</span>
-					<span className="hidden md:inline text-primary font-semibold">Ship faster, type safer</span>
+					<span className="hidden md:inline text-primary font-semibold">{NAVBAR_CONFIG.banner.tagline}</span>
 				</span>
 			</div>
 
@@ -43,27 +44,24 @@ export const Navbar = () => {
 				{/* Logo */}
 				<Link href="/" className="flex items-center gap-2">
 					<div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-						<span className="text-primary-foreground font-bold text-sm font-mono">TS</span>
+						<span className="text-primary-foreground font-bold text-sm font-mono">{NAVBAR_CONFIG.brand.logo}</span>
 					</div>
-					<span className="font-semibold text-foreground">better-ts-stack</span>
+					<span className="font-semibold text-foreground">{NAVBAR_CONFIG.brand.name}</span>
 				</Link>
 
 				{/* Desktop Nav */}
 				<div className="hidden md:flex items-center gap-8">
-					<a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-						Modules
-					</a>
-					<a href="#architecture" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-						Architecture
-					</a>
-					<a
-						href="https://github.com/abdullah-dev0"
-						target="_blank"
-						rel="noopener noreferrer"
-						className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5">
-						<Github className="w-4 h-4" />
-						GitHub
-					</a>
+					{NAVBAR_CONFIG.links.map((link, i) => (
+						<a
+							key={i}
+							href={link.href}
+							target={link.external ? "_blank" : undefined}
+							rel={link.external ? "noopener noreferrer" : undefined}
+							className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5">
+							{link.label === "GitHub" && <Github className="w-4 h-4" />}
+							{link.label}
+						</a>
+					))}
 				</div>
 
 				{/* Actions */}
@@ -73,7 +71,7 @@ export const Navbar = () => {
 					</Button>
 
 					<Button variant="default" size="sm" className="hidden md:flex btn-depth">
-						Get Started
+						{NAVBAR_CONFIG.cta.text}
 					</Button>
 
 					{/* Mobile Menu Toggle */}
@@ -85,29 +83,28 @@ export const Navbar = () => {
 
 			{/* Mobile Menu */}
 			{mobileOpen && (
-				<motion.div
+				<MotionDiv
 					initial={{ opacity: 0, y: -10 }}
 					animate={{ opacity: 1, y: 0 }}
 					className="md:hidden bg-background/95 backdrop-blur-lg border-b border-border">
 					<div className="container px-6 py-4 flex flex-col gap-4">
-						<a href="#features" className="text-sm text-muted-foreground hover:text-foreground py-2">
-							Modules
-						</a>
-						<a href="#architecture" className="text-sm text-muted-foreground hover:text-foreground py-2">
-							Architecture
-						</a>
-						<a
-							href="https://github.com/abdullah-dev0"
-							className="text-sm text-muted-foreground hover:text-foreground py-2 flex items-center gap-1.5">
-							<Github className="w-4 h-4" />
-							GitHub
-						</a>
+						{NAVBAR_CONFIG.links.map((link, i) => (
+							<a
+								key={i}
+								href={link.href}
+								target={link.external ? "_blank" : undefined}
+								rel={link.external ? "noopener noreferrer" : undefined}
+								className="text-sm text-muted-foreground hover:text-foreground py-2 flex items-center gap-1.5">
+								{link.label === "GitHub" && <Github className="w-4 h-4" />}
+								{link.label}
+							</a>
+						))}
 						<Button variant="default" size="sm" className="w-full mt-2 btn-depth">
-							Get Started
+							{NAVBAR_CONFIG.cta.text}
 						</Button>
 					</div>
-				</motion.div>
+				</MotionDiv>
 			)}
-		</motion.header>
+		</MotionHeader>
 	);
 };

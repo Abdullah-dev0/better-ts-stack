@@ -1,14 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import { Copy, Check, Terminal } from "lucide-react";
+import { TERMINAL_CONFIG } from "@/lib/constants";
+import { MotionDiv, MotionSpan, FadeInUp } from "./motion";
 
 export const TerminalPreview = () => {
 	const [copied, setCopied] = useState(false);
 	const [typingComplete, setTypingComplete] = useState(false);
 	const [displayedText, setDisplayedText] = useState("");
-	const command = "npx ts-better-stack@latest init";
+	const command = TERMINAL_CONFIG.command;
 
 	useEffect(() => {
 		let currentIndex = 0;
@@ -20,9 +21,9 @@ export const TerminalPreview = () => {
 				clearInterval(typingInterval);
 				setTypingComplete(true);
 			}
-		}, 80);
+		}, TERMINAL_CONFIG.typingSpeed);
 		return () => clearInterval(typingInterval);
-	}, []);
+	}, [command]);
 
 	const handleCopy = async () => {
 		await navigator.clipboard.writeText(command);
@@ -31,11 +32,7 @@ export const TerminalPreview = () => {
 	};
 
 	return (
-		<motion.div
-			initial={{ opacity: 0, y: 30 }}
-			animate={{ opacity: 1, y: 0 }}
-			transition={{ duration: 0.6, delay: 0.3 }}
-			className="relative w-full max-w-2xl mx-auto">
+		<FadeInUp delay={0.3} duration={0.6} className="relative w-full max-w-2xl mx-auto">
 			{/* Terminal container */}
 			<div className="relative glass-panel terminal-glow rounded-xl overflow-hidden">
 				{/* Terminal header */}
@@ -57,7 +54,7 @@ export const TerminalPreview = () => {
 						<span className="text-primary font-mono text-sm">❯</span>
 						<div className="flex-1">
 							<span className="text-terminal-text font-mono text-sm">{displayedText}</span>
-							<motion.span
+							<MotionSpan
 								animate={{ opacity: [1, 0, 1] }}
 								transition={{ duration: 1, repeat: Infinity }}
 								className="inline-block w-2 h-4 bg-terminal-text ml-0.5 align-middle"
@@ -67,22 +64,22 @@ export const TerminalPreview = () => {
 
 					{/* Output lines */}
 					{typingComplete && (
-						<motion.div
+						<MotionDiv
 							initial={{ opacity: 0 }}
 							animate={{ opacity: 1 }}
 							transition={{ duration: 0.4 }}
 							className="mt-4 space-y-1">
-							<p className="text-muted-foreground font-mono text-xs">
-								<span className="text-primary">✓</span> Scaffolding your type-safe project...
-							</p>
-							<p className="text-muted-foreground font-mono text-xs">
-								<span className="text-primary">✓</span> TypeScript + Prisma + MongoDB configured
-							</p>
-							<p className="text-muted-foreground font-mono text-xs">
-								<span className="text-primary">✓</span> Docker compose ready
-							</p>
-							<p className="text-primary font-mono text-xs mt-2">→ Done in 2.4s. Run `cd my-app && npm run dev`</p>
-						</motion.div>
+							{TERMINAL_CONFIG.output.map((line, i) => {
+								const isLast = i === TERMINAL_CONFIG.output.length - 1;
+								return (
+									<p
+										key={i}
+										className={`font-mono text-xs ${isLast ? "mt-2 " : ""}${isLast ? "text-primary" : "text-muted-foreground"}`}>
+										<span className={line.color}>{line.icon}</span> {line.text}
+									</p>
+								);
+							})}
+						</MotionDiv>
 					)}
 				</div>
 
@@ -97,6 +94,6 @@ export const TerminalPreview = () => {
 					)}
 				</button>
 			</div>
-		</motion.div>
+		</FadeInUp>
 	);
 };

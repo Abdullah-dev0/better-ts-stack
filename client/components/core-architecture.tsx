@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { Database, Layout, AlertTriangle, CheckCircle, XCircle, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { CORE_ARCHITECTURE_CONFIG } from "@/lib/constants";
 
 export function CoreArchitecture() {
 	return (
@@ -21,34 +22,38 @@ export function CoreArchitecture() {
 					<div className="flex-1 space-y-8">
 						<div>
 							<div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-xs font-medium text-zinc-400 mb-6">
-								<div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-								Core Architecture
+								{CORE_ARCHITECTURE_CONFIG.badge.indicator && (
+									<div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+								)}
+								{CORE_ARCHITECTURE_CONFIG.badge.text}
 							</div>
 							<h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-6">
-								Stop guessing. <br />
-								<span className="text-emerald-400">Start knowing.</span>
+								{CORE_ARCHITECTURE_CONFIG.title.main} <br />
+								<span className="text-emerald-400">{CORE_ARCHITECTURE_CONFIG.title.accent}</span>
 							</h2>
-							<p className="text-lg text-zinc-400 leading-relaxed">
-								Built on the principles of correctness and performance. ts-better-stack isn&apos;t just a starter
-								template; it&apos;s a philosophy.
-							</p>
+							<p className="text-lg text-zinc-400 leading-relaxed">{CORE_ARCHITECTURE_CONFIG.description}</p>
 						</div>
 
 						<div className="space-y-6">
-							<p className="text-zinc-400">
-								Traditional API layers break the type chain. ts-better-stack preserves it. If you change a column name
-								in your database, your frontend build fails immediately. No more runtime surprises.
-							</p>
+							<p className="text-zinc-400">{CORE_ARCHITECTURE_CONFIG.details}</p>
 
 							<div className="flex items-center gap-8">
 								<div className="flex flex-col">
-									<span className="text-3xl font-bold text-white mb-1">0</span>
-									<span className="text-xs uppercase tracking-wider text-zinc-500">Runtime Errors</span>
+									<span className="text-3xl font-bold text-white mb-1">
+										{CORE_ARCHITECTURE_CONFIG.stats.runtimeErrors.value}
+									</span>
+									<span className="text-xs uppercase tracking-wider text-zinc-500">
+										{CORE_ARCHITECTURE_CONFIG.stats.runtimeErrors.label}
+									</span>
 								</div>
 								<div className="w-px h-12 bg-zinc-800" />
 								<div className="flex flex-col">
-									<span className="text-3xl font-bold text-emerald-400 mb-1">100%</span>
-									<span className="text-xs uppercase tracking-wider text-zinc-500">Compile-time Safety</span>
+									<span className="text-3xl font-bold text-emerald-400 mb-1">
+										{CORE_ARCHITECTURE_CONFIG.stats.compileTimeSafety.value}
+									</span>
+									<span className="text-xs uppercase tracking-wider text-zinc-500">
+										{CORE_ARCHITECTURE_CONFIG.stats.compileTimeSafety.label}
+									</span>
 								</div>
 							</div>
 						</div>
@@ -106,7 +111,7 @@ function InteractiveSim() {
 	return (
 		<div className="bg-zinc-950 border border-zinc-800 rounded-2xl overflow-hidden shadow-2xl">
 			{/* Controls */}
-			<div className="flex items-center justify-between p-4 border-b border-zinc-800 bg-zinc-900/50">
+				<div className="flex items-center justify-between p-4 border-b border-zinc-800 bg-zinc-900/50">
 				<div className="flex items-center gap-2 bg-black/50 p-1 rounded-lg border border-zinc-800">
 					<button
 						onClick={() => {
@@ -117,7 +122,7 @@ function InteractiveSim() {
 							"px-3 py-1.5 text-xs font-medium rounded-md transition-colors",
 							mode === "legacy" ? "bg-zinc-800 text-white" : "text-zinc-500 hover:text-zinc-300",
 						)}>
-						Traditional
+						{CORE_ARCHITECTURE_CONFIG.simulation.modes.legacy}
 					</button>
 					<button
 						onClick={() => {
@@ -128,7 +133,7 @@ function InteractiveSim() {
 							"px-3 py-1.5 text-xs font-medium rounded-md transition-colors",
 							mode === "nexus" ? "bg-emerald-500/20 text-emerald-400" : "text-zinc-500 hover:text-zinc-300",
 						)}>
-						ts-better-stack
+						{CORE_ARCHITECTURE_CONFIG.simulation.modes.nexus}
 					</button>
 				</div>
 				<Button variant="ghost" size="icon" onClick={handleReset} title="Reset">
@@ -189,8 +194,8 @@ function InteractiveSim() {
 				{/* Simulation Actions */}
 				<div className="mt-8 p-4 bg-zinc-900/30 rounded-xl border border-zinc-800/50 flex flex-col gap-4">
 					<div className="flex items-center justify-between text-xs text-zinc-500">
-						<span>Action</span>
-						<span>Result</span>
+						<span>{CORE_ARCHITECTURE_CONFIG.simulation.labels.action}</span>
+						<span>{CORE_ARCHITECTURE_CONFIG.simulation.labels.result}</span>
 					</div>
 
 					<div className="flex gap-2">
@@ -200,7 +205,7 @@ function InteractiveSim() {
 							className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white border-zinc-700"
 							onClick={handleUpdateColumn}
 							disabled={dbState === "changed"}>
-							Rename Column (migrate)
+							{CORE_ARCHITECTURE_CONFIG.simulation.actions.renameColumn}
 						</Button>
 					</div>
 
@@ -208,7 +213,9 @@ function InteractiveSim() {
 
 					<div className="flex items-center justify-between">
 						<div className="text-sm font-medium text-white">
-							{mode === "legacy" ? "Runtime Status" : "Build Status"}
+							{mode === "legacy"
+								? CORE_ARCHITECTURE_CONFIG.simulation.labels.runtimeStatus
+								: CORE_ARCHITECTURE_CONFIG.simulation.labels.buildStatus}
 						</div>
 						<AnimatePresence mode="wait">
 							{mode === "nexus" ? (
@@ -219,7 +226,7 @@ function InteractiveSim() {
 										animate={{ opacity: 1, x: 0 }}
 										className="flex items-center gap-2 text-red-400 text-sm">
 										<XCircle size={16} />
-										<span>Build Failed</span>
+										<span>{CORE_ARCHITECTURE_CONFIG.simulation.status.buildFailed}</span>
 									</motion.div>
 								) : (
 									<motion.div
@@ -228,7 +235,7 @@ function InteractiveSim() {
 										animate={{ opacity: 1, x: 0 }}
 										className="flex items-center gap-2 text-emerald-400 text-sm">
 										<CheckCircle size={16} />
-										<span>Type-Safe</span>
+										<span>{CORE_ARCHITECTURE_CONFIG.simulation.status.typeSafe}</span>
 									</motion.div>
 								)
 							) : // Legacy Mode
@@ -239,11 +246,13 @@ function InteractiveSim() {
 									animate={{ opacity: 1, x: 0 }}
 									className="flex items-center gap-2 text-red-400 text-sm">
 									<AlertTriangle size={16} />
-									<span>Runtime Crash</span>
+									<span>{CORE_ARCHITECTURE_CONFIG.simulation.status.runtimeCrash}</span>
 								</motion.div>
 							) : (
 								<div className="text-zinc-500 text-sm italic">
-									{status === "idle" && dbState === "changed" ? "Waiting for request..." : "App Running"}
+									{status === "idle" && dbState === "changed"
+										? CORE_ARCHITECTURE_CONFIG.simulation.status.waiting
+										: CORE_ARCHITECTURE_CONFIG.simulation.status.appRunning}
 								</div>
 							)}
 						</AnimatePresence>
@@ -251,7 +260,9 @@ function InteractiveSim() {
 
 					{mode === "legacy" && dbState === "changed" && status === "idle" && (
 						<Button onClick={handleRun} disabled={isRunning} className="w-full" size="sm" variant="default">
-							{isRunning ? "Running..." : "Simulate User Request"}
+							{isRunning
+								? CORE_ARCHITECTURE_CONFIG.simulation.actions.running
+								: CORE_ARCHITECTURE_CONFIG.simulation.actions.simulateRequest}
 						</Button>
 					)}
 				</div>

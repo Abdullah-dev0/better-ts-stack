@@ -3,6 +3,7 @@
 import * as React from "react";
 import { motion, useScroll, useMotionValueEvent } from "motion/react";
 import { Button } from "./ui/button";
+import { MOBILE_CTA_CONFIG } from "@/lib/constants";
 
 export function MobileCTA() {
   const { scrollY } = useScroll();
@@ -26,7 +27,7 @@ export function MobileCTA() {
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
     >
       <Button variant="default" size="lg" className="w-full">
-        Get Started
+        {MOBILE_CTA_CONFIG.buttonText}
       </Button>
     </motion.div>
   );

@@ -1,19 +1,14 @@
 "use client";
 
 import { motion } from "motion/react";
-
-const stats = [
-	{ label: "Type-Latencies", value: "0ms" },
-	{ label: "Lighthouse Score", value: "100/100" },
-	{ label: "Bundle Overhead", value: "2.4kb" },
-];
+import { STATS } from "@/lib/constants";
 
 export function Stats() {
 	return (
 		<section className="bg-white dark:bg-zinc-950 border-y border-zinc-200 dark:border-zinc-800">
 			<div className="container mx-auto px-4">
 				<div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-zinc-200 dark:divide-zinc-800">
-					{stats.map((stat, i) => (
+					{STATS.map((stat, i) => (
 						<motion.div
 							key={i}
 							initial={{ opacity: 0, y: 10 }}

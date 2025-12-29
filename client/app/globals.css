@@ -1,26 +1,209 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@theme {
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  /* Module colors for component usage */
+  --color-module-frontend: hsl(var(--module-frontend));
+  --color-module-backend: hsl(var(--module-backend));
+  --color-module-database: hsl(var(--module-database));
+  --color-module-coming: hsl(var(--module-coming));
+  
+  /* Terminal colors */
+  --color-terminal-bg: hsl(var(--terminal-bg));
+  --color-terminal-text: hsl(var(--terminal-text));
+  --color-glow-green: hsl(var(--glow-green));
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+
+  @keyframes accordion-down {
+    from { height: 0 }
+    to { height: var(--radix-accordion-content-height) }
+  }
+  @keyframes accordion-up {
+    from { height: var(--radix-accordion-content-height) }
+    to { height: 0 }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+:root {
+  /* Deep warm background - Light Theme */
+  --background: 30 15% 97%;
+  --foreground: 240 10% 6%;
+  
+  --card: 30 10% 99%;
+  --card-foreground: 240 10% 6%;
+  
+  --popover: 30 10% 99%;
+  --popover-foreground: 240 10% 6%;
+  
+  /* Correctness Green - Primary Accent */
+  --primary: 160 84% 39%;
+  --primary-foreground: 0 0% 100%;
+  
+  /* Secondary - Warm Stone */
+  --secondary: 30 10% 94%;
+  --secondary-foreground: 240 6% 10%;
+  
+  --muted: 30 10% 94%;
+  --muted-foreground: 240 4% 46%;
+  
+  --accent: 30 10% 94%;
+  --accent-foreground: 240 6% 10%;
+  
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 98%;
+  
+  --border: 30 10% 88%;
+  --input: 30 10% 88%;
+  --ring: 160 84% 39%;
+  
+  --radius: 0.75rem;
+  
+  /* Custom Design Tokens */
+  --glow-green: 160 84% 39%;
+  --terminal-bg: 240 10% 4%;
+  --terminal-text: 160 84% 65%;
+  
+  /* Module colors */
+  --module-frontend: 200 95% 48%;
+  --module-backend: 270 80% 55%;
+  --module-database: 35 95% 55%;
+  --module-coming: 340 75% 55%;
+}
+
+.dark {
+  /* Midnight Deep - Dark Theme */
+  --background: 240 15% 6%;
+  --foreground: 30 10% 95%;
+  
+  --card: 240 12% 9%;
+  --card-foreground: 30 10% 95%;
+  
+  --popover: 240 12% 9%;
+  --popover-foreground: 30 10% 95%;
+  
+  --primary: 160 84% 45%;
+  --primary-foreground: 240 10% 4%;
+  
+  --secondary: 240 8% 14%;
+  --secondary-foreground: 30 10% 95%;
+  
+  --muted: 240 8% 14%;
+  --muted-foreground: 240 5% 60%;
+  
+  --accent: 240 8% 14%;
+  --accent-foreground: 30 10% 95%;
+  
+  --destructive: 0 62% 30%;
+  --destructive-foreground: 0 0% 98%;
+  
+  --border: 240 8% 16%;
+  --input: 240 8% 16%;
+  --ring: 160 84% 45%;
+  
+  --terminal-bg: 240 12% 8%;
+  --terminal-text: 160 84% 65%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply bg-card/80 backdrop-blur-xl border border-border/50 shadow-lg;
+  }
+  
+  .glow-border {
+    @apply relative overflow-hidden;
+  }
+  
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70;
+  }
+  
+  .btn-depth {
+    @apply transition-all duration-150 active:scale-[0.98] active:shadow-inner;
+  }
+  
+  .terminal-glow {
+    box-shadow: 0 0 0 1px hsl(var(--border));
+  }
+  
+  .module-glow-frontend {
+    box-shadow: 0 0 60px -15px hsl(var(--module-frontend) / 0.3);
+  }
+  
+  .module-glow-backend {
+    box-shadow: 0 0 60px -15px hsl(var(--module-backend) / 0.3);
+  }
+  
+  .module-glow-database {
+    box-shadow: 0 0 60px -15px hsl(var(--module-database) / 0.3);
+  }
+}
+
+@layer utilities {
+  .bg-grid {
+    background-size: 60px 60px;
+    background-image: 
+      linear-gradient(to right, hsl(var(--border) / 0.4) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--border) / 0.4) 1px, transparent 1px);
+  }
+  
+  .bg-dots {
+    background-image: radial-gradient(hsl(var(--border)) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  
+  .bg-gradient-radial {
+    background: radial-gradient(ellipse 80% 50% at 50% -20%, hsl(var(--primary) / 0.03), transparent);
+  }
 }

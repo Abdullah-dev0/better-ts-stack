@@ -12,7 +12,7 @@ export function Footer() {
 				</h1>
 			</div>
 
-			<div className="container mx-auto px-6 py-7">
+			<div className="container mx-auto px-6 py-12">
 				<div className="grid grid-cols-1 md:grid-cols-4 gap-10">
 					{/* Brand Column */}
 					<div className="space-y-4">

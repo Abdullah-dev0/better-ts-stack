@@ -3,17 +3,16 @@
 import { cn } from "@/lib/utils";
 import { motion, useMotionTemplate, useMotionValue } from "framer-motion";
 import {
-	Server,
-	Database,
 	Box,
 	Container,
+	Database,
 	Layout,
+	Server,
 	Shield,
 	Zap,
 	type LucideIcon,
 } from "lucide-react";
 import { MouseEvent } from "react";
-import type { Feature } from "@/lib/constants";
 
 // Icon map for string to component conversion
 const iconMap: Record<string, LucideIcon> = {

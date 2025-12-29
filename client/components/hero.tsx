@@ -1,8 +1,8 @@
-import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { TerminalPreview } from "./terminal-preview";
 import { HERO_CONFIG } from "@/lib/constants";
-import { FloatingOrb, FadeInUp, FadeIn } from "./motion";
+import { ArrowRight, Sparkles } from "lucide-react";
+import { FadeInUp, FloatingOrb } from "./motion";
+import { TerminalPreview } from "./terminal-preview";
 
 export const HeroSection = () => {
 	return (

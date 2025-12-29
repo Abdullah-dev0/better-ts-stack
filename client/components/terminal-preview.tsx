@@ -1,29 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Copy, Check, Terminal } from "lucide-react";
 import { TERMINAL_CONFIG } from "@/lib/constants";
-import { MotionDiv, MotionSpan, FadeInUp } from "./motion";
 
 export const TerminalPreview = () => {
 	const [copied, setCopied] = useState(false);
-	const [typingComplete, setTypingComplete] = useState(false);
-	const [displayedText, setDisplayedText] = useState("");
 	const command = TERMINAL_CONFIG.command;
-
-	useEffect(() => {
-		let currentIndex = 0;
-		const typingInterval = setInterval(() => {
-			if (currentIndex <= command.length) {
-				setDisplayedText(command.slice(0, currentIndex));
-				currentIndex++;
-			} else {
-				clearInterval(typingInterval);
-				setTypingComplete(true);
-			}
-		}, TERMINAL_CONFIG.typingSpeed);
-		return () => clearInterval(typingInterval);
-	}, [command]);
 
 	const handleCopy = async () => {
 		await navigator.clipboard.writeText(command);
@@ -32,7 +15,7 @@ export const TerminalPreview = () => {
 	};
 
 	return (
-		<FadeInUp delay={0.3} duration={0.6} className="relative w-full max-w-2xl mx-auto">
+		<div className="relative w-full max-w-2xl mx-auto">
 			{/* Terminal container */}
 			<div className="relative glass-panel terminal-glow rounded-xl overflow-hidden">
 				{/* Terminal header */}
@@ -53,34 +36,26 @@ export const TerminalPreview = () => {
 					<div className="flex items-center gap-3">
 						<span className="text-primary font-mono text-sm">❯</span>
 						<div className="flex-1">
-							<span className="text-terminal-text font-mono text-sm">{displayedText}</span>
-							<MotionSpan
-								animate={{ opacity: [1, 0, 1] }}
-								transition={{ duration: 1, repeat: Infinity }}
-								className="inline-block w-2 h-4 bg-terminal-text ml-0.5 align-middle"
-							/>
+							<span className="text-terminal-text font-mono text-sm">{command}</span>
+							<span className="inline-block w-2 h-4 bg-terminal-text ml-0.5 align-middle animate-pulse" />
 						</div>
 					</div>
 
 					{/* Output lines */}
-					{typingComplete && (
-						<MotionDiv
-							initial={{ opacity: 0 }}
-							animate={{ opacity: 1 }}
-							transition={{ duration: 0.4 }}
-							className="mt-4 space-y-1">
-							{TERMINAL_CONFIG.output.map((line, i) => {
-								const isLast = i === TERMINAL_CONFIG.output.length - 1;
-								return (
-									<p
-										key={i}
-										className={`font-mono text-xs ${isLast ? "mt-2 " : ""}${isLast ? "text-primary" : "text-muted-foreground"}`}>
-										<span className={line.color}>{line.icon}</span> {line.text}
-									</p>
-								);
-							})}
-						</MotionDiv>
-					)}
+					<div className="mt-4 space-y-1">
+						{TERMINAL_CONFIG.output.map((line, i) => {
+							const isLast = i === TERMINAL_CONFIG.output.length - 1;
+							return (
+								<p
+									key={i}
+									className={`font-mono text-xs ${isLast ? "mt-2 " : ""}${
+										isLast ? "text-primary" : "text-muted-foreground"
+									}`}>
+									<span className={line.color}>{line.icon}</span> {line.text}
+								</p>
+							);
+						})}
+					</div>
 				</div>
 
 				{/* Copy button */}
@@ -94,6 +69,6 @@ export const TerminalPreview = () => {
 					)}
 				</button>
 			</div>
-		</FadeInUp>
+		</div>
 	);
 };

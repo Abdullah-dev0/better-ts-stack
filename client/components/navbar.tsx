@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Github, Moon, Sun, Menu, X, Zap } from "lucide-react";
+import { Github, Menu, Moon, Sun, X, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { NAVBAR_CONFIG } from "@/lib/constants";
@@ -52,15 +52,13 @@ export const Navbar = () => {
 				{/* Desktop Nav */}
 				<div className="hidden md:flex items-center gap-8">
 					{NAVBAR_CONFIG.links.map((link, i) => (
-						<a
+						<Link
 							key={i}
 							href={link.href}
-							target={link.external ? "_blank" : undefined}
-							rel={link.external ? "noopener noreferrer" : undefined}
 							className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5">
 							{link.label === "GitHub" && <Github className="w-4 h-4" />}
 							{link.label}
-						</a>
+						</Link>
 					))}
 				</div>
 
@@ -89,15 +87,13 @@ export const Navbar = () => {
 					className="md:hidden bg-background/95 backdrop-blur-lg border-b border-border">
 					<div className="container px-6 py-4 flex flex-col gap-4">
 						{NAVBAR_CONFIG.links.map((link, i) => (
-							<a
+							<Link
 								key={i}
 								href={link.href}
-								target={link.external ? "_blank" : undefined}
-								rel={link.external ? "noopener noreferrer" : undefined}
 								className="text-sm text-muted-foreground hover:text-foreground py-2 flex items-center gap-1.5">
 								{link.label === "GitHub" && <Github className="w-4 h-4" />}
 								{link.label}
-							</a>
+							</Link>
 						))}
 						<Button variant="default" size="sm" className="w-full mt-2 btn-depth">
 							{NAVBAR_CONFIG.cta.text}

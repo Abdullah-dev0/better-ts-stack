@@ -1,5 +1,5 @@
 import { ARCHITECTURE_FEATURES, ARCHITECTURE_SECTION } from "@/lib/constants";
-import { FeatureCard } from "./architecture-grid-client";
+import { FeatureCard } from "./FeatureCard";
 
 export function ArchitectureGrid() {
 	return (

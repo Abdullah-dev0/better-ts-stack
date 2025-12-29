@@ -24,10 +24,10 @@ export const Navbar = () => {
 
 	return (
 		<MotionHeader
-			initial={{ y: -20, opacity: 0 }}
-			animate={{ y: 0, opacity: 1 }}
-			transition={{ duration: 0.4 }}
-			className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+			initial={{ opacity: 0 }}
+			animate={{ opacity: 1 }}
+			transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+			className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 ${
 				scrolled ? "bg-background/80 backdrop-blur-md border-b border-border/50" : "bg-transparent"
 			}`}>
 			{/* Spicy tagline banner */}
@@ -84,6 +84,7 @@ export const Navbar = () => {
 				<MotionDiv
 					initial={{ opacity: 0, y: -10 }}
 					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
 					className="md:hidden bg-background/95 backdrop-blur-lg border-b border-border">
 					<div className="container px-6 py-4 flex flex-col gap-4">
 						{NAVBAR_CONFIG.links.map((link, i) => (

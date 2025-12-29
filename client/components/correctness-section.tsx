@@ -1,7 +1,7 @@
-import { Check, Database, Code2, X } from "lucide-react";
-import { STACK_ITEMS, CORRECTNESS_FEATURE_CARDS, CORRECTNESS_SECTION } from "@/lib/constants";
-import { FloatingIcon, FadeIn } from "./motion";
-import { StackItemCard, FeatureCardComponent } from "./correctness-section-client";
+import { CORRECTNESS_FEATURE_CARDS, CORRECTNESS_SECTION, STACK_ITEMS } from "@/lib/constants";
+import { Check, Code2, Database, GitBranch, Layers, X } from "lucide-react";
+import { FeatureCardComponent, StackItemCard } from "./correctness-section-client";
+import { FadeIn, FloatingIcon } from "./motion";
 
 export function CorrectnessSection() {
 	return (
@@ -9,21 +9,22 @@ export function CorrectnessSection() {
 			{/* Background pattern */}
 			<div className="absolute inset-0 bg-grid opacity-30" />
 
-			{/* Floating animated icon - top left */}
+			{/* Floating animated icons - Reduced */}
+			{/* Top left */}
 			<FloatingIcon
 				duration={5}
 				yRange={[0, -15, 0]}
-				className="absolute left-10 top-20 hidden lg:flex w-10 h-10 rounded-xl bg-card border border-border items-center justify-center text-muted-foreground">
-				<Database size={20} />
+				className="absolute left-10 top-20 hidden lg:flex w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/30 items-center justify-center text-purple-400">
+				<Database size={18} />
 			</FloatingIcon>
 
-			{/* Floating animated icon - top right */}
+			{/* Top right */}
 			<FloatingIcon
 				duration={6}
 				delay={0.5}
 				yRange={[0, 20, 0]}
-				className="absolute right-10 top-20 hidden lg:flex w-10 h-10 rounded-xl bg-card border border-border items-center justify-center text-muted-foreground">
-				<Code2 size={20} />
+				className="absolute right-10 top-20 hidden lg:flex w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/30 items-center justify-center text-blue-400">
+				<Code2 size={18} />
 			</FloatingIcon>
 
 			<div className="container mx-auto px-4 relative z-10">
@@ -89,6 +90,15 @@ export function CorrectnessSection() {
 					))}
 				</div>
 			</div>
+
+			{/* Floating animated icon - Bottom right */}
+			<FloatingIcon
+				duration={5.5}
+				delay={0.8}
+				yRange={[0, 18, 0]}
+				className="absolute right-12 bottom-28 hidden lg:flex w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 items-center justify-center text-emerald-400">
+				<GitBranch size={18} />
+			</FloatingIcon>
 		</section>
 	);
 }

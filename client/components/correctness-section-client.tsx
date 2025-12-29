@@ -13,7 +13,7 @@ import {
 	type LucideIcon,
 } from "lucide-react";
 import { ScrollRevealLeft, ScrollReveal } from "./motion";
-import type { StackItem, FeatureCard } from "@/lib/constants";
+import type { StackItemCardProps, FeatureCardComponentProps } from "./types";
 
 // Icon maps for string to component conversion
 const stackIconMap: Record<string, LucideIcon> = {
@@ -28,10 +28,6 @@ const featureIconMap: Record<string, LucideIcon> = {
 	GitBranch,
 	Zap,
 };
-
-interface StackItemCardProps extends StackItem {
-	delay?: number;
-}
 
 export function StackItemCard({ icon: iconName, label, sub, color, delay = 0 }: StackItemCardProps) {
 	const Icon = stackIconMap[iconName];
@@ -55,10 +51,6 @@ export function StackItemCard({ icon: iconName, label, sub, color, delay = 0 }: 
 			<ArrowRight size={16} className="text-muted-foreground group-hover:text-primary transition-colors" />
 		</ScrollRevealLeft>
 	);
-}
-
-interface FeatureCardComponentProps extends FeatureCard {
-	delay?: number;
 }
 
 export function FeatureCardComponent({ icon: iconName, title, description, delay = 0 }: FeatureCardComponentProps) {

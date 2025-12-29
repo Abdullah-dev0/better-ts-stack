@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { HERO_CONFIG } from "@/lib/constants";
-import { ArrowRight, Sparkles } from "lucide-react";
-import { FadeInUp, FloatingOrb } from "./motion";
+import { ArrowRight, Sparkles, Server, Database, Box } from "lucide-react";
+import { FadeInUp, FloatingOrb, FloatingIcon } from "./motion";
 import { TerminalPreview } from "./terminal-preview";
 
 export const HeroSection = () => {
@@ -26,6 +26,33 @@ export const HeroSection = () => {
 				opacityRange={[0.03, 0.08, 0.03]}
 				className="absolute bottom-1/3 right-1/4 w-64 h-64 bg-muted-foreground/5 rounded-full blur-3xl"
 			/>
+
+			{/* Floating animated icons */}
+			{/* Top left */}
+			<FloatingIcon
+				duration={6}
+				yRange={[0, -20, 0]}
+				className="absolute left-8 top-1/4 hidden lg:flex w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 items-center justify-center text-purple-400">
+				<Server size={20} />
+			</FloatingIcon>
+
+			{/* Top right */}
+			<FloatingIcon
+				duration={7}
+				delay={0.3}
+				yRange={[0, 18, 0]}
+				className="absolute right-8 top-1/3 hidden lg:flex w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/30 items-center justify-center text-blue-400">
+				<Database size={20} />
+			</FloatingIcon>
+
+			{/* Bottom right */}
+			<FloatingIcon
+				duration={6.2}
+				delay={0.6}
+				yRange={[0, 16, 0]}
+				className="absolute right-12 bottom-1/3 hidden lg:flex w-11 h-11 rounded-xl bg-cyan-500/10 border border-cyan-500/30 items-center justify-center text-cyan-400">
+				<Box size={19} />
+			</FloatingIcon>
 
 			<div className="relative z-10 max-w-4xl mx-auto text-center">
 				{/* Badge */}

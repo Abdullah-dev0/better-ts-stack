@@ -13,6 +13,7 @@ import {
 	type LucideIcon,
 } from "lucide-react";
 import { MouseEvent } from "react";
+import type { FeatureCardProps } from "./types";
 
 // Icon map for string to component conversion
 const iconMap: Record<string, LucideIcon> = {
@@ -24,15 +25,6 @@ const iconMap: Record<string, LucideIcon> = {
 	Shield,
 	Zap,
 };
-
-interface FeatureCardProps {
-	icon: string;
-	title: string;
-	description: string;
-	color: string;
-	badge: string | null;
-	size: "normal" | "large";
-}
 
 export function FeatureCard({ icon: iconName, title, description, color, badge, size }: FeatureCardProps) {
 	const Icon = iconMap[iconName];

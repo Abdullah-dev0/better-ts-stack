@@ -1,5 +1,5 @@
 import { CORRECTNESS_FEATURE_CARDS, CORRECTNESS_SECTION, STACK_ITEMS } from "@/lib/constants";
-import { Check, Code2, Database, GitBranch, Layers, X } from "lucide-react";
+import { Check, Code2, Database, GitBranch, X } from "lucide-react";
 import { FeatureCardComponent, StackItemCard } from "./correctness-section-client";
 import { FadeIn, FloatingIcon } from "./motion";
 

@@ -15,7 +15,7 @@ export const MotionHeader = motion.header;
 // Common Animation Components
 // ============================================================================
 
-export const FadeInUp = ({ children, delay = 0, duration = 0.5, className }: BaseAnimationProps): JSX.Element => {
+export const FadeInUp = ({ children, delay = 0, duration = 0.5, className }: BaseAnimationProps) => {
 	return (
 		<MotionDiv
 			initial={{ opacity: 0, y: 20 }}
@@ -27,7 +27,7 @@ export const FadeInUp = ({ children, delay = 0, duration = 0.5, className }: Bas
 	);
 };
 
-export const FadeIn = ({ children, delay = 0, duration = 0.5, className }: BaseAnimationProps): JSX.Element => {
+export const FadeIn = ({ children, delay = 0, duration = 0.5, className }: BaseAnimationProps) => {
 	return (
 		<MotionDiv initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration, delay }} className={className}>
 			{children}
@@ -35,7 +35,7 @@ export const FadeIn = ({ children, delay = 0, duration = 0.5, className }: BaseA
 	);
 };
 
-export const ScrollReveal = ({ children, delay = 0, duration = 0.5, className }: BaseAnimationProps): JSX.Element => {
+export const ScrollReveal = ({ children, delay = 0, duration = 0.5, className }: BaseAnimationProps) => {
 	return (
 		<MotionDiv
 			initial={{ opacity: 0, y: 20 }}
@@ -48,7 +48,7 @@ export const ScrollReveal = ({ children, delay = 0, duration = 0.5, className }:
 	);
 };
 
-export const ScrollRevealLeft = ({ children, delay = 0, duration = 0.5, className }: BaseAnimationProps): JSX.Element => {
+export const ScrollRevealLeft = ({ children, delay = 0, duration = 0.5, className }: BaseAnimationProps) => {
 	return (
 		<MotionDiv
 			initial={{ opacity: 0, x: -20 }}

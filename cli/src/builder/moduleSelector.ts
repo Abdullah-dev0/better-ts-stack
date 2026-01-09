@@ -1,10 +1,7 @@
 import { ProjectConfig } from '../types';
 
 // Determines which base and feature modules to include based on user configuration
-export function selectModules(config: ProjectConfig): {
-  base: string;
-  modules: string[];
-} {
+export function selectModules(config: ProjectConfig) {
   // Select base framework based on application type and framework choice
   const base =
     config.applicationType === 'backend'

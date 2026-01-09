@@ -1,12 +1,6 @@
 import { ProjectConfig } from '../types';
 
-/**
- * Generate next steps based on project configuration
- * Creates a list of commands and instructions for the user to follow
- * @param config - Project configuration
- * @param depsInstalled - Whether dependencies were already installed
- * @returns Array of next step strings
- */
+// Generates a list of instructions for the user to follow after project creation
 export function generateNextSteps(config: ProjectConfig, depsInstalled: boolean): string[] {
   const steps: string[] = [];
 
@@ -38,11 +32,7 @@ export function generateNextSteps(config: ProjectConfig, depsInstalled: boolean)
   return steps;
 }
 
-/**
- * Get the install command for the specified package manager
- * @param packageManager - Package manager to use
- * @returns Install command string
- */
+// Returns the dependency installation command for a package manager
 function getInstallCommand(packageManager: string): string {
   switch (packageManager) {
     case 'npm':
@@ -56,11 +46,7 @@ function getInstallCommand(packageManager: string): string {
   }
 }
 
-/**
- * Get the run command prefix for the specified package manager
- * @param packageManager - Package manager to use
- * @returns Run command prefix string
- */
+// Returns the script execution prefix for a package manager
 function getRunCommand(packageManager: string): string {
   switch (packageManager) {
     case 'npm':
@@ -74,12 +60,7 @@ function getRunCommand(packageManager: string): string {
   }
 }
 
-/**
- * Display success message with next steps
- * @param _projectName - Name of the created project (reserved for future use)
- * @param steps - Array of next step strings
- * @returns Complete formatted message with success banner and next steps
- */
+// Formats the next steps into a success message string
 export function displayNextSteps(_projectName: string, steps: string[]): string {
   const formattedSteps = steps.map((step, index) => `  ${index + 1}. ${step}`).join('\n');
 

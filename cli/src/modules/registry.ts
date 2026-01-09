@@ -1,18 +1,10 @@
-/**
- * Module registry implementation
- * Provides centralized access to all available modules (base, database, features)
- */
+// Module registry for accessing base templates and feature modules
 
 import path from 'path';
 import fs from 'fs-extra';
 import { ModuleConfig, Module, createBuildError } from '../types';
 
-/**
- * Resolve the path to a module directory
- * Supports both base templates (e.g., 'backend/express') and modules (e.g., 'prisma')
- * @param id - Module ID or path (e.g., 'backend/express', 'prisma', 'docker')
- * @returns Absolute path to the module directory
- */
+// Determines the absolute filesystem path for a given module ID
 function resolveModulePath(id: string) {
   // If id contains a slash, it's a base template path like 'backend/express'
   if (id.includes('/')) {
@@ -22,11 +14,7 @@ function resolveModulePath(id: string) {
   return path.join(__dirname, `../../templates/modules/${id}`);
 }
 
-/**
- * Load and parse a module's config.json file
- * @param modulePath - Path to the module directory
- * @returns Promise resolving to the module configuration
- */
+// Reads and parses a module's config.json file
 async function loadModuleConfig(modulePath: string): Promise<ModuleConfig> {
   const configPath = path.join(modulePath, 'config.json');
 
@@ -44,12 +32,7 @@ async function loadModuleConfig(modulePath: string): Promise<ModuleConfig> {
   }
 }
 
-/**
- * Get a module by ID tecnically its a name
- * @param id - Module ID ('express', 'prisma', 'mongoose', 'docker', 'auth')
- * @returns Promise resolving to the module with config and path
- * @throws Error if module is not found or config cannot be loaded
- */
+// Retrieves a module's path and configuration by its ID
 export async function getModule(id: string): Promise<Module> {
   const modulePath = resolveModulePath(id);
 

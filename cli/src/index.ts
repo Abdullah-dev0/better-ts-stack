@@ -9,10 +9,7 @@ import { outro } from '@clack/prompts';
 import path from 'path';
 import { cwd } from 'process';
 
-/**
- * Main CLI function
- * Orchestrates the entire CLI workflow from welcome message to completion
- */
+// Main entry point for the CLI tool
 async function main(): Promise<void> {
   try {
     // Display welcome message

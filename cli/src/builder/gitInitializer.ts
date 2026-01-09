@@ -1,11 +1,7 @@
 import { execSync } from 'child_process';
 import consola from 'consola';
 
-/**
- * Check if git is available on the system
- * @param - None
- * @returns true if git is installed and available, false otherwise
- */
+// Checks if git is installed and available in the system PATH
 function isGitAvailable(): boolean {
   try {
     execSync('git --version', { stdio: 'ignore' });
@@ -16,11 +12,7 @@ function isGitAvailable(): boolean {
   }
 }
 
-/**
- * Initialize a git repository in the specified directory
- * @param cwd - The working directory where git should be initialized
- * @returns true if git init succeeded, false if it failed
- */
+// Initializes a new git repository in the given directory
 function initGit(cwd: string): boolean {
   consola.info('Initializing git repository...');
 
@@ -38,11 +30,7 @@ function initGit(cwd: string): boolean {
   }
 }
 
-/**
- * Create an initial commit with all files in the repository
- * @param cwd - The working directory where the commit should be created
- * @returns true if commit succeeded, false if it failed
- */
+// Stages all files and creates an initial commit
 function createInitialCommit(cwd: string): boolean {
   consola.info('Creating initial commit...');
 
@@ -69,12 +57,7 @@ function createInitialCommit(cwd: string): boolean {
   }
 }
 
-/**
- * Initialize git repository and create initial commit
- * Handles the complete git initialization workflow with proper error handling
- * @param cwd - The working directory where git should be initialized
- * @returns true if git was successfully initialized and committed, false otherwise
- */
+// Coordinates the full git initialization process
 export function initializeGitRepository(cwd: string): boolean {
   // Check if git is available
   if (!isGitAvailable()) {

@@ -2,11 +2,7 @@ import { execSync } from 'child_process';
 import consola from 'consola';
 import type { PackageManager } from '../types';
 
-/**
- * Get the install command for the specified package manager
- * @param packageManager - The package manager to use (npm, pnpm, or bun)
- * @returns The install command string
- */
+// Returns the installation command for the given package manager
 function getInstallCommand(packageManager: PackageManager): string {
   const commands: Record<PackageManager, string> = {
     npm: 'npm install',
@@ -17,12 +13,7 @@ function getInstallCommand(packageManager: PackageManager): string {
   return commands[packageManager];
 }
 
-/**
- * Install dependencies using the specified package manager
- * @param packageManager - The package manager to use
- * @param cwd - The working directory where dependencies should be installed
- * @returns true if installation succeeded, false if it failed
- */
+// Installs project dependencies in the target directory
 export function installDependencies(packageManager: PackageManager, cwd: string): boolean {
   const command = getInstallCommand(packageManager);
 

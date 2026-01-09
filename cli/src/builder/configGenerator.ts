@@ -1,7 +1,4 @@
-/**
- * Configuration generation utilities
- * Handles merging module configurations and generating output files
- */
+// Utilities for merging module configurations and generating project files
 
 import fs from 'fs-extra';
 import Handlebars from 'handlebars';
@@ -14,29 +11,7 @@ import {
   createBuildError,
 } from '../types';
 
-/**
- * Process script variables using Handlebars template engine
- *
- * Replaces `{{variable}}` placeholders in package.json scripts with actual values
- * from the template context. This ensures scripts like `docker build -t {{projectName}}`
- * are properly rendered before being merged into the final package.json.
- *
- * @param scripts - Record of script names to script commands (may contain {{variables}})
- * @param context - Template context with all available variables
- * @returns Record of script names to processed script commands (variables replaced)
- * @throws {BuildError} If template compilation fails or undefined variables are encountered
- * @example
- * ```typescript
- * const scripts = {
- *   'docker:build': 'docker build -t {{projectName}} .',
- *   'start': 'node dist/index.js'
- * };
- * const context = { projectName: 'my-app', ... };
- * const processed = processScriptVariables(scripts, context);
- * // processed['docker:build'] === 'docker build -t my-app .'
- * // processed['start'] === 'node dist/index.js' (unchanged)
- * ```
- */
+// Replaces Handlebars variables within script command strings
 export function processScriptVariables(
   scripts: Record<string, string>,
   context: TemplateContext
@@ -63,19 +38,7 @@ export function processScriptVariables(
   return processedScripts;
 }
 
-/**
- * Merge configurations from multiple modules
- * Later modules override earlier ones in case of conflicts
- *
- * Processes script variables using Handlebars before merging to ensure
- * all {{variable}} placeholders are replaced with actual values from the
- * template context. This prevents literal placeholders from appearing in
- * the final package.json.
- *
- * @param modules - Array of module configurations to merge
- * @param context - Template context with all available variables for script processing
- * @returns Merged configuration with all script variables processed
- */
+// Merges configurations from multiple modules, processing script variables
 export function mergeConfigurations(
   modules: ModuleConfig[],
   context: TemplateContext
@@ -115,12 +78,7 @@ export function mergeConfigurations(
   return merged;
 }
 
-/**
- * Generate package.json file from merged configuration
- * @param targetDir - Target directory for the package.json file
- * @param mergedConfig - Merged configuration from all modules
- * @param config - Project configuration with project information
- */
+// Generates the final package.json file from the merged configuration
 export async function generatePackageJson(
   targetDir: string,
   mergedConfig: MergedConfig,
@@ -151,11 +109,7 @@ export async function generatePackageJson(
   }
 }
 
-/**
- * Generate environment files (.env.example and .env) from merged environment variables
- * @param targetDir - Target directory for the environment files
- * @param envVars - Environment variables from merged configuration
- */
+// Generates .env and .env.example files from merged environment variables
 export async function generateEnvFile(
   targetDir: string,
   envVars: Record<string, string>

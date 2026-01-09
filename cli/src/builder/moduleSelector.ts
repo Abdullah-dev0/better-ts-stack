@@ -1,12 +1,6 @@
 import { ProjectConfig } from '../types';
 
-/**
- * Select which modules to include based on project configuration
- * Returns an object with base template path and additional module IDs
- *
- * @param config - Project configuration from prompts
- * @returns Object containing base template path and array of additional module IDs
- */
+// Determines which base and feature modules to include based on user configuration
 export function selectModules(config: ProjectConfig): {
   base: string;
   modules: string[];

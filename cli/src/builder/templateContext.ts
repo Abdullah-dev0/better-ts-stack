@@ -1,43 +1,18 @@
-/**
- * Template context builder for Handlebars template processing
- * Converts ProjectConfig into a context object with all variables and helpers
- */
+// Context builder for Handlebars, providing variables and helpers for templates
 
 import { ProjectConfig } from '../types';
 
-/**
- * Convert a string to lowercase
- * @param str - Input string
- * @returns Lowercase string
- */
+// Converts string to lowercase
 export function lowercase(str: string): string {
   return str.toLowerCase();
 }
 
-/**
- * Convert a string to uppercase
- * @param str - Input string
- * @returns Uppercase string
- */
+// Converts string to uppercase
 export function uppercase(str: string): string {
   return str.toUpperCase();
 }
 
-/**
- * Convert a string to kebab-case
- *
- * Handles spaces, underscores, and camelCase conversions.
- * Useful for generating file names, Docker image names, and other identifiers.
- *
- * @param str - Input string to convert
- * @returns Kebab-case string (lowercase with hyphens)
- * @example
- * ```typescript
- * kebabCase('MyProject') // 'my-project'
- * kebabCase('my_project') // 'my-project'
- * kebabCase('my project') // 'my-project'
- * ```
- */
+// Converts string to kebab-case
 export function kebabCase(str: string): string {
   return str
     .replace(/([a-z])([A-Z])/g, '$1-$2') // camelCase to kebab-case
@@ -45,28 +20,6 @@ export function kebabCase(str: string): string {
     .toLowerCase();
 }
 
-/**
- * Build template context from project configuration
- *
- * Creates a context object with all variables and helper functions for Handlebars templates.
- * This context is used to render .hbs template files during the building process.
- *
- * @param config - Project configuration containing user choices and settings
- * @returns Template context with all variables and helpers ready for Handlebars rendering
- * @example
- * ```typescript
- * const config: ProjectConfig = {
- *   projectName: 'my-app',
- *   packageManager: 'npm',
- *   database: 'prisma',
- *   useDocker: true,
- *   useAuth: false
- * };
- * const context = buildTemplateContext(config);
- * // context.projectName === 'my-app'
- * // context.helpers.kebabCase('MyApp') === 'my-app'
- * ```
- */
 export function buildTemplateContext(config: ProjectConfig) {
   return {
     projectName: config.projectName,

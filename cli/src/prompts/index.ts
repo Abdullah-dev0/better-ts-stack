@@ -1,10 +1,14 @@
-/**
- * Clack prompt definitions and prompt manager
- */
+// Clack prompt definitions and management
 
 import { intro, text, select, confirm, isCancel, cancel, group } from '@clack/prompts';
 import consola from 'consola';
-import { ProjectConfig, ApplicationType, DatabaseOption, BackendFramework, PackageManager } from '../types';
+import {
+  ProjectConfig,
+  ApplicationType,
+  DatabaseOption,
+  BackendFramework,
+  PackageManager,
+} from '../types';
 import { validateProjectName } from '../validators';
 
 // Type-safe option definitions
@@ -36,11 +40,7 @@ const authOptions = [
   { value: true as const, label: 'Yes', hint: '(Coming Soon)' },
 ];
 
-/**
- * Collects all user choices through interactive prompts
- * @param cwd - Current working directory (defaults to process.cwd())
- * @returns Promise resolving to ProjectConfig object with all selections
- */
+// Collects user input via interactive prompts
 export async function collectUserChoices() {
   intro('🚀 better-ts-stack');
 
@@ -176,11 +176,7 @@ export async function collectUserChoices() {
   return project;
 }
 
-/**
- * Confirms the building with the user by displaying a summary
- * @param config - The project configuration to confirm
- * @returns Promise resolving to true if confirmed, false otherwise
- */
+// Displays a summary and asks for final confirmation before building
 export async function confirmBuild(config: ProjectConfig, targetDir: string) {
   consola.info('Project Summary:');
 

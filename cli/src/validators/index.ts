@@ -1,18 +1,9 @@
-/**
- * Validation utilities for user inputs
- */
+// Validation utilities for user inputs
 
 import { z } from 'zod';
 import * as fs from 'fs-extra';
 import * as path from 'path';
-/**
- * Zod schema for project name validation
- * - Must be at least 1 character
- * - Can be "." to build in current directory
- * - Otherwise must be lowercase with only letters, numbers, and hyphens
- * - Cannot start or end with a hyphen
- * - Must be a valid npm package name
- */
+// Validates project name: lowercase, numbers, hyphens, or "." for current dir
 export const projectNameSchema = z
   .string()
   .min(1, 'Project name is required')
@@ -29,11 +20,7 @@ export const projectNameSchema = z
     'Project name must be 214 characters or less (npm package name limit)'
   );
 
-/**
- * Validates a project name against npm package naming rules
- * @param name - The project name to validate
- * @returns undefined if valid, or an error message string if invalid
- */
+// Checks if a project name follows npm naming conventions
 export function validateProjectName(name: string): string | undefined {
   const result = projectNameSchema.safeParse(name);
 
@@ -46,11 +33,7 @@ export function validateProjectName(name: string): string | undefined {
   return firstError.message;
 }
 
-/**
- * Validates that a directory either doesn't exist or is empty
- * @param dirPath - The directory path to validate
- * @returns true if valid (doesn't exist or is empty), or an error message string if invalid
- */
+// Ensures a directory is empty or does not exist before starting build
 export async function validateDirectoryEmpty(dirPath: string): Promise<null | string> {
   try {
     // Check if directory exists

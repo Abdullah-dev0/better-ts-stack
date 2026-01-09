@@ -1,17 +1,11 @@
-/**
- * File processing utilities for copying and processing module files
- */
+// Utilities for copying files and processing Handlebars templates
 
 import fs from 'fs-extra';
 import path from 'path';
 import Handlebars from 'handlebars';
 import { createBuildError, TemplateContext } from '../types';
 
-/**
- * Copy files from a module directory to the target directory
- * @param moduleDir - Source module directory path
- * @param targetDir - Destination directory path
- */
+// Copies files from a module to the destination, skipping config.json
 export async function copyModuleFiles(moduleDir: string, targetDir: string): Promise<void> {
   try {
     // Ensure target directory exists
@@ -35,14 +29,7 @@ export async function copyModuleFiles(moduleDir: string, targetDir: string): Pro
   }
 }
 
-/**
- * Compile and render a Handlebars template with the provided context
- *
- * @param content - Template content string with Handlebars syntax
- * @param context - Template context containing variables and helpers
- * @returns Rendered template string with all variables replaced
- * @throws {BuildError} If template compilation fails due to syntax errors
- */
+// Compiles and renders template content with Handlebars and provided context
 export function compileTemplate(content: string, context: TemplateContext): string {
   try {
     // Register helper functions with Handlebars
@@ -64,14 +51,7 @@ export function compileTemplate(content: string, context: TemplateContext): stri
   }
 }
 
-/**
- * Process template files with Handlebars variable replacement
- * Processes .hbs files by replacing variables and removing .hbs extension
- *
- * @param targetDir - Directory containing template files
- * @param context - Template context with variables for replacement
- * @param templateFiles - Array of template file paths relative to targetDir
- */
+// Processes multiple template files by replacing variables and handling extensions
 export async function processTemplateFiles(
   targetDir: string,
   context: TemplateContext,
@@ -82,17 +62,7 @@ export async function processTemplateFiles(
   }
 }
 
-/**
- * Process a single template file with Handlebars variable replacement
- *
- * Reads a .hbs template file, compiles it with Handlebars, renders it with the provided
- * context, and writes the output. If the file has a .hbs extension, it is removed from
- * the output filename and the original .hbs file is deleted.
- *
- * @param filePath - Absolute path to the template file
- * @param context - Template context with variables for replacement
- * @throws {BuildError} If file reading, template compilation, or writing fails
- */
+// Processes a single template file, replaces variables, and renames/deletes .hbs files
 export async function processTemplateFile(
   filePath: string,
   context: TemplateContext

@@ -11,12 +11,7 @@ import { initializeGitRepository } from './gitInitializer';
 import { selectModules } from './moduleSelector';
 import { buildTemplateContext } from './templateContext';
 
-/**
- * Main building function
- * Orchestrates the entire project building process (14 steps)
- * @param config - Project configuration from prompts
- * @returns Promise resolving to build result with success status and next steps
- */
+// Main function to orchestrate the project construction process
 export async function build(config: ProjectConfig, targetDir: string): Promise<BuildResult> {
   const absoluteTargetDir = targetDir;
 
@@ -25,6 +20,7 @@ export async function build(config: ProjectConfig, targetDir: string): Promise<B
   try {
     // Step 1: Validate target directory doesn't exist or is empty
     consola.info('Validating target directory...');
+
     const validationResult = await validateDirectoryEmpty(absoluteTargetDir);
 
     if (validationResult) {

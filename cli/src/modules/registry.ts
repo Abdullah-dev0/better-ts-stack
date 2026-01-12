@@ -1,8 +1,8 @@
 // Module registry for accessing base templates and feature modules
 
-import path from 'path';
 import fs from 'fs-extra';
-import { ModuleConfig, Module, createBuildError } from '../types';
+import path from 'path';
+import { ModuleConfig, createBuildError } from '../types';
 
 // Determines the absolute filesystem path for a given module ID
 function resolveModulePath(id: string) {
@@ -33,7 +33,7 @@ async function loadModuleConfig(modulePath: string): Promise<ModuleConfig> {
 }
 
 // Retrieves a module's path and configuration by its ID
-export async function getModule(id: string): Promise<Module> {
+export async function getModule(id: string) {
   const modulePath = resolveModulePath(id);
 
   // Check if module directory exists

@@ -1,0 +1,106 @@
+{{#if (eq database 'none')}}
+import crypto from 'crypto';
+{{/if}}
+{{#if (eq database 'prisma')}}
+import { prisma } from '../lib/prisma';
+{{/if}}
+{{#if (eq database 'mongoose')}}
+import UserModel from '../models/User';
+{{/if}}
+
+export interface AuthUser {
+  id: string;
+  email: string;
+  name?: string | null;
+  password: string;
+}
+
+export interface CreateUserInput {
+  email: string;
+  name?: string | null;
+  password: string;
+}
+
+{{#if (eq database 'none')}}
+const users: AuthUser[] = [];
+{{/if}}
+
+export async function findUserByEmail(email: string): Promise<AuthUser | null> {
+  {{#if (eq database 'prisma')}}
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) return null;
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    password: user.password,
+  };
+  {{/if}}
+
+  {{#if (eq database 'mongoose')}}
+  const user = await UserModel.findOne({ email }).exec();
+  if (!user) return null;
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    password: user.password,
+  };
+  {{/if}}
+
+  {{#if (eq database 'none')}}
+  const user = users.find((candidate) => candidate.email === email);
+  return user ?? null;
+  {{/if}}
+}
+
+export async function createUser(data: CreateUserInput): Promise<AuthUser> {
+  {{#if (eq database 'prisma')}}
+  const user = await prisma.user.create({
+    data: {
+      email: data.email,
+      name: data.name,
+      password: data.password,
+    },
+  });
+
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    password: user.password,
+  };
+  {{/if}}
+
+  {{#if (eq database 'mongoose')}}
+  const user = await UserModel.create({
+    email: data.email,
+    name: data.name,
+    password: data.password,
+  });
+
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    password: user.password,
+  };
+  {{/if}}
+
+  {{#if (eq database 'none')}}
+  const newUser: AuthUser = {
+    id: crypto.randomUUID(),
+    email: data.email,
+    name: data.name,
+    password: data.password,
+  };
+
+  users.push(newUser);
+  return newUser;
+  {{/if}}
+}
+
+export function toPublicUser(user: AuthUser) {
+  const { password: _password, ...rest } = user;
+  return rest;
+}

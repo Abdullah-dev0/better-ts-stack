@@ -37,7 +37,7 @@ const packageManagerOptions = [
 
 const authOptions = [
   { value: false as const, label: 'No' },
-  { value: true as const, label: 'Yes', hint: '(Coming Soon)' },
+  { value: true as const, label: 'Yes' },
 ];
 
 // Collects user input via interactive prompts
@@ -146,10 +146,6 @@ export async function collectUserChoices() {
         if (isCancel(selection)) {
           cancel('Operation cancelled.');
           process.exit(0);
-        }
-
-        if (selection === true) {
-          consola.warn('Authentication is coming soon!');
         }
 
         return selection;

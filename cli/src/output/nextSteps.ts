@@ -10,6 +10,11 @@ export function generateNextSteps(config: ProjectConfig, depsInstalled: boolean)
   // Step 2: Set environment variables
   steps.push('Copy .env.example to .env and set your environment variables');
 
+  if (config.useAuth) {
+    steps.push('Set JWT_SECRET in .env (required for auth)');
+    steps.push('Create a user via POST /auth/register then login with /auth/login');
+  }
+
   // Step 3: Install dependencies if not already done
   if (!depsInstalled) {
     const installCmd = getInstallCommand(config.packageManager);

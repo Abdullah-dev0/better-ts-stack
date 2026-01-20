@@ -4,6 +4,9 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import healthRouter from './routes/health';
+{{#if useAuth}}
+import authRouter from './routes/auth';
+{{/if}}
 
 dotenv.config();
 
@@ -19,6 +22,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use('/health', healthRouter);
+{{#if useAuth}}
+app.use('/auth', authRouter);
+{{/if}}
 
 // 404 handler
 app.use((_req: Request, res: Response) => {

@@ -1,0 +1,26 @@
+{
+  "id": "auth",
+  "name": "JWT Auth",
+  "description": "JWT authentication with bcrypt password hashing",
+  "type": "feature",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.5"
+  },
+  "scripts": {},
+  "envVars": {
+    "JWT_SECRET": "please-change-me",
+    "JWT_EXPIRES_IN": "1h"
+  },
+  "templateFiles": [
+    "src/lib/jwt.ts.hbs",
+    "src/middleware/requireAuth.ts.hbs",
+    "src/services/userStore.ts.hbs",
+    "src/routes/auth.ts.hbs",
+    "src/controllers/authController.ts.hbs"
+  ]
+}

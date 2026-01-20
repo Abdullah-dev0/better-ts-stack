@@ -1,0 +1,64 @@
+import { Request, Response } from 'express';
+import bcrypt from 'bcrypt';
+import { signToken } from '../lib/jwt';
+import { AuthenticatedRequest } from '../middleware/requireAuth';
+import { createUser, findUserByEmail, toPublicUser } from '../services/userStore';
+
+const SALT_ROUNDS = 10;
+
+export async function register(req: Request, res: Response): Promise<void> {
+  const { email, password, name } = req.body;
+
+  if (!email || !password) {
+    res.status(400).json({ error: 'Email and password are required' });
+    return;
+  }
+
+  const existingUser = await findUserByEmail(email);
+  if (existingUser) {
+    res.status(409).json({ error: 'User already exists' });
+    return;
+  }
+
+  const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+  const user = await createUser({ email, name, password: hashedPassword });
+  const token = signToken({ sub: user.id, email: user.email, name: user.name });
+
+  res.status(201).json({ user: toPublicUser(user), token });
+}
+
+export async function login(req: Request, res: Response): Promise<void> {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    res.status(400).json({ error: 'Email and password are required' });
+    return;
+  }
+
+  const user = await findUserByEmail(email);
+
+  if (!user) {
+    res.status(401).json({ error: 'Invalid credentials' });
+    return;
+  }
+
+  const isValidPassword = await bcrypt.compare(password, user.password);
+
+  if (!isValidPassword) {
+    res.status(401).json({ error: 'Invalid credentials' });
+    return;
+  }
+
+  const token = signToken({ sub: user.id, email: user.email, name: user.name });
+
+  res.json({ user: toPublicUser(user), token });
+}
+
+export async function me(req: AuthenticatedRequest, res: Response): Promise<void> {
+  if (!req.user) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+
+  res.json({ user: req.user });
+}

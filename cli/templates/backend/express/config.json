@@ -36,5 +36,7 @@
     "NODE_ENV": "development",
     "PORT": "3000"
   },
-  "templateFiles": []
+  "templateFiles": [
+    "src/index.ts"
+  ]
 }

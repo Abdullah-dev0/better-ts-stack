@@ -23,7 +23,6 @@ export function generateNextSteps(config: ProjectConfig, depsInstalled: boolean)
 
   // Step 4: Database-specific steps
   if (config.database === 'prisma') {
-    // Prisma requires generate and migrate
     steps.push(`${getRunCommand(config.packageManager)} prisma:generate`);
     steps.push(`${getRunCommand(config.packageManager)} prisma:migrate`);
   } else if (config.database === 'mongoose') {

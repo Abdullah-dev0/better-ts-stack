@@ -2,7 +2,7 @@
 
 import fs from 'fs-extra';
 import path from 'path';
-import { ModuleConfig, createBuildError } from '../types';
+import { ModuleConfig, buildError } from '../types';
 
 // Determines the absolute filesystem path for a given module ID
 function resolveModulePath(id: string) {
@@ -24,10 +24,10 @@ async function loadModuleConfig(modulePath: string): Promise<ModuleConfig> {
     const config = JSON.parse(configContent) as ModuleConfig;
     return config;
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    throw createBuildError(
-      `Failed to load module config from ${configPath}: ${errorMessage}`,
-      'MODULE_CONFIG_ERROR'
+    throw buildError(
+      error,
+      'MODULE_CONFIG_ERROR',
+      `Failed to load module config from ${configPath}`
     );
   }
 }
@@ -40,7 +40,7 @@ export async function getModule(id: string) {
   const exists = await fs.pathExists(modulePath);
 
   if (!exists) {
-    throw createBuildError(`Module not found: ${id}`, 'MODULE_NOT_FOUND');
+    throw buildError(`Module not found: ${id}`, 'MODULE_NOT_FOUND');
   }
 
   // Load module configuration

@@ -35,20 +35,19 @@ export function validateProjectName(name: string): string | undefined {
 
 // Ensures a directory is empty or does not exist before starting build
 export async function validateDirectoryEmpty(dirPath: string) {
-    const exists = await fs.pathExists(dirPath);
+  const exists = await fs.pathExists(dirPath);
 
-    if (!exists) return null;
+  if (!exists) return null;
 
-    const stats = await fs.stat(dirPath);
+  const stats = await fs.stat(dirPath);
 
-    if (!stats.isDirectory()) {
-      return `Path "${dirPath}" exists but is not a directory`;
-    }
+  if (!stats.isDirectory()) {
+    return `Path "${dirPath}" exists but is not a directory`;
+  }
 
-    const files = await fs.readdir(dirPath);
+  const files = await fs.readdir(dirPath);
 
-    if (files.length === 0) return null;
+  if (files.length === 0) return null;
 
-    return `Directory "${path.basename(dirPath)}" already exists and is not empty`;
-  } 
-
+  return `Directory "${path.basename(dirPath)}" already exists and is not empty`;
+}

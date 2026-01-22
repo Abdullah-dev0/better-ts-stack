@@ -21,7 +21,7 @@ export async function collectUserChoices() {
   const project = await group(
     {
       applicationType: async () => {
-        let selection ;
+        let selection;
 
         while (!selection) {
           const result = await select<ApplicationType>({
@@ -129,7 +129,7 @@ export async function collectUserChoices() {
           message: 'Init git?',
           initialValue: true,
         }),
-        
+
       installDeps: () =>
         confirm({
           message: 'Install dependencies now?',
@@ -176,8 +176,6 @@ export async function confirmBuild(config: ProjectConfig, targetDir: string) {
 
   if (!shouldContinue) {
     cancel('Building cancelled by user.');
-    return false;
+    process.exit(0);
   }
-
-  return true;
 }

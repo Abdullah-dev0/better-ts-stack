@@ -75,23 +75,17 @@ export interface BuildError extends Error {
   exitCode: number;
 }
 
-// Creates a new BuildError instance
-export function createBuildError(message: string, code: string, exitCode: number = 1): BuildError {
-  const error = new Error(message);
+// Unified error creation function
+export function buildError(
+  errorOrMessage: unknown,
+  code: string,
+  context?: string,
+  exitCode: number = 1
+): BuildError {
+  const message = errorOrMessage instanceof Error ? errorOrMessage.message : String(errorOrMessage);
+  const fullMessage = context ? `${context}: ${message}` : message;
+  const error = new Error(fullMessage);
   return Object.assign(error, { code, exitCode });
-}
-
-// Checks if an error is a BuildError
-export function isBuildError(error: unknown): error is BuildError {
-  return (
-    error instanceof Error &&
-    typeof error === 'object' &&
-    error !== null &&
-    'code' in error &&
-    'exitCode' in error &&
-    typeof (error as BuildError).code === 'string' &&
-    typeof (error as BuildError).exitCode === 'number'
-  );
 }
 
 // Variables and helpers available in Handlebars templates
@@ -109,7 +103,6 @@ export interface TemplateContext {
     kebabCase: (str: string) => string;
   };
 }
-
 
 // Type-safe option definitions
 export const applicationTypeOptions = [

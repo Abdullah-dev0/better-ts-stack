@@ -2,7 +2,7 @@ import consola from 'consola';
 import fs from 'fs-extra';
 import { getModule } from '../modules/registry';
 import { generateNextSteps } from '../output/nextSteps';
-import { Module, ProjectConfig, BuildResult, createBuildError, isBuildError } from '../types';
+import { buildError, BuildResult, Module, ProjectConfig } from '../types';
 import { validateDirectoryEmpty } from '../validators';
 import { generateEnvFile, generatePackageJson, mergeConfigurations } from './configGenerator';
 import { installDependencies } from './dependencyInstaller';
@@ -10,12 +10,6 @@ import { copyModuleFiles, processTemplateFiles } from './fileProcessor';
 import { initializeGitRepository } from './gitInitializer';
 import { selectModules } from './moduleSelector';
 import { buildTemplateContext } from './templateContext';
-
-// Helper to wrap errors with build context
-const wrapError = (error: unknown, message: string, code: string) => {
-  const errorMessage = error instanceof Error ? error.message : String(error);
-  throw createBuildError(`${message}: ${errorMessage}`, code, 1);
-};
 
 // Main function to orchestrate the project construction process
 export async function build(config: ProjectConfig, targetDir: string): Promise<BuildResult> {
@@ -25,18 +19,16 @@ export async function build(config: ProjectConfig, targetDir: string): Promise<B
     // 1. Validate target directory
     consola.info('Validating target directory...');
 
-
     const validationResult = await validateDirectoryEmpty(targetDir);
 
-    if (validationResult) throw createBuildError(validationResult, 'DIRECTORY_NOT_EMPTY', 1);
+    if (validationResult) throw buildError(validationResult, 'DIRECTORY_NOT_EMPTY');
 
     // 2. Create target directory
     consola.info('Creating project directory...');
 
-  
-    await fs
-      .ensureDir(targetDir)
-      .catch((e) => wrapError(e, 'Failed to create directory', 'DIRECTORY_CREATE_ERROR'));
+    await fs.ensureDir(targetDir).catch((e) => {
+      throw buildError(e, 'DIRECTORY_CREATE_ERROR', 'Failed to create directory');
+    });
 
     // 3. Select modules
     consola.info('Selecting modules...');
@@ -51,7 +43,7 @@ export async function build(config: ProjectConfig, targetDir: string): Promise<B
         modules.push(await getModule(moduleId));
       }
     } catch (e) {
-      wrapError(e, 'Failed to load modules', 'MODULE_LOADING_ERROR');
+      throw buildError(e, 'MODULE_LOADING_ERROR', 'Failed to load modules');
     }
     consola.success(
       `Selected ${modules.length} modules: ${modules.map((m) => m.config.id).join(', ')}`
@@ -76,7 +68,7 @@ export async function build(config: ProjectConfig, targetDir: string): Promise<B
       }
       consola.success('Module files copied');
     } catch (e) {
-      wrapError(e, 'Failed to copy module files', 'FILE_COPY_ERROR');
+      throw buildError(e, 'FILE_COPY_ERROR', 'Failed to copy module files');
     }
 
     // 8. Process Handlebars templates
@@ -90,21 +82,21 @@ export async function build(config: ProjectConfig, targetDir: string): Promise<B
         consola.info('  No template files to process');
       }
     } catch (e) {
-      wrapError(e, 'Failed to process template files', 'TEMPLATE_PROCESSING_ERROR');
+      throw buildError(e, 'TEMPLATE_PROCESSING_ERROR', 'Failed to process template files');
     }
 
     // 9. Generate package.json
     consola.info('Generating package.json...');
-    await generatePackageJson(targetDir, mergedConfig, config).catch((e) =>
-      wrapError(e, 'Failed to generate package.json', 'PACKAGE_JSON_ERROR')
-    );
+    await generatePackageJson(targetDir, mergedConfig, config).catch((e) => {
+      throw buildError(e, 'PACKAGE_JSON_ERROR', 'Failed to generate package.json');
+    });
     consola.success('package.json generated');
 
     // 10. Generate environment files
     consola.info('Generating environment files...');
-    await generateEnvFile(targetDir, mergedConfig.envVars).catch((e) =>
-      wrapError(e, 'Failed to generate environment files', 'ENV_FILE_ERROR')
-    );
+    await generateEnvFile(targetDir, mergedConfig.envVars).catch((e) => {
+      throw buildError(e, 'ENV_FILE_ERROR', 'Failed to generate environment files');
+    });
     consola.success('Environment files generated');
 
     // 11. Install dependencies (optional)
@@ -135,8 +127,6 @@ export async function build(config: ProjectConfig, targetDir: string): Promise<B
       nextSteps: generateNextSteps(config, depsInstalled),
     };
   } catch (error) {
-    if (isBuildError(error)) throw error;
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    throw createBuildError(`Building failed: ${errorMessage}`, 'BUILDING_ERROR', 1);
+    throw buildError(error, 'BUILDING_ERROR', 'Building failed');
   }
 }

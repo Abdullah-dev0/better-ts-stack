@@ -3,7 +3,7 @@
 import fs from 'fs-extra';
 import path from 'path';
 import Handlebars from 'handlebars';
-import { createBuildError, TemplateContext } from '../types';
+import { buildError, TemplateContext } from '../types';
 
 // Copies files from a module to the destination, skipping config.json
 export async function copyModuleFiles(moduleDir: string, targetDir: string): Promise<void> {
@@ -21,11 +21,7 @@ export async function copyModuleFiles(moduleDir: string, targetDir: string): Pro
       },
     });
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    throw createBuildError(
-      `Failed to copy module files from ${moduleDir}: ${errorMessage}`,
-      'FILE_COPY_ERROR'
-    );
+    throw buildError(error, 'FILE_COPY_ERROR', `Failed to copy module files from ${moduleDir}`);
   }
 }
 
@@ -43,11 +39,7 @@ export function compileTemplate(content: string, context: TemplateContext): stri
     // Render with context
     return template(context);
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    throw createBuildError(
-      `Failed to compile Handlebars template: ${errorMessage}`,
-      'TEMPLATE_SYNTAX_ERROR'
-    );
+    throw buildError(error, 'TEMPLATE_SYNTAX_ERROR', 'Failed to compile Handlebars template');
   }
 }
 
@@ -97,10 +89,6 @@ export async function processTemplateFile(
     }
 
     // Wrap other errors
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    throw createBuildError(
-      `Failed to process template file ${filePath}: ${errorMessage}`,
-      'TEMPLATE_WRITE_ERROR'
-    );
+    throw buildError(error, 'TEMPLATE_WRITE_ERROR', `Failed to process template file ${filePath}`);
   }
 }

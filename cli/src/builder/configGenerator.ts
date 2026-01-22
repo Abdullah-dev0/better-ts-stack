@@ -3,13 +3,7 @@
 import fs from 'fs-extra';
 import Handlebars from 'handlebars';
 import path from 'path';
-import {
-  MergedConfig,
-  ModuleConfig,
-  ProjectConfig,
-  TemplateContext,
-  createBuildError,
-} from '../types';
+import { MergedConfig, ModuleConfig, ProjectConfig, TemplateContext, buildError } from '../types';
 
 // Replaces Handlebars variables within script command strings
 export function processScriptVariables(
@@ -27,11 +21,7 @@ export function processScriptVariables(
       const template = Handlebars.compile(scriptCommand, { noEscape: true });
       processedScripts[scriptName] = template(context, { helpers });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      throw createBuildError(
-        `Failed to process script "${scriptName}": ${errorMessage}`,
-        'TEMPLATE_SCRIPT_ERROR'
-      );
+      throw buildError(error, 'TEMPLATE_SCRIPT_ERROR', `Failed to process script "${scriptName}"`);
     }
   }
 
@@ -101,11 +91,7 @@ export async function generatePackageJson(
     const packageJsonPath = path.join(targetDir, 'package.json');
     await fs.writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n', 'utf-8');
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    throw createBuildError(
-      `Failed to generate package.json: ${errorMessage}`,
-      'PACKAGE_JSON_ERROR'
-    );
+    throw buildError(error, 'PACKAGE_JSON_ERROR', 'Failed to generate package.json');
   }
 }
 
@@ -132,10 +118,6 @@ export async function generateEnvFile(
     const envPath = path.join(targetDir, '.env');
     await fs.copy(envExamplePath, envPath);
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    throw createBuildError(
-      `Failed to generate environment files: ${errorMessage}`,
-      'ENV_FILE_ERROR'
-    );
+    throw buildError(error, 'ENV_FILE_ERROR', 'Failed to generate environment files');
   }
 }

@@ -24,11 +24,16 @@ export async function build(config: ProjectConfig, targetDir: string): Promise<B
   try {
     // 1. Validate target directory
     consola.info('Validating target directory...');
+
+
     const validationResult = await validateDirectoryEmpty(targetDir);
+
     if (validationResult) throw createBuildError(validationResult, 'DIRECTORY_NOT_EMPTY', 1);
 
     // 2. Create target directory
     consola.info('Creating project directory...');
+
+  
     await fs
       .ensureDir(targetDir)
       .catch((e) => wrapError(e, 'Failed to create directory', 'DIRECTORY_CREATE_ERROR'));

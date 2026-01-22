@@ -1,5 +1,3 @@
-// Clack prompt definitions and management
-
 import { intro, text, select, confirm, isCancel, cancel, group } from '@clack/prompts';
 import consola from 'consola';
 import {
@@ -8,37 +6,13 @@ import {
   DatabaseOption,
   BackendFramework,
   PackageManager,
+  applicationTypeOptions,
+  frameworkOptions,
+  databaseOptions,
+  packageManagerOptions,
+  authOptions,
 } from '../types';
 import { validateProjectName } from '../validators';
-
-// Type-safe option definitions
-const applicationTypeOptions = [
-  { value: 'backend' as const, label: 'Backend' },
-  { value: 'frontend' as const, label: 'Frontend', hint: '(Coming Soon)' },
-];
-
-const frameworkOptions = [
-  { value: 'express' as const, label: 'Express' },
-  { value: 'hono' as const, label: 'Hono', hint: '(Coming Soon)' },
-  { value: 'nest' as const, label: 'NestJS', hint: '(Coming Soon)' },
-];
-
-const databaseOptions = [
-  { value: 'none' as const, label: 'None (Skip database setup)' },
-  { value: 'prisma' as const, label: 'Prisma (Type-safe ORM)' },
-  { value: 'mongoose' as const, label: 'Mongoose (Standard MongoDB ODM)' },
-];
-
-const packageManagerOptions = [
-  { value: 'npm' as const, label: 'npm' },
-  { value: 'pnpm' as const, label: 'pnpm' },
-  { value: 'bun' as const, label: 'bun' },
-];
-
-const authOptions = [
-  { value: false as const, label: 'No' },
-  { value: true as const, label: 'Yes' },
-];
 
 // Collects user input via interactive prompts
 export async function collectUserChoices() {
@@ -47,7 +21,7 @@ export async function collectUserChoices() {
   const project = await group(
     {
       applicationType: async () => {
-        let selection: ApplicationType | undefined;
+        let selection ;
 
         while (!selection) {
           const result = await select<ApplicationType>({
@@ -72,7 +46,7 @@ export async function collectUserChoices() {
         return selection;
       },
       framework: async () => {
-        let selection: BackendFramework | undefined;
+        let selection;
 
         while (!selection) {
           const result = await select<BackendFramework>({
@@ -86,7 +60,7 @@ export async function collectUserChoices() {
             process.exit(0);
           }
 
-          if (result === 'hono' || result === 'nest') {
+          if (result === 'hono') {
             consola.warn('This framework is coming soon! Please select another option.');
             continue;
           }
@@ -155,6 +129,7 @@ export async function collectUserChoices() {
           message: 'Init git?',
           initialValue: true,
         }),
+        
       installDeps: () =>
         confirm({
           message: 'Install dependencies now?',

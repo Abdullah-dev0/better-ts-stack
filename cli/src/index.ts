@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import consola from 'consola';
 import { collectUserChoices, confirmBuild } from './prompts';
 import { build } from './builder';
@@ -23,8 +21,6 @@ async function main(): Promise<void> {
     const confirmed = await confirmBuild(config, targetDir);
 
     if (!confirmed) {
-      // This path is largely handled by confirmBuild's cancellation check,
-      // but keeping it for safety if logic changes.
       process.exit(0);
     }
 

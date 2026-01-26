@@ -1,23 +1,21 @@
-import { intro, text, select, confirm, isCancel, cancel, group } from '@clack/prompts';
+import { cancel, confirm, group, isCancel, select, text } from '@clack/prompts';
 import consola from 'consola';
 import {
-  ProjectConfig,
   ApplicationType,
-  DatabaseOption,
   BackendFramework,
+  DatabaseOption,
   PackageManager,
+  ProjectConfig,
   applicationTypeOptions,
-  frameworkOptions,
-  databaseOptions,
-  packageManagerOptions,
   authOptions,
+  databaseOptions,
+  frameworkOptions,
+  packageManagerOptions,
 } from '../types';
 import { validateProjectName } from '../validators';
 
 // Collects user input via interactive prompts
 export async function collectUserChoices() {
-  intro('🚀 better-ts-stack');
-
   const project = await group(
     {
       applicationType: async () => {

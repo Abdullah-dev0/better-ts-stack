@@ -32,6 +32,7 @@ export async function build(config: ProjectConfig, targetDir: string): Promise<B
 
     // 3. Select modules
     consola.info('Selecting modules...');
+
     const selection = selectModules(config);
 
     // 4. Load modules

@@ -4,11 +4,16 @@ import path from 'path';
 import { cwd } from 'process';
 import { build } from './builder';
 import { displayNextSteps } from './output/nextSteps';
+import { showInteractiveIntro } from './intro';
 import { collectUserChoices, confirmBuild } from './prompts';
 
 // Main entry point for the CLI tool
 async function main(): Promise<void> {
+  // Show interactive intro
+  await showInteractiveIntro();
+
   const config = await collectUserChoices();
+
   const targetDir = path.resolve(cwd(), config.projectName);
 
   await confirmBuild(config, targetDir);

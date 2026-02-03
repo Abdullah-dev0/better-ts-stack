@@ -14,7 +14,7 @@ A powerful CLI tool that generates fully configured TypeScript projects with bac
 - � Optional Docker support with multi-stage builds
 - � Database integration (PostgreSQL with Prisma or MongoDB with Mongoose)
 - 🔐 JWT authentication ready (coming soon)
-- �  TypeScript with strict mode enabled
+- � TypeScript with strict mode enabled
 - 🎨 ESLint + Prettier pre-configured
 - 🔄 Hot reload for development
 - 📚 Comprehensive documentation and examples
@@ -27,7 +27,8 @@ npx better-ts-stack
 
 # Or install globally
 npm install -g better-ts-stack
-better-ts-stack
+# or
+create-ts-stack
 ```
 
 Answer a few simple questions and get a complete project ready to run.
@@ -65,6 +66,7 @@ The CLI will guide you through setup with questions like:
 ### Backend Modules
 
 #### Express Base (Always Included)
+
 - Express.js server with TypeScript
 - Middleware setup (cors, helmet, compression)
 - Environment configuration
@@ -73,6 +75,7 @@ The CLI will guide you through setup with questions like:
 - Development and production scripts
 
 #### Prisma (PostgreSQL)
+
 - Prisma ORM configuration
 - PostgreSQL connection setup
 - Example schema and models
@@ -80,6 +83,7 @@ The CLI will guide you through setup with questions like:
 - Type-safe database queries
 
 #### Mongoose (MongoDB)
+
 - Mongoose ODM configuration
 - MongoDB connection setup
 - Example schemas and models
@@ -89,12 +93,14 @@ The CLI will guide you through setup with questions like:
 ### Frontend Modules (Coming Soon)
 
 #### React
+
 - React 18+ with TypeScript
 - Vite for blazing fast development
 - React Router for navigation
 - Pre-configured build pipeline
 
 #### Next.js
+
 - Next.js 14+ with App Router
 - Server and client components
 - API routes integration
@@ -103,6 +109,7 @@ The CLI will guide you through setup with questions like:
 ### Infrastructure Modules
 
 #### Docker
+
 - Multi-stage Dockerfile
 - Docker Compose configuration
 - Production-optimized builds
@@ -112,6 +119,7 @@ The CLI will guide you through setup with questions like:
 ## 🔧 Technology Stack Used
 
 ### Backend
+
 - **Runtime**: Node.js with TypeScript 5.3+
 - **Framework**: Express.js
 - **Validation**: Zod
@@ -126,4 +134,3 @@ Built with modern best practices for full-stack TypeScript development.
 ---
 
 **Ready to build your next project?** Run `npx better-ts-stack` and get started in seconds!
-

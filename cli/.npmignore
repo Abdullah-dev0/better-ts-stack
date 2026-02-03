@@ -1,0 +1,35 @@
+# Source (only dist and templates are published)
+src/
+
+# Config and tooling
+.husky/
+.eslintrc*
+eslint.config.mjs
+.prettierrc
+.prettierignore
+.lintstagedrc.json
+tsconfig.json
+tsconfig.eslint.json
+
+# Dependencies and lockfiles
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build artifacts (dist is built before publish; keep in files)
+*.tsbuildinfo
+
+# IDE and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Env and logs
+.env
+.env.*
+*.log
+
+# Docs for contributors (npm page uses README.md)
+AGENTS.md

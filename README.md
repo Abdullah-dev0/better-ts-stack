@@ -27,8 +27,7 @@ npx better-ts-stack
 
 # Or install globally
 npm install -g better-ts-stack
-# or
-create-ts-stack
+better-ts-stack
 ```
 
 Answer a few simple questions and get a complete project ready to run.

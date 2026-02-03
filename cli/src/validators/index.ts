@@ -1,4 +1,3 @@
-// Validation utilities for user inputs
 import * as fs from "fs-extra";
 import * as path from "path";
 import { z } from "zod";

@@ -6,8 +6,19 @@ import { createUser, findUserByEmail, toPublicUser } from '../services/userStore
 
 const SALT_ROUNDS = 10;
 
+interface RegisterBody {
+  email?: string;
+  password?: string;
+  name?: string | null;
+}
+
+interface LoginBody {
+  email?: string;
+  password?: string;
+}
+
 export async function register(req: Request, res: Response): Promise<void> {
-  const { email, password, name } = req.body;
+  const { email, password, name } = req.body as RegisterBody;
 
   if (!email || !password) {
     res.status(400).json({ error: 'Email and password are required' });
@@ -28,7 +39,7 @@ export async function register(req: Request, res: Response): Promise<void> {
 }
 
 export async function login(req: Request, res: Response): Promise<void> {
-  const { email, password } = req.body;
+  const { email, password } = req.body as LoginBody;
 
   if (!email || !password) {
     res.status(400).json({ error: 'Email and password are required' });
@@ -54,7 +65,7 @@ export async function login(req: Request, res: Response): Promise<void> {
   res.json({ user: toPublicUser(user), token });
 }
 
-export async function me(req: AuthenticatedRequest, res: Response): Promise<void> {
+export function me(req: AuthenticatedRequest, res: Response): void {
   if (!req.user) {
     res.status(401).json({ error: 'Unauthorized' });
     return;

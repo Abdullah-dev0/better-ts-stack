@@ -1,11 +1,12 @@
-import { outro } from '@clack/prompts';
-import consola from 'consola';
-import path from 'path';
-import { cwd } from 'process';
-import { build } from './builder';
-import { displayNextSteps } from './output/nextSteps';
-import { showInteractiveIntro } from './intro';
-import { collectUserChoices, confirmBuild } from './prompts';
+import { outro } from "@clack/prompts";
+import consola from "consola";
+import path from "path";
+import { cwd } from "process";
+
+import { build } from "./builder";
+import { showInteractiveIntro } from "./intro";
+import { displayNextSteps } from "./output/nextSteps";
+import { collectUserChoices, confirmBuild } from "./prompts";
 
 // Main entry point for the CLI tool
 async function main(): Promise<void> {
@@ -21,14 +22,17 @@ async function main(): Promise<void> {
   const result = await build(config, targetDir);
 
   if (result.success) {
-    const nextStepsMessage = displayNextSteps(config.projectName, result.nextSteps);
+    const nextStepsMessage = displayNextSteps(
+      config.projectName,
+      result.nextSteps
+    );
     consola.success(nextStepsMessage);
-    outro('Happy coding!');
+    outro("Happy coding!");
     process.exit(0);
   }
 }
 
 main().catch((err) => {
-  consola.error('❌ Error:', err);
+  consola.error("❌ Error:", err);
   process.exit(1);
 });

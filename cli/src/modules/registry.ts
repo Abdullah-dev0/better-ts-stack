@@ -1,13 +1,13 @@
 // Module registry for accessing base templates and feature modules
+import fs from "fs-extra";
+import path from "path";
 
-import fs from 'fs-extra';
-import path from 'path';
-import { ModuleConfig, buildError } from '../types';
+import { buildError, ModuleConfig } from "../types";
 
 // Determines the absolute filesystem path for a given module ID
 function resolveModulePath(id: string) {
   // If id contains a slash, it's a base template path like 'backend/express'
-  if (id.includes('/')) {
+  if (id.includes("/")) {
     return path.join(__dirname, `../../templates/${id}`);
   }
   // Otherwise, it's a module in templates/modules/
@@ -16,17 +16,17 @@ function resolveModulePath(id: string) {
 
 // Reads and parses a module's config.json file
 async function loadModuleConfig(modulePath: string): Promise<ModuleConfig> {
-  const configPath = path.join(modulePath, 'config.json');
+  const configPath = path.join(modulePath, "config.json");
 
   try {
-    const configContent = await fs.readFile(configPath, 'utf-8');
+    const configContent = await fs.readFile(configPath, "utf-8");
     // Type annotation provides runtime validation expectation
     const config = JSON.parse(configContent) as ModuleConfig;
     return config;
   } catch (error) {
     throw buildError(
       error,
-      'MODULE_CONFIG_ERROR',
+      "MODULE_CONFIG_ERROR",
       `Failed to load module config from ${configPath}`
     );
   }
@@ -40,7 +40,7 @@ export async function getModule(id: string) {
   const exists = await fs.pathExists(modulePath);
 
   if (!exists) {
-    throw buildError(`Module not found: ${id}`, 'MODULE_NOT_FOUND');
+    throw buildError(`Module not found: ${id}`, "MODULE_NOT_FOUND");
   }
 
   // Load module configuration

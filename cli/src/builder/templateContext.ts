@@ -1,6 +1,5 @@
 // Context builder for Handlebars, providing variables and helpers for templates
-
-import { ProjectConfig } from '../types';
+import { ProjectConfig } from "../types";
 
 // Converts string to lowercase
 export function lowercase(str: string): string {
@@ -15,8 +14,8 @@ export function uppercase(str: string): string {
 // Converts string to kebab-case
 export function kebabCase(str: string): string {
   return str
-    .replace(/([a-z])([A-Z])/g, '$1-$2') // camelCase to kebab-case
-    .replace(/[\s_]+/g, '-') // spaces and underscores to hyphens
+    .replace(/([a-z])([A-Z])/g, "$1-$2") // camelCase to kebab-case
+    .replace(/[\s_]+/g, "-") // spaces and underscores to hyphens
     .toLowerCase();
 }
 
@@ -34,9 +33,9 @@ export function buildTemplateContext(config: ProjectConfig) {
       kebabCase,
       eq: (a: string, b: string) => a === b,
       runner: () => {
-        if (config.packageManager === 'bun') return 'bun';
-        if (config.packageManager === 'pnpm') return 'pnpm';
-        return 'node';
+        if (config.packageManager === "bun") return "bun";
+        if (config.packageManager === "pnpm") return "pnpm";
+        return "node";
       },
     },
   };

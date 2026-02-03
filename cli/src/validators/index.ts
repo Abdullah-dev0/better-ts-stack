@@ -1,23 +1,23 @@
 // Validation utilities for user inputs
+import * as fs from "fs-extra";
+import * as path from "path";
+import { z } from "zod";
 
-import { z } from 'zod';
-import * as fs from 'fs-extra';
-import * as path from 'path';
 // Validates project name: lowercase, numbers, hyphens, or "." for current dir
 export const projectNameSchema = z
   .string()
-  .min(1, 'Project name is required')
+  .min(1, "Project name is required")
   .refine(
-    (name) => name === '.' || /^[a-z0-9-]+$/.test(name),
+    (name) => name === "." || /^[a-z0-9-]+$/.test(name),
     'Project name must be "." for current directory, or lowercase with only letters, numbers, and hyphens'
   )
   .refine(
-    (name) => name === '.' || (!name.startsWith('-') && !name.endsWith('-')),
-    'Project name cannot start or end with a hyphen'
+    (name) => name === "." || (!name.startsWith("-") && !name.endsWith("-")),
+    "Project name cannot start or end with a hyphen"
   )
   .refine(
-    (name) => name === '.' || name.length <= 214,
-    'Project name must be 214 characters or less (npm package name limit)'
+    (name) => name === "." || name.length <= 214,
+    "Project name must be 214 characters or less (npm package name limit)"
   );
 
 // Checks if a project name follows npm naming conventions

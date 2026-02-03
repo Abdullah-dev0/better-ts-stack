@@ -8,7 +8,7 @@ export interface AuthenticatedRequest extends Request {
 export function requireAuth(req: AuthenticatedRequest, res: Response, next: NextFunction): void {
   const authHeader = req.headers.authorization;
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  if (!authHeader || !authHeader.startsWith('Bearer')) {
     res.status(401).json({ error: 'Authorization header missing or invalid' });
     return;
   }

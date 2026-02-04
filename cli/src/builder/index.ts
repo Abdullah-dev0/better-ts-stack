@@ -65,6 +65,7 @@ export async function build(
 
     // 5. Build template context
     consola.info("Building template context...");
+
     const templateContext = buildTemplateContext(config);
 
     // 6. Merge configurations

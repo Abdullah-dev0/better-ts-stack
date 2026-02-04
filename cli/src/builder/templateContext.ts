@@ -23,10 +23,13 @@ export function buildTemplateContext(config: ProjectConfig) {
   return {
     projectName: config.projectName,
     packageManager: config.packageManager,
-    database: config.database,
+    database: config.database ?? "none",
     port: 3000, // Default port
-    useDocker: config.useDocker,
-    useAuth: config.useAuth,
+    useDocker: config.useDocker ?? false,
+    useAuth:
+      typeof config.useAuth === "boolean"
+        ? config.useAuth
+        : config.useAuth !== "none",
     helpers: {
       lowercase,
       uppercase,

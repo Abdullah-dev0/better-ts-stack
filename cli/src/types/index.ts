@@ -18,15 +18,21 @@ export interface Dependencies {
 // Supported backend frameworks
 export type BackendFramework = "express" | "hono";
 
+// Supported frontend frameworks
+export type FrontendFramework = "nextjs" | "vite";
+
+// Frontend auth options
+export type FrontendAuthOption = "none" | "better-auth";
+
 // Main configuration object for the build pipeline
 export interface ProjectConfig {
   // Project basics
   projectName: string;
   applicationType: ApplicationType;
-  framework: BackendFramework;
-  database: DatabaseOption;
-  useDocker: boolean;
-  useAuth: boolean;
+  framework: BackendFramework | FrontendFramework;
+  database?: DatabaseOption;
+  useDocker?: boolean;
+  useAuth?: boolean | FrontendAuthOption;
   // Tooling
   packageManager: PackageManager;
 
@@ -113,9 +119,19 @@ export const applicationTypeOptions = [
   { value: "frontend" as const, label: "Frontend", hint: "(Coming Soon)" },
 ];
 
-export const frameworkOptions = [
+export const backendFrameworkOptions = [
   { value: "express" as const, label: "Express" },
   { value: "hono" as const, label: "Hono", hint: "(Coming Soon)" },
+];
+
+export const frontendFrameworkOptions = [
+  { value: "nextjs" as const, label: "Next.js" },
+  { value: "vite" as const, label: "Vite", hint: "(Coming Soon)" },
+];
+
+export const frontendDatabaseOptions = [
+  { value: "drizzle" as const, label: "Drizzle" },
+  { value: "prisma" as const, label: "Prisma (Type-safe ORM)" },
 ];
 
 export const databaseOptions = [
@@ -133,4 +149,9 @@ export const packageManagerOptions = [
 export const authOptions = [
   { value: false as const, label: "No" },
   { value: true as const, label: "Yes" },
+];
+
+export const frontendAuthOptions = [
+  { value: "none" as const, label: "No" },
+  { value: "better-auth" as const, label: "Better Auth" },
 ];

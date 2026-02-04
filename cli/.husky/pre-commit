@@ -1,1 +1,1 @@
-npm run lint-staged
+cd cli && npm run lint-staged

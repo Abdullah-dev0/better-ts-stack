@@ -1,41 +1,67 @@
 import { cancel, confirm, group, isCancel, select } from "@clack/prompts";
-import consola from "consola";
 
 import {
-  FrontendAuthOption,
-  frontendAuthOptions,
+  authOptions,
+  DatabaseType,
+  databaseTypeOptions,
   FrontendFramework,
-  frontendFrameworkOptions,
+  isValidOrmOption,
+  mongodbOrmOptions,
+  OrmOption,
   PackageManager,
   packageManagerOptions,
+  postgresqlOrmOptions,
+  PromptChoices,
 } from "../../types";
 
-export const collectFrontendChoices = async () => {
+export const collectFrontendChoices = async (): Promise<PromptChoices> => {
   const project = await group(
     {
-      framework: async () => {
-        let selection;
+      framework: async (): Promise<FrontendFramework> => {
+        // Auto-select Next.js since it's the only option
+        return Promise.resolve("nextjs");
+      },
+      databaseType: async () => {
+        const selection = await select<DatabaseType>({
+          message: "Select a database:",
+          options: databaseTypeOptions,
+          initialValue: "none",
+        });
 
-        while (!selection) {
-          const result = await select<FrontendFramework>({
-            message: "Select a frontend framework:",
-            options: frontendFrameworkOptions,
-            initialValue: "nextjs",
-          });
+        if (isCancel(selection)) {
+          cancel("Operation cancelled.");
+          process.exit(0);
+        }
 
-          if (isCancel(result)) {
-            cancel("Operation cancelled.");
-            process.exit(0);
-          }
+        return selection;
+      },
+      orm: async ({ results }) => {
+        // Type guard to narrow the databaseType from unknown to DatabaseType
+        const dbType = results.databaseType;
 
-          if (result === "vite") {
-            consola.warn(
-              "This framework is coming soon! Please select another option."
-            );
-            continue;
-          }
+        // Skip ORM selection if no database type was selected
+        if (dbType === "none") {
+          return "none" as const;
+        }
 
-          selection = result;
+        // Type guard: at this point, dbType must be mongodb or postgresql
+        if (dbType !== "mongodb" && dbType !== "postgresql") {
+          throw new Error(`Invalid database type: ${dbType}`);
+        }
+
+        // Select appropriate ORM options based on database type
+        const ormOptions =
+          dbType === "mongodb" ? mongodbOrmOptions : postgresqlOrmOptions;
+
+        const selection = await select<OrmOption>({
+          message: `Select an ORM for ${dbType}:`,
+          options: ormOptions,
+          initialValue: "prisma",
+        });
+
+        if (isCancel(selection)) {
+          cancel("Operation cancelled.");
+          process.exit(0);
         }
 
         return selection;
@@ -54,11 +80,16 @@ export const collectFrontendChoices = async () => {
 
         return selection;
       },
+      useDocker: () =>
+        confirm({
+          message: "Use Docker?",
+          initialValue: false,
+        }),
       useAuth: async () => {
-        const selection = await select<FrontendAuthOption>({
-          message: "Add authentication?",
-          options: frontendAuthOptions,
-          initialValue: "none",
+        const selection = await select<boolean>({
+          message: "Add Better Auth?",
+          options: authOptions,
+          initialValue: false,
         });
 
         if (isCancel(selection)) {
@@ -88,5 +119,22 @@ export const collectFrontendChoices = async () => {
     }
   );
 
-  return project;
+  // Transform the group result into the proper typed object
+  // Validate orm using type guard
+  if (!isValidOrmOption(project.orm)) {
+    throw new Error(`Invalid ORM option: ${String(project.orm)}`);
+  }
+
+  const result: PromptChoices = {
+    framework: project.framework,
+    databaseType: project.databaseType,
+    orm: project.orm,
+    packageManager: project.packageManager,
+    useDocker: Boolean(project.useDocker),
+    useAuth: project.useAuth,
+    initGit: Boolean(project.initGit),
+    installDeps: Boolean(project.installDeps),
+  };
+
+  return result;
 };

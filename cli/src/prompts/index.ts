@@ -4,6 +4,7 @@ import consola from "consola";
 import {
   ApplicationType,
   applicationTypeOptions,
+  deriveDatabase,
   ProjectConfig,
 } from "../types";
 import { validateProjectName } from "../validators";
@@ -37,17 +38,21 @@ export async function collectUserChoices() {
   let userChoices;
   if (applicationType === "backend") {
     userChoices = await collectBackendChoices();
-  } else if (applicationType === "frontend") {
+  } else if (applicationType === "fullstack") {
     userChoices = await collectFrontendChoices();
   } else {
     cancel("Invalid application type selected.");
     process.exit(0);
   }
 
+  // Derive database field from databaseType + orm for backward compatibility
+  const database = deriveDatabase(userChoices.databaseType, userChoices.orm);
+
   const choices: ProjectConfig = {
     projectName,
     applicationType,
     ...userChoices,
+    database,
   };
 
   return choices;
@@ -57,10 +62,13 @@ export async function collectUserChoices() {
 export async function confirmBuild(config: ProjectConfig, targetDir: string) {
   consola.info("Project Summary:");
 
+  const appTypeLabel =
+    config.applicationType === "backend" ? "Backend API" : "Full-stack App";
+
   consola.box(
     `Project Name:    ${config.projectName}\n` +
       `Target Dir:      ${targetDir}\n` +
-      `App Type:        ${config.applicationType}\n` +
+      `App Type:        ${appTypeLabel}\n` +
       `Framework:       ${config.framework}\n` +
       `Database:        ${config.database}\n` +
       `Auth:            ${config.useAuth ? "Yes" : "No"}\n` +

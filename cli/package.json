@@ -31,7 +31,8 @@
     "lint-staged": "lint-staged",
     "format": "prettier --write  \"**/*.{ts,tsx,js,jsx,json,md,mdx,css}\"",
     "format:check": "prettier --check  \"**/*.{ts,tsx,js,jsx,json,md,mdx,css}\"",
-    "prepare": "cd .. && husky cli/.husky"
+    "prepare": "cd .. && husky cli/.husky",
+    "type:check": "tsc --noEmit"
   },
   "keywords": [
     "cli",

@@ -1,18 +1,22 @@
-import { cancel, confirm, group, isCancel, select, text } from "@clack/prompts";
+import { cancel, confirm, group, isCancel, select } from "@clack/prompts";
 import consola from "consola";
 
 import {
   authOptions,
   BackendFramework,
   backendFrameworkOptions,
-  DatabaseOption,
-  databaseOptions,
+  DatabaseType,
+  databaseTypeOptions,
+  isValidOrmOption,
+  mongodbOrmOptions,
+  OrmOption,
   PackageManager,
-  packageManagerOptions
+  packageManagerOptions,
+  postgresqlOrmOptions,
+  PromptChoices,
 } from "../../types";
-import { validateProjectName } from "../../validators";
 
-export const collectBackendChoices = async () => {
+export const collectBackendChoices = async (): Promise<PromptChoices> => {
   const project = await group(
     {
       framework: async () => {
@@ -42,18 +46,42 @@ export const collectBackendChoices = async () => {
 
         return selection;
       },
-      projectName: () =>
-        text({
-          message: "Project name:",
-          placeholder: "my-awesome-project",
-          validate: (value) => validateProjectName(value),
-        }),
-
-      database: async () => {
-        const selection = await select<DatabaseOption>({
-          message: "How would you like to interact with the database?",
-          options: databaseOptions,
+      databaseType: async () => {
+        const selection = await select<DatabaseType>({
+          message: "Select a database:",
+          options: databaseTypeOptions,
           initialValue: "none",
+        });
+
+        if (isCancel(selection)) {
+          cancel("Operation cancelled.");
+          process.exit(0);
+        }
+
+        return selection;
+      },
+      orm: async ({ results }) => {
+        // Type guard to narrow the databaseType from unknown to DatabaseType
+        const dbType = results.databaseType;
+
+        // Skip ORM selection if no database type was selected
+        if (dbType === "none") {
+          return "none" as const;
+        }
+
+        // Type guard: at this point, dbType must be mongodb or postgresql
+        if (dbType !== "mongodb" && dbType !== "postgresql") {
+          throw new Error(`Invalid database type: ${dbType}`);
+        }
+
+        // Select appropriate ORM options based on database type
+        const ormOptions =
+          dbType === "mongodb" ? mongodbOrmOptions : postgresqlOrmOptions;
+
+        const selection = await select<OrmOption>({
+          message: `Select an ORM for ${dbType}:`,
+          options: ormOptions,
+          initialValue: "prisma",
         });
 
         if (isCancel(selection)) {
@@ -116,5 +144,22 @@ export const collectBackendChoices = async () => {
     }
   );
 
-  return project;
+  // Transform the group result into the proper typed object
+  // Validate orm using type guard
+  if (!isValidOrmOption(project.orm)) {
+    throw new Error(`Invalid ORM option: ${String(project.orm)}`);
+  }
+
+  const result: PromptChoices = {
+    framework: project.framework,
+    databaseType: project.databaseType,
+    orm: project.orm,
+    packageManager: project.packageManager,
+    useDocker: Boolean(project.useDocker),
+    useAuth: Boolean(project.useAuth),
+    initGit: Boolean(project.initGit),
+    installDeps: Boolean(project.installDeps),
+  };
+
+  return result;
 };

@@ -2,10 +2,17 @@
 
 // Supported package managers
 export type PackageManager = "npm" | "pnpm" | "bun";
-// Supported database options
-export type DatabaseOption = "none" | "prisma" | "mongoose";
 
-export type ApplicationType = "frontend" | "backend";
+// Database type (what database system to use)
+export type DatabaseType = "mongodb" | "postgresql" | "none";
+
+// ORM/ODM options
+export type OrmOption = "prisma" | "mongoose" | "drizzle" | "none";
+
+// Legacy: kept for backward compatibility, will be derived from databaseType + orm
+export type DatabaseOption = "none" | "prisma" | "mongoose" | "drizzle";
+
+export type ApplicationType = "backend" | "fullstack";
 
 // Module classification types
 export type ModuleType = "base" | "database" | "feature";
@@ -19,10 +26,7 @@ export interface Dependencies {
 export type BackendFramework = "express" | "hono";
 
 // Supported frontend frameworks
-export type FrontendFramework = "nextjs" | "vite";
-
-// Frontend auth options
-export type FrontendAuthOption = "none" | "better-auth";
+export type FrontendFramework = "nextjs";
 
 // Main configuration object for the build pipeline
 export interface ProjectConfig {
@@ -30,15 +34,57 @@ export interface ProjectConfig {
   projectName: string;
   applicationType: ApplicationType;
   framework: BackendFramework | FrontendFramework;
-  database?: DatabaseOption;
-  useDocker?: boolean;
-  useAuth?: boolean | FrontendAuthOption;
+
+  // Database configuration
+  databaseType: DatabaseType;
+  orm: OrmOption;
+  database: DatabaseOption; // Derived from databaseType + orm for backward compatibility
+
+  useDocker: boolean;
+  useAuth: boolean;
+
   // Tooling
   packageManager: PackageManager;
 
   // Post-build options
   initGit: boolean;
   installDeps: boolean;
+}
+
+/**
+ * Shared type for prompt choices (used by both frontend and backend collectors).
+ * This is essentially ProjectConfig without the derived/initial fields.
+ */
+export type PromptChoices = Omit<
+  ProjectConfig,
+  "projectName" | "applicationType" | "database"
+>;
+
+/** Type guard to validate OrmOption values */
+export function isValidOrmOption(value: unknown): value is OrmOption {
+  return (
+    value === "prisma" ||
+    value === "mongoose" ||
+    value === "drizzle" ||
+    value === "none"
+  );
+}
+
+/**
+ * Derives the database option from database type and ORM selection.
+ * Returns "none" if either is "none", otherwise returns the ORM which
+ * must be a valid DatabaseOption (prisma, mongoose, or drizzle).
+ */
+export function deriveDatabase(
+  databaseType: DatabaseType,
+  orm: OrmOption
+): DatabaseOption {
+  if (databaseType === "none" || orm === "none") {
+    return "none";
+  }
+  // At this point, orm must be one of: prisma, mongoose, drizzle
+  // which are all valid DatabaseOption values
+  return orm;
 }
 
 // Module configuration from config.json
@@ -115,8 +161,8 @@ export interface TemplateContext {
 
 // Type-safe option definitions
 export const applicationTypeOptions = [
-  { value: "backend" as const, label: "Backend" },
-  { value: "frontend" as const, label: "Frontend", hint: "(Coming Soon)" },
+  { value: "backend" as const, label: "Backend API (Express/NestJS)" },
+  { value: "fullstack" as const, label: "Full-stack App (Next.js)" },
 ];
 
 export const backendFrameworkOptions = [
@@ -125,19 +171,34 @@ export const backendFrameworkOptions = [
 ];
 
 export const frontendFrameworkOptions = [
-  { value: "nextjs" as const, label: "Next.js" },
-  { value: "vite" as const, label: "Vite", hint: "(Coming Soon)" },
+  { value: "nextjs" as const, label: "Next.js 15 (App Router)" },
 ];
 
-export const frontendDatabaseOptions = [
-  { value: "drizzle" as const, label: "Drizzle" },
+// Database type options (what database system)
+export const databaseTypeOptions = [
+  { value: "none" as const, label: "None (Skip database setup)" },
+  { value: "mongodb" as const, label: "MongoDB" },
+  { value: "postgresql" as const, label: "PostgreSQL" },
+];
+
+// ORM options for MongoDB
+export const mongodbOrmOptions = [
   { value: "prisma" as const, label: "Prisma (Type-safe ORM)" },
+  { value: "mongoose" as const, label: "Mongoose (MongoDB ODM)" },
 ];
 
+// ORM options for PostgreSQL
+export const postgresqlOrmOptions = [
+  { value: "prisma" as const, label: "Prisma (Type-safe ORM)" },
+  { value: "drizzle" as const, label: "Drizzle (Lightweight ORM)" },
+];
+
+// Legacy database options (for backward compatibility)
 export const databaseOptions = [
   { value: "none" as const, label: "None (Skip database setup)" },
   { value: "prisma" as const, label: "Prisma (Type-safe ORM)" },
   { value: "mongoose" as const, label: "Mongoose (Standard MongoDB ODM)" },
+  { value: "drizzle" as const, label: "Drizzle (Lightweight ORM)" },
 ];
 
 export const packageManagerOptions = [
@@ -149,9 +210,4 @@ export const packageManagerOptions = [
 export const authOptions = [
   { value: false as const, label: "No" },
   { value: true as const, label: "Yes" },
-];
-
-export const frontendAuthOptions = [
-  { value: "none" as const, label: "No" },
-  { value: "better-auth" as const, label: "Better Auth" },
 ];

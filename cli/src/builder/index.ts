@@ -3,7 +3,7 @@ import fs from "fs-extra";
 
 import { getModule } from "../modules/registry";
 import { generateNextSteps } from "../output/nextSteps";
-import { buildError, BuildResult, Module, ProjectConfig } from "../types";
+import { buildError, BuildResult, ModuleConfig, ProjectConfig } from "../types";
 import { validateDirectoryEmpty } from "../validators";
 import {
   generateEnvFile,
@@ -50,11 +50,18 @@ export async function build(
 
     // 4. Load modules
     consola.info("Loading module configurations...");
-    const modules: Module[] = [];
+    const modules: Array<{
+      config: ModuleConfig;
+      path: string;
+      framework: string;
+    }> = [];
     try {
-      modules.push(await getModule(selection.base));
-      for (const moduleId of selection.modules) {
-        modules.push(await getModule(moduleId));
+      const baseModule = await getModule(selection.base);
+      modules.push({ ...baseModule, framework: config.framework });
+
+      for (const moduleWithFramework of selection.modules) {
+        const module = await getModule(moduleWithFramework.id);
+        modules.push({ ...module, framework: moduleWithFramework.framework });
       }
     } catch (e) {
       throw buildError(e, "MODULE_LOADING_ERROR", "Failed to load modules");

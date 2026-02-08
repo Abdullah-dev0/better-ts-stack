@@ -21,12 +21,12 @@ export const NAVBAR_CONFIG = {
 		tagline: "Ship faster, type safer",
 	},
 	links: [
-		{ href: "#features", label: "Modules", external: false },
-		{ href: "#architecture", label: "Architecture", external: false },
+		{ href: "/docs", label: "Docs", external: false },
 		{ href: "https://github.com/abdullah-dev0", label: "GitHub", external: true },
 	] as const satisfies readonly NavbarLink[],
 	cta: {
 		text: "Get Started",
+		href: "/docs",
 	},
 } as const;
 
@@ -48,9 +48,11 @@ export const HERO_CONFIG = {
 		primary: {
 			text: "Get Started",
 			icon: "ArrowRight",
+			href: "/docs/cli",
 		},
 		secondary: {
 			text: "View Documentation",
+			href: "/docs",
 		},
 	},
 } as const;
@@ -233,14 +235,14 @@ export const FOOTER_CONFIG = {
 	],
 	pages: [
 		{ href: "/", label: "Home" },
-		{ href: "#modules", label: "Features" },
-		{ href: "#architecture", label: "Architecture" },
-		{ href: "#", label: "Docs" },
+		{ href: "/docs", label: "Docs" },
+		{ href: "/docs/cli", label: "CLI" },
+		{ href: "/docs/structure", label: "Architecture" },
 	],
 	resources: [
-		{ href: "#", label: "Documentation" },
-		{ href: "#", label: "Getting Started" },
-		{ href: "#", label: "Examples" },
+		{ href: "/docs", label: "Documentation" },
+		{ href: "/docs/cli", label: "Getting Started" },
+		{ href: "/docs/examples", label: "Examples" },
 	],
 } as const;
 

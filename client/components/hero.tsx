@@ -1,6 +1,8 @@
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { HERO_CONFIG } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 import { ArrowRight, Sparkles, Server, Database, Box } from "lucide-react";
+import Link from "next/link";
 import { FadeInUp, FloatingOrb, FloatingIcon } from "./motion";
 import { TerminalPreview } from "./terminal-preview";
 
@@ -75,13 +77,17 @@ export const HeroSection = () => {
 
 				{/* CTA Buttons */}
 				<FadeInUp delay={0.3} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-					<Button size="lg" className="btn-depth gap-2 px-6">
+					<Link
+						href={HERO_CONFIG.cta.primary.href}
+						className={cn(buttonVariants({ size: "lg" }), "btn-depth gap-2 px-6")}>
 						{HERO_CONFIG.cta.primary.text}
 						<ArrowRight className="w-4 h-4" />
-					</Button>
-					<Button variant="outline" size="lg" className="btn-depth px-6">
+					</Link>
+					<Link
+						href={HERO_CONFIG.cta.secondary.href}
+						className={cn(buttonVariants({ variant: "outline", size: "lg" }), "btn-depth px-6")}>
 						{HERO_CONFIG.cta.secondary.text}
-					</Button>
+					</Link>
 				</FadeInUp>
 
 				{/* Terminal Preview */}

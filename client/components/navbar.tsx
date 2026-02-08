@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { Github, Menu, Moon, Sun, X, Zap } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { NAVBAR_CONFIG } from "@/lib/constants";
 import { MotionDiv, MotionHeader } from "./motion";
@@ -55,6 +56,7 @@ export const Navbar = () => {
 						<Link
 							key={i}
 							href={link.href}
+							{...(link.external && { target: "_blank", rel: "noopener noreferrer" })}
 							className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5">
 							{link.label === "GitHub" && <Github className="w-4 h-4" />}
 							{link.label}
@@ -68,9 +70,11 @@ export const Navbar = () => {
 						{isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
 					</Button>
 
-					<Button variant="default" size="sm" className="hidden md:flex btn-depth">
+					<Link
+						href={NAVBAR_CONFIG.cta.href}
+						className={cn(buttonVariants({ variant: "default", size: "sm" }), "hidden md:flex btn-depth")}>
 						{NAVBAR_CONFIG.cta.text}
-					</Button>
+					</Link>
 
 					{/* Mobile Menu Toggle */}
 					<Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileOpen(!mobileOpen)}>
@@ -91,14 +95,17 @@ export const Navbar = () => {
 							<Link
 								key={i}
 								href={link.href}
+								{...(link.external && { target: "_blank", rel: "noopener noreferrer" })}
 								className="text-sm text-muted-foreground hover:text-foreground py-2 flex items-center gap-1.5">
 								{link.label === "GitHub" && <Github className="w-4 h-4" />}
 								{link.label}
 							</Link>
 						))}
-						<Button variant="default" size="sm" className="w-full mt-2 btn-depth">
+						<Link
+							href={NAVBAR_CONFIG.cta.href}
+							className={cn(buttonVariants({ variant: "default", size: "sm" }), "w-full mt-2 btn-depth flex items-center justify-center")}>
 							{NAVBAR_CONFIG.cta.text}
-						</Button>
+						</Link>
 					</div>
 				</MotionDiv>
 			)}

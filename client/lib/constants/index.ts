@@ -43,7 +43,7 @@ export const HERO_CONFIG = {
 		accent: "by Default.",
 	},
 	subheadline:
-		"ts-better-stack scaffolds production-ready TypeScript projects with modular architecture—Prisma, MongoDB, Docker, and more. Zero configuration required.",
+		"better-ts-stack scaffolds production-ready TypeScript projects with modular architecture—Express, Prisma, MongoDB, Docker, and more. Zero configuration required.",
 	cta: {
 		primary: {
 			text: "Get Started",
@@ -72,7 +72,7 @@ export const ARCHITECTURE_FEATURES: Feature[] = [
 		icon: "Server",
 		title: "Backend Module",
 		description:
-			"TypeScript backend with Express or Fastify. Fully type-safe REST API with automatic validation using Zod.",
+			"TypeScript backend with Express. Fully type-safe REST API with automatic validation using Zod. Hono support coming soon.",
 		color: "text-purple-400",
 		badge: null,
 		size: "large",
@@ -104,25 +104,17 @@ export const ARCHITECTURE_FEATURES: Feature[] = [
 	{
 		icon: "Layout",
 		title: "Frontend Module",
-		description: "Next.js/Vite Integration coming soon. Pre-configured with Tailwind and key libraries.",
-		color: "text-muted-foreground",
-		badge: "Coming Soon",
+		description: "Full-stack Next.js integration. Pre-configured with Tailwind CSS, React 19, and modern tooling.",
+		color: "text-green-400",
+		badge: null,
 		size: "large",
 	},
 	{
 		icon: "Shield",
 		title: "Auth Module",
-		description: "JWT authentication with session management. Role-based access control out of the box.",
+		description: "Optional JWT authentication with session management. Add auth to your project with one prompt.",
 		color: "text-primary",
-		badge: "Coming Soon",
-		size: "normal",
-	},
-	{
-		icon: "Zap",
-		title: "Edge Functions",
-		description: "Deploy to Vercel Edge, Cloudflare Workers, or any edge runtime with ease.",
-		color: "text-teal-400",
-		badge: "Coming Soon",
+		badge: null,
 		size: "normal",
 	},
 ];
@@ -148,7 +140,7 @@ export interface StackItem {
 
 export const STACK_ITEMS: StackItem[] = [
 	{ icon: "Database", label: "Data Layer", sub: "MongoDB + Prisma + Mongoose", color: "text-primary" },
-	{ icon: "Layers", label: "Business Logic", sub: "TypeScript + Zod + better-auth", color: "text-purple-400" },
+	{ icon: "Layers", label: "Business Logic", sub: "TypeScript + Zod + JWT Auth", color: "text-purple-400" },
 	{ icon: "Server", label: "API Layer", sub: "Express + TypeScript", color: "text-blue-400" },
 	{ icon: "UploadCloud", label: "Deployment", sub: "Docker + CI/CD", color: "text-orange-400" },
 ];
@@ -188,14 +180,14 @@ export const CORRECTNESS_SECTION = {
 			description: "Hours of config, auth headaches, type mismatches.",
 		},
 		good: {
-			label: "ts-better-stack",
+			label: "better-ts-stack",
 			description: "One command, full stack, ready to ship.",
 		},
 	},
 	templates: {
 		title: "Ready-Made Templates. Zero Setup.",
 		description:
-			"Pick your stack, choose your package manager (npm, yarn, pnpm, bun), and get a production-ready TypeScript project with Express backend, better-auth authentication, and end-to-end type safety. No configuration needed.",
+			"Pick your stack, choose your package manager (npm, pnpm, bun), and get a production-ready TypeScript project with Express backend, optional JWT authentication, and end-to-end type safety. No configuration needed.",
 	},
 } as const;
 
@@ -203,13 +195,14 @@ export const CORRECTNESS_SECTION = {
 // TERMINAL PREVIEW CONSTANTS
 // ============================================================================
 export const TERMINAL_CONFIG = {
-	command: "npx ts-better-stack@latest init",
+	command: "npx better-ts-stack",
 	typingSpeed: 80, // milliseconds per character
 	output: [
 		{ icon: "✓", text: "Scaffolding your type-safe project...", color: "text-primary" },
-		{ icon: "✓", text: "TypeScript + Prisma + MongoDB configured", color: "text-primary" },
-		{ icon: "✓", text: "Docker compose ready", color: "text-primary" },
-		{ icon: "→", text: "Done in 2.4s. Run `cd my-app && npm run dev`", color: "text-primary" },
+		{ icon: "✓", text: "Express + TypeScript configured", color: "text-primary" },
+		{ icon: "✓", text: "Database (Prisma/Drizzle) ready", color: "text-primary" },
+		{ icon: "✓", text: "Docker Compose configured", color: "text-primary" },
+		{ icon: "→", text: "Done! Run `cd my-app && npm run dev`", color: "text-primary" },
 	],
 } as const;
 
@@ -227,8 +220,8 @@ export const STATS = [
 // ============================================================================
 export const FOOTER_CONFIG = {
 	brand: {
-		name: "ts-better-stack",
-		logo: "ts",
+		name: "better-ts-stack",
+		logo: "TS",
 	},
 	copyright: {
 		year: new Date().getFullYear(),
@@ -281,9 +274,9 @@ export const CORE_ARCHITECTURE_CONFIG = {
 		accent: "Start knowing.",
 	},
 	description:
-		"Built on the principles of correctness and performance. ts-better-stack isn't just a starter template; it's a philosophy.",
+		"Built on the principles of correctness and performance. better-ts-stack isn't just a starter template; it's a philosophy.",
 	details:
-		"Traditional API layers break the type chain. ts-better-stack preserves it. If you change a column name in your database, your frontend build fails immediately. No more runtime surprises.",
+		"Traditional API layers break the type chain. better-ts-stack preserves it. If you change a column name in your database, your frontend build fails immediately. No more runtime surprises.",
 	stats: {
 		runtimeErrors: {
 			value: "0",
@@ -297,7 +290,7 @@ export const CORE_ARCHITECTURE_CONFIG = {
 	simulation: {
 		modes: {
 			legacy: "Traditional",
-			nexus: "ts-better-stack",
+			modern: "better-ts-stack",
 		},
 		actions: {
 			renameColumn: "Rename Column (migrate)",
@@ -325,7 +318,7 @@ export const CORE_ARCHITECTURE_CONFIG = {
 // ============================================================================
 export const CODE_COMPARISON_CONFIG = {
 	title: "Type-Flow Visualization",
-	description: "See the difference. Nexus bridges the gap between your backend and frontend.",
+	description: "See the difference. better-ts-stack bridges the gap between your backend and frontend.",
 	files: {
 		traditional: {
 			name: "traditional-fetch.ts",
@@ -335,10 +328,10 @@ export const CODE_COMPARISON_CONFIG = {
 // ❌ No type inference
 console.log(data.user.nmae)`,
 		},
-		nexus: {
-			name: "nexus-client.ts",
+		modern: {
+			name: "typed-client.ts",
 			label: "Type-Safe",
-			code: `const data = await client.users.get.query()
+			code: `const data = await api.users.get()
 
 // ✅ Full autocompletion
 console.log(data.user.name)`,

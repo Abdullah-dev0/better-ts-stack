@@ -1,0 +1,127 @@
+---
+title: Getting Started
+description: Quick start guide for Better-TS-Stack - a modern TypeScript project generator
+icon: BookOpen
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { Cards, Card } from 'fumadocs-ui/components/card';
+import { Terminal, FolderTree, Settings, Rocket } from 'lucide-react';
+
+## Welcome to Better-TS-Stack
+
+Better-TS-Stack is a powerful CLI tool that generates fully configured TypeScript projects with backend, frontend, database integration, Docker support, and more through an interactive setup.
+
+<Callout type="info" title="Quick Start">
+  Get your project running in under 5 minutes with our interactive CLI.
+</Callout>
+
+## Features
+
+- 🚀 **Fast Setup** - Interactive CLI guides you through project creation
+- 📦 **Full Stack** - Backend (Express/Fastify), Frontend (Next.js), Database (PostgreSQL/MySQL)
+- 🐳 **Docker Ready** - Production-ready containerization out of the box
+- 🔒 **Type Safe** - Full TypeScript support with strict type checking
+- 🧪 **Testing Included** - Jest/Vitest configured and ready
+- 📝 **ESLint & Prettier** - Code quality tools pre-configured
+
+## Quick Installation
+
+<Steps>
+
+<Step>
+### Install the CLI
+
+<Tabs items={['npm', 'pnpm', 'yarn']}>
+  <Tab value="npm">
+    ```bash
+    npm install -g better-ts-stack
+    ```
+  </Tab>
+  <Tab value="pnpm">
+    ```bash
+    pnpm add -g better-ts-stack
+    ```
+  </Tab>
+  <Tab value="yarn">
+    ```bash
+    yarn global add better-ts-stack
+    ```
+  </Tab>
+</Tabs>
+
+</Step>
+
+<Step>
+### Create Your Project
+
+Run the interactive CLI to generate your project:
+
+```bash
+better-ts-stack create my-awesome-app
+```
+
+The CLI will guide you through selecting:
+- Project name and description
+- Backend framework (Express, Fastify, or none)
+- Frontend framework (Next.js, React, or none)
+- Database (PostgreSQL, MySQL, or none)
+- Additional features (Docker, testing, etc.)
+
+</Step>
+
+<Step>
+### Start Development
+
+Navigate to your project and start coding:
+
+```bash
+cd my-awesome-app
+npm install
+npm run dev
+```
+
+</Step>
+
+</Steps>
+
+## What's Included?
+
+Your generated project includes:
+
+- **Backend API** - RESTful API with TypeScript, validation, and error handling
+- **Frontend App** - Modern React/Next.js application with routing
+- **Database Setup** - Configured ORM (Prisma/TypeORM) with migrations
+- **Docker Compose** - Multi-container orchestration for development and production
+- **CI/CD Pipeline** - GitHub Actions workflow template
+- **Documentation** - README with project-specific instructions
+
+<Callout type="warn" title="Requirements">
+  Node.js 18+ is required. Make sure you have it installed before proceeding.
+</Callout>
+
+## Next Steps
+
+<Cards>
+  <Card title="CLI Usage" href="/docs/cli" icon={<Terminal />}>
+    Learn about all CLI commands and options
+  </Card>
+  <Card title="Project Structure" href="/docs/structure" icon={<FolderTree />}>
+    Understand the generated project layout
+  </Card>
+  <Card title="Configuration" href="/docs/configuration" icon={<Settings />}>
+    Customize your project settings
+  </Card>
+  <Card title="Deployment" href="/docs/deployment" icon={<Rocket />}>
+    Deploy your application to production
+  </Card>
+</Cards>
+
+## Community & Support
+
+- 📖 [Read the full documentation](/docs)
+- 💬 [Join our Discord community](https://discord.gg/example)
+- 🐛 [Report issues on GitHub](https://github.com/example/better-ts-stack)
+- 💡 [Request features](https://github.com/example/better-ts-stack/issues)

@@ -1,0 +1,290 @@
+---
+title: CLI Usage
+description: Complete guide to using the Better-TS-Stack CLI tool
+icon: Terminal
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Overview
+
+The Better-TS-Stack CLI provides an interactive interface for generating and managing TypeScript projects. This guide covers all available commands and options.
+
+## Commands
+
+### create
+
+Generate a new TypeScript stack project.
+
+```bash
+better-ts-stack create [project-name] [options]
+```
+
+<Callout type="info">
+  If you don't provide a project name, the CLI will prompt you for one.
+</Callout>
+
+#### Options
+
+| Option | Alias | Description | Default |
+|--------|-------|-------------|---------|
+| `--backend <framework>` | `-b` | Backend framework (express, fastify, none) | Interactive |
+| `--frontend <framework>` | `-f` | Frontend framework (nextjs, react, none) | Interactive |
+| `--database <db>` | `-d` | Database (postgresql, mysql, sqlite, none) | Interactive |
+| `--docker` | | Include Docker configuration | false |
+| `--testing` | `-t` | Include testing setup | false |
+| `--ci` | | Include CI/CD pipeline | false |
+| `--skip-install` | | Skip npm install after generation | false |
+| `--verbose` | `-v` | Verbose output | false |
+
+#### Examples
+
+**Interactive mode (recommended):**
+
+```bash
+better-ts-stack create
+```
+
+**With all options specified:**
+
+```bash
+better-ts-stack create my-app \
+  --backend express \
+  --frontend nextjs \
+  --database postgresql \
+  --docker \
+  --testing
+```
+
+**Quick API-only project:**
+
+```bash
+better-ts-stack create api-server -b fastify -d postgresql -f none
+```
+
+**Frontend-only project:**
+
+```bash
+better-ts-stack create my-website -f nextjs -b none -d none
+```
+
+### init
+
+Initialize Better-TS-Stack configuration in an existing project.
+
+```bash
+better-ts-stack init [options]
+```
+
+<Callout type="warn" title="Caution">
+  This will modify your existing project structure. Make sure to commit your changes first.
+</Callout>
+
+#### Options
+
+| Option | Description |
+|--------|-------------|
+| `--force` | Overwrite existing configuration |
+| `--modules <modules>` | Comma-separated list of modules to add |
+
+#### Example
+
+```bash
+better-ts-stack init --modules docker,testing
+```
+
+### add
+
+Add additional modules to an existing Better-TS-Stack project.
+
+```bash
+better-ts-stack add <module> [options]
+```
+
+#### Available Modules
+
+- `docker` - Add Docker and docker-compose configuration
+- `testing` - Add Jest or Vitest testing setup
+- `ci` - Add GitHub Actions workflow
+- `auth` - Add authentication module (JWT, sessions)
+- `logging` - Add structured logging (Winston, Pino)
+- `validation` - Add request validation (Zod, Joi)
+
+#### Examples
+
+**Add Docker support:**
+
+```bash
+better-ts-stack add docker
+```
+
+**Add authentication module:**
+
+```bash
+better-ts-stack add auth --provider jwt
+```
+
+**Add multiple modules:**
+
+```bash
+better-ts-stack add testing ci --test-framework vitest
+```
+
+### update
+
+Update Better-TS-Stack templates and dependencies.
+
+```bash
+better-ts-stack update [options]
+```
+
+#### Options
+
+| Option | Description |
+|--------|-------------|
+| `--check` | Check for updates without installing |
+| `--templates` | Update only templates |
+| `--dependencies` | Update project dependencies |
+
+### info
+
+Display project information and configuration.
+
+```bash
+better-ts-stack info
+```
+
+This command shows:
+- Current Better-TS-Stack version
+- Project configuration
+- Installed modules
+- Available updates
+
+## Global Options
+
+These options work with all commands:
+
+| Option | Alias | Description |
+|--------|-------|-------------|
+| `--help` | `-h` | Show help for command |
+| `--version` | `-V` | Show CLI version |
+| `--no-color` | | Disable colored output |
+| `--quiet` | `-q` | Minimal output |
+
+## Configuration File
+
+Better-TS-Stack projects include a `stack.config.ts` file for customization:
+
+```typescript
+import { defineConfig } from 'better-ts-stack';
+
+export default defineConfig({
+  // Project metadata
+  name: 'my-awesome-app',
+  version: '1.0.0',
+  
+  // Backend configuration
+  backend: {
+    framework: 'express',
+    port: 3000,
+    cors: true,
+  },
+  
+  // Frontend configuration
+  frontend: {
+    framework: 'nextjs',
+    port: 3001,
+  },
+  
+  // Database configuration
+  database: {
+    type: 'postgresql',
+    host: 'localhost',
+    port: 5432,
+  },
+  
+  // Module options
+  modules: {
+    docker: true,
+    testing: {
+      framework: 'vitest',
+      coverage: true,
+    },
+    ci: {
+      provider: 'github',
+    },
+  },
+});
+```
+
+## Environment Variables
+
+Configure the CLI using environment variables:
+
+```bash
+# Set default backend framework
+export BTS_DEFAULT_BACKEND=express
+
+# Set default frontend framework
+export BTS_DEFAULT_FRONTEND=nextjs
+
+# Skip confirmation prompts
+export BTS_AUTO_CONFIRM=true
+
+# Custom templates directory
+export BTS_TEMPLATES_DIR=/path/to/templates
+```
+
+## Troubleshooting
+
+### Command not found
+
+If you get "command not found" after installation:
+
+<Tabs items={['npm', 'pnpm', 'yarn']}>
+  <Tab value="npm">
+    ```bash
+    # Check if npm global bin is in PATH
+    npm config get prefix
+    
+    # Add to PATH (bash/zsh)
+    export PATH="$PATH:$(npm config get prefix)/bin"
+    ```
+  </Tab>
+  <Tab value="pnpm">
+    ```bash
+    # Check pnpm global bin directory
+    pnpm bin -g
+    
+    # Add to PATH
+    export PATH="$PATH:$(pnpm bin -g)"
+    ```
+  </Tab>
+  <Tab value="yarn">
+    ```bash
+    # Check yarn global bin directory
+    yarn global bin
+    
+    # Add to PATH
+    export PATH="$PATH:$(yarn global bin)"
+    ```
+  </Tab>
+</Tabs>
+
+### Permission errors
+
+On Unix systems, you might need sudo or use a version manager:
+
+```bash
+# Install with nvm (recommended)
+nvm use 18
+npm install -g better-ts-stack
+
+# Or use npx without global install
+npx better-ts-stack create my-app
+```
+
+<Callout type="info" title="Need Help?">
+  Join our [Discord community](https://discord.gg/example) for real-time support.
+</Callout>

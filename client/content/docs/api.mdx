@@ -1,0 +1,425 @@
+---
+title: API Reference
+description: Complete API documentation for Better-TS-Stack generated projects
+icon: Code
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Authentication API
+
+### POST /api/auth/register
+
+Register a new user account.
+
+**Request Body:**
+
+```typescript
+{
+  email: string;      // Valid email address
+  password: string;   // Min 8 characters
+  name: string;       // User's full name
+}
+```
+
+**Response (201 Created):**
+
+```typescript
+{
+  user: {
+    id: string;
+    email: string;
+    name: string;
+    createdAt: string;
+  },
+  token: string;      // JWT token
+}
+```
+
+**Example:**
+
+<Tabs items={['cURL', 'JavaScript', 'Python']}>
+  <Tab value="cURL">
+    ```bash
+    curl -X POST http://localhost:3000/api/auth/register \
+      -H "Content-Type: application/json" \
+      -d '{
+        "email": "user@example.com",
+        "password": "securepass123",
+        "name": "John Doe"
+      }'
+    ```
+  </Tab>
+  <Tab value="JavaScript">
+    ```typescript
+    const response = await fetch('http://localhost:3000/api/auth/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: 'user@example.com',
+        password: 'securepass123',
+        name: 'John Doe',
+      }),
+    });
+
+    const data = await response.json();
+    console.log(data.token);
+    ```
+  </Tab>
+  <Tab value="Python">
+    ```python
+    import requests
+
+    response = requests.post(
+        'http://localhost:3000/api/auth/register',
+        json={
+            'email': 'user@example.com',
+            'password': 'securepass123',
+            'name': 'John Doe'
+        }
+    )
+
+    data = response.json()
+    print(data['token'])
+    ```
+  </Tab>
+</Tabs>
+
+**Error Responses:**
+
+| Status | Error | Description |
+|--------|-------|-------------|
+| 400 | `INVALID_EMAIL` | Invalid email format |
+| 400 | `WEAK_PASSWORD` | Password doesn't meet requirements |
+| 409 | `EMAIL_EXISTS` | Email already registered |
+
+---
+
+### POST /api/auth/login
+
+Authenticate a user and receive a JWT token.
+
+**Request Body:**
+
+```typescript
+{
+  email: string;
+  password: string;
+}
+```
+
+**Response (200 OK):**
+
+```typescript
+{
+  user: {
+    id: string;
+    email: string;
+    name: string;
+  },
+  token: string;
+}
+```
+
+**Example:**
+
+```typescript
+const response = await fetch('http://localhost:3000/api/auth/login', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    email: 'user@example.com',
+    password: 'securepass123',
+  }),
+});
+
+const { token } = await response.json();
+localStorage.setItem('token', token);
+```
+
+<Callout type="warn" title="Token Storage">
+  Store JWT tokens securely. Use httpOnly cookies in production instead of localStorage.
+</Callout>
+
+---
+
+### POST /api/auth/logout
+
+Invalidate the current session (if using refresh tokens).
+
+**Headers:**
+
+```
+Authorization: Bearer {token}
+```
+
+**Response (204 No Content)**
+
+---
+
+### GET /api/auth/me
+
+Get current authenticated user details.
+
+**Headers:**
+
+```
+Authorization: Bearer {token}
+```
+
+**Response (200 OK):**
+
+```typescript
+{
+  id: string;
+  email: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+}
+```
+
+## Users API
+
+### GET /api/users
+
+Get a list of users (paginated).
+
+**Query Parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `page` | number | 1 | Page number |
+| `limit` | number | 10 | Items per page |
+| `search` | string | - | Search by name or email |
+| `sort` | string | createdAt | Sort field |
+| `order` | 'asc' \| 'desc' | desc | Sort order |
+
+**Headers:**
+
+```
+Authorization: Bearer {token}
+```
+
+**Response (200 OK):**
+
+```typescript
+{
+  data: Array<{
+    id: string;
+    email: string;
+    name: string;
+    createdAt: string;
+  }>,
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  }
+}
+```
+
+**Example:**
+
+```typescript
+const response = await fetch(
+  'http://localhost:3000/api/users?page=1&limit=20&search=john',
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
+
+const { data, meta } = await response.json();
+```
+
+---
+
+### GET /api/users/:id
+
+Get a specific user by ID.
+
+**Headers:**
+
+```
+Authorization: Bearer {token}
+```
+
+**Response (200 OK):**
+
+```typescript
+{
+  id: string;
+  email: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+}
+```
+
+---
+
+### PUT /api/users/:id
+
+Update a user's information.
+
+**Headers:**
+
+```
+Authorization: Bearer {token}
+```
+
+**Request Body:**
+
+```typescript
+{
+  name?: string;
+  email?: string;
+}
+```
+
+**Response (200 OK):**
+
+```typescript
+{
+  id: string;
+  email: string;
+  name: string;
+  updatedAt: string;
+}
+```
+
+---
+
+### DELETE /api/users/:id
+
+Delete a user account.
+
+**Headers:**
+
+```
+Authorization: Bearer {token}
+```
+
+**Response (204 No Content)**
+
+<Callout type="warn" title="Authorization">
+  Users can only delete their own account unless they have admin privileges.
+</Callout>
+
+## Error Handling
+
+All API errors follow a consistent format:
+
+```typescript
+{
+  error: {
+    code: string;           // Machine-readable error code
+    message: string;        // Human-readable message
+    details?: any;          // Additional error details
+    timestamp: string;      // ISO 8601 timestamp
+  }
+}
+```
+
+### Common Error Codes
+
+| Code | Status | Description |
+|------|--------|-------------|
+| `UNAUTHORIZED` | 401 | Missing or invalid authentication |
+| `FORBIDDEN` | 403 | Insufficient permissions |
+| `NOT_FOUND` | 404 | Resource not found |
+| `VALIDATION_ERROR` | 400 | Invalid request data |
+| `INTERNAL_ERROR` | 500 | Server error |
+| `RATE_LIMIT_EXCEEDED` | 429 | Too many requests |
+
+### Example Error Response
+
+```json
+{
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Invalid request data",
+    "details": {
+      "email": "Invalid email format",
+      "password": "Password must be at least 8 characters"
+    },
+    "timestamp": "2026-02-08T10:30:00.000Z"
+  }
+}
+```
+
+## Rate Limiting
+
+API endpoints are rate-limited to prevent abuse:
+
+- **Authentication endpoints**: 5 requests per 15 minutes
+- **General API**: 100 requests per 15 minutes
+- **Search endpoints**: 30 requests per minute
+
+Rate limit headers are included in responses:
+
+```
+X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 95
+X-RateLimit-Reset: 1612345678
+```
+
+## Pagination
+
+List endpoints support cursor-based pagination:
+
+```typescript
+{
+  data: Array<T>,
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  },
+  links: {
+    first: string;
+    prev?: string;
+    next?: string;
+    last: string;
+  }
+}
+```
+
+## Webhooks
+
+Subscribe to real-time events (if webhook module is enabled):
+
+### Available Events
+
+| Event | Description |
+|-------|-------------|
+| `user.created` | New user registered |
+| `user.updated` | User information updated |
+| `user.deleted` | User account deleted |
+
+### Webhook Payload
+
+```typescript
+{
+  event: string;
+  timestamp: string;
+  data: any;
+  signature: string;  // HMAC signature for verification
+}
+```
+
+<Callout type="info" title="SDK Available">
+  Consider using our TypeScript SDK for type-safe API calls:
+  ```bash
+  npm install @better-ts-stack/sdk
+  ```
+</Callout>

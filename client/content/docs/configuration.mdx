@@ -1,0 +1,525 @@
+---
+title: Configuration
+description: Configure and customize your Better-TS-Stack project
+icon: Settings
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Configuration File
+
+Better-TS-Stack uses a `stack.config.ts` file at the root of your project for centralized configuration.
+
+```typescript title="stack.config.ts"
+import { defineConfig } from 'better-ts-stack';
+
+export default defineConfig({
+  name: 'my-awesome-app',
+  version: '1.0.0',
+  
+  backend: {
+    framework: 'express',
+    port: 3000,
+    cors: {
+      enabled: true,
+      origins: ['http://localhost:3001'],
+    },
+  },
+  
+  frontend: {
+    framework: 'nextjs',
+    port: 3001,
+  },
+  
+  database: {
+    type: 'postgresql',
+    host: process.env.DB_HOST || 'localhost',
+    port: 5432,
+    name: process.env.DB_NAME || 'myapp',
+  },
+  
+  modules: {
+    docker: true,
+    testing: {
+      framework: 'vitest',
+      coverage: true,
+    },
+  },
+});
+```
+
+## Environment Variables
+
+Use `.env` files for environment-specific configuration:
+
+<Tabs items={['Development', 'Production', 'Testing']}>
+  <Tab value="Development">
+    ```bash title=".env.development"
+    # Server
+    NODE_ENV=development
+    PORT=3000
+    
+    # Database
+    DB_HOST=localhost
+    DB_PORT=5432
+    DB_NAME=myapp_dev
+    DB_USER=postgres
+    DB_PASSWORD=postgres
+    
+    # JWT
+    JWT_SECRET=dev-secret-change-in-production
+    JWT_EXPIRES_IN=7d
+    
+    # Frontend
+    NEXT_PUBLIC_API_URL=http://localhost:3000/api
+    ```
+  </Tab>
+  
+  <Tab value="Production">
+    ```bash title=".env.production"
+    # Server
+    NODE_ENV=production
+    PORT=3000
+    
+    # Database
+    DB_HOST=${DATABASE_HOST}
+    DB_PORT=5432
+    DB_NAME=${DATABASE_NAME}
+    DB_USER=${DATABASE_USER}
+    DB_PASSWORD=${DATABASE_PASSWORD}
+    DB_SSL=true
+    
+    # JWT
+    JWT_SECRET=${JWT_SECRET}
+    JWT_EXPIRES_IN=24h
+    
+    # Frontend
+    NEXT_PUBLIC_API_URL=${API_URL}
+    ```
+  </Tab>
+  
+  <Tab value="Testing">
+    ```bash title=".env.test"
+    # Server
+    NODE_ENV=test
+    PORT=3001
+    
+    # Database (use in-memory or test database)
+    DB_HOST=localhost
+    DB_PORT=5432
+    DB_NAME=myapp_test
+    DB_USER=postgres
+    DB_PASSWORD=postgres
+    
+    # JWT
+    JWT_SECRET=test-secret
+    JWT_EXPIRES_IN=1h
+    ```
+  </Tab>
+</Tabs>
+
+<Callout type="warn" title="Security">
+  Never commit `.env` files to version control! Use `.env.example` as a template.
+</Callout>
+
+## Backend Configuration
+
+### Express Configuration
+
+```typescript title="backend/src/app.ts"
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import { config } from './config';
+
+const app = express();
+
+// Security middleware
+app.use(helmet());
+
+// CORS configuration
+app.use(cors({
+  origin: config.cors.origins,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+
+// Body parser
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true }));
+
+// Rate limiting
+import rateLimit from 'express-rate-limit';
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+});
+
+app.use('/api/', limiter);
+
+export default app;
+```
+
+### Database Configuration
+
+<Tabs items={['PostgreSQL', 'MySQL', 'MongoDB']}>
+  <Tab value="PostgreSQL">
+    ```typescript title="backend/src/config/database.ts"
+    import { DataSource } from 'typeorm';
+    import { config } from './index';
+
+    export const AppDataSource = new DataSource({
+      type: 'postgres',
+      host: config.database.host,
+      port: config.database.port,
+      username: config.database.user,
+      password: config.database.password,
+      database: config.database.name,
+      synchronize: config.env === 'development',
+      logging: config.env === 'development',
+      entities: ['src/models/**/*.ts'],
+      migrations: ['src/migrations/**/*.ts'],
+      ssl: config.env === 'production' ? { rejectUnauthorized: false } : false,
+    });
+    ```
+  </Tab>
+  
+  <Tab value="MySQL">
+    ```typescript title="backend/src/config/database.ts"
+    import { DataSource } from 'typeorm';
+    import { config } from './index';
+
+    export const AppDataSource = new DataSource({
+      type: 'mysql',
+      host: config.database.host,
+      port: config.database.port,
+      username: config.database.user,
+      password: config.database.password,
+      database: config.database.name,
+      synchronize: config.env === 'development',
+      logging: config.env === 'development',
+      entities: ['src/models/**/*.ts'],
+      migrations: ['src/migrations/**/*.ts'],
+    });
+    ```
+  </Tab>
+  
+  <Tab value="MongoDB">
+    ```typescript title="backend/src/config/database.ts"
+    import mongoose from 'mongoose';
+    import { config } from './index';
+
+    const connectDB = async () => {
+      try {
+        await mongoose.connect(config.database.uri, {
+          useNewUrlParser: true,
+          useUnifiedTopology: true,
+        });
+        console.log('MongoDB connected successfully');
+      } catch (error) {
+        console.error('MongoDB connection error:', error);
+        process.exit(1);
+      }
+    };
+
+    export default connectDB;
+    ```
+  </Tab>
+</Tabs>
+
+## Frontend Configuration
+
+### Next.js Configuration
+
+```typescript title="frontend/next.config.ts"
+import type { NextConfig } from 'next';
+
+const config: NextConfig = {
+  reactStrictMode: true,
+  swcMinify: true,
+  
+  // Environment variables exposed to browser
+  env: {
+    API_URL: process.env.NEXT_PUBLIC_API_URL,
+  },
+  
+  // Image optimization
+  images: {
+    domains: ['localhost', 'api.example.com'],
+    formats: ['image/avif', 'image/webp'],
+  },
+  
+  // Headers
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'X-DNS-Prefetch-Control',
+            value: 'on',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'SAMEORIGIN',
+          },
+        ],
+      },
+    ];
+  },
+  
+  // Redirects
+  async redirects() {
+    return [
+      {
+        source: '/home',
+        destination: '/',
+        permanent: true,
+      },
+    ];
+  },
+};
+
+export default config;
+```
+
+### API Client Configuration
+
+```typescript title="frontend/src/services/api.ts"
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api',
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Request interceptor
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Handle unauthorized
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
+export default api;
+```
+
+## Docker Configuration
+
+### docker-compose.yml
+
+```yaml title="docker-compose.yml"
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend/src:/app/src
+    command: npm run dev
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      NEXT_PUBLIC_API_URL: http://backend:3000/api
+    ports:
+      - "3001:3001"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend/src:/app/src
+
+  # Redis (optional)
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  postgres_data:
+  redis_data:
+```
+
+### Development Override
+
+```yaml title="docker-compose.dev.yml"
+version: '3.8'
+
+services:
+  backend:
+    build:
+      target: development
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    command: npm run dev
+    environment:
+      NODE_ENV: development
+
+  frontend:
+    build:
+      target: development
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    command: npm run dev
+```
+
+Run with:
+
+```bash
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+```
+
+## Testing Configuration
+
+### Vitest Configuration
+
+```typescript title="backend/vitest.config.ts"
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+  test: {
+    globals: true,
+    environment: 'node',
+    setupFiles: ['./tests/setup.ts'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      exclude: [
+        'node_modules/',
+        'tests/',
+        '**/*.d.ts',
+        '**/*.config.*',
+        '**/dist/**',
+      ],
+    },
+    testTimeout: 10000,
+  },
+});
+```
+
+<Callout type="info" title="Configuration Tips">
+  - Use environment-specific config files
+  - Keep secrets in environment variables
+  - Document all configuration options
+  - Validate configuration at startup
+</Callout>
+
+## Advanced Configuration
+
+### Custom Middleware
+
+```typescript title="backend/src/middleware/custom.middleware.ts"
+import { Request, Response, NextFunction } from 'express';
+
+export function requestLogger(req: Request, res: Response, next: NextFunction) {
+  const start = Date.now();
+  
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    console.log(`${req.method} ${req.path} - ${res.statusCode} [${duration}ms]`);
+  });
+  
+  next();
+}
+
+export function apiKeyAuth(req: Request, res: Response, next: NextFunction) {
+  const apiKey = req.headers['x-api-key'];
+  
+  if (!apiKey || apiKey !== process.env.API_KEY) {
+    return res.status(401).json({ error: 'Invalid API key' });
+  }
+  
+  next();
+}
+```
+
+### Feature Flags
+
+```typescript title="shared/config/features.ts"
+export const features = {
+  authentication: {
+    enabled: true,
+    providers: ['jwt', 'oauth'],
+  },
+  payments: {
+    enabled: process.env.ENABLE_PAYMENTS === 'true',
+    provider: 'stripe',
+  },
+  analytics: {
+    enabled: process.env.NODE_ENV === 'production',
+    provider: 'google-analytics',
+  },
+};
+```
+
+## Next Steps
+
+- [Deployment Guide](/docs/deployment) - Deploy your configured app
+- [API Reference](/docs/api) - API endpoint documentation
+- [Security Best Practices](/docs/security) - Secure your application

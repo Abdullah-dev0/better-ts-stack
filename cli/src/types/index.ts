@@ -149,6 +149,7 @@ export interface TemplateContext {
   projectName: string;
   packageManager: string;
   database: string;
+  framework: string;
   port: number;
   useDocker: boolean;
   useAuth: boolean;

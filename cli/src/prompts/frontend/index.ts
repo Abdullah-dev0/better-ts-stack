@@ -44,12 +44,11 @@ export const collectFrontendChoices = async (): Promise<PromptChoices> => {
           return "none" as const;
         }
 
-        // Type guard: at this point, dbType must be mongodb or postgresql
+        // Select ORM based on database type
         if (dbType !== "mongodb" && dbType !== "postgresql") {
-          throw new Error(`Invalid database type: ${dbType}`);
+          return "none" as const;
         }
 
-        // Select appropriate ORM options based on database type
         const ormOptions =
           dbType === "mongodb" ? mongodbOrmOptions : postgresqlOrmOptions;
 

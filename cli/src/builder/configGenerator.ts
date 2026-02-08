@@ -85,13 +85,16 @@ export async function generatePackageJson(
   config: ProjectConfig
 ): Promise<void> {
   try {
+    const isFullstack = config.applicationType === "fullstack";
     const packageJson = {
       name: config.projectName,
       version: "1.0.0",
       description: `Project created with better-ts-stack using ${config.database !== "none" ? config.database : "no database"}`,
-      main: "dist/index.js",
+      ...(isFullstack ? {} : { main: "dist/index.js" }),
       scripts: mergedConfig.scripts,
-      keywords: ["backend", "typescript", "express"],
+      keywords: isFullstack
+        ? ["nextjs", "react", "typescript"]
+        : ["backend", "typescript", "express"],
       author: "",
       license: "MIT",
       dependencies: mergedConfig.dependencies,

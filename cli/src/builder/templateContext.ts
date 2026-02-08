@@ -20,10 +20,13 @@ export function kebabCase(str: string): string {
 }
 
 export function buildTemplateContext(config: ProjectConfig) {
+  const framework =
+    config.applicationType === "backend" ? config.framework : "nextjs";
   return {
     projectName: config.projectName,
     packageManager: config.packageManager,
     database: config.database ?? "none",
+    framework,
     port: 3000, // Default port
     useDocker: config.useDocker ?? false,
     useAuth:

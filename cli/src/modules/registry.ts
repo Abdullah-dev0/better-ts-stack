@@ -6,11 +6,15 @@ import { buildError, ModuleConfig } from "../types";
 
 // Determines the absolute filesystem path for a given module ID
 function resolveModulePath(id: string) {
-  // If id contains a slash, it's a base template path like 'backend/express'
-  if (id.includes("/")) {
+  // Base templates: backend/express, frontend/nextjs
+  if (id.startsWith("backend/") || id.startsWith("frontend/")) {
     return path.join(__dirname, `../../templates/${id}`);
   }
-  // Otherwise, it's a module in templates/modules/
+  // Compound module ids: auth/express, auth/nextjs, prisma/express, etc.
+  if (id.includes("/")) {
+    return path.join(__dirname, `../../templates/modules/${id}`);
+  }
+  // Simple module ids: docker, mongoose
   return path.join(__dirname, `../../templates/modules/${id}`);
 }
 

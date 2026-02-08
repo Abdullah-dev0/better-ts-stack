@@ -1,0 +1,26 @@
+import { betterAuth } from "better-auth";
+import { nextCookies } from "better-auth/next-js";
+{{#if (eq database 'prisma')}}
+import { prismaAdapter } from "better-auth/adapters/prisma";
+import { prisma } from "./prisma";
+{{/if}}
+{{#if (eq database 'drizzle')}}
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { db } from "./db";
+{{/if}}
+
+export const auth = betterAuth({
+  {{#if (eq database 'prisma')}}
+  database: prismaAdapter(prisma, { provider: "pg" }),
+  {{/if}}
+  {{#if (eq database 'drizzle')}}
+  database: drizzleAdapter(db, { provider: "pg" }),
+  {{/if}}
+  {{#if (eq database 'none')}}
+  // TODO: add Prisma or Drizzle module and set database adapter
+  database: undefined as any,
+  {{/if}}
+  plugins: [nextCookies()],
+  secret: process.env.BETTER_AUTH_SECRET,
+  baseURL: process.env.BETTER_AUTH_URL,
+});

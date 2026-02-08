@@ -14,9 +14,13 @@ export function selectModules(config: ProjectConfig) {
 
   const modules: Array<{ id: string; framework: string }> = [];
 
-  // Add database module if selected
+  // Add database module if selected (compound ids: prisma/express, prisma/nextjs, drizzle/nextjs, or mongoose)
   if (config.database !== "none") {
-    modules.push({ id: config.database, framework });
+    const dbId =
+      config.database === "mongoose"
+        ? "mongoose"
+        : `${config.database}/${framework}`;
+    modules.push({ id: dbId, framework });
   }
 
   // Add feature modules based on configuration
@@ -25,7 +29,7 @@ export function selectModules(config: ProjectConfig) {
   }
 
   if (config.useAuth) {
-    modules.push({ id: "auth", framework });
+    modules.push({ id: `auth/${framework}`, framework });
   }
 
   return { base, modules };

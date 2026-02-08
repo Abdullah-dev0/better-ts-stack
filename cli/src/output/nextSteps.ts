@@ -6,6 +6,7 @@ export function generateNextSteps(
   depsInstalled: boolean
 ): string[] {
   const steps: string[] = [];
+  const isFullstack = config.applicationType === "fullstack";
 
   // Step 1: cd into project directory
   steps.push(`cd ${config.projectName}`);
@@ -13,11 +14,22 @@ export function generateNextSteps(
   // Step 2: Set environment variables
   steps.push("Copy .env.example to .env and set your environment variables");
 
-  if (config.useAuth) {
-    steps.push("Set JWT_SECRET in .env (required for auth)");
-    steps.push(
-      "Create a user via POST /auth/register then login with /auth/login"
-    );
+  if (isFullstack) {
+    if (config.useAuth) {
+      steps.push("Set BETTER_AUTH_SECRET and BETTER_AUTH_URL in .env");
+      if (config.database !== "none") {
+        steps.push(
+          "Run Better Auth schema generation (see better-auth.com docs)"
+        );
+      }
+    }
+  } else {
+    if (config.useAuth) {
+      steps.push("Set JWT_SECRET in .env (required for auth)");
+      steps.push(
+        "Create a user via POST /auth/register then login with /auth/login"
+      );
+    }
   }
 
   // Step 3: Install dependencies if not already done
@@ -30,8 +42,10 @@ export function generateNextSteps(
   if (config.database === "prisma") {
     steps.push(`${getRunCommand(config.packageManager)} prisma:generate`);
     steps.push(`${getRunCommand(config.packageManager)} prisma:migrate`);
+  } else if (config.database === "drizzle") {
+    steps.push(`${getRunCommand(config.packageManager)} db:generate`);
+    steps.push(`${getRunCommand(config.packageManager)} db:migrate`);
   } else if (config.database === "mongoose") {
-    // Mongoose just needs MongoDB running
     steps.push(
       "Ensure MongoDB is running locally or update MONGODB_URI in .env"
     );

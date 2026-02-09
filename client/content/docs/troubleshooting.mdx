@@ -1,0 +1,372 @@
+---
+title: Troubleshooting
+description: Common issues and solutions
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Common Issues
+
+Here are solutions to common problems you might encounter.
+
+---
+
+## Installation Issues
+
+### "Command not found" after global install
+
+**Problem:** You installed globally but get "command not found"
+
+**Solution:**
+
+<Tabs items={['Linux/Mac', 'Windows']}>
+  <Tab value="Linux/Mac">
+    ```bash
+    # Check npm global location
+    npm config get prefix
+    
+    # Add to PATH in ~/.bashrc or ~/.zshrc
+    export PATH="$PATH:$(npm config get prefix)/bin"
+    
+    # Reload shell
+    source ~/.bashrc  # or source ~/.zshrc
+    ```
+  </Tab>
+  <Tab value="Windows">
+    ```powershell
+    # Check npm global location
+    npm config get prefix
+    
+    # Add to system PATH:
+    # 1. Open System Properties > Environment Variables
+    # 2. Edit PATH variable
+    # 3. Add: C:\Users\<username>\AppData\Roaming\npm
+    ```
+  </Tab>
+</Tabs>
+
+### Permission denied on Linux/Mac
+
+**Problem:** EACCES permission errors when installing globally
+
+**Solution:**
+
+```bash
+# Don't use sudo! Instead, change npm's directory
+mkdir ~/.npm-global
+npm config set prefix '~/.npm-global'
+echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.bashrc
+source ~/.bashrc
+
+# Now install without sudo
+npm install -g better-ts-stack
+```
+
+---
+
+## Project Generation Issues
+
+### "Target directory is not empty"
+
+**Problem:** The CLI says the directory already has files
+
+**Solution:**
+
+```bash
+# Option 1: Use a different project name
+npx better-ts-stack
+# Enter: my-new-project
+
+# Option 2: Empty the directory
+rm -rf my-project/*
+npx better-ts-stack
+
+# Option 3: Create new directory
+mkdir my-project && cd my-project
+npx better-ts-stack
+```
+
+### "Invalid project name"
+
+**Problem:** Project name rejected
+
+**Solution:**
+
+Valid names:
+- `my-api`
+- `cool-app-v2`
+- `customer_portal`
+
+Invalid names:
+- `my app` (contains space)
+- `.hidden` (starts with dot)
+- `` (empty)
+
+---
+
+## Database Issues
+
+### "Cannot connect to database"
+
+**Problem:** App can't connect to PostgreSQL/MongoDB
+
+**Solution:**
+
+```bash
+# Check if PostgreSQL is running
+pg_isready
+
+# Start PostgreSQL (Mac with Homebrew)
+brew services start postgresql
+
+# Start PostgreSQL (Linux)
+sudo service postgresql start
+
+# Check connection string in .env
+DATABASE_URL="postgresql://user:password@localhost:5432/dbname"
+```
+
+### Prisma migration errors
+
+**Problem:** Migration fails
+
+**Solution:**
+
+```bash
+# Reset database (careful - deletes data!)
+npx prisma migrate reset
+
+# Or create new migration
+npx prisma migrate dev --name fix_migration
+
+# Push schema without migration
+npx prisma db push
+```
+
+---
+
+## Runtime Issues
+
+### "Port 3000 already in use"
+
+**Problem:** Another app is using port 3000
+
+**Solution:**
+
+```bash
+# Find and kill process
+lsof -ti:3000 | xargs kill -9
+
+# Or use different port
+PORT=3001 npm run dev
+```
+
+### "Cannot find module"
+
+**Problem:** Module not found errors
+
+**Solution:**
+
+```bash
+# Reinstall dependencies
+rm -rf node_modules package-lock.json
+npm install
+
+# Check if .env file exists
+cp .env.example .env
+
+# Restart TypeScript server (VS Code)
+Cmd+Shift+P > TypeScript: Restart TS Server
+```
+
+---
+
+## TypeScript Issues
+
+### Type errors in generated code
+
+**Problem:** TypeScript errors after generation
+
+**Solution:**
+
+```bash
+# Check TypeScript version
+npx tsc --version
+
+# Should be 5.x
+# If not, update:
+npm install -D typescript@latest
+
+# Run type check
+npm run type:check
+```
+
+### "Property does not exist on type"
+
+**Problem:** Type definitions missing
+
+**Solution:**
+
+```bash
+# Install missing types
+npm install -D @types/express @types/node @types/cors
+
+# Regenerate Prisma client (if using Prisma)
+npx prisma generate
+```
+
+---
+
+## Docker Issues
+
+### "Docker daemon not running"
+
+**Problem:** Docker commands fail
+
+**Solution:**
+
+```bash
+# Mac - Start Docker Desktop
+open -a Docker
+
+# Linux
+sudo systemctl start docker
+
+# Check Docker status
+docker ps
+```
+
+### Container fails to start
+
+**Problem:** Docker container exits immediately
+
+**Solution:**
+
+```bash
+# Check logs
+docker-compose logs app
+
+# Rebuild without cache
+docker-compose build --no-cache
+
+# Check .env file exists
+cp .env.example .env
+
+# Start with explicit files
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+```
+
+---
+
+## Auth Issues
+
+### "Invalid token" errors
+
+**Problem:** JWT authentication fails
+
+**Solution:**
+
+```bash
+# Check JWT_SECRET is set
+cat .env | grep JWT_SECRET
+
+# Should be 32+ characters
+JWT_SECRET="your-super-secret-key-min-32-chars"
+
+# Restart server after changing .env
+```
+
+### "Password comparison failed"
+
+**Problem:** bcrypt comparison fails
+
+**Solution:**
+
+```bash
+# Ensure password was hashed during registration
+# Check database:
+npx prisma studio
+
+# Look at user.password - should be hashed string
+# If plaintext, registration isn't hashing passwords
+```
+
+---
+
+## Performance Issues
+
+### Slow TypeScript compilation
+
+**Problem:** Build takes too long
+
+**Solution:**
+
+```bash
+# Use incremental compilation
+# In tsconfig.json:
+{
+  "compilerOptions": {
+    "incremental": true
+  }
+}
+
+# Use tsx for development (already included)
+npm run dev  # Uses tsx watch
+```
+
+### Large node_modules
+
+**Problem:** node_modules is huge
+
+**Solution:**
+
+```bash
+# Use pnpm for better disk usage
+pnpm install
+
+# Or clean npm cache
+npm cache clean --force
+```
+
+---
+
+## Getting Help
+
+If you're still stuck:
+
+1. **Check the logs** — Run with `DEBUG=* npm run dev` for verbose output
+2. **Check GitHub Issues** — Search [existing issues](https://github.com/abdullah-dev0/better-ts-stack/issues)
+3. **Create minimal reproduction** — Strip down to the simplest case that fails
+4. **Check versions** — Ensure Node.js 18+, npm 9+, TypeScript 5+
+
+### Debug Mode
+
+Enable debug logging:
+
+```bash
+# Set debug environment variable
+export DEBUG=*
+
+# Run CLI with debug
+DEBUG=* npx better-ts-stack
+```
+
+### Check System Requirements
+
+```bash
+# Verify Node.js version
+node --version  # Should be 18.0.0+
+
+# Verify npm version
+npm --version   # Should be 9.0.0+
+
+# Check available ports
+lsof -i :3000
+lsof -i :5432
+```
+
+<Callout type="info">
+  Still having issues? [Open an issue on GitHub](https://github.com/abdullah-dev0/better-ts-stack/issues) with your error message and steps to reproduce.
+</Callout>

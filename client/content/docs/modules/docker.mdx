@@ -1,0 +1,315 @@
+---
+title: Docker Module
+description: Container configuration with multi-stage builds and docker-compose
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Docker Module Overview
+
+The Docker Module provides production-ready containerization for your application, including optimized multi-stage builds and development-friendly docker-compose configurations.
+
+## What's Generated
+
+```
+Dockerfile                    # Multi-stage production build
+.dockerignore                 # Optimized ignore patterns
+docker-compose.yml           # Production orchestration
+docker-compose.dev.yml       # Development overrides (optional)
+```
+
+---
+
+## Dockerfile
+
+Multi-stage build for optimized production images:
+
+```dockerfile
+# Stage 1: Dependencies
+FROM node:18-alpine AS deps
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+RUN npm ci --only=production
+
+# Stage 2: Builder
+FROM node:18-alpine AS builder
+WORKDIR /app
+
+# Copy dependencies from deps stage
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+# Build TypeScript
+RUN npm run build
+
+# Stage 3: Production
+FROM node:18-alpine AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+# Create non-root user
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nodejs
+
+# Copy built application
+COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
+COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nodejs:nodejs /app/package.json ./package.json
+
+USER nodejs
+
+EXPOSE 3000
+
+CMD ["node", "dist/index.js"]
+```
+
+### Benefits of Multi-Stage
+
+| Stage | Purpose | Size Impact |
+|-------|---------|-------------|
+| **deps** | Install production dependencies | Cached layer |
+| **builder** | Compile TypeScript | Discarded |
+| **runner** | Final minimal image | ~150MB vs ~1GB |
+
+---
+
+## Docker Compose
+
+### Production Configuration
+
+```yaml
+# docker-compose.yml
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Include if database module selected
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
+```
+
+### Development Configuration
+
+```yaml
+# docker-compose.dev.yml
+version: '3.8'
+
+services:
+  app:
+    build:
+      target: development
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/dist
+    command: npm run dev
+    environment:
+      - NODE_ENV=development
+    ports:
+      - "3000:3000"
+      - "9229:9229"  # Debug port
+```
+
+---
+
+## Usage
+
+### Development
+
+```bash
+# Start with hot reload
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+# Or shorter
+docker-compose up
+
+# View logs
+docker-compose logs -f app
+
+# Stop
+docker-compose down
+```
+
+### Production
+
+```bash
+# Build production image
+docker-compose build
+
+# Run production
+docker-compose -f docker-compose.yml up -d
+
+# Scale to 3 instances
+docker-compose up -d --scale app=3
+```
+
+### Useful Commands
+
+```bash
+# Rebuild after package.json changes
+docker-compose build --no-cache
+
+# Run commands in container
+docker-compose exec app npm run migrate
+
+# Shell into container
+docker-compose exec app sh
+
+# View resource usage
+docker stats
+```
+
+---
+
+## .dockerignore
+
+Prevents unnecessary files from being copied:
+
+```
+node_modules
+npm-debug.log
+.env
+.env.local
+.env.*.local
+dist
+.git
+.gitignore
+README.md
+.eslintrc
+.prettierrc
+coverage
+.vscode
+.idea
+*.test.ts
+*.spec.ts
+tests/
+.nyc_output
+```
+
+---
+
+## Environment Variables
+
+Create a `.env` file for docker-compose:
+
+```bash
+# Application
+NODE_ENV=production
+PORT=3000
+
+# Database
+DATABASE_URL=postgresql://postgres:postgres@postgres:5432/myapp
+DB_NAME=myapp
+DB_USER=postgres
+DB_PASSWORD=postgres
+
+# Auth
+JWT_SECRET=your-super-secret-key
+```
+
+---
+
+## Optimizations
+
+### 1. Layer Caching
+
+Dependencies are cached unless `package.json` changes:
+
+```dockerfile
+# This layer is cached
+COPY package*.json ./
+RUN npm ci
+
+# This changes frequently
+COPY . .
+RUN npm run build
+```
+
+### 2. Non-Root User
+
+Security best practice:
+
+```dockerfile
+RUN addgroup --system nodejs
+RUN adduser --system nodejs
+USER nodejs
+```
+
+### 3. Health Checks
+
+Built-in monitoring:
+
+```yaml
+healthcheck:
+  test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+  interval: 30s
+  timeout: 10s
+  retries: 3
+```
+
+---
+
+## Debugging
+
+### View Container Logs
+
+```bash
+docker-compose logs -f --tail=100 app
+```
+
+### Execute Commands
+
+```bash
+# Run database migrations
+docker-compose exec app npx prisma migrate deploy
+
+# Open database shell
+docker-compose exec postgres psql -U postgres -d myapp
+```
+
+### Debug Mode
+
+Enable Node.js inspector:
+
+```yaml
+services:
+  app:
+    ports:
+      - "9229:9229"  # Debug port
+    command: node --inspect=0.0.0.0:9229 dist/index.js
+```
+
+<Callout type="tip">
+  Use `docker-compose -f docker-compose.yml -f docker-compose.dev.yml up` for development to get hot reload and volume mounts.
+</Callout>

@@ -1,0 +1,172 @@
+---
+title: Installation
+description: Install Better-TS-Stack globally or run with npx
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { Steps, Step } from 'fumadocs-ui/components/steps';
+
+## Installation Methods
+
+You have several options to run Better-TS-Stack. Choose the one that fits your workflow.
+
+### Method 1: npx (Recommended)
+
+The quickest way to get started—no installation required:
+
+```bash
+npx better-ts-stack
+```
+
+**Pros:**
+- Always uses the latest version
+- No global installation needed
+- Perfect for CI/CD pipelines
+- No permission issues
+
+**Cons:**
+- Slightly slower startup (downloads each time)
+- Requires internet connection
+
+---
+
+### Method 2: Global Installation
+
+Install once, use anywhere:
+
+<Tabs items={['npm', 'pnpm', 'yarn', 'bun']}>
+  <Tab value="npm">
+    ```bash
+    npm install -g better-ts-stack
+    better-ts-stack
+    ```
+  </Tab>
+  <Tab value="pnpm">
+    ```bash
+    pnpm add -g better-ts-stack
+    better-ts-stack
+    ```
+  </Tab>
+  <Tab value="yarn">
+    ```bash
+    yarn global add better-ts-stack
+    better-ts-stack
+    ```
+  </Tab>
+  <Tab value="bun">
+    ```bash
+    bun add -g better-ts-stack
+    better-ts-stack
+    ```
+  </Tab>
+</Tabs>
+
+**Pros:**
+- Faster execution
+- Works offline after first install
+- Easier to type
+
+**Cons:**
+- Needs manual updates (`npm update -g better-ts-stack`)
+- Global packages can cause version conflicts
+- May require sudo on some systems
+
+<Callout type="info">
+  **Update global installation:**
+  ```bash
+  npm update -g better-ts-stack
+  # or
+  pnpm update -g better-ts-stack
+  ```
+</Callout>
+
+---
+
+### Method 3: pnpm dlx
+
+If you use pnpm as your package manager:
+
+```bash
+pnpm dlx better-ts-stack
+```
+
+Same benefits as npx, but uses pnpm's caching.
+
+---
+
+### Method 4: bunx
+
+For Bun users:
+
+```bash
+bunx better-ts-stack
+```
+
+---
+
+## Troubleshooting Installation
+
+### "Command not found" after global install
+
+Your npm global bin directory might not be in your PATH:
+
+<Tabs items={['Linux/Mac', 'Windows']}>
+  <Tab value="Linux/Mac">
+    ```bash
+    # Add to your ~/.bashrc or ~/.zshrc
+    export PATH="$PATH:$(npm config get prefix)/bin"
+    
+    # Or check where npm installs globally
+    npm config get prefix
+    ```
+  </Tab>
+  <Tab value="Windows">
+    ```powershell
+    # Check npm global location
+    npm config get prefix
+    
+    # Add that path + \node_modules\.bin to your PATH environment variable
+    ```
+  </Tab>
+</Tabs>
+
+### Permission errors on Linux/Mac
+
+Avoid using `sudo` with npm. Instead:
+
+```bash
+# Change npm's default directory
+mkdir ~/.npm-global
+npm config set prefix '~/.npm-global'
+echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.bashrc
+source ~/.bashrc
+
+# Now install without sudo
+npm install -g better-ts-stack
+```
+
+### Check installation
+
+```bash
+# Verify it's installed
+better-ts-stack --version
+
+# Or check with npx
+npx better-ts-stack --version
+```
+
+---
+
+## Which Should You Choose?
+
+| Use Case | Recommended Method |
+|----------|-------------------|
+| First time trying it out | `npx better-ts-stack` |
+| Using it frequently | Global install |
+| CI/CD pipelines | `npx better-ts-stack` |
+| Specific version needed | `npx better-ts-stack@1.0.0` |
+
+<Callout type="tip">
+  **Pro tip:** You can always use `npx` even after global installation if you want to try a newer version without updating.
+</Callout>

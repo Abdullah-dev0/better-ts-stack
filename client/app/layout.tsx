@@ -1,10 +1,8 @@
-import { ThemeProvider } from "@/components/theme-provider";
-import { RootProvider } from 'fumadocs-ui/provider/next';
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ReactNode } from "react";
-
+import { ThemeProvider } from "@/components/theme-provider";
+import { RootProvider } from "fumadocs-ui/provider/next";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -23,15 +21,18 @@ export const metadata: Metadata = {
 	keywords: ["TypeScript", "Next.js", "Prisma", "tRPC", "type safety", "CLI tool", "scaffolding"],
 };
 
-export default function Layout({ children }: { children: ReactNode }) {
+export default function RootLayout({
+	children,
+}: Readonly<{
+	children: React.ReactNode;
+}>) {
 	return (
 		<html lang="en" suppressHydrationWarning>
-			<body
-				// required styles
-				className="flex flex-col min-h-screen"
-			>
-				<RootProvider>{children}</RootProvider>
+			<body className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans`}>
+				<ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+					<RootProvider>{children}</RootProvider>
+				</ThemeProvider>
 			</body>
 		</html>
 	);
-}	
+}

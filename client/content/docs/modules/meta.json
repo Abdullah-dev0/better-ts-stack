@@ -1,0 +1,4 @@
+{
+  "title": "Modules",
+  "pages": ["index", "backend", "frontend", "database", "auth", "docker"]
+}

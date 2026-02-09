@@ -1,0 +1,358 @@
+---
+title: Database Module
+description: PostgreSQL with Prisma/Drizzle or MongoDB with Mongoose
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Database Module Overview
+
+The Database Module sets up database connectivity with your choice of ORM/ODM, providing type-safe database access for your application.
+
+## Available Options
+
+| Database | ORM/ODM | Best For | Type Safety |
+|----------|---------|----------|-------------|
+| **PostgreSQL** | Prisma | Relational data, complex queries | Full (auto-generated) |
+| **PostgreSQL** | Drizzle | SQL-first approach | Full |
+| **MongoDB** | Mongoose | Flexible schemas, JSON data | Partial |
+
+---
+
+## PostgreSQL + Prisma
+
+The most popular choice, offering excellent type safety and developer experience.
+
+### Generated Files
+
+```
+prisma/
+├── schema.prisma       # Database schema
+└── (migrations/)       # Migration files (generated)
+src/
+└── lib/
+    └── prisma.ts       # Prisma client singleton
+```
+
+### Schema Example
+
+```prisma
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+```
+
+### Prisma Client Setup
+
+```typescript
+// src/lib/prisma.ts
+import { PrismaClient } from '@prisma/client';
+
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined;
+};
+
+export const prisma = globalForPrisma.prisma ?? new PrismaClient();
+
+if (process.env.NODE_ENV !== 'production') {
+  globalForPrisma.prisma = prisma;
+}
+```
+
+### Available Scripts
+
+```bash
+# Database operations
+npx prisma migrate dev --name init    # Create and apply migration
+npx prisma generate                   # Generate client
+npx prisma studio                     # Open database GUI
+npx prisma db push                    # Push schema changes
+npx prisma db seed                    # Run seed script
+```
+
+### Usage in Code
+
+```typescript
+import { prisma } from './lib/prisma';
+
+// Create user
+const user = await prisma.user.create({
+  data: {
+    email: 'user@example.com',
+    password: 'hashed-password',
+    name: 'John Doe'
+  }
+});
+
+// Find user
+const found = await prisma.user.findUnique({
+  where: { email: 'user@example.com' }
+});
+
+// Update user
+const updated = await prisma.user.update({
+  where: { id: user.id },
+  data: { name: 'Jane Doe' }
+});
+```
+
+---
+
+## PostgreSQL + Drizzle
+
+For developers who prefer writing SQL directly with full type safety.
+
+### Generated Files
+
+```
+src/
+├── db/
+│   ├── schema.ts       # Table definitions
+│   └── index.ts        # Database connection
+└── migrations/         # SQL migration files
+```
+
+### Schema Example
+
+```typescript
+// src/db/schema.ts
+import { pgTable, uuid, varchar, timestamp } from 'drizzle-orm/pg-core';
+
+export const users = pgTable('users', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  email: varchar('email', { length: 255 }).notNull().unique(),
+  password: varchar('password', { length: 255 }).notNull(),
+  name: varchar('name', { length: 255 }),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow()
+});
+```
+
+### Database Connection
+
+```typescript
+// src/db/index.ts
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { Pool } from 'pg';
+import * as schema from './schema';
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL
+});
+
+export const db = drizzle(pool, { schema });
+```
+
+### Usage in Code
+
+```typescript
+import { db } from './db';
+import { users } from './db/schema';
+import { eq } from 'drizzle-orm';
+
+// Insert
+const newUser = await db.insert(users).values({
+  email: 'user@example.com',
+  password: 'hashed-password'
+}).returning();
+
+// Select
+const user = await db.select().from(users).where(eq(users.email, 'user@example.com'));
+
+// Update
+await db.update(users)
+  .set({ name: 'Jane Doe' })
+  .where(eq(users.id, userId));
+```
+
+---
+
+## MongoDB + Mongoose
+
+Best for flexible, document-based data models.
+
+### Generated Files
+
+```
+src/
+└── models/
+    └── User.ts         # Mongoose model
+```
+
+### Model Example
+
+```typescript
+// src/models/User.ts
+import mongoose, { Schema, Document } from 'mongoose';
+
+export interface IUser extends Document {
+  email: string;
+  password: string;
+  name?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const UserSchema: Schema = new Schema({
+  email: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  password: {
+    type: String,
+    required: true
+  },
+  name: {
+    type: String
+  }
+}, {
+  timestamps: true
+});
+
+export default mongoose.model<IUser>('User', UserSchema);
+```
+
+### Database Connection
+
+```typescript
+// src/lib/db.ts
+import mongoose from 'mongoose';
+
+export async function connectDB() {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI!);
+    console.log('✅ MongoDB connected');
+  } catch (error) {
+    console.error('❌ MongoDB connection error:', error);
+    process.exit(1);
+  }
+}
+```
+
+### Usage in Code
+
+```typescript
+import User from './models/User';
+
+// Create
+const user = await User.create({
+  email: 'user@example.com',
+  password: 'hashed-password'
+});
+
+// Find
+const found = await User.findOne({ email: 'user@example.com' });
+
+// Update
+await User.findByIdAndUpdate(userId, { name: 'Jane Doe' });
+```
+
+---
+
+## Environment Variables
+
+### PostgreSQL
+
+```bash
+DATABASE_URL="postgresql://user:password@localhost:5432/dbname?schema=public"
+```
+
+### MongoDB
+
+```bash
+MONGODB_URI="mongodb://localhost:27017/dbname"
+# or
+MONGODB_URI="mongodb+srv://user:password@cluster.mongodb.net/dbname"
+```
+
+---
+
+## Docker Integration
+
+When Docker is enabled, the database module includes:
+
+### PostgreSQL Service
+
+```yaml
+# docker-compose.yml
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: myapp
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+    # ... your app configuration
+    depends_on:
+      - postgres
+```
+
+### MongoDB Service
+
+```yaml
+services:
+  mongodb:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+```
+
+---
+
+## Migration Strategy
+
+### Prisma
+
+```bash
+# Development
+npx prisma migrate dev --name descriptive_name
+
+# Production
+npx prisma migrate deploy
+
+# Reset (careful!)
+npx prisma migrate reset
+```
+
+### Drizzle
+
+```bash
+# Generate migration
+npx drizzle-kit generate
+
+# Run migration
+npx drizzle-kit migrate
+```
+
+### Mongoose
+
+Mongoose handles schema changes automatically in development. For production, consider migration tools like `migrate-mongo`.
+
+<Callout type="tip">
+  **Recommendation:** Use Prisma for new projects. It offers the best developer experience with excellent TypeScript support.
+</Callout>

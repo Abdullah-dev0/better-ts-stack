@@ -1,348 +1,259 @@
 ---
 title: Project Structure
-description: Understanding the generated project structure and organization
-icon: FolderTree
+description: Understanding the generated project organization
 ---
 
 import { File, Folder, Files } from 'fumadocs-ui/components/files';
 import { Callout } from 'fumadocs-ui/components/callout';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 ## Overview
 
-Better-TS-Stack generates a well-organized, scalable project structure following industry best practices. The exact structure depends on your selected options, but all projects share common organizational patterns.
+Better-TS-Stack generates well-organized, scalable project structures. The exact layout depends on your selected options.
 
-## Full Stack Project
+---
 
-Here's the structure of a full-stack project with all features enabled:
+## Backend API Only
 
-<Files>
-  <Folder name="my-app" defaultOpen>
-    <Folder name="backend" defaultOpen>
-      <Folder name="src">
-        <Folder name="controllers">
-          <File name="user.controller.ts" />
-          <File name="auth.controller.ts" />
-        </Folder>
-        <Folder name="models">
-          <File name="user.model.ts" />
-        </Folder>
-        <Folder name="routes">
+<Tabs items={['Basic', 'With Database', 'With Auth & Docker']}>
+  <Tab value="Basic">
+    <Files>
+      <Folder name="my-api" defaultOpen>
+        <Folder name="src" defaultOpen>
           <File name="index.ts" />
-          <File name="user.routes.ts" />
+          <File name="app.ts" />
+          <Folder name="routes">
+            <File name="index.ts" />
+            <File name="health.ts" />
+          </Folder>
+          <Folder name="middleware">
+            <File name="errorHandler.ts" />
+          </Folder>
         </Folder>
-        <Folder name="middleware">
-          <File name="auth.middleware.ts" />
-          <File name="error.middleware.ts" />
-        </Folder>
-        <Folder name="services">
-          <File name="user.service.ts" />
-          <File name="auth.service.ts" />
-        </Folder>
-        <Folder name="utils">
-          <File name="logger.ts" />
-          <File name="validation.ts" />
-        </Folder>
-        <File name="app.ts" />
-        <File name="server.ts" />
+        <File name="package.json" />
+        <File name="tsconfig.json" />
+        <File name=".env" />
+        <File name=".env.example" />
+        <File name=".gitignore" />
+        <File name="README.md" />
       </Folder>
-      <Folder name="tests">
-        <File name="user.test.ts" />
-        <File name="auth.test.ts" />
-      </Folder>
-      <File name="package.json" />
-      <File name="tsconfig.json" />
-      <File name=".env.example" />
-    </Folder>
-    <Folder name="frontend">
-      <Folder name="src">
-        <Folder name="components">
-          <File name="Header.tsx" />
-          <File name="Footer.tsx" />
+    </Files>
+  </Tab>
+  
+  <Tab value="With Database">
+    <Files>
+      <Folder name="my-api" defaultOpen>
+        <Folder name="prisma" defaultOpen>
+          <File name="schema.prisma" />
         </Folder>
-        <Folder name="pages">
-          <File name="index.tsx" />
-          <File name="about.tsx" />
-        </Folder>
-        <Folder name="hooks">
-          <File name="useAuth.ts" />
-        </Folder>
-        <Folder name="services">
-          <File name="api.ts" />
-        </Folder>
-        <Folder name="types">
+        <Folder name="src" defaultOpen>
           <File name="index.ts" />
+          <File name="app.ts" />
+          <Folder name="lib">
+            <File name="prisma.ts" />
+          </Folder>
+          <Folder name="routes">
+            <File name="index.ts" />
+            <File name="health.ts" />
+          </Folder>
         </Folder>
+        <File name="package.json" />
+        <File name="tsconfig.json" />
+        <File name=".env" />
+        <File name=".env.example" />
       </Folder>
-      <File name="package.json" />
-      <File name="tsconfig.json" />
-    </Folder>
-    <Folder name="shared">
-      <Folder name="types">
-        <File name="user.types.ts" />
-        <File name="api.types.ts" />
+    </Files>
+  </Tab>
+  
+  <Tab value="With Auth & Docker">
+    <Files>
+      <Folder name="my-api" defaultOpen>
+        <Folder name="prisma" defaultOpen>
+          <File name="schema.prisma" />
+        </Folder>
+        <Folder name="src" defaultOpen>
+          <Folder name="lib">
+            <File name="prisma.ts" />
+            <File name="jwt.ts" />
+          </Folder>
+          <Folder name="controllers">
+            <File name="authController.ts" />
+          </Folder>
+          <Folder name="middleware">
+            <File name="auth.ts" />
+            <File name="errorHandler.ts" />
+          </Folder>
+          <Folder name="routes">
+            <File name="index.ts" />
+            <File name="auth.ts" />
+            <File name="health.ts" />
+          </Folder>
+          <File name="index.ts" />
+          <File name="app.ts" />
+        </Folder>
+        <File name="Dockerfile" />
+        <File name="docker-compose.yml" />
+        <File name="docker-compose.dev.yml" />
+        <File name=".dockerignore" />
+        <File name="package.json" />
       </Folder>
-      <File name="package.json" />
-    </Folder>
-    <File name="docker-compose.yml" />
-    <File name="docker-compose.dev.yml" />
-    <File name=".gitignore" />
-    <File name="README.md" />
-    <File name="stack.config.ts" />
-  </Folder>
-</Files>
+    </Files>
+  </Tab>
+</Tabs>
+
+---
+
+## Full-Stack Project
+
+<Tabs items={['Basic', 'With All Modules']}>
+  <Tab value="Basic">
+    <Files>
+      <Folder name="my-app" defaultOpen>
+        <Folder name="backend" defaultOpen>
+          <Folder name="src">
+            <File name="index.ts" />
+            <File name="app.ts" />
+          </Folder>
+          <File name="package.json" />
+        </Folder>
+        <Folder name="frontend" defaultOpen>
+          <Folder name="app">
+            <File name="layout.tsx" />
+            <File name="page.tsx" />
+            <File name="globals.css" />
+          </Folder>
+          <Folder name="components">
+            <Folder name="ui">
+              <File name="button.tsx" />
+            </Folder>
+          </Folder>
+          <Folder name="lib">
+            <File name="utils.ts" />
+          </Folder>
+          <File name="package.json" />
+        </Folder>
+        <File name="package.json" />
+        <File name="README.md" />
+      </Folder>
+    </Files>
+  </Tab>
+  
+  <Tab value="With All Modules">
+    <Files>
+      <Folder name="my-app" defaultOpen>
+        <Folder name="backend" defaultOpen>
+          <Folder name="prisma">
+            <File name="schema.prisma" />
+          </Folder>
+          <Folder name="src">
+            <Folder name="lib">
+              <File name="prisma.ts" />
+              <File name="jwt.ts" />
+            </Folder>
+            <Folder name="controllers">
+              <File name="authController.ts" />
+            </Folder>
+            <Folder name="middleware">
+              <File name="auth.ts" />
+              <File name="errorHandler.ts" />
+            </Folder>
+            <Folder name="routes">
+              <File name="index.ts" />
+              <File name="auth.ts" />
+              <File name="health.ts" />
+            </Folder>
+            <File name="index.ts" />
+            <File name="app.ts" />
+          </Folder>
+          <File name="Dockerfile" />
+          <File name="package.json" />
+        </Folder>
+        <Folder name="frontend" defaultOpen>
+          <Folder name="app">
+            <Folder name="api">
+              <Folder name="auth">
+                <File name="route.ts" />
+              </Folder>
+            </Folder>
+            <File name="layout.tsx" />
+            <File name="page.tsx" />
+            <File name="globals.css" />
+          </Folder>
+          <Folder name="components">
+            <Folder name="ui">
+              <File name="button.tsx" />
+            </Folder>
+          </Folder>
+          <Folder name="lib">
+            <File name="utils.ts" />
+            <File name="auth.ts" />
+          </Folder>
+          <File name="package.json" />
+        </Folder>
+        <File name="Dockerfile" />
+        <File name="docker-compose.yml" />
+        <File name="docker-compose.dev.yml" />
+        <File name="package.json" />
+        <File name="README.md" />
+      </Folder>
+    </Files>
+  </Tab>
+</Tabs>
+
+---
 
 ## Directory Breakdown
 
 ### Backend Structure
 
-The backend follows a layered architecture pattern:
-
-```typescript
+```
 backend/src/
-├── controllers/     # Request handlers
-├── models/          # Data models & schemas
-├── routes/          # API route definitions
-├── middleware/      # Express/Fastify middleware
-├── services/        # Business logic layer
-├── utils/           # Helper functions
-├── app.ts           # App configuration
-└── server.ts        # Server entry point
+├── index.ts          # Server entry point
+├── app.ts            # Express app configuration
+├── routes/           # API route definitions
+├── middleware/       # Express middleware
+├── controllers/      # Request handlers
+├── lib/              # Utility functions (db, auth)
+└── types/            # TypeScript types
 ```
-
-#### Controllers
-
-Handle HTTP requests and responses. Keep them thin - delegate business logic to services.
-
-```typescript title="backend/src/controllers/user.controller.ts"
-import { Request, Response } from 'express';
-import { UserService } from '../services/user.service';
-
-export class UserController {
-  constructor(private userService: UserService) {}
-
-  async getUser(req: Request, res: Response) {
-    const user = await this.userService.findById(req.params.id);
-    return res.json(user);
-  }
-
-  async createUser(req: Request, res: Response) {
-    const user = await this.userService.create(req.body);
-    return res.status(201).json(user);
-  }
-}
-```
-
-#### Services
-
-Contain business logic and interact with models/database.
-
-```typescript title="backend/src/services/user.service.ts"
-import { User } from '../models/user.model';
-import { CreateUserDto } from '../types';
-
-export class UserService {
-  async findById(id: string): Promise<User | null> {
-    return User.findByPk(id);
-  }
-
-  async create(data: CreateUserDto): Promise<User> {
-    return User.create(data);
-  }
-
-  async update(id: string, data: Partial<CreateUserDto>): Promise<User> {
-    const user = await this.findById(id);
-    if (!user) throw new Error('User not found');
-    return user.update(data);
-  }
-}
-```
-
-#### Routes
-
-Define API endpoints and connect them to controllers.
-
-```typescript title="backend/src/routes/user.routes.ts"
-import { Router } from 'express';
-import { UserController } from '../controllers/user.controller';
-import { authMiddleware } from '../middleware/auth.middleware';
-
-const router = Router();
-const userController = new UserController();
-
-router.get('/:id', authMiddleware, userController.getUser);
-router.post('/', authMiddleware, userController.createUser);
-router.put('/:id', authMiddleware, userController.updateUser);
-router.delete('/:id', authMiddleware, userController.deleteUser);
-
-export default router;
-```
-
-<Callout type="info" title="Middleware">
-  Middleware functions run before your route handlers. Use them for authentication, validation, logging, etc.
-</Callout>
 
 ### Frontend Structure
 
-The frontend uses a component-based architecture:
-
-```typescript
-frontend/src/
-├── components/      # Reusable UI components
-├── pages/           # Page components (Next.js/React)
-├── hooks/           # Custom React hooks
-├── services/        # API communication
-├── contexts/        # React context providers
-├── types/           # TypeScript type definitions
-└── utils/           # Helper functions
+```
+frontend/
+├── app/              # Next.js App Router
+│   ├── layout.tsx    # Root layout
+│   ├── page.tsx      # Home page
+│   └── api/          # API routes
+├── components/       # React components
+│   └── ui/           # UI components
+├── lib/              # Utilities
+└── public/           # Static assets
 ```
 
-#### Components
+### Database Structure
 
-Reusable UI building blocks:
-
-```typescript title="frontend/src/components/UserCard.tsx"
-import { User } from '@/types';
-
-interface UserCardProps {
-  user: User;
-  onEdit?: (user: User) => void;
-  onDelete?: (userId: string) => void;
-}
-
-export function UserCard({ user, onEdit, onDelete }: UserCardProps) {
-  return (
-    <div className="user-card">
-      <h3>{user.name}</h3>
-      <p>{user.email}</p>
-      <div className="actions">
-        {onEdit && <button onClick={() => onEdit(user)}>Edit</button>}
-        {onDelete && <button onClick={() => onDelete(user.id)}>Delete</button>}
-      </div>
-    </div>
-  );
-}
+**Prisma:**
+```
+prisma/
+├── schema.prisma     # Database schema
+└── migrations/       # Migration files
 ```
 
-#### Custom Hooks
-
-Encapsulate reusable logic:
-
-```typescript title="frontend/src/hooks/useAuth.ts"
-import { useState, useEffect } from 'react';
-import { authService } from '@/services/auth';
-import type { User } from '@/types';
-
-export function useAuth() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  async function checkAuth() {
-    try {
-      const currentUser = await authService.getCurrentUser();
-      setUser(currentUser);
-    } catch (error) {
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function login(email: string, password: string) {
-    const user = await authService.login(email, password);
-    setUser(user);
-  }
-
-  async function logout() {
-    await authService.logout();
-    setUser(null);
-  }
-
-  return { user, loading, login, logout };
-}
+**Mongoose:**
+```
+src/models/
+└── User.ts           # Mongoose models
 ```
 
-### Shared Package
-
-Share types and utilities between backend and frontend:
-
-```typescript title="shared/types/user.types.ts"
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface CreateUserDto {
-  email: string;
-  name: string;
-  password: string;
-}
-
-export interface UpdateUserDto {
-  email?: string;
-  name?: string;
-}
-
-export interface LoginDto {
-  email: string;
-  password: string;
-}
-
-export interface AuthResponse {
-  user: User;
-  token: string;
-}
-```
-
-<Callout type="warn" title="Import Path">
-  Configure path aliases in tsconfig.json to import shared types easily:
-  ```json
-  {
-    "compilerOptions": {
-      "paths": {
-        "@shared/*": ["../shared/*"]
-      }
-    }
-  }
-  ```
-</Callout>
+---
 
 ## Configuration Files
 
-### package.json
+### TypeScript Configuration
 
-Each package has its own dependencies and scripts:
-
-```json title="backend/package.json"
-{
-  "name": "backend",
-  "version": "1.0.0",
-  "scripts": {
-    "dev": "tsx watch src/server.ts",
-    "build": "tsc",
-    "start": "node dist/server.js",
-    "test": "vitest",
-    "lint": "eslint src --ext .ts",
-    "type:check": "tsc --noEmit"
-  },
-  "dependencies": {
-    "express": "^4.18.0",
-    "zod": "^3.22.0"
-  }
-}
-```
-
-### tsconfig.json
-
-TypeScript configuration for type safety:
-
-```json title="backend/tsconfig.json"
+```json
+// tsconfig.json
 {
   "compilerOptions": {
     "target": "ES2020",
@@ -362,39 +273,58 @@ TypeScript configuration for type safety:
 }
 ```
 
-### Docker Configuration
+### Package.json Scripts
 
-Multi-stage builds for optimized images:
-
-```dockerfile title="backend/Dockerfile"
-# Build stage
-FROM node:18-alpine AS builder
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
-
-# Production stage
-FROM node:18-alpine
-WORKDIR /app
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules ./node_modules
-COPY package*.json ./
-EXPOSE 3000
-CMD ["node", "dist/server.js"]
+```json
+{
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "lint": "eslint src",
+    "format": "prettier --write .",
+    "type:check": "tsc --noEmit"
+  }
+}
 ```
+
+---
+
+## Environment Files
+
+### .env.example
+
+```bash
+# Server
+PORT=3000
+NODE_ENV=development
+
+# Database
+DATABASE_URL="postgresql://user:password@localhost:5432/dbname"
+
+# Auth
+JWT_SECRET="your-secret-key"
+JWT_EXPIRES_IN="7d"
+
+# Frontend
+NEXT_PUBLIC_API_URL=http://localhost:3000/api
+```
+
+### .env
+
+Copy `.env.example` to `.env` and fill in your values. **Never commit `.env` to git.**
+
+---
 
 ## Best Practices
 
-1. **Keep controllers thin** - Move business logic to services
-2. **Use dependency injection** - Makes testing easier
-3. **Shared types** - Use the shared package for API contracts
-4. **Environment variables** - Never commit `.env` files
-5. **Error handling** - Use centralized error middleware
-6. **Validation** - Validate inputs at the route level
-7. **Testing** - Write tests for services and critical paths
+1. **Keep controllers thin** — Move business logic to services
+2. **Use TypeScript strict mode** — Catch errors at compile time
+3. **Environment variables** — Never hardcode secrets
+4. **Consistent naming** — Use kebab-case for files, camelCase for variables
+5. **Module boundaries** — Keep backend and frontend separate
+6. **Git workflow** — Commit before major changes
 
-<Callout type="info" title="Monorepo">
-  Consider using tools like Turborepo or Nx for managing multiple packages as your project grows.
+<Callout type="info">
+  The generated structure follows industry best practices and scales from prototypes to production applications.
 </Callout>

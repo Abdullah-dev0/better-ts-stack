@@ -1,127 +1,141 @@
 ---
 title: Getting Started
-description: Quick start guide for Better-TS-Stack - a modern TypeScript project generator
-icon: BookOpen
+description: Quick start guide for Better-TS-Stack - generate production-ready TypeScript projects in seconds
 ---
 
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 import { Cards, Card } from 'fumadocs-ui/components/card';
-import { Terminal, FolderTree, Settings, Rocket } from 'lucide-react';
+import { Terminal, Zap, Shield, Container, Database, Layout } from 'lucide-react';
 
-## Welcome to Better-TS-Stack
+## What is Better-TS-Stack?
 
-Better-TS-Stack is a powerful CLI tool that generates fully configured TypeScript projects with backend, frontend, database integration, Docker support, and more through an interactive setup.
+Better-TS-Stack is an interactive CLI tool that generates fully configured TypeScript projects with your choice of backend, frontend, database, and DevOps tools. No configuration files to wrestle with—just answer a few prompts and get a production-ready codebase.
 
-<Callout type="info" title="Quick Start">
-  Get your project running in under 5 minutes with our interactive CLI.
+<Callout type="info" title="Perfect for">
+  - Starting new full-stack TypeScript projects
+  - Prototyping APIs with type-safe backends  
+  - Learning modern TypeScript patterns
+  - Standardizing project structure across teams
 </Callout>
 
-## Features
+## Quick Start
 
-- 🚀 **Fast Setup** - Interactive CLI guides you through project creation
-- 📦 **Full Stack** - Backend (Express/Fastify), Frontend (Next.js), Database (PostgreSQL/MySQL)
-- 🐳 **Docker Ready** - Production-ready containerization out of the box
-- 🔒 **Type Safe** - Full TypeScript support with strict type checking
-- 🧪 **Testing Included** - Jest/Vitest configured and ready
-- 📝 **ESLint & Prettier** - Code quality tools pre-configured
-
-## Quick Installation
+Get a new project running in under 2 minutes:
 
 <Steps>
 
 <Step>
-### Install the CLI
+### Run the CLI
 
-<Tabs items={['npm', 'pnpm', 'yarn']}>
-  <Tab value="npm">
+<Tabs items={['npx (recommended)', 'Global Install', 'pnpm', 'bun']}>
+  <Tab value="npx (recommended)">
+    ```bash
+    npx better-ts-stack
+    ```
+  </Tab>
+  <Tab value="Global Install">
     ```bash
     npm install -g better-ts-stack
+    better-ts-stack
     ```
   </Tab>
   <Tab value="pnpm">
     ```bash
-    pnpm add -g better-ts-stack
+    pnpm dlx better-ts-stack
     ```
   </Tab>
-  <Tab value="yarn">
+  <Tab value="bun">
     ```bash
-    yarn global add better-ts-stack
+    bunx better-ts-stack
     ```
   </Tab>
 </Tabs>
+</Step>
+
+<Step>
+### Answer the Prompts
+
+The CLI will guide you through:
+
+1. **Project name** — What to call your new project
+2. **Application type** — Backend API only, or full-stack with frontend
+3. **Backend framework** — Express (Hono coming soon)
+4. **Database** — PostgreSQL with Prisma, MongoDB with Mongoose, or Drizzle
+5. **Authentication** — Optional JWT auth for Express or Better Auth for Next.js
+6. **Docker** — Optional Docker Compose setup
+7. **Package manager** — npm, pnpm, or bun
 
 </Step>
 
 <Step>
-### Create Your Project
-
-Run the interactive CLI to generate your project:
+### Start Developing
 
 ```bash
-better-ts-stack create my-awesome-app
-```
-
-The CLI will guide you through selecting:
-- Project name and description
-- Backend framework (Express, Fastify, or none)
-- Frontend framework (Next.js, React, or none)
-- Database (PostgreSQL, MySQL, or none)
-- Additional features (Docker, testing, etc.)
-
-</Step>
-
-<Step>
-### Start Development
-
-Navigate to your project and start coding:
-
-```bash
-cd my-awesome-app
-npm install
+cd your-project-name
+npm install  # or pnpm install, bun install
 npm run dev
 ```
 
+Your project is now running with hot reload enabled!
 </Step>
 
 </Steps>
 
 ## What's Included?
 
-Your generated project includes:
+<Cards>
+  <Card title="Backend API" icon={<Database className="text-blue-400" />}>
+    Express.js with TypeScript, Zod validation, and proper error handling
+  </Card>
+  <Card title="Frontend App" icon={<Layout className="text-green-400" />}>
+    Next.js 16 with React 19, Tailwind CSS v4, and App Router
+  </Card>
+  <Card title="Type-Safe Database" icon={<Shield className="text-purple-400" />}>
+    Prisma or Drizzle ORM with auto-generated types
+  </Card>
+  <Card title="Authentication" icon={<Zap className="text-yellow-400" />}>
+    JWT tokens for Express, Better Auth for Next.js
+  </Card>
+  <Card title="Docker Ready" icon={<Container className="text-blue-400" />}>
+    Multi-stage Dockerfile and docker-compose.yml
+  </Card>
+  <Card title="Developer Tools" icon={<Terminal className="text-primary" />}>
+    ESLint, Prettier, TypeScript strict mode, Husky hooks
+  </Card>
+</Cards>
 
-- **Backend API** - RESTful API with TypeScript, validation, and error handling
-- **Frontend App** - Modern React/Next.js application with routing
-- **Database Setup** - Configured ORM (Prisma/TypeORM) with migrations
-- **Docker Compose** - Multi-container orchestration for development and production
-- **CI/CD Pipeline** - GitHub Actions workflow template
-- **Documentation** - README with project-specific instructions
+## Requirements
 
-<Callout type="warn" title="Requirements">
-  Node.js 18+ is required. Make sure you have it installed before proceeding.
+- **Node.js** 18.0.0 or higher
+- **Package manager** — npm, pnpm, or bun
+- **Git** — For repository initialization (optional)
+
+<Callout type="warn">
+  Make sure you have Node.js 18+ installed. Check with: `node --version`
 </Callout>
 
 ## Next Steps
 
 <Cards>
-  <Card title="CLI Usage" href="/docs/cli" icon={<Terminal />}>
-    Learn about all CLI commands and options
+  <Card title="Installation Options" href="/docs/installation">
+    Learn about global vs npx installation, package manager differences
   </Card>
-  <Card title="Project Structure" href="/docs/structure" icon={<FolderTree />}>
-    Understand the generated project layout
+  <Card title="Interactive Usage" href="/docs/usage">
+    Deep dive into the CLI prompts and options
   </Card>
-  <Card title="Configuration" href="/docs/configuration" icon={<Settings />}>
-    Customize your project settings
+  <Card title="Modules" href="/docs/modules">
+    Explore backend, frontend, database, auth, and Docker options
   </Card>
-  <Card title="Deployment" href="/docs/deployment" icon={<Rocket />}>
-    Deploy your application to production
+  <Card title="Project Structure" href="/docs/structure">
+    Understand the generated project organization
   </Card>
 </Cards>
 
-## Community & Support
+---
 
-- 📖 [Read the full documentation](/docs)
-- 💬 [Join our Discord community](https://discord.gg/example)
-- 🐛 [Report issues on GitHub](https://github.com/example/better-ts-stack)
-- 💡 [Request features](https://github.com/example/better-ts-stack/issues)
+## Need Help?
+
+- 💬 Found a bug? [Open an issue on GitHub](https://github.com/abdullah-dev0/better-ts-stack/issues)
+- ⭐ Enjoying the tool? [Leave a star on GitHub](https://github.com/abdullah-dev0/better-ts-stack)

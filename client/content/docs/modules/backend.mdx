@@ -1,0 +1,258 @@
+---
+title: Backend Module
+description: Express.js backend with TypeScript, routing, and middleware
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Backend Module Overview
+
+The Backend Module generates a production-ready Express.js server with TypeScript, following industry best practices for API development.
+
+## What's Generated
+
+```
+src/
+├── index.ts              # Server entry point
+├── app.ts                # Express app configuration
+├── routes/
+│   ├── index.ts          # Route aggregator
+│   └── health.ts         # Health check endpoint
+├── middleware/
+│   └── errorHandler.ts   # Global error handling
+├── lib/
+│   └── (auth, db)        # Auth and DB utilities (if selected)
+└── types/
+    └── index.ts          # Shared TypeScript types
+```
+
+---
+
+## Core Files
+
+### index.ts — Entry Point
+
+```typescript
+import app from './app';
+import { config } from './config';
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+});
+```
+
+### app.ts — Express Configuration
+
+```typescript
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import routes from './routes';
+import { errorHandler } from './middleware/errorHandler';
+
+const app = express();
+
+// Security middleware
+app.use(helmet());
+
+// CORS
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || 'http://localhost:3001',
+  credentials: true
+}));
+
+// Body parsing
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Routes
+app.use('/api', routes);
+
+// Error handling (always last)
+app.use(errorHandler);
+
+export default app;
+```
+
+---
+
+## Routing Structure
+
+Routes follow a clean separation pattern:
+
+```typescript
+// src/routes/index.ts
+import { Router } from 'express';
+import healthRouter from './health';
+
+const router = Router();
+
+router.use('/health', healthRouter);
+// Additional routes auto-registered here
+
+export default router;
+```
+
+### Health Check Endpoint
+
+```typescript
+// src/routes/health.ts
+import { Router } from 'express';
+
+const router = Router();
+
+router.get('/', (req, res) => {
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
+
+export default router;
+```
+
+---
+
+## Error Handling
+
+Built-in error middleware provides consistent API error responses:
+
+```typescript
+// src/middleware/errorHandler.ts
+import { Request, Response, NextFunction } from 'express';
+
+export function errorHandler(
+  err: Error,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  console.error('Error:', err);
+  
+  res.status(500).json({
+    error: {
+      code: 'INTERNAL_ERROR',
+      message: process.env.NODE_ENV === 'production' 
+        ? 'Internal server error' 
+        : err.message,
+      timestamp: new Date().toISOString()
+    }
+  });
+}
+```
+
+---
+
+## Available Scripts
+
+```bash
+npm run dev       # tsx watch src/index.ts
+npm run build     # tsc (compiles to dist/)
+npm run start     # node dist/index.js
+npm run lint      # eslint src
+npm run type:check # tsc --noEmit
+```
+
+---
+
+## Integration with Other Modules
+
+### With Database Module
+
+If you select a database, the backend module:
+
+- Adds database connection setup
+- Includes example models/entities
+- Provides typed database client
+- Adds database health checks
+
+### With Auth Module
+
+If you enable auth, the backend module:
+
+- Adds `/api/auth/*` routes (register, login, logout)
+- Includes JWT middleware for protected routes
+- Provides `req.user` typing
+- Adds user context to requests
+
+### Example: Protected Route
+
+```typescript
+import { Router } from 'express';
+import { authMiddleware } from '../middleware/auth';
+
+const router = Router();
+
+// Public route
+router.get('/public', (req, res) => {
+  res.json({ message: 'Hello World' });
+});
+
+// Protected route
+router.get('/profile', authMiddleware, (req, res) => {
+  res.json({ user: req.user });
+});
+
+export default router;
+```
+
+---
+
+## Environment Variables
+
+```bash
+# Server
+PORT=3000
+NODE_ENV=development
+
+# CORS
+CORS_ORIGIN=http://localhost:3001
+
+# Database (if selected)
+DATABASE_URL="postgresql://user:pass@localhost:5432/db"
+
+# Auth (if selected)
+JWT_SECRET="your-secret-key"
+JWT_EXPIRES_IN="7d"
+```
+
+---
+
+## Extending the Backend
+
+### Add New Routes
+
+1. Create file: `src/routes/users.ts`
+2. Implement route handlers
+3. Register in `src/routes/index.ts`
+
+### Add Middleware
+
+1. Create file: `src/middleware/custom.ts`
+2. Implement middleware function
+3. Register in `src/app.ts`
+
+### Add Controllers
+
+For complex applications, separate logic into controllers:
+
+```typescript
+// src/controllers/user.controller.ts
+export class UserController {
+  async getAll(req: Request, res: Response) {
+    // Implementation
+  }
+  
+  async getById(req: Request, res: Response) {
+    // Implementation
+  }
+}
+```
+
+<Callout type="tip">
+  The generated structure scales from simple APIs to complex microservices.
+</Callout>

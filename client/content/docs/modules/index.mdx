@@ -1,0 +1,156 @@
+---
+title: Modules Overview
+description: Understand the modular architecture of Better-TS-Stack projects
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Cards, Card } from 'fumadocs-ui/components/card';
+import { Server, Layout, Database, Shield, Container } from 'lucide-react';
+
+## Modular by Design
+
+Better-TS-Stack follows a **modular architecture**. Instead of generating a monolithic codebase, it composes your project from independent, well-designed modules that work together seamlessly.
+
+Each module is:
+- **Self-contained** — Has its own templates, configs, and logic
+- **Optional** — Include only what you need
+- **Composable** — Works with other modules automatically
+- **Best-practice** — Follows industry standards
+
+---
+
+## Available Modules
+
+<Cards>
+  <Card title="Backend" href="/docs/modules/backend" icon={<Server className="text-blue-400" />}>
+    Express.js server with TypeScript, routing, middleware, and error handling
+  </Card>
+  
+  <Card title="Frontend" href="/docs/modules/frontend" icon={<Layout className="text-green-400" />}>
+    Next.js 16 with React 19, Tailwind CSS v4, and modern tooling
+  </Card>
+  
+  <Card title="Database" href="/docs/modules/database" icon={<Database className="text-purple-400" />}>
+    PostgreSQL with Prisma/Drizzle or MongoDB with Mongoose
+  </Card>
+  
+  <Card title="Auth" href="/docs/modules/auth" icon={<Shield className="text-yellow-400" />}>
+    JWT authentication for Express, Better Auth for Next.js
+  </Card>
+  
+  <Card title="Docker" href="/docs/modules/docker" icon={<Container className="text-blue-400" />}>
+    Multi-stage Docker builds and docker-compose orchestration
+  </Card>
+</Cards>
+
+---
+
+## How Modules Work Together
+
+When you select multiple modules, Better-TS-Stack intelligently wires them together:
+
+### Example: Full-Stack with Auth
+
+If you select:
+- Backend (Express)
+- Frontend (Next.js)
+- Database (PostgreSQL + Prisma)
+- Auth (Yes)
+
+The CLI automatically:
+1. Creates Express auth routes with JWT
+2. Generates Prisma User schema with password hashing
+3. Sets up Next.js auth context and hooks
+4. Configures environment variables for both sides
+5. Adds protected route middleware
+
+### Example: API with Docker
+
+If you select:
+- Backend (Express)
+- Database (MongoDB)
+- Docker (Yes)
+
+The CLI automatically:
+1. Generates Express API with Mongoose models
+2. Creates Dockerfile with multi-stage build
+3. Creates docker-compose.yml with MongoDB service
+4. Configures connection strings for containerized environment
+
+---
+
+## Module Configuration
+
+Each module contributes to the final `package.json` and configuration files:
+
+```json
+{
+  "dependencies": {
+    // Backend module
+    "express": "^4.18.0",
+    "cors": "^2.8.5",
+    
+    // Database module (Prisma)
+    "@prisma/client": "^5.0.0",
+    "prisma": "^5.0.0",
+    
+    // Auth module
+    "jsonwebtoken": "^9.0.0",
+    "bcrypt": "^5.1.0"
+  }
+}
+```
+
+---
+
+## Customizing Modules
+
+After generation, you can extend any module:
+
+<Callout type="tip">
+  **All generated code is editable.** The modules provide a solid foundation, but you're free to modify, extend, or replace any part.
+</Callout>
+
+### Adding to Backend
+- New routes in `src/routes/`
+- New middleware in `src/middleware/`
+- Additional controllers in `src/controllers/`
+
+### Adding to Frontend
+- New pages in `app/` directory
+- New components in `components/`
+- API routes in `app/api/`
+
+### Adding to Database
+- New models in Prisma schema
+- New Mongoose schemas
+- Additional migrations
+
+---
+
+## Module Dependencies
+
+Some modules work better together:
+
+| Combination | Benefits |
+|-------------|----------|
+| Backend + Database | Complete API with data persistence |
+| Frontend + Backend | Full-stack with type-safe API calls |
+| Backend + Auth + Database | Secure API with user management |
+| Everything + Docker | Production-ready containerization |
+
+<Callout type="info">
+  The CLI handles all wiring automatically. Just select the modules you want, and it configures the connections.
+</Callout>
+
+---
+
+## Next Steps
+
+Explore each module in detail:
+
+- **[Backend Module](/docs/modules/backend)** — Express server architecture
+- **[Frontend Module](/docs/modules/frontend)** — Next.js application structure
+- **[Database Module](/docs/modules/database)** — ORM options and configuration
+- **[Auth Module](/docs/modules/auth)** — Authentication implementation
+- **[Docker Module](/docs/modules/docker)** — Containerization setup

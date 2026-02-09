@@ -1,0 +1,310 @@
+---
+title: Interactive Usage
+description: How the Better-TS-Stack CLI works - prompts, options, and flow
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Steps, Step } from 'fumadocs-ui/components/steps';
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+
+## How the CLI Works
+
+Better-TS-Stack is entirely **interactive**. Unlike other CLI tools with complex command-line flags, you simply run the command and answer a series of prompts. The CLI then generates a complete, configured project based on your choices.
+
+<Callout type="info">
+  There are **no subcommands or flags**. Just run `npx better-ts-stack` and follow the prompts.
+</Callout>
+
+---
+
+## The Prompt Flow
+
+When you run the CLI, here's exactly what happens:
+
+<Steps>
+
+<Step>
+### Welcome Screen
+
+You'll see an animated ASCII art banner with "Better TS Stack" and a friendly welcome message.
+</Step>
+
+<Step>
+### Project Name
+
+```
+◆  What is your project name?
+│  _
+└
+```
+
+**Requirements:**
+- Must be a valid directory name
+- Cannot be empty
+- Cannot contain spaces (use hyphens or underscores)
+- Cannot start with a dot
+
+**Example valid names:** `my-api`, `cool-app-v2`, `customer_portal`
+</Step>
+
+<Step>
+### Application Type
+
+```
+◆  What type of application do you want to create?
+│  ● Backend API only (Express)
+│  ○ Full-stack (Express + Next.js)
+└
+```
+
+**Options:**
+
+| Option | Description | Use Case |
+|--------|-------------|----------|
+| **Backend API only** | Express server with database | REST APIs, microservices, backend-only projects |
+| **Full-stack** | Express + Next.js together | Complete web applications with frontend and API |
+</Step>
+
+<Step>
+### Backend Framework
+
+```
+◆  Which backend framework do you want to use?
+│  ● Express
+│  ○ Hono (coming soon)
+└
+```
+
+**Currently available:**
+- **Express** — Battle-tested, huge ecosystem, perfect for REST APIs
+
+**Coming soon:**
+- **Hono** — Lightweight, fast, edge-ready
+</Step>
+
+<Step>
+### Database Selection
+
+```
+◆  Which database do you want to use?
+│  ● PostgreSQL with Prisma
+│  ○ MongoDB with Mongoose
+│  ○ PostgreSQL with Drizzle (Next.js only)
+└
+```
+
+**Options explained:**
+
+| Database | ORM/ODM | Best For | Notes |
+|----------|---------|----------|-------|
+| **PostgreSQL + Prisma** | Prisma | Relational data, complex queries | Full type safety, migrations, works with Express & Next.js |
+| **MongoDB + Mongoose** | Mongoose | Flexible schemas, rapid prototyping | Document-based, great for JSON-like data |
+| **PostgreSQL + Drizzle** | Drizzle | SQL lovers, performance | Type-safe SQL, currently Next.js only |
+
+<Callout type="tip">
+  **Not sure?** Start with PostgreSQL + Prisma. It offers the best balance of features, type safety, and documentation.
+</Callout>
+</Step>
+
+<Step>
+### Authentication (Optional)
+
+```
+◆  Do you want to include authentication?
+│  ● Yes
+│  ○ No
+└
+```
+
+If you select **Yes**, the CLI includes:
+
+- **For Express backend:** JWT-based authentication with login/register endpoints
+- **For Next.js frontend:** Better Auth integration with social providers support
+
+**What's included:**
+- User registration/login endpoints
+- Password hashing with bcrypt
+- JWT token generation and validation
+- Protected route middleware
+- User model/schema updates
+</Step>
+
+<Step>
+### Docker (Optional)
+
+```
+◆  Do you want to include Docker configuration?
+│  ● Yes
+│  ○ No
+└
+```
+
+**If Yes, you get:**
+- `Dockerfile` — Multi-stage build for production
+- `docker-compose.yml` — Development environment with hot reload
+- `.dockerignore` — Optimized for Node.js projects
+
+**Services included in docker-compose:**
+- Your Node.js app
+- PostgreSQL database (if selected)
+- Volume mounts for development
+</Step>
+
+<Step>
+### Package Manager
+
+```
+◆  Which package manager do you want to use?
+│  ● npm
+│  ○ pnpm
+│  ○ bun
+└
+```
+
+The CLI will generate lock files and install commands appropriate for your choice.
+</Step>
+
+<Step>
+### Confirmation
+
+Before generating, the CLI shows a summary:
+
+```
+┌─────────────────────────────────────┐
+│  Project Configuration              │
+├─────────────────────────────────────┤
+│  Name: my-awesome-api               │
+│  Type: Backend API only             │
+│  Backend: Express                   │
+│  Database: PostgreSQL with Prisma   │
+│  Auth: Yes                          │
+│  Docker: Yes                        │
+│  Package Manager: npm               │
+└─────────────────────────────────────┘
+
+◆  Continue with project generation?
+│  ● Yes
+│  ○ No
+└
+```
+</Step>
+
+<Step>
+### Generation Progress
+
+Watch as the CLI:
+1. Validates the target directory
+2. Creates project structure
+3. Copies template files
+4. Processes Handlebars templates
+5. Generates configuration files
+6. Installs dependencies (optional)
+7. Initializes Git repository (optional)
+8. Creates initial commit
+</Step>
+
+<Step>
+### Next Steps
+
+Finally, you'll see:
+
+```
+✔ Project generated successfully!
+
+Next steps:
+  cd my-awesome-api
+  npm install
+  npm run dev
+
+Happy coding!
+```
+
+</Step>
+
+</Steps>
+
+---
+
+## After Generation
+
+### Project Structure
+
+Your generated project will look like this:
+
+```
+my-awesome-api/
+├── src/
+│   ├── index.ts          # Entry point
+│   ├── routes/           # API routes
+│   ├── controllers/      # Request handlers
+│   ├── middleware/       # Express middleware
+│   ├── lib/              # Utilities (auth, db, etc.)
+│   └── types/            # TypeScript types
+├── prisma/               # Prisma schema (if selected)
+│   └── schema.prisma
+├── tests/                # Test files
+├── .env                  # Environment variables
+├── .env.example          # Example env file
+├── Dockerfile            # (if Docker selected)
+├── docker-compose.yml    # (if Docker selected)
+├── package.json
+├── tsconfig.json
+└── README.md
+```
+
+### Available Scripts
+
+After `npm install`, these scripts are available:
+
+```bash
+npm run dev       # Start with hot reload (tsx watch)
+npm run build     # Compile TypeScript
+npm run start     # Run compiled code
+npm run lint      # Run ESLint
+npm run format    # Format with Prettier
+npm run type:check # TypeScript check without emit
+```
+
+---
+
+## Customization
+
+### Modifying Generated Code
+
+All generated code is fully editable. The templates use Handlebars for variable substitution, but once generated, it's plain TypeScript/JavaScript.
+
+### Adding More Features Later
+
+You can manually add features the CLI doesn't include:
+
+<Accordions>
+<Accordion title="Add more database models">
+Edit `prisma/schema.prisma` and run:
+```bash
+npx prisma migrate dev --name add_new_model
+npx prisma generate
+```
+</Accordion>
+
+<Accordion title="Add more Express routes">
+Create a new file in `src/routes/` and register it in `src/index.ts`.
+</Accordion>
+
+<Accordion title="Change database after generation">
+You can switch ORMs or databases, but it requires manual migration. It's usually easier to generate a new project.
+</Accordion>
+</Accordions>
+
+---
+
+## Tips for Best Results
+
+1. **Use descriptive project names** — They become folder names and package.json names
+2. **Start with defaults** — PostgreSQL + Prisma + Express is the most tested combination
+3. **Enable Docker early** — It's easier to have Docker from the start than to add it later
+4. **Use git** — The CLI initializes a repo—commit before making major changes
+5. **Check .env.example** — Copy to `.env` and fill in your values before running
+
+<Callout type="info">
+  The CLI generates production-ready code, but always review and test before deploying to production.
+</Callout>

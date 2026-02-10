@@ -95,6 +95,7 @@
   --border: 30 10% 88%;
   --input: 30 10% 88%;
   --ring: 160 84% 39%;
+  
   --radius: 0.75rem;
   
   /* Custom Design Tokens */
@@ -148,6 +149,10 @@
     @apply border-border;
   }
   
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+  
   h1, h2, h3, h4, h5, h6 {
     @apply font-semibold tracking-tight;
   }
@@ -156,6 +161,10 @@
 @layer components {
   .glass-panel {
     @apply bg-card/80 backdrop-blur-xl border border-border/50 shadow-lg;
+  }
+  
+  .glow-border {
+    @apply relative overflow-hidden;
   }
   
   .text-gradient {
@@ -169,6 +178,18 @@
   .terminal-glow {
     box-shadow: 0 0 0 1px hsl(var(--border));
   }
+  
+  .module-glow-frontend {
+    box-shadow: 0 0 60px -15px hsl(var(--module-frontend) / 0.3);
+  }
+  
+  .module-glow-backend {
+    box-shadow: 0 0 60px -15px hsl(var(--module-backend) / 0.3);
+  }
+  
+  .module-glow-database {
+    box-shadow: 0 0 60px -15px hsl(var(--module-database) / 0.3);
+  }
 }
 
 @layer utilities {
@@ -177,6 +198,11 @@
     background-image: 
       linear-gradient(to right, hsl(var(--border) / 0.4) 1px, transparent 1px),
       linear-gradient(to bottom, hsl(var(--border) / 0.4) 1px, transparent 1px);
+  }
+  
+  .bg-dots {
+    background-image: radial-gradient(hsl(var(--border)) 1px, transparent 1px);
+    background-size: 24px 24px;
   }
   
   .bg-gradient-radial {

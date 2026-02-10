@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTheme } from "next-themes";
 import { Github, Menu, Moon, Sun, X, Zap } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -10,8 +11,14 @@ import { MotionDiv, MotionHeader } from "./motion";
 
 export const Navbar = () => {
 	const [scrolled, setScrolled] = useState(false);
-	const [isDark, setIsDark] = useState(false);
 	const [mobileOpen, setMobileOpen] = useState(false);
+	const { theme, setTheme } = useTheme();
+	const [mounted, setMounted] = useState(false);
+
+	useEffect(() => {
+		const id = setTimeout(() => setMounted(true), 0);
+		return () => clearTimeout(id);
+	}, []);
 
 	useEffect(() => {
 		const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -19,35 +26,32 @@ export const Navbar = () => {
 		return () => window.removeEventListener("scroll", handleScroll);
 	}, []);
 
-	useEffect(() => {
-		document.documentElement.classList.toggle("dark", isDark);
-	}, [isDark]);
-
 	return (
 		<MotionHeader
-			initial={{ opacity: 0 }}
-			animate={{ opacity: 1 }}
-			transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
-			className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 ${
-				scrolled ? "bg-background/80 backdrop-blur-md border-b border-border/50" : "bg-transparent"
+			initial={{ opacity: 0, y: -20 }}
+			animate={{ opacity: 1, y: 0 }}
+			transition={{ duration: 0.5 }}
+			className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+				scrolled ? "bg-background/80 backdrop-blur-xl border-b border-border/50" : "bg-transparent"
 			}`}>
-			{/* Spicy tagline banner */}
-			<div className="bg-primary/10 border-b border-primary/20 py-1.5 px-4 text-center">
-				<span className="text-xs md:text-sm font-medium text-foreground/80 flex items-center justify-center gap-2">
-					<Zap className="w-3.5 h-3.5 text-primary" />
-					<span>{NAVBAR_CONFIG.banner.text}</span>
-					<span className="hidden md:inline text-muted-foreground">•</span>
-					<span className="hidden md:inline text-primary font-semibold">{NAVBAR_CONFIG.banner.tagline}</span>
-				</span>
+			{/* Announcement banner */}
+			<div className="bg-primary/10 border-b border-primary/20 py-2">
+				<div className="container mx-auto px-6 flex items-center justify-center gap-2 text-xs">
+					<Zap className="w-3 h-3 text-primary" />
+					<span className="text-foreground/80">{NAVBAR_CONFIG.banner.text}</span>
+					<span className="hidden md:inline text-primary font-mono ml-2">{NAVBAR_CONFIG.banner.tagline}</span>
+				</div>
 			</div>
 
 			<nav className="container mx-auto px-6 h-16 flex items-center justify-between">
 				{/* Logo */}
-				<Link href="/" className="flex items-center gap-2">
-					<div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-						<span className="text-primary-foreground font-bold text-sm font-mono">{NAVBAR_CONFIG.brand.logo}</span>
+				<Link href="/" className="flex items-center gap-3 group">
+					<div className="w-10 h-10 rounded-xl 	rom-primary to-accent flex items-center justify-center pulse-glow">
+						<span className="text-primary-foreground font-bold text-lg font-mono">{NAVBAR_CONFIG.brand.logo}</span>
 					</div>
-					<span className="font-semibold text-foreground">{NAVBAR_CONFIG.brand.name}</span>
+					<span className="font-bold text-lg text-foreground group-hover:text-primary transition-colors">
+						{NAVBAR_CONFIG.brand.name}
+					</span>
 				</Link>
 
 				{/* Desktop Nav */}
@@ -57,53 +61,67 @@ export const Navbar = () => {
 							key={i}
 							href={link.href}
 							{...(link.external && { target: "_blank", rel: "noopener noreferrer" })}
-							className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5">
-							{link.label === "GitHub" && <Github className="w-4 h-4" />}
+							className="text-sm text-muted-foreground hover:text-primary transition-colors relative group">
+							{link.label === "GitHub" && <Github className="w-4 h-4 inline mr-1" />}
 							{link.label}
+							<span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300" />
 						</Link>
 					))}
 				</div>
 
 				{/* Actions */}
 				<div className="flex items-center gap-3">
-					<Button variant="ghost" size="icon" onClick={() => setIsDark(!isDark)} className="w-9 h-9">
-						{isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-					</Button>
+					{mounted && (
+						<>
+							<Button
+								variant="ghost"
+								size="icon"
+								onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+								className="glass-card rounded-lg">
+								{theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+							</Button>
+							<Link
+								href={NAVBAR_CONFIG.cta.href}
+								className={cn(
+									buttonVariants({ size: "sm" }),
+									"hidden md:flex btn-cyber text-primary-foreground font-medium",
+								)}>
+								{NAVBAR_CONFIG.cta.text}
+							</Link>
 
-					<Link
-						href={NAVBAR_CONFIG.cta.href}
-						className={cn(buttonVariants({ variant: "default", size: "sm" }), "hidden md:flex btn-depth")}>
-						{NAVBAR_CONFIG.cta.text}
-					</Link>
-
-					{/* Mobile Menu Toggle */}
-					<Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileOpen(!mobileOpen)}>
-						{mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-					</Button>
+							<Button
+								variant="ghost"
+								size="icon"
+								className="md:hidden glass-card rounded-lg"
+								onClick={() => setMobileOpen(!mobileOpen)}>
+								{mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+							</Button>
+						</>
+					)}
 				</div>
 			</nav>
 
 			{/* Mobile Menu */}
 			{mobileOpen && (
 				<MotionDiv
-					initial={{ opacity: 0, y: -10 }}
-					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
-					className="md:hidden bg-background/95 backdrop-blur-lg border-b border-border">
+					initial={{ opacity: 0, height: 0 }}
+					animate={{ opacity: 1, height: "auto" }}
+					exit={{ opacity: 0, height: 0 }}
+					className="md:hidden bg-background/95 backdrop-blur-xl border-b border-border">
 					<div className="container px-6 py-4 flex flex-col gap-4">
 						{NAVBAR_CONFIG.links.map((link, i) => (
 							<Link
 								key={i}
 								href={link.href}
 								{...(link.external && { target: "_blank", rel: "noopener noreferrer" })}
-								className="text-sm text-muted-foreground hover:text-foreground py-2 flex items-center gap-1.5">
-								{link.label === "GitHub" && <Github className="w-4 h-4" />}
+								className="text-sm text-muted-foreground hover:text-primary py-2">
+								{link.label === "GitHub" && <Github className="w-4 h-4 inline mr-1" />}
 								{link.label}
 							</Link>
 						))}
 						<Link
 							href={NAVBAR_CONFIG.cta.href}
-							className={cn(buttonVariants({ variant: "default", size: "sm" }), "w-full mt-2 btn-depth flex items-center justify-center")}>
+							className={cn(buttonVariants({ size: "sm" }), "w-full btn-cyber text-primary-foreground")}>
 							{NAVBAR_CONFIG.cta.text}
 						</Link>
 					</div>

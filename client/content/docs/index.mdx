@@ -3,21 +3,19 @@ title: Getting Started
 description: Quick start guide for Better-TS-Stack - generate production-ready TypeScript projects in seconds
 ---
 
-import { Step, Steps } from 'fumadocs-ui/components/steps';
-import { Callout } from 'fumadocs-ui/components/callout';
-import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
-import { Cards, Card } from 'fumadocs-ui/components/card';
-import { Terminal, Zap, Shield, Container, Database, Layout } from 'lucide-react';
+import { Step, Steps } from "fumadocs-ui/components/steps";
+import { Callout } from "fumadocs-ui/components/callout";
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
+import { Cards, Card } from "fumadocs-ui/components/card";
+import { Terminal, Zap, Shield, Container, Database, Layout } from "lucide-react";
 
 ## What is Better-TS-Stack?
 
 Better-TS-Stack is an interactive CLI tool that generates fully configured TypeScript projects with your choice of backend, frontend, database, and DevOps tools. No configuration files to wrestle with—just answer a few prompts and get a production-ready codebase.
 
 <Callout type="info" title="Perfect for">
-  - Starting new full-stack TypeScript projects
-  - Prototyping APIs with type-safe backends  
-  - Learning modern TypeScript patterns
-  - Standardizing project structure across teams
+	- Starting new full-stack TypeScript projects - Prototyping APIs with type-safe backends - Learning modern TypeScript
+	patterns - Standardizing project structure across teams
 </Callout>
 
 ## Quick Start
@@ -61,7 +59,7 @@ The CLI will guide you through:
 
 1. **Project name** — What to call your new project
 2. **Application type** — Backend API only, or full-stack with frontend
-3. **Backend framework** — Express (Hono coming soon)
+3. **Backend framework** — Express (NestJS coming soon)
 4. **Database** — PostgreSQL with Prisma, MongoDB with Mongoose, or Drizzle
 5. **Authentication** — Optional JWT auth for Express or Better Auth for Next.js
 6. **Docker** — Optional Docker Compose setup
@@ -79,6 +77,7 @@ npm run dev
 ```
 
 Your project is now running with hot reload enabled!
+
 </Step>
 
 </Steps>
@@ -86,24 +85,24 @@ Your project is now running with hot reload enabled!
 ## What's Included?
 
 <Cards>
-  <Card title="Backend API" icon={<Database className="text-blue-400" />}>
-    Express.js with TypeScript, Zod validation, and proper error handling
-  </Card>
-  <Card title="Frontend App" icon={<Layout className="text-green-400" />}>
-    Next.js 16 with React 19, Tailwind CSS v4, and App Router
-  </Card>
-  <Card title="Type-Safe Database" icon={<Shield className="text-purple-400" />}>
-    Prisma or Drizzle ORM with auto-generated types
-  </Card>
-  <Card title="Authentication" icon={<Zap className="text-yellow-400" />}>
-    JWT tokens for Express, Better Auth for Next.js
-  </Card>
-  <Card title="Docker Ready" icon={<Container className="text-blue-400" />}>
-    Multi-stage Dockerfile and docker-compose.yml
-  </Card>
-  <Card title="Developer Tools" icon={<Terminal className="text-primary" />}>
-    ESLint, Prettier, TypeScript strict mode, Husky hooks
-  </Card>
+	<Card title="Backend API" icon={<Database className="text-blue-400" />}>
+		Express.js with TypeScript, Zod validation, and proper error handling
+	</Card>
+	<Card title="Frontend App" icon={<Layout className="text-green-400" />}>
+		Next.js 16 with React 19, Tailwind CSS v4, and App Router
+	</Card>
+	<Card title="Type-Safe Database" icon={<Shield className="text-purple-400" />}>
+		Prisma or Drizzle ORM with auto-generated types
+	</Card>
+	<Card title="Authentication" icon={<Zap className="text-yellow-400" />}>
+		JWT tokens for Express, Better Auth for Next.js
+	</Card>
+	<Card title="Docker Ready" icon={<Container className="text-blue-400" />}>
+		Multi-stage Dockerfile and docker-compose.yml
+	</Card>
+	<Card title="Developer Tools" icon={<Terminal className="text-primary" />}>
+		ESLint, Prettier, TypeScript strict mode, Husky hooks
+	</Card>
 </Cards>
 
 ## Requirements
@@ -112,25 +111,23 @@ Your project is now running with hot reload enabled!
 - **Package manager** — npm, pnpm, or bun
 - **Git** — For repository initialization (optional)
 
-<Callout type="warn">
-  Make sure you have Node.js 18+ installed. Check with: `node --version`
-</Callout>
+<Callout type="warn">Make sure you have Node.js 18+ installed. Check with: `node --version`</Callout>
 
 ## Next Steps
 
 <Cards>
-  <Card title="Installation Options" href="/docs/installation">
-    Learn about global vs npx installation, package manager differences
-  </Card>
-  <Card title="Interactive Usage" href="/docs/usage">
-    Deep dive into the CLI prompts and options
-  </Card>
-  <Card title="Modules" href="/docs/modules">
-    Explore backend, frontend, database, auth, and Docker options
-  </Card>
-  <Card title="Project Structure" href="/docs/structure">
-    Understand the generated project organization
-  </Card>
+	<Card title="Installation Options" href="/docs/installation">
+		Learn about global vs npx installation, package manager differences
+	</Card>
+	<Card title="Interactive Usage" href="/docs/usage">
+		Deep dive into the CLI prompts and options
+	</Card>
+	<Card title="Modules" href="/docs/modules">
+		Explore backend, frontend, database, auth, and Docker options
+	</Card>
+	<Card title="Project Structure" href="/docs/structure">
+		Understand the generated project organization
+	</Card>
 </Cards>
 
 ---

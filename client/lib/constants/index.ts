@@ -74,7 +74,7 @@ export const ARCHITECTURE_FEATURES: Feature[] = [
 		icon: "Server",
 		title: "Backend Module",
 		description:
-			"TypeScript backend with Express. Fully type-safe REST API with automatic validation using Zod. Hono support coming soon.",
+			"TypeScript backend with Express. Fully type-safe REST API with automatic validation using Zod. NestJS support coming soon.",
 		color: "text-purple-400",
 		badge: null,
 		size: "large",

@@ -3,16 +3,16 @@ title: Interactive Usage
 description: How the Better-TS-Stack CLI works - prompts, options, and flow
 ---
 
-import { Callout } from 'fumadocs-ui/components/callout';
-import { Steps, Step } from 'fumadocs-ui/components/steps';
-import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+import { Callout } from "fumadocs-ui/components/callout";
+import { Steps, Step } from "fumadocs-ui/components/steps";
+import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
 
 ## How the CLI Works
 
 Better-TS-Stack is entirely **interactive**. Unlike other CLI tools with complex command-line flags, you simply run the command and answer a series of prompts. The CLI then generates a complete, configured project based on your choices.
 
 <Callout type="info">
-  There are **no subcommands or flags**. Just run `npx better-ts-stack` and follow the prompts.
+	There are **no subcommands or flags**. Just run `npx better-ts-stack` and follow the prompts.
 </Callout>
 
 ---
@@ -27,6 +27,7 @@ When you run the CLI, here's exactly what happens:
 ### Welcome Screen
 
 You'll see an animated ASCII art banner with "Better TS Stack" and a friendly welcome message.
+
 </Step>
 
 <Step>
@@ -39,12 +40,14 @@ You'll see an animated ASCII art banner with "Better TS Stack" and a friendly we
 ```
 
 **Requirements:**
+
 - Must be a valid directory name
 - Cannot be empty
 - Cannot contain spaces (use hyphens or underscores)
 - Cannot start with a dot
 
 **Example valid names:** `my-api`, `cool-app-v2`, `customer_portal`
+
 </Step>
 
 <Step>
@@ -59,10 +62,11 @@ You'll see an animated ASCII art banner with "Better TS Stack" and a friendly we
 
 **Options:**
 
-| Option | Description | Use Case |
-|--------|-------------|----------|
+| Option               | Description                  | Use Case                                        |
+| -------------------- | ---------------------------- | ----------------------------------------------- |
 | **Backend API only** | Express server with database | REST APIs, microservices, backend-only projects |
-| **Full-stack** | Express + Next.js together | Complete web applications with frontend and API |
+| **Full-stack**       | Express + Next.js together   | Complete web applications with frontend and API |
+
 </Step>
 
 <Step>
@@ -71,16 +75,18 @@ You'll see an animated ASCII art banner with "Better TS Stack" and a friendly we
 ```
 ◆  Which backend framework do you want to use?
 │  ● Express
-│  ○ Hono (coming soon)
+│  ○ NestJS (coming soon)
 └
 ```
 
 **Currently available:**
+
 - **Express** — Battle-tested, huge ecosystem, perfect for REST APIs
 
 **Coming soon:**
-- **Hono** — Lightweight, fast, edge-ready
-</Step>
+
+- **NestJS** — Enterprise-grade framework with powerful architecture
+  </Step>
 
 <Step>
 ### Database Selection
@@ -95,11 +101,11 @@ You'll see an animated ASCII art banner with "Better TS Stack" and a friendly we
 
 **Options explained:**
 
-| Database | ORM/ODM | Best For | Notes |
-|----------|---------|----------|-------|
-| **PostgreSQL + Prisma** | Prisma | Relational data, complex queries | Full type safety, migrations, works with Express & Next.js |
-| **MongoDB + Mongoose** | Mongoose | Flexible schemas, rapid prototyping | Document-based, great for JSON-like data |
-| **PostgreSQL + Drizzle** | Drizzle | SQL lovers, performance | Type-safe SQL, currently Next.js only |
+| Database                 | ORM/ODM  | Best For                            | Notes                                                      |
+| ------------------------ | -------- | ----------------------------------- | ---------------------------------------------------------- |
+| **PostgreSQL + Prisma**  | Prisma   | Relational data, complex queries    | Full type safety, migrations, works with Express & Next.js |
+| **MongoDB + Mongoose**   | Mongoose | Flexible schemas, rapid prototyping | Document-based, great for JSON-like data                   |
+| **PostgreSQL + Drizzle** | Drizzle  | SQL lovers, performance             | Type-safe SQL, currently Next.js only                      |
 
 <Callout type="tip">
   **Not sure?** Start with PostgreSQL + Prisma. It offers the best balance of features, type safety, and documentation.
@@ -122,12 +128,13 @@ If you select **Yes**, the CLI includes:
 - **For Next.js frontend:** Better Auth integration with social providers support
 
 **What's included:**
+
 - User registration/login endpoints
 - Password hashing with bcrypt
 - JWT token generation and validation
 - Protected route middleware
 - User model/schema updates
-</Step>
+  </Step>
 
 <Step>
 ### Docker (Optional)
@@ -140,15 +147,17 @@ If you select **Yes**, the CLI includes:
 ```
 
 **If Yes, you get:**
+
 - `Dockerfile` — Multi-stage build for production
 - `docker-compose.yml` — Development environment with hot reload
 - `.dockerignore` — Optimized for Node.js projects
 
 **Services included in docker-compose:**
+
 - Your Node.js app
 - PostgreSQL database (if selected)
 - Volume mounts for development
-</Step>
+  </Step>
 
 <Step>
 ### Package Manager
@@ -162,6 +171,7 @@ If you select **Yes**, the CLI includes:
 ```
 
 The CLI will generate lock files and install commands appropriate for your choice.
+
 </Step>
 
 <Step>
@@ -187,12 +197,14 @@ Before generating, the CLI shows a summary:
 │  ○ No
 └
 ```
+
 </Step>
 
 <Step>
 ### Generation Progress
 
 Watch as the CLI:
+
 1. Validates the target directory
 2. Creates project structure
 3. Copies template files
@@ -201,7 +213,7 @@ Watch as the CLI:
 6. Installs dependencies (optional)
 7. Initializes Git repository (optional)
 8. Creates initial commit
-</Step>
+   </Step>
 
 <Step>
 ### Next Steps
@@ -287,7 +299,7 @@ npx prisma generate
 </Accordion>
 
 <Accordion title="Add more Express routes">
-Create a new file in `src/routes/` and register it in `src/index.ts`.
+	Create a new file in `src/routes/` and register it in `src/index.ts`.
 </Accordion>
 
 <Accordion title="Change database after generation">
@@ -306,5 +318,5 @@ You can switch ORMs or databases, but it requires manual migration. It's usually
 5. **Check .env.example** — Copy to `.env` and fill in your values before running
 
 <Callout type="info">
-  The CLI generates production-ready code, but always review and test before deploying to production.
+	The CLI generates production-ready code, but always review and test before deploying to production.
 </Callout>

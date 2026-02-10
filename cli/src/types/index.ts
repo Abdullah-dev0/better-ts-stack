@@ -23,7 +23,7 @@ export interface Dependencies {
 }
 
 // Supported backend frameworks
-export type BackendFramework = "express" | "hono";
+export type BackendFramework = "express" | "nestjs";
 
 // Supported frontend frameworks
 export type FrontendFramework = "nextjs";
@@ -168,7 +168,7 @@ export const applicationTypeOptions = [
 
 export const backendFrameworkOptions = [
   { value: "express" as const, label: "Express" },
-  { value: "hono" as const, label: "Hono", hint: "(Coming Soon)" },
+  { value: "nestjs" as const, label: "NestJS", hint: "(Coming Soon)" },
 ];
 
 export const frontendFrameworkOptions = [

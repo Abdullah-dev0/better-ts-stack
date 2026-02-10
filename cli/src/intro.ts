@@ -1,41 +1,35 @@
 // Better TS Stack - Interactive CLI Intro
-import readline from "readline";
+import consola from "consola";
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export async function showInteractiveIntro() {
   console.clear();
-  console.log(
-    "\n  ════════════════════════════════════════════════════════════"
-  );
-  console.log(
-    "  ║                                                           ║"
-  );
-  console.log(
-    "  ║              Better TS Stack                              ║"
-  );
-  console.log(
-    "  ║                                                           ║"
-  );
-  console.log(
-    "  ════════════════════════════════════════════════════════════\n"
-  );
-  console.log(
-    "  Build powerful TypeScript projects with enterprise-grade tooling\n"
-  );
-  console.log("  ⚡  Lightning-fast setup with zero configuration");
-  console.log("  🎯  Production-ready templates for every use case");
-  console.log("  🛠️   Modern tooling: ESLint, Prettier, Vitest & more");
-  console.log("  📦  Optimized builds with best practices baked in\n");
 
-  return new Promise<void>((resolve) => {
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-    });
+  // Subtle fade-in effect
+  console.log("\n");
+  await sleep(80);
 
-    rl.question("  Press Enter to continue... ", () => {
-      rl.close();
-      console.log();
-      resolve();
-    });
-  });
+  consola.log("  \x1b[36m╭─────────────────────────────────────────╮\x1b[0m");
+  await sleep(50);
+
+  consola.log(
+    "  \x1b[36m│\x1b[0m                                         \x1b[36m│\x1b[0m"
+  );
+  await sleep(50);
+
+  consola.log(
+    "  \x1b[36m│\x1b[0m         \x1b[1m\x1b[96mBetter TS Stack\x1b[0m                 \x1b[36m│\x1b[0m"
+  );
+  await sleep(50);
+
+  consola.log(
+    "  \x1b[36m│\x1b[0m                                         \x1b[36m│\x1b[0m"
+  );
+  await sleep(50);
+
+  consola.log("  \x1b[36m╰─────────────────────────────────────────╯\x1b[0m");
+
+  await sleep(150);
+  console.log("\n");
 }

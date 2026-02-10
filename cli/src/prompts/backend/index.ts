@@ -34,7 +34,7 @@ export const collectBackendChoices = async (): Promise<PromptChoices> => {
             process.exit(0);
           }
 
-          if (result === "hono") {
+          if (result === "nestjs") {
             consola.warn(
               "This framework is coming soon! Please select another option."
             );

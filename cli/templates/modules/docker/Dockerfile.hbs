@@ -1,20 +1,27 @@
 {{#if (eq framework 'nextjs')}}
-# Build stage
-FROM node:18-alpine AS builder
+# Base stage
+FROM node:20-alpine AS base
 WORKDIR /app
+RUN apk add --no-cache libc6-compat
 
+# Dependencies stage
+FROM base AS deps
 COPY package*.json ./
-RUN npm ci
+RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
+
+# Build stage
+FROM base AS builder
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build
 
 # Production stage
-FROM node:18-alpine
+FROM node:20-alpine AS runner
 WORKDIR /app
-
 ENV NODE_ENV=production
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
 
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
@@ -22,42 +29,43 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
 EXPOSE {{port}}
-ENV PORT={{port}}
-ENV HOSTNAME="0.0.0.0"
+ENV PORT={{port}} HOSTNAME=0.0.0.0
+
 CMD ["node", "server.js"]
+
 {{else}}
 # Build stage
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Copy package files
 COPY package*.json ./
+RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
-# Install all dependencies (including dev dependencies for build)
-RUN npm ci
-
-# Copy source code
 COPY . .
 
-# Build TypeScript
-RUN npm run build
+# Only build if package.json has a build script
+RUN npm run build || echo "No build script found, skipping build step"
 
 # Production stage
-FROM node:18-alpine
+FROM node:20-alpine
 WORKDIR /app
+ENV NODE_ENV=production
 
-# Copy package files
+# Create non-root user for security
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 expressuser
+
 COPY package*.json ./
+RUN if [ -f package-lock.json ]; then npm ci --omit=dev; else npm install --omit=dev; fi
 
-# Install only production dependencies
-RUN npm ci --only=production
+# Copy built files (if TypeScript) or source files (if JavaScript)
+COPY --from=builder --chown=expressuser:nodejs /app/dist ./dist 2>/dev/null || \
+     COPY --chown=expressuser:nodejs /app/src ./src 2>/dev/null || \
+     COPY --chown=expressuser:nodejs /app/*.js ./
 
-# Copy built application from builder stage
-COPY --from=builder /app/dist ./dist
-
-# Expose port
+USER expressuser
 EXPOSE {{port}}
+ENV PORT={{port}}
 
-# Run the application
-CMD ["node", "dist/index.js"]
+CMD ["node", "{{entrypoint}}"]
 {{/if}}

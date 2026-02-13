@@ -120,18 +120,17 @@ For developers who prefer writing SQL directly with full type safety.
 
 ### Generated Files
 
-```
-src/
-├── db/
-│   ├── schema.ts       # Table definitions
-│   └── index.ts        # Database connection
-└── migrations/         # SQL migration files
+```text
+lib/
+  schema.ts              # Table definitions
+  db.ts                  # Database connection
+drizzle/                 # SQL migration files (generated)
 ```
 
 ### Schema Example
 
 ```typescript
-// src/db/schema.ts
+// lib/schema.ts
 import { pgTable, uuid, varchar, timestamp } from 'drizzle-orm/pg-core';
 
 export const users = pgTable('users', {
@@ -144,10 +143,16 @@ export const users = pgTable('users', {
 });
 ```
 
+<Callout type="tip">
+  If you also enable **Better Auth** with Drizzle, the generated `lib/schema.ts`
+  includes Better Auth core tables (`user`, `session`, `account`,
+  `verification`) instead of only the sample `users` table.
+</Callout>
+
 ### Database Connection
 
 ```typescript
-// src/db/index.ts
+// lib/db.ts
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import * as schema from './schema';
@@ -163,7 +168,7 @@ export const db = drizzle(pool, { schema });
 
 ```typescript
 import { db } from './db';
-import { users } from './db/schema';
+import { users } from './schema';
 import { eq } from 'drizzle-orm';
 
 // Insert
@@ -356,3 +361,4 @@ Mongoose handles schema changes automatically in development. For production, co
 <Callout type="tip">
   **Recommendation:** Use Prisma for new projects. It offers the best developer experience with excellent TypeScript support.
 </Callout>
+

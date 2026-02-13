@@ -224,6 +224,8 @@ export default router;
 ## Next.js + Better Auth
 
 For Next.js applications with modern authentication needs.
+In this CLI, Better Auth for Next.js is generated with a database adapter
+(Prisma or Drizzle for PostgreSQL).
 
 ### Generated Files
 
@@ -243,20 +245,18 @@ components/
 ```typescript
 // lib/auth.ts
 import { betterAuth } from "better-auth";
-import { prismaAdapter } from "better-auth/adapters/prisma";
-import { prisma } from "./prisma";
+import { nextCookies } from "better-auth/next-js";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { db } from "./db";
 
 export const auth = betterAuth({
-  database: prismaAdapter(prisma),
+  database: drizzleAdapter(db, { provider: "pg" }),
   emailAndPassword: {
     enabled: true,
   },
-  socialProviders: {
-    github: {
-      clientId: process.env.GITHUB_CLIENT_ID!,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
-    },
-  },
+  plugins: [nextCookies()],
+  secret: process.env.BETTER_AUTH_SECRET,
+  baseURL: process.env.BETTER_AUTH_URL,
 });
 ```
 
@@ -265,15 +265,16 @@ export const auth = betterAuth({
 ```typescript
 // app/api/auth/[...all]/route.ts
 import { auth } from "@/lib/auth";
+import { toNextJsHandler } from "better-auth/next-js";
 
-export const { GET, POST } = auth.handler;
+export const { GET, POST } = toNextJsHandler(auth);
 ```
 
 ### Client-Side Usage
 
 ```typescript
 // lib/auth-client.ts
-import { createAuthClient } from "better-auth/client";
+import { createAuthClient } from "better-auth/react";
 
 export const authClient = createAuthClient();
 
@@ -293,6 +294,12 @@ async function handleLogin(email: string, password: string) {
 }
 ```
 
+<Callout type="tip">
+  When using **Drizzle + Better Auth**, the generated Drizzle schema already
+  includes Better Auth core tables (`user`, `session`, `account`,
+  `verification`).
+</Callout>
+
 ---
 
 ## Environment Variables
@@ -309,6 +316,7 @@ JWT_EXPIRES_IN="7d"
 ```bash
 # Required
 BETTER_AUTH_SECRET="your-secret-key"
+BETTER_AUTH_URL="http://localhost:3000"
 
 # OAuth Providers (optional)
 GITHUB_CLIENT_ID="your-github-client-id"

@@ -125,7 +125,7 @@ You'll see an animated ASCII art banner with "Better TS Stack" and a friendly we
 If you select **Yes**, the CLI includes:
 
 - **For Express backend:** JWT-based authentication with login/register endpoints
-- **For Next.js frontend:** Better Auth integration with social providers support
+- **For Next.js frontend:** Better Auth integration with Prisma or Drizzle (PostgreSQL)
 
 **What's included:**
 
@@ -134,6 +134,12 @@ If you select **Yes**, the CLI includes:
 - JWT token generation and validation
 - Protected route middleware
 - User model/schema updates
+
+<Callout type="info">
+  For Next.js projects in this CLI, Better Auth requires a database selection.
+  If you choose Drizzle + Better Auth, generated schema includes Better Auth core
+  tables (`user`, `session`, `account`, `verification`).
+</Callout>
   </Step>
 
 <Step>

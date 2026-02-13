@@ -84,7 +84,12 @@ export const collectFrontendChoices = async (): Promise<PromptChoices> => {
           message: "Use Docker?",
           initialValue: false,
         }),
-      useAuth: async () => {
+      useAuth: async ({ results }) => {
+        // Better Auth template requires a database-backed adapter
+        if (results.databaseType === "none") {
+          return false;
+        }
+
         const selection = await select<boolean>({
           message: "Add Better Auth?",
           options: authOptions,
@@ -130,7 +135,7 @@ export const collectFrontendChoices = async (): Promise<PromptChoices> => {
     orm: project.orm,
     packageManager: project.packageManager,
     useDocker: Boolean(project.useDocker),
-    useAuth: project.useAuth,
+    useAuth: Boolean(project.useAuth),
     initGit: Boolean(project.initGit),
     installDeps: Boolean(project.installDeps),
   };

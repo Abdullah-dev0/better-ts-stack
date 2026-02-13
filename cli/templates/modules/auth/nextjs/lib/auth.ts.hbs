@@ -16,10 +16,9 @@ export const auth = betterAuth({
   {{#if (eq database 'drizzle')}}
   database: drizzleAdapter(db, { provider: "pg" }),
   {{/if}}
-  {{#if (eq database 'none')}}
-  // TODO: add Prisma or Drizzle module and set database adapter
-  database: undefined as any,
-  {{/if}}
+  emailAndPassword: {
+    enabled: true,
+  },
   plugins: [nextCookies()],
   secret: process.env.BETTER_AUTH_SECRET,
   baseURL: process.env.BETTER_AUTH_URL,

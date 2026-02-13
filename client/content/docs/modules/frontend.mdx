@@ -181,7 +181,8 @@ NEXT_PUBLIC_API_URL=http://localhost:3000/api
 
 ## Integration with Auth Module
 
-If auth is enabled with Next.js, the frontend module includes:
+If auth is enabled with Next.js, the frontend module includes Better Auth
+with a database-backed adapter (Prisma or Drizzle).
 
 ### Better Auth Setup
 
@@ -189,39 +190,37 @@ If auth is enabled with Next.js, the frontend module includes:
 // lib/auth.ts
 import { betterAuth } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { db } from "./db";
 
 export const auth = betterAuth({
-  database: prismaAdapter(prisma),
-  socialProviders: {
-    github: {
-      clientId: process.env.GITHUB_CLIENT_ID!,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
-    },
+  database: drizzleAdapter(db, { provider: "pg" }),
+  emailAndPassword: {
+    enabled: true,
   },
   plugins: [nextCookies()],
+  secret: process.env.BETTER_AUTH_SECRET,
+  baseURL: process.env.BETTER_AUTH_URL,
 });
 ```
 
-### Auth Context
+### Auth Route Handler
 
-React context for managing auth state (if JWT backend selected):
+```typescript
+// app/api/auth/[...all]/route.ts
+import { auth } from "@/lib/auth";
+import { toNextJsHandler } from "better-auth/next-js";
 
-```tsx
-// components/AuthProvider.tsx
-'use client';
+export const { GET, POST } = toNextJsHandler(auth);
+```
 
-import { createContext, useContext, useEffect, useState } from 'react';
+### Client Usage
 
-const AuthContext = createContext(null);
+```typescript
+// lib/auth-client.ts
+import { createAuthClient } from "better-auth/react";
 
-export function AuthProvider({ children }) {
-  // Auth state management
-  return (
-    <AuthContext.Provider value={auth}>
-      {children}
-    </AuthContext.Provider>
-  );
-}
+export const authClient = createAuthClient();
 ```
 
 ---

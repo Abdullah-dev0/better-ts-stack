@@ -2,212 +2,136 @@
 
 ## Project Overview
 
-This is a TypeScript CLI tool monorepo that generates fully configured TypeScript projects with backend, frontend, database integration, Docker support, and more through an interactive setup.
+TypeScript CLI monorepo that generates fully configured TypeScript projects with backend, frontend, database, Docker support via interactive setup.
 
-**Monorepo Structure:**
-- `cli/` - The CLI tool package (Node.js CLI application)
-- `client/` - Next.js documentation website (Next.js 16 + React 19)
+**Structure:**
+
+- `cli/` - Node.js CLI tool
+- `client/` - Next.js 16 + React 19 documentation website
 
 ## Build, Lint & Development Commands
 
-### CLI Package (`cli/`)
+### CLI (`cli/`)
 
 ```bash
 cd cli
 
-# Development - run with tsx (hot reload)
+# Development (hot reload)
 npm run dev
 
-# Build - compile TypeScript to dist/
+# Build to dist/
 npm run build
 
-# Run compiled code
+# Run compiled
 npm start
 
-# Type checking (no emit)
+# Type check (no emit)
 npm run type:check
 
-# Linting
-npm run lint              # Check for issues
-npm run lint:fix          # Auto-fix issues
+# Lint
+npm run lint
+npm run lint:fix      # Auto-fix
 
-# Formatting
-npm run format            # Format with Prettier
-npm run format:check      # Check formatting
+# Format
+npm run format
+npm run format:check
 ```
 
-### Client Package (`client/`)
+### Client (`client/`)
 
 ```bash
 cd client
-
-# Development
-npm run dev               # Start Next.js dev server
-
-# Build
-npm run build             # Build for production
-
-# Linting
-npm run lint              # ESLint check
+npm run dev           # Dev server
+npm run build         # Production build
+npm run lint          # ESLint check
 ```
 
 ## Code Style Guidelines
 
-### TypeScript Configuration
+### TypeScript
 
-**CLI (`cli/tsconfig.json`):**
-- Target: ES2020, Module: CommonJS
-- Strict mode enabled with full type safety
-- No unused variables or parameters allowed
-- Output: `dist/` directory
+**CLI:** ES2020, CommonJS, strict mode, no unused vars
+**Client:** ES2017, ESNext modules, react-jsx, `@/*` path alias
 
-**Client (`client/tsconfig.json`):**
-- Target: ES2017
-- Module: ESNext with bundler resolution
-- JSX: react-jsx
-- Path mapping: `@/*` maps to project root
+### Formatting (Prettier - CLI)
 
-### Formatting (Prettier) - CLI only
+- Semi-colons required, double quotes, ES5 trailing commas
+- Print width: 80, tab width: 2 spaces
+- Arrow functions: always parentheses
 
-- Semi-colons: required
-- Double quotes (singleQuote: false)
-- Trailing commas: ES5 compatible
-- Print width: 80 characters
-- Tab width: 2 spaces (no tabs)
-- Arrow function parentheses: always
-- End of line: LF
+**Import Order:**
 
-**Import Order (via @trivago/prettier-plugin-sort-imports):**
-1. `^react` - React imports
-2. `^next` - Next.js imports
-3. `<THIRD_PARTY_MODULES>` - Third-party libraries
-4. `^@repo/(.*)$` - Monorepo packages
-5. `^@/(.*)$` - Path aliases
-6. `^[./]` - Local imports
+1. `^react` → 2. `^next` → 3. `<THIRD_PARTY_MODULES>` → 4. `^@repo/(.*)$` → 5. `^@/` → 6. `^[./]`
 
 ### ESLint Rules
 
-**CLI:**
-- Explicit function return types: off (inferred preferred)
-- No explicit any: warn
-- No unused vars: error
-- No floating promises: error (must handle all async calls)
-- Console statements: allowed (CLI tool needs output)
-
-**Client:**
-- Uses `eslint-config-next` with TypeScript support
-- Follows Next.js core web vitals rules
-
-### Imports & Module Structure
-
-**CLI:**
-- Use Node.js built-in imports with `node:` prefix: `import path from 'node:path'`
-- Third-party imports next (sorted by Prettier)
-- Local imports last using relative paths
-- Prefer named exports for utilities
-- Default exports for main entry points
-
-**Client:**
-- Use path alias `@/` for imports from project root
-- Import order handled by Prettier plugin
-- Follow React/Next.js conventions
+- CLI: No unused vars (error), no floating promises (error), any (warn), console allowed
+- Client: eslint-config-next with Next.js core web vitals
 
 ### Naming Conventions
 
-- Functions/variables: camelCase (e.g., `buildProject`, `validateInput`)
-- Types/Interfaces: PascalCase (e.g., `ProjectConfig`, `BuildResult`)
-- Constants: UPPER_SNAKE_CASE for true constants
-- Files: camelCase or PascalCase matching main export
-- Boolean variables: prefix with verb (e.g., `isEnabled`, `hasError`)
-- React components: PascalCase
+- Functions/variables: `camelCase`
+- Types/Interfaces: `PascalCase`
+- Constants: `UPPER_SNAKE_CASE`
+- Files: match main export (camelCase or PascalCase)
+- Booleans: `isEnabled`, `hasError`
+- React components: `PascalCase`
+
+### Imports
+
+- CLI: Use `node:` prefix for Node.js built-ins, named exports for utilities, default for entry points
+- Client: Use `@/` path alias, prefer server components
 
 ### Error Handling
 
-**CLI:**
-- Use `buildError()` helper from `src/types/index.ts` for all errors
-- Always wrap async operations with try-catch
-- Provide context in error messages: `throw buildError(e, 'CODE', 'context')`
-- Use consola for user-facing messages, not console.log
-- Exit codes: 0 for success, 1 for errors
-
-**Client:**
-- Use Next.js error boundaries for React errors
-- Handle async errors with try-catch
-- Use appropriate HTTP status codes for API routes
+- CLI: Use `buildError()` from `src/types/index.ts`, wrap async with try-catch, use consola, exit 0/1
+- Client: Next.js error boundaries, try-catch async, proper HTTP status codes
 
 ### Testing
 
-**No test framework currently configured** in either package.
+No test framework configured. When adding tests:
 
-When adding tests, consider:
-- CLI: Vitest or Jest for unit testing
-- Client: Jest with React Testing Library for component testing
+- CLI: Vitest or Jest
+- Client: Jest + React Testing Library
 
-### Git Hooks
+Run single test: `npx vitest run <file>` or `npx jest <file>`
 
-Husky + lint-staged configured in CLI:
-- Pre-commit: Runs Prettier and ESLint on staged files
-- Configured in `cli/.husky/` and `cli/.lintstagedrc.json`
-
-### Architecture Patterns
+## Architecture
 
 **CLI:**
+
 - Barrel exports via `index.ts` in each directory
-- Group related functionality in feature folders
-- Keep functions pure when possible
-- Async/await preferred over callbacks
-- Use Zod for runtime validation
-- Use consola for structured logging
+- Feature folders, pure functions preferred
+- Async/await, Zod for validation, consola for logging
 
 **Client:**
-- App Router structure (Next.js 13+)
-- Server Components by default
-- Client Components only when needed ('use client')
-- Tailwind CSS v4 for styling
-- Radix UI primitives for accessible components
 
-### Project Structure
+- Next.js App Router, Server Components by default
+- `'use client'` only when needed
+- Tailwind CSS v4, Radix UI primitives
 
-**CLI (`cli/src/`):**
+**Project Structure (`cli/src/`):**
+
 ```
 src/
-  index.ts          # CLI entry point
-  types/            # Type definitions & errors
-  prompts/          # User interaction logic
-  builder/          # Project generation logic
-  validators/       # Input validation
-  output/           # Output formatting
-  modules/          # Module registry
+  index.ts      # Entry point
+  types/        # Types & errors
+  prompts/      # User interaction
+  builder/      # Project generation
+  validators/   # Input validation
+  output/       # Output formatting
+  modules/      # Module registry
 ```
 
-**Client (`client/`):**
-```
-app/                # Next.js App Router
-components/         # React components
-public/             # Static assets
-```
+## Dependencies
 
-### Dependencies
+**CLI:** @clack/prompts, consola, fs-extra, handlebars, zod
+**Client:** next, react 19, @radix-ui/react-slot, tailwindcss v4, motion
 
-**CLI Runtime:**
-- @clack/prompts - Interactive CLI prompts
-- consola - Structured logging
-- fs-extra - Enhanced file system operations
-- handlebars - Template engine
-- zod - Schema validation
+## Important Notes
 
-**Client Runtime:**
-- next - Next.js framework
-- react/react-dom - React 19
-- @radix-ui/react-slot - UI primitives
-- tailwindcss v4 - Styling
-- motion - Animation library
-
-### Important Notes
-
-- CLI is a Node.js tool - console output is expected and necessary
-- Handlebars templates are in `cli/templates/` directory
+- CLI requires console output (expected)
+- Handlebars templates: `cli/templates/`
 - Node.js 18+ required
-- Client uses Next.js 16 with React 19 (bleeding edge)
-- Run lint/typecheck before committing changes
-- No Cursor rules or Copilot instructions found in repo
+- Run lint/typecheck before committing
+- No Cursor or Copilot rules configured

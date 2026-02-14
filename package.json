@@ -1,0 +1,22 @@
+{
+  "name": "better-ts-stack",
+  "private": true,
+  "workspaces": ["cli", "client"],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "build:cli": "npm run build -w cli",
+    "build:client": "npm run build -w client",
+    "dev:cli": "npm run dev -w cli",
+    "dev:client": "npm run dev -w client",
+    "lint": "npm run lint --workspaces",
+    "lint:fix": "npm run lint:fix --workspaces",
+    "type:check": "npm run type:check --workspaces",
+    "format": "npm run format -w cli",
+    "format:check": "npm run format:check -w cli",
+    "start:cli": "npm run start -w cli",
+    "start:client": "npm run start -w client"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

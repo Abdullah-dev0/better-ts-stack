@@ -11,6 +11,32 @@ TypeScript CLI monorepo that generates fully configured TypeScript projects with
 
 ## Build, Lint & Development Commands
 
+### From root (npm workspaces)
+
+```bash
+# Build all
+npm run build
+npm run build:cli
+npm run build:client
+
+# Dev
+npm run dev:cli       # CLI with hot reload
+npm run dev:client    # Next.js dev server
+
+# Lint / type-check all
+npm run lint
+npm run lint:fix
+npm run type:check
+
+# Format (CLI has Prettier config)
+npm run format
+npm run format:check
+
+# Run built apps
+npm run start:cli
+npm run start:client
+```
+
 ### CLI (`cli/`)
 
 ```bash

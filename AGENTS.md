@@ -4,160 +4,156 @@
 
 TypeScript CLI monorepo that generates fully configured TypeScript projects with backend, frontend, database, Docker support via interactive setup.
 
-**Structure:**
-
-- `cli/` - Node.js CLI tool
-- `client/` - Next.js 16 + React 19 documentation website
+**Structure:** `cli/` (Node.js CLI generator), `client/` (Next.js 16 + React 19 docs site)
 
 ## Build, Lint & Development Commands
 
 ### From root (npm workspaces)
 
 ```bash
-# Build all
-npm run build
-npm run build:cli
-npm run build:client
-
-# Dev
-npm run dev:cli       # CLI with hot reload
-npm run dev:client    # Next.js dev server
-
-# Lint / type-check all
-npm run lint
-npm run lint:fix
-npm run type:check
-
-# Format (CLI has Prettier config)
-npm run format
-npm run format:check
-
-# Run built apps
-npm run start:cli
-npm run start:client
+npm run build              # Build all workspaces
+npm run build:cli          # Build CLI only
+npm run build:client       # Build client only
+npm run dev:cli            # CLI with hot reload (tsx)
+npm run dev:client         # Next.js dev server
+npm run lint               # Lint all workspaces
+npm run lint:fix           # Auto-fix lint issues
+npm run type:check         # TypeScript check (no emit)
+npm run format             # Format code (Prettier - CLI only)
+npm run start:cli          # Run compiled CLI
+npm run start:client       # Run Next.js production server
 ```
 
-### CLI (`cli/`)
+### Individual workspaces
 
 ```bash
-cd cli
-
-# Development (hot reload)
-npm run dev
-
-# Build to dist/
-npm run build
-
-# Run compiled
-npm start
-
-# Type check (no emit)
-npm run type:check
-
-# Lint
-npm run lint
-npm run lint:fix      # Auto-fix
-
-# Format
-npm run format
-npm run format:check
+# CLI (cli/): npm run dev | build | start | lint | lint:fix | format
+# Client (client/): npm run dev | build | lint | lint:fix
 ```
 
-### Client (`client/`)
+### Running Tests
 
-```bash
-cd client
-npm run dev           # Dev server
-npm run build         # Production build
-npm run lint          # ESLint check
-```
+No test framework configured. When added: CLI: `npx vitest run <file>`, Client: `npx jest <file>`
 
 ## Code Style Guidelines
 
-### TypeScript
+### TypeScript Configuration
 
-**CLI:** ES2020, CommonJS, strict mode, no unused vars
-**Client:** ES2017, ESNext modules, react-jsx, `@/*` path alias
+**CLI:** ES2020, CommonJS, strict, noUnusedLocals, noUnusedParameters, noImplicitReturns
 
-### Formatting (Prettier - CLI)
+**Client:** ES2017, ESNext modules, strict, react-jsx, `@/*` path alias
 
-- Semi-colons required, double quotes, ES5 trailing commas
-- Print width: 80, tab width: 2 spaces
-- Arrow functions: always parentheses
+### Formatting (Prettier - CLI only)
 
-**Import Order:**
+Semi-colons required, double quotes, ES5 trailing commas, print width 80, tab width 2 spaces, arrow functions always parentheses, LF line endings.
 
-1. `^react` → 2. `^next` → 3. `<THIRD_PARTY_MODULES>` → 4. `^@repo/(.*)$` → 5. `^@/` → 6. `^[./]`
+**Import Order:** `^react` → `^next` → `<THIRD_PARTY_MODULES>` → `^@repo/(.*)$` → `^@/` → `^[./]`
 
 ### ESLint Rules
 
-- CLI: No unused vars (error), no floating promises (error), any (warn), console allowed
-- Client: eslint-config-next with Next.js core web vitals
+- CLI: no-unused-vars (error), no-floating-promises (error), no-explicit-any (warn), no-console (off)
+- Client: eslint-config-next with core-web-vitals
 
 ### Naming Conventions
 
-- Functions/variables: `camelCase`
-- Types/Interfaces: `PascalCase`
-- Constants: `UPPER_SNAKE_CASE`
-- Files: match main export (camelCase or PascalCase)
-- Booleans: `isEnabled`, `hasError`
-- React components: `PascalCase`
+| Type | Convention | Example |
+|------|------------|---------|
+| Functions/variables | camelCase | `buildProject` |
+| Types/Interfaces | PascalCase | `ProjectConfig` |
+| Constants | UPPER_SNAKE_CASE | `DEFAULT_PORT` |
+| React components | PascalCase | `Button` |
+| Files | match main export | `button.tsx` |
+| Booleans | is/has prefix | `isEnabled` |
 
-### Imports
+### Import Patterns
 
-- CLI: Use `node:` prefix for Node.js built-ins, named exports for utilities, default for entry points
-- Client: Use `@/` path alias, prefer server components
+**CLI:** Use `node:` prefix for built-ins, named exports for utilities
+```typescript
+import path from "node:path";
+import { cwd } from "node:process";
+import fs from "fs-extra";
+import { buildError } from "./types";
+```
+
+**Client:** Use `@/` path alias, prefer server components
+```typescript
+import * as React from "react";
+import { cn } from "@/lib/utils";
+```
 
 ### Error Handling
 
-- CLI: Use `buildError()` from `src/types/index.ts`, wrap async with try-catch, use consola, exit 0/1
-- Client: Next.js error boundaries, try-catch async, proper HTTP status codes
+**CLI:** Use `buildError()` from `src/types/index.ts`, wrap async with try-catch, use consola for logging
 
-### Testing
+**Client:** Next.js error boundaries, try-catch async, proper HTTP status codes
 
-No test framework configured. When adding tests:
+### React/Next.js Patterns
 
-- CLI: Vitest or Jest
-- Client: Jest + React Testing Library
-
-Run single test: `npx vitest run <file>` or `npx jest <file>`
+- Default: Server Components (no directive needed)
+- Use `"use client"` only when needed (useState, useEffect, event handlers)
+```typescript
+"use client";
+import * as React from "react";
+export function Component({ children, ...props }: React.ComponentProps<typeof SomeProvider>) {
+  return <SomeProvider {...props}>{children}</SomeProvider>;
+}
+```
 
 ## Architecture
 
-**CLI:**
-
-- Barrel exports via `index.ts` in each directory
-- Feature folders, pure functions preferred
-- Async/await, Zod for validation, consola for logging
-
-**Client:**
-
-- Next.js App Router, Server Components by default
-- `'use client'` only when needed
-- Tailwind CSS v4, Radix UI primitives
-
-**Project Structure (`cli/src/`):**
+### CLI (`cli/src/`)
 
 ```
 src/
-  index.ts      # Entry point
-  types/        # Types & errors
-  prompts/      # User interaction
-  builder/      # Project generation
-  validators/   # Input validation
-  output/       # Output formatting
-  modules/      # Module registry
+├── index.ts           # Entry point
+├── intro.ts           # Interactive intro
+├── types/             # Types & buildError()
+├── prompts/           # User interaction (@clack/prompts)
+├── builder/           # Project generation pipeline
+├── validators/        # Input validation (Zod)
+├── output/            # Output formatting
+└── modules/           # Module registry
 ```
+
+Patterns: Barrel exports via `index.ts`, feature folders, pure functions, async/await, Zod validation, consola logging
+
+### Client (`client/`)
+
+```
+app/
+├── layout.tsx         # Root layout
+├── page.tsx           # Home page
+├── docs/              # Documentation (fumadocs)
+└── api/               # API routes
+components/
+├── ui/                # UI primitives (Radix, shadcn-style)
+├── motion/            # Animation components
+└── *.tsx              # Feature components
+```
+
+Patterns: Next.js App Router, Server Components default, Tailwind CSS v4, Radix UI, fumadocs
+
+### Templates (`cli/templates/`)
+
+- `backend/express/` - Express.js template
+- `frontend/nextjs/` - Next.js template
+- `modules/` - Modular feature additions (Handlebars `.hbs` files)
+
+## Module System
+
+Modules in `cli/templates/modules/` have `ModuleConfig` with: id, name, type ("base" | "database" | "feature"), dependencies, devDependencies, scripts, envVars, templateFiles.
 
 ## Dependencies
 
 **CLI:** @clack/prompts, consola, fs-extra, handlebars, zod
-**Client:** next, react 19, @radix-ui/react-slot, tailwindcss v4, motion
+
+**Client:** next, react 19, @radix-ui/react-slot, tailwindcss v4, motion, fumadocs-ui, lucide-react
 
 ## Important Notes
 
-- CLI requires console output (expected)
-- Handlebars templates: `cli/templates/`
 - Node.js 18+ required
-- Run lint/typecheck before committing
+- Run `npm run lint && npm run type:check` before committing
+- CLI console output is expected (not an error)
+- Use `buildError()` for all CLI error handling
+- Husky + lint-staged: runs ESLint fix and Prettier on staged files
 - No Cursor or Copilot rules configured

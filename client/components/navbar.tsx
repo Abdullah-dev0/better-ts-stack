@@ -1,24 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useTheme } from "next-themes";
-import { Github, Menu, Moon, Sun, X, Zap } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import Link from "next/link";
 import { NAVBAR_CONFIG } from "@/lib/constants";
-import { MotionDiv, MotionHeader } from "./motion";
+import { cn } from "@/lib/utils";
+import { Github, Menu, X, Zap } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { ThemeToggle } from "./theme-toggle";
 
 export const Navbar = () => {
 	const [scrolled, setScrolled] = useState(false);
 	const [mobileOpen, setMobileOpen] = useState(false);
-	const { theme, setTheme } = useTheme();
-	const [mounted, setMounted] = useState(false);
-
-	useEffect(() => {
-		const id = setTimeout(() => setMounted(true), 0);
-		return () => clearTimeout(id);
-	}, []);
 
 	useEffect(() => {
 		const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -27,10 +19,7 @@ export const Navbar = () => {
 	}, []);
 
 	return (
-		<MotionHeader
-			initial={{ opacity: 0, y: -20 }}
-			animate={{ opacity: 1, y: 0 }}
-			transition={{ duration: 0.5 }}
+		<div
 			className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
 				scrolled ? "bg-background/80 backdrop-blur-xl border-b border-border/50" : "bg-transparent"
 			}`}>
@@ -71,43 +60,29 @@ export const Navbar = () => {
 
 				{/* Actions */}
 				<div className="flex items-center gap-3">
-					{mounted && (
-						<>
-							<Button
-								variant="ghost"
-								size="icon"
-								onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-								className="glass-card rounded-lg">
-								{theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-							</Button>
-							<Link
-								href={NAVBAR_CONFIG.cta.href}
-								className={cn(
-									buttonVariants({ size: "sm" }),
-									"hidden md:flex btn-cyber text-primary-foreground font-medium",
-								)}>
-								{NAVBAR_CONFIG.cta.text}
-							</Link>
+					<ThemeToggle />
+					<Link
+						href={NAVBAR_CONFIG.cta.href}
+						className={cn(
+							buttonVariants({ size: "sm" }),
+							"hidden md:flex btn-cyber text-primary-foreground font-medium",
+						)}>
+						{NAVBAR_CONFIG.cta.text}
+					</Link>
 
-							<Button
-								variant="ghost"
-								size="icon"
-								className="md:hidden glass-card rounded-lg"
-								onClick={() => setMobileOpen(!mobileOpen)}>
-								{mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-							</Button>
-						</>
-					)}
+					<Button
+						variant="ghost"
+						size="icon"
+						className="md:hidden glass-card rounded-lg"
+						onClick={() => setMobileOpen(!mobileOpen)}>
+						{mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+					</Button>
 				</div>
 			</nav>
 
 			{/* Mobile Menu */}
 			{mobileOpen && (
-				<MotionDiv
-					initial={{ opacity: 0, height: 0 }}
-					animate={{ opacity: 1, height: "auto" }}
-					exit={{ opacity: 0, height: 0 }}
-					className="md:hidden bg-background/95 backdrop-blur-xl border-b border-border">
+				<div className="md:hidden bg-background/95 backdrop-blur-xl border-b border-border">
 					<div className="container px-6 py-4 flex flex-col gap-4">
 						{NAVBAR_CONFIG.links.map((link, i) => (
 							<Link
@@ -125,8 +100,8 @@ export const Navbar = () => {
 							{NAVBAR_CONFIG.cta.text}
 						</Link>
 					</div>
-				</MotionDiv>
+				</div>
 			)}
-		</MotionHeader>
+		</div>
 	);
 };

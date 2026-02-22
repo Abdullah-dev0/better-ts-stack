@@ -2,11 +2,17 @@ import { betterAuth } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
 {{#if (eq database 'prisma')}}
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { prisma } from "./prisma";
+import { PrismaClient } from "@prisma/client";
 {{/if}}
 {{#if (eq database 'drizzle')}}
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "./db";
+{{/if}}
+
+{{#if (eq database 'prisma')}}
+const prisma = new PrismaClient();
+{{!-- if there is an error in upper line or prisma client try this then  --}}
+{{!-- const prisma = PrismaClient(); --}}
 {{/if}}
 
 export const auth = betterAuth({

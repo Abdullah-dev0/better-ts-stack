@@ -1,7 +1,3 @@
-/**
- * Prisma Client for Next.js
- * Singleton pattern to prevent multiple instances in development (hot reload)
- */
 import { PrismaClient } from "@prisma/client";
 
 const globalForPrisma = globalThis as unknown as {

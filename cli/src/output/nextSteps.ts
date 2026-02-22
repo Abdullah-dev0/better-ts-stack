@@ -17,11 +17,6 @@ export function generateNextSteps(
   if (isFullstack) {
     if (config.useAuth) {
       steps.push("Set BETTER_AUTH_SECRET and BETTER_AUTH_URL in .env");
-      if (config.database === "prisma") {
-        steps.push(
-          "Run Better Auth schema generation (see better-auth.com docs)"
-        );
-      }
     }
   } else {
     if (config.useAuth) {

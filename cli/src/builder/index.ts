@@ -1,5 +1,6 @@
 import consola from "consola";
 import fs from "fs-extra";
+import path from "node:path";
 
 import { getModule } from "../modules/registry";
 import { generateNextSteps } from "../output/nextSteps";
@@ -158,6 +159,17 @@ export async function build(
       } catch {
         consola.warn("Continuing despite git initialization issues");
       }
+    }
+
+    // Better Auth with Prisma uses inline Prisma client in lib/auth.ts.
+    // Remove Prisma helper file to avoid shipping an unused file.
+    if (
+      config.applicationType === "fullstack" &&
+      config.framework === "nextjs" &&
+      config.useAuth &&
+      config.database === "prisma"
+    ) {
+      await fs.remove(path.join(targetDir, "lib", "prisma.ts"));
     }
 
     // 13. Done!

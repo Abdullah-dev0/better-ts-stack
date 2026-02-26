@@ -40,11 +40,12 @@ LOG_LEVEL=debug
 ### Frontend (.env.local)
 
 ```bash
-# API URL
+# API URL (if backend is selected)
 NEXT_PUBLIC_API_URL=http://localhost:3000/api
 
 # Authentication (if Better Auth)
-NEXT_PUBLIC_AUTH_URL=http://localhost:3001
+BETTER_AUTH_URL=http://localhost:3000
+BETTER_AUTH_SECRET="please-change-me-to-a-random-string"
 ```
 
 ### Environment-Specific Files
@@ -252,24 +253,65 @@ volumes:
 
 ### schema.prisma
 
-```prisma
-generator client {
-  provider = "prisma-client-js"
-}
+<Tabs items={['Express', 'Next.js']}>
+  <Tab value="Express">
+    ```prisma
+    generator client {
+      provider = "prisma-client-js"
+    }
 
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
+    datasource db {
+      provider = "postgresql"
+      url      = env("DATABASE_URL")
+    }
 
-model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
+    model User {
+      id        String   @id @default(uuid())
+      email     String   @unique
+      name      String?
+      password  String
+      createdAt DateTime @default(now())
+      updatedAt DateTime @updatedAt
+
+      @@map("users")
+    }
+    ```
+  </Tab>
+  <Tab value="Next.js">
+    ```prisma
+    generator client {
+      provider = "prisma-client-js"
+      output   = "../lib/generated/client"
+    }
+
+    datasource db {
+      provider = "postgresql"
+    }
+    ```
+  </Tab>
+</Tabs>
+
+<Callout type="info">
+  In Next.js projects, the datasource URL is loaded via `prisma.config.ts`.
+  If Better Auth is enabled, the generated Prisma schema includes Better Auth
+  tables (`user`, `session`, `account`, `verification`).
+</Callout>
+
+### prisma.config.ts (Next.js)
+
+```typescript
+import "dotenv/config";
+import { defineConfig, env } from "prisma/config";
+
+export default defineConfig({
+  schema: "prisma/schema.prisma",
+  migrations: {
+    path: "prisma/migrations",
+  },
+  datasource: {
+    url: env("DATABASE_URL"),
+  },
+});
 ```
 
 ### prisma/migrations

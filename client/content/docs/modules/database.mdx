@@ -26,64 +26,136 @@ The most popular choice, offering excellent type safety and developer experience
 
 ### Generated Files
 
-```
-prisma/
-├── schema.prisma       # Database schema
-└── (migrations/)       # Migration files (generated)
-src/
-└── lib/
-    └── prisma.ts       # Prisma client singleton
-```
+<Tabs items={['Express', 'Next.js']}>
+  <Tab value="Express">
+    ```text
+    prisma/
+      schema.prisma          # Database schema
+      migrations/            # Migration files (generated)
+    src/
+      lib/prisma.ts          # Prisma client singleton
+    ```
+  </Tab>
+  <Tab value="Next.js">
+    ```text
+    prisma/
+      schema.prisma          # Database schema
+      migrations/            # Migration files (generated)
+    prisma.config.ts         # Prisma config + datasource URL
+    lib/
+      prisma.ts              # Prisma client singleton
+      generated/client/      # Generated Prisma Client output
+    ```
+  </Tab>
+</Tabs>
 
 ### Schema Example
 
-```prisma
-// prisma/schema.prisma
-generator client {
-  provider = "prisma-client-js"
-}
+<Tabs items={['Express', 'Next.js']}>
+  <Tab value="Express">
+    ```prisma
+    // prisma/schema.prisma
+    generator client {
+      provider = "prisma-client-js"
+    }
 
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
+    datasource db {
+      provider = "postgresql"
+      url      = env("DATABASE_URL")
+    }
 
-model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-```
+    model User {
+      id        String   @id @default(uuid())
+      email     String   @unique
+      name      String?
+      password  String
+      createdAt DateTime @default(now())
+      updatedAt DateTime @updatedAt
+
+      @@map("users")
+    }
+    ```
+  </Tab>
+  <Tab value="Next.js">
+    ```prisma
+    // prisma/schema.prisma
+    generator client {
+      provider = "prisma-client-js"
+      output   = "../lib/generated/client"
+    }
+
+    datasource db {
+      provider = "postgresql"
+    }
+    ```
+  </Tab>
+</Tabs>
+
+<Callout type="info">
+  In Next.js projects, Prisma reads `DATABASE_URL` from `prisma.config.ts`.
+  If Better Auth is enabled, `schema.prisma` includes Better Auth core tables.
+</Callout>
 
 ### Prisma Client Setup
 
-```typescript
-// src/lib/prisma.ts
-import { PrismaClient } from '@prisma/client';
+<Tabs items={['Express', 'Next.js']}>
+  <Tab value="Express">
+    ```typescript
+    // src/lib/prisma.ts
+    import { PrismaClient } from "@prisma/client";
 
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined;
-};
+    const globalForPrisma = globalThis as unknown as {
+      prisma: PrismaClient | undefined;
+    };
 
-export const prisma = globalForPrisma.prisma ?? new PrismaClient();
+    export const prisma =
+      globalForPrisma.prisma ??
+      new PrismaClient({
+        log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
+      });
 
-if (process.env.NODE_ENV !== 'production') {
-  globalForPrisma.prisma = prisma;
-}
-```
+    if (process.env.NODE_ENV !== "production") {
+      globalForPrisma.prisma = prisma;
+    }
+    ```
+  </Tab>
+  <Tab value="Next.js">
+    ```typescript
+    // lib/prisma.ts
+    import { PrismaPg } from "@prisma/adapter-pg";
+    import { PrismaClient } from "../generated/client";
+
+    const globalForPrisma = global as unknown as {
+      prisma: PrismaClient;
+    };
+
+    const adapter = new PrismaPg({
+      connectionString: process.env.DATABASE_URL,
+    });
+
+    const prisma =
+      globalForPrisma.prisma ||
+      new PrismaClient({
+        adapter,
+      });
+
+    if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+
+    export default prisma;
+    ```
+  </Tab>
+</Tabs>
 
 ### Available Scripts
 
 ```bash
-# Database operations
-npx prisma migrate dev --name init    # Create and apply migration
-npx prisma generate                   # Generate client
-npx prisma studio                     # Open database GUI
-npx prisma db push                    # Push schema changes
-npx prisma db seed                    # Run seed script
+# Generated in package.json by Prisma module
+npm run prisma:generate
+npm run prisma:migrate
+npm run prisma:studio
+
+# Optional direct CLI commands
+npx prisma migrate deploy
 ```
 
 ### Usage in Code

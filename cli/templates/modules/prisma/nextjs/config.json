@@ -3,15 +3,21 @@
   "name": "Prisma ORM",
   "description": "Prisma ORM for Next.js with PostgreSQL",
   "type": "database",
-  "dependencies": { "@prisma/client": "^5.8.0" },
-  "devDependencies": { "prisma": "^5.8.0" },
+  "dependencies": {
+    "@prisma/client": "^7.4.1",
+    "@prisma/adapter-pg": "^7.4.1"
+  },
+  "devDependencies": {
+    "prisma": "^7.4.1",
+    "dotenv": "^17.3.1"
+  },
   "scripts": {
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio"
   },
   "envVars": {
-    "DATABASE_URL": "postgresql://user:password@localhost:5432/mydb?schema=public"
+    "DATABASE_URL": "postgresql://postgres:postgres@localhost:5432/postgres?schema=public"
   },
   "templateFiles": ["prisma/schema.prisma.hbs"]
 }

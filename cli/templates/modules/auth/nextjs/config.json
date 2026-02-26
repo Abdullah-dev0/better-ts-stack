@@ -1,1 +1,18 @@
-{"id":"auth","name":"Better Auth","description":"Better Auth for Next.js with optional Prisma or Drizzle adapter","type":"feature","dependencies":{"better-auth":"^1.0.0"},"devDependencies":{},"scripts":{},"envVars":{"BETTER_AUTH_SECRET":"please-change-me-to-a-random-string","BETTER_AUTH_URL":"http://localhost:3000"},"templateFiles":["lib/auth.ts.hbs","lib/auth-client.ts","app/api/auth/[...all]/route.ts"]}
+{
+  "id": "auth",
+  "name": "Better Auth",
+  "description": "Better Auth for Next.js with optional Prisma or Drizzle adapter",
+  "type": "feature",
+  "dependencies": { "better-auth": "^1.4.19" },
+  "devDependencies": {},
+  "scripts": {},
+  "envVars": {
+    "BETTER_AUTH_SECRET": "please-change-me-to-a-random-string",
+    "BETTER_AUTH_URL": "http://localhost:3000"
+  },
+  "templateFiles": [
+    "lib/auth.ts.hbs",
+    "lib/auth-client.ts",
+    "app/api/auth/[...all]/route.ts"
+  ]
+}

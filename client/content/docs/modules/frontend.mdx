@@ -4,6 +4,7 @@ description: Next.js 16 frontend with React 19, Tailwind CSS v4, and modern tool
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 ## Frontend Module Overview
 
@@ -186,23 +187,51 @@ with a database-backed adapter (Prisma or Drizzle).
 
 ### Better Auth Setup
 
-```typescript
-// lib/auth.ts
-import { betterAuth } from "better-auth";
-import { nextCookies } from "better-auth/next-js";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { db } from "./db";
+<Tabs items={['Prisma Adapter', 'Drizzle Adapter']}>
+  <Tab value="Prisma Adapter">
+    ```typescript
+    // lib/auth.ts
+    import { betterAuth } from "better-auth";
+    import { nextCookies } from "better-auth/next-js";
+    import { prismaAdapter } from "better-auth/adapters/prisma";
+    import client from "./prisma";
 
-export const auth = betterAuth({
-  database: drizzleAdapter(db, { provider: "pg" }),
-  emailAndPassword: {
-    enabled: true,
-  },
-  plugins: [nextCookies()],
-  secret: process.env.BETTER_AUTH_SECRET,
-  baseURL: process.env.BETTER_AUTH_URL,
-});
-```
+    export const auth = betterAuth({
+      database: prismaAdapter(client, { provider: "postgres" }),
+      emailAndPassword: {
+        enabled: true,
+      },
+      plugins: [nextCookies()],
+      secret: process.env.BETTER_AUTH_SECRET,
+      baseURL: process.env.BETTER_AUTH_URL,
+    });
+    ```
+  </Tab>
+  <Tab value="Drizzle Adapter">
+    ```typescript
+    // lib/auth.ts
+    import { betterAuth } from "better-auth";
+    import { nextCookies } from "better-auth/next-js";
+    import { drizzleAdapter } from "better-auth/adapters/drizzle";
+    import { db } from "./db";
+
+    export const auth = betterAuth({
+      database: drizzleAdapter(db, { provider: "postgres" }),
+      emailAndPassword: {
+        enabled: true,
+      },
+      plugins: [nextCookies()],
+      secret: process.env.BETTER_AUTH_SECRET,
+      baseURL: process.env.BETTER_AUTH_URL,
+    });
+    ```
+  </Tab>
+</Tabs>
+
+<Callout type="info">
+  `BETTER_AUTH_URL` and `BETTER_AUTH_SECRET` are server-side environment
+  variables. Do not prefix them with `NEXT_PUBLIC_`.
+</Callout>
 
 ### Auth Route Handler
 

@@ -229,36 +229,58 @@ In this CLI, Better Auth for Next.js is generated with a database adapter
 
 ### Generated Files
 
-```
+```text
 lib/
-├── auth.ts             # Better Auth configuration
-└── auth-client.ts      # Client-side auth
+  auth.ts             # Better Auth configuration
+  auth-client.ts      # Client-side auth helpers
+  prisma.ts           # Prisma client (when using Prisma)
+  db.ts               # Drizzle client (when using Drizzle)
 app/
-├── api/auth/[...all]/route.ts  # Auth API routes
-└── (auth)/             # Auth pages (if generated)
-components/
-└── auth/               # Auth components
+  api/auth/[...all]/route.ts  # Better Auth route handler
 ```
 
 ### Better Auth Configuration
 
-```typescript
-// lib/auth.ts
-import { betterAuth } from "better-auth";
-import { nextCookies } from "better-auth/next-js";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { db } from "./db";
+<Tabs items={['Prisma Adapter', 'Drizzle Adapter']}>
+  <Tab value="Prisma Adapter">
+    ```typescript
+    // lib/auth.ts
+    import { betterAuth } from "better-auth";
+    import { nextCookies } from "better-auth/next-js";
+    import { prismaAdapter } from "better-auth/adapters/prisma";
+    import client from "./prisma";
 
-export const auth = betterAuth({
-  database: drizzleAdapter(db, { provider: "pg" }),
-  emailAndPassword: {
-    enabled: true,
-  },
-  plugins: [nextCookies()],
-  secret: process.env.BETTER_AUTH_SECRET,
-  baseURL: process.env.BETTER_AUTH_URL,
-});
-```
+    export const auth = betterAuth({
+      database: prismaAdapter(client, { provider: "postgres" }),
+      emailAndPassword: {
+        enabled: true,
+      },
+      plugins: [nextCookies()],
+      secret: process.env.BETTER_AUTH_SECRET,
+      baseURL: process.env.BETTER_AUTH_URL,
+    });
+    ```
+  </Tab>
+  <Tab value="Drizzle Adapter">
+    ```typescript
+    // lib/auth.ts
+    import { betterAuth } from "better-auth";
+    import { nextCookies } from "better-auth/next-js";
+    import { drizzleAdapter } from "better-auth/adapters/drizzle";
+    import { db } from "./db";
+
+    export const auth = betterAuth({
+      database: drizzleAdapter(db, { provider: "postgres" }),
+      emailAndPassword: {
+        enabled: true,
+      },
+      plugins: [nextCookies()],
+      secret: process.env.BETTER_AUTH_SECRET,
+      baseURL: process.env.BETTER_AUTH_URL,
+    });
+    ```
+  </Tab>
+</Tabs>
 
 ### Auth Route Handler
 
@@ -295,9 +317,8 @@ async function handleLogin(email: string, password: string) {
 ```
 
 <Callout type="tip">
-  When using **Drizzle + Better Auth**, the generated Drizzle schema already
-  includes Better Auth core tables (`user`, `session`, `account`,
-  `verification`).
+  Prisma + Better Auth generates Better Auth tables in `prisma/schema.prisma`.
+  Drizzle + Better Auth generates them in `lib/schema.ts`.
 </Callout>
 
 ---

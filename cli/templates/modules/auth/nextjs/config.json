@@ -3,7 +3,7 @@
   "name": "Better Auth",
   "description": "Better Auth for Next.js with optional Prisma or Drizzle adapter",
   "type": "feature",
-  "dependencies": { "better-auth": "^1.4.19" },
+  "dependencies": { "better-auth": "^1.4.19", "mongodb": "^6.0.0" },
   "devDependencies": {},
   "scripts": {},
   "envVars": {

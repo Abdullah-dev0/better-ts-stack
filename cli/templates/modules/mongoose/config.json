@@ -4,12 +4,13 @@
   "description": "MongoDB database integration using Mongoose ODM",
   "type": "database",
   "dependencies": {
-    "mongoose": "^8.0.0"
+    "mongoose": "^8.0.0",
+    "mongodb": "^6.0.0"
   },
   "devDependencies": {},
   "scripts": {},
   "envVars": {
     "MONGODB_URI": "mongodb://localhost:27017/myapp"
   },
-  "templateFiles": []
+  "templateFiles": ["src/lib/db.ts.hbs"]
 }

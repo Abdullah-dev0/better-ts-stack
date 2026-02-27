@@ -6,7 +6,7 @@ import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 
 export const ThemeToggle = () => {
-	const { theme, setTheme } = useTheme();
+	const { setTheme, resolvedTheme } = useTheme();
 
 	const mounted = useSyncExternalStore(
 		() => () => {},
@@ -22,9 +22,9 @@ export const ThemeToggle = () => {
 		<Button
 			variant="ghost"
 			size="icon"
-			onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+			onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
 			className="glass-card rounded-lg cursor-pointer">
-			{theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+			{resolvedTheme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
 		</Button>
 	);
 };

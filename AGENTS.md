@@ -6,29 +6,34 @@ TypeScript CLI monorepo that generates fully configured TypeScript projects with
 
 **Structure:** `cli/` (Node.js CLI generator), `client/` (Next.js 16 + React 19 docs site)
 
+> Note: This is a multi-package repository without npm workspaces. Run commands from individual directories.
+
 ## Build, Lint & Development Commands
 
-### From root (npm workspaces)
+### CLI (cli/)
 
 ```bash
-npm run build              # Build all workspaces
-npm run build:cli          # Build CLI only
-npm run build:client       # Build client only
-npm run dev:cli            # CLI with hot reload (tsx)
-npm run dev:client         # Next.js dev server
-npm run lint               # Lint all workspaces
-npm run lint:fix           # Auto-fix lint issues
-npm run type:check         # TypeScript check (no emit)
-npm run format             # Format code (Prettier - CLI only)
-npm run start:cli          # Run compiled CLI
-npm run start:client       # Run Next.js production server
+cd cli
+npm run dev            # CLI with hot reload (tsx)
+npm run build          # Compile TypeScript
+npm run start          # Run compiled CLI
+npm run lint           # ESLint
+npm run lint:fix       # Auto-fix lint issues
+npm run format         # Prettier format
+npm run format:check   # Check formatting
+npm run type:check     # TypeScript check (no emit)
 ```
 
-### Individual workspaces
+### Client (client/)
 
 ```bash
-# CLI (cli/): npm run dev | build | start | lint | lint:fix | format
-# Client (client/): npm run dev | build | lint | lint:fix
+cd client
+npm run dev            # Next.js dev server
+npm run build          # Production build
+npm run start          # Run production server
+npm run lint           # ESLint
+npm run lint:fix       # Auto-fix lint issues
+npm run type:check     # TypeScript check (no emit)
 ```
 
 ### Running Tests
@@ -152,8 +157,8 @@ Modules in `cli/templates/modules/` have `ModuleConfig` with: id, name, type ("b
 ## Important Notes
 
 - Node.js 18+ required
-- Run `npm run lint && npm run type:check` before committing
+- Run `npm run lint && npm run type:check` before committing (in each workspace)
 - CLI console output is expected (not an error)
 - Use `buildError()` for all CLI error handling
-- Husky + lint-staged: runs ESLint fix and Prettier on staged files
+- Husky + lint-staged configured in CLI: runs ESLint fix and Prettier on staged files
 - No Cursor or Copilot rules configured

@@ -7,7 +7,7 @@ export function Footer() {
 		<footer className="bg-background py-16 relative overflow-hidden">
 			{/* Giant Background Text - behind content */}
 			<div className="flex items-start justify-center pointer-events-none select-none overflow-hidden z-0">
-				<h1 className="text-[6rem] md:text-[10rem] font-black text-muted/60 whitespace-nowrap tracking-tight">
+				<h1 className="text-[6rem] md:text-[10rem] font-black text-foreground/[0.07] whitespace-nowrap tracking-tight">
 					BETTER TS STACK
 				</h1>
 			</div>
@@ -64,7 +64,11 @@ export function Footer() {
 						<ul className="space-y-3 text-sm text-muted-foreground">
 							{FOOTER_CONFIG.social.map((social, i) => (
 								<li key={i}>
-									<Link href={social.href} target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+									<Link
+										href={social.href}
+										target="_blank"
+										rel="noopener noreferrer"
+										className="hover:text-primary transition-colors">
 										{social.label}
 									</Link>
 								</li>

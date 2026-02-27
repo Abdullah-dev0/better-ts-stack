@@ -2,16 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { motion, useMotionTemplate, useMotionValue } from "framer-motion";
-import {
-	Box,
-	Container,
-	Database,
-	Layout,
-	Server,
-	Shield,
-	Zap,
-	type LucideIcon,
-} from "lucide-react";
+import { Box, Container, Database, Layout, Server, Shield, Zap, type LucideIcon } from "lucide-react";
 import { MouseEvent } from "react";
 import type { FeatureCardProps } from "./types";
 
@@ -50,7 +41,7 @@ export function FeatureCard({ icon: iconName, title, description, color, badge, 
 					background: useMotionTemplate`
             radial-gradient(
               400px circle at ${mouseX}px ${mouseY}px,
-              hsl(var(--primary) / 0.08),
+              color-mix(in oklch, var(--color-primary) 8%, transparent),
               transparent 80%
             )
           `,

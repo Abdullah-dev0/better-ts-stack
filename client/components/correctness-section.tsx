@@ -14,7 +14,7 @@ export function CorrectnessSection() {
 			<FloatingIcon
 				duration={5}
 				yRange={[0, -15, 0]}
-				className="absolute left-10 top-20 hidden lg:flex w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/30 items-center justify-center text-purple-400">
+				className="absolute left-10 top-20 hidden lg:flex w-10 h-10 rounded-xl bg-primary/10 border border-primary/30 items-center justify-center text-primary">
 				<Database size={18} />
 			</FloatingIcon>
 
@@ -23,7 +23,7 @@ export function CorrectnessSection() {
 				duration={6}
 				delay={0.5}
 				yRange={[0, 20, 0]}
-				className="absolute right-10 top-20 hidden lg:flex w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/30 items-center justify-center text-blue-400">
+				className="absolute right-10 top-20 hidden lg:flex w-10 h-10 rounded-xl bg-secondary/50 border border-border items-center justify-center text-muted-foreground">
 				<Code2 size={18} />
 			</FloatingIcon>
 
@@ -96,7 +96,7 @@ export function CorrectnessSection() {
 				duration={5.5}
 				delay={0.8}
 				yRange={[0, 18, 0]}
-				className="absolute right-12 bottom-28 hidden lg:flex w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 items-center justify-center text-emerald-400">
+				className="absolute right-12 bottom-28 hidden lg:flex w-10 h-10 rounded-xl bg-accent/50 border border-border items-center justify-center text-accent-foreground">
 				<GitBranch size={18} />
 			</FloatingIcon>
 		</section>

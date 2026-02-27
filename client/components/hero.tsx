@@ -34,7 +34,7 @@ export const HeroSection = () => {
 			<FloatingIcon
 				duration={6}
 				yRange={[0, -20, 0]}
-				className="absolute left-8 top-1/4 hidden lg:flex w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 items-center justify-center text-purple-400">
+				className="absolute left-8 top-1/4 hidden lg:flex w-12 h-12 rounded-xl bg-primary/10 border border-primary/30 items-center justify-center text-primary">
 				<Server size={20} />
 			</FloatingIcon>
 
@@ -43,7 +43,7 @@ export const HeroSection = () => {
 				duration={7}
 				delay={0.3}
 				yRange={[0, 18, 0]}
-				className="absolute right-8 top-1/3 hidden lg:flex w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/30 items-center justify-center text-blue-400">
+				className="absolute right-8 top-1/3 hidden lg:flex w-12 h-12 rounded-xl bg-secondary/50 border border-border items-center justify-center text-muted-foreground">
 				<Database size={20} />
 			</FloatingIcon>
 
@@ -52,7 +52,7 @@ export const HeroSection = () => {
 				duration={6.2}
 				delay={0.6}
 				yRange={[0, 16, 0]}
-				className="absolute right-12 bottom-1/3 hidden lg:flex w-11 h-11 rounded-xl bg-cyan-500/10 border border-cyan-500/30 items-center justify-center text-cyan-400">
+				className="absolute right-12 bottom-1/3 hidden lg:flex w-11 h-11 rounded-xl bg-accent/50 border border-border items-center justify-center text-accent-foreground">
 				<Box size={19} />
 			</FloatingIcon>
 
@@ -71,7 +71,9 @@ export const HeroSection = () => {
 				</FadeInUp>
 
 				{/* Subheadline */}
-				<FadeInUp delay={0.2} className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
+				<FadeInUp
+					delay={0.2}
+					className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
 					{HERO_CONFIG.subheadline}
 				</FadeInUp>
 

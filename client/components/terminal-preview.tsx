@@ -36,7 +36,7 @@ export const TerminalPreview = () => {
 								initial={{ opacity: 0, scale: 0 }}
 								animate={{ opacity: 1, scale: 1 }}
 								transition={{ delay: 0.6, duration: 0.3 }}
-								className="w-3 h-3 rounded-full bg-yellow-500/80"
+								className="w-3 h-3 rounded-full bg-accent-foreground/80"
 							/>
 							<MotionDiv
 								initial={{ opacity: 0, scale: 0 }}

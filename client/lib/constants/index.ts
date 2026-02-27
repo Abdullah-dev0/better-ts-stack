@@ -75,7 +75,7 @@ export const ARCHITECTURE_FEATURES: Feature[] = [
 		title: "Backend Module",
 		description:
 			"TypeScript backend with Express. Fully type-safe REST API with automatic validation using Zod. NestJS support coming soon.",
-		color: "text-purple-400",
+		color: "text-module-backend",
 		badge: null,
 		size: "large",
 	},
@@ -83,7 +83,7 @@ export const ARCHITECTURE_FEATURES: Feature[] = [
 		icon: "Database",
 		title: "Prisma ORM",
 		description: "Type-safe database access with auto-generated types. Seamless integration with the backend module.",
-		color: "text-orange-400",
+		color: "text-module-database",
 		badge: null,
 		size: "normal",
 	},
@@ -99,7 +99,7 @@ export const ARCHITECTURE_FEATURES: Feature[] = [
 		icon: "Container",
 		title: "Docker Ready",
 		description: "Pre-configured Docker Compose setup. One command to spin up your entire dev environment.",
-		color: "text-blue-400",
+		color: "text-muted-foreground",
 		badge: null,
 		size: "normal",
 	},
@@ -107,7 +107,7 @@ export const ARCHITECTURE_FEATURES: Feature[] = [
 		icon: "Layout",
 		title: "Frontend Module",
 		description: "Full-stack Next.js integration. Pre-configured with Tailwind CSS, React 19, and modern tooling.",
-		color: "text-green-400",
+		color: "text-module-frontend",
 		badge: null,
 		size: "large",
 	},
@@ -142,9 +142,9 @@ export interface StackItem {
 
 export const STACK_ITEMS: StackItem[] = [
 	{ icon: "Database", label: "Data Layer", sub: "MongoDB + Prisma + Mongoose", color: "text-primary" },
-	{ icon: "Layers", label: "Business Logic", sub: "TypeScript + Zod + JWT Auth", color: "text-purple-400" },
-	{ icon: "Server", label: "API Layer", sub: "Express + TypeScript", color: "text-blue-400" },
-	{ icon: "UploadCloud", label: "Deployment", sub: "Docker + CI/CD", color: "text-orange-400" },
+	{ icon: "Layers", label: "Business Logic", sub: "TypeScript + Zod + JWT Auth", color: "text-module-backend" },
+	{ icon: "Server", label: "API Layer", sub: "Express + TypeScript", color: "text-muted-foreground" },
+	{ icon: "UploadCloud", label: "Deployment", sub: "Docker + CI/CD", color: "text-module-database" },
 ];
 
 export interface FeatureCard {

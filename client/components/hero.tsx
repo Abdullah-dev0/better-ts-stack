@@ -8,7 +8,7 @@ import { TerminalPreview } from "./terminal-preview";
 
 export const HeroSection = () => {
 	return (
-		<section className="relative min-h-screen flex flex-col items-center justify-center pt-24 pb-16 px-6 overflow-hidden">
+		<section className="relative mt-10 min-h-screen flex flex-col items-center justify-center pt-24 pb-16 px-6 overflow-hidden">
 			{/* Grid background */}
 			<div className="absolute inset-0 bg-grid mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)]" />
 
@@ -61,6 +61,9 @@ export const HeroSection = () => {
 				<FadeInUp className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-8">
 					<Sparkles className="w-3.5 h-3.5 text-primary" />
 					<span className="text-xs font-medium text-primary">{HERO_CONFIG.badge.text}</span>
+					<span className="px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wider bg-[oklch(0.72_0.19_145)] text-white">
+						BETA
+					</span>
 				</FadeInUp>
 
 				{/* Headline */}
@@ -73,8 +76,20 @@ export const HeroSection = () => {
 				{/* Subheadline */}
 				<FadeInUp
 					delay={0.2}
-					className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
+					className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-6 leading-relaxed">
 					{HERO_CONFIG.subheadline}
+				</FadeInUp>
+
+				{/* Tech stack keyword pills */}
+				<FadeInUp delay={0.25} className="flex flex-wrap items-center justify-center gap-2 mb-10">
+					{["TypeScript", "Express", "Prisma", "MongoDB", "Docker", "Zod", "JWT", "Next.js"].map((word, i) => (
+						<span
+							key={word}
+							style={{ animationDelay: `${0.3 + i * 0.07}s` }}
+							className="animate-fade-in px-3 py-1 rounded-full text-xs font-medium bg-secondary text-secondary-foreground border border-border hover:border-primary/40 hover:text-primary transition-colors duration-200">
+							{word}
+						</span>
+					))}
 				</FadeInUp>
 
 				{/* CTA Buttons */}

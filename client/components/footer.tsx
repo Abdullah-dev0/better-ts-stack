@@ -1,6 +1,6 @@
+import { FOOTER_CONFIG } from "@/lib/constants";
 import { Github, Twitter } from "lucide-react";
 import Link from "next/link";
-import { FOOTER_CONFIG } from "@/lib/constants";
 
 export function Footer() {
 	return (

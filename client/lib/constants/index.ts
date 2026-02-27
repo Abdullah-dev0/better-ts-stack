@@ -17,8 +17,8 @@ export const NAVBAR_CONFIG = {
 	},
 	banner: {
 		icon: "Zap",
-		text: "Built by developers who hate boilerplate",
-		tagline: "Ship faster, type safer",
+		text: "Opinionated in the right places. Flexible where it matters.",
+		tagline: "Build fast. Refactor fearlessly. Deploy confidently.",
 	},
 	links: [
 		{ href: "/docs", label: "Docs", external: false },
@@ -36,14 +36,14 @@ export const NAVBAR_CONFIG = {
 export const HERO_CONFIG = {
 	badge: {
 		icon: "Sparkles",
-		text: "Full-Stack CLI Tool",
+		text: "Bold & Confident",
 	},
 	headline: {
-		main: "Ship Type-Safety",
-		accent: "by Default.",
+		main: "Type-safe. Production-ready.",
+		accent: "No nonsense.",
 	},
 	subheadline:
-		"better-ts-stack scaffolds production-ready TypeScript projects with modular architecture—Express, Prisma, MongoDB, Docker, and more. Zero configuration required.",
+		"From one CLI command to production—without the chaos. Zero config. Maximum confidence. Your backend, but better.",
 	cta: {
 		primary: {
 			text: "Get Started",
@@ -259,8 +259,8 @@ export const MOBILE_CTA_CONFIG = {
 // ============================================================================
 export const ANNOUNCEMENT_BANNER_CONFIG = {
 	icon: "Zap",
-	text: "Built by developers who hate boilerplate",
-	tagline: "Ship faster, type safer",
+	text: "Start strong. Ship stronger.",
+	tagline: "Build fast. Refactor fearlessly. Deploy confidently.",
 } as const;
 
 // ============================================================================

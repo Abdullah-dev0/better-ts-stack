@@ -96,7 +96,7 @@ export const TerminalPreview = () => {
 	const [currentLineIdx, setCurrentLineIdx] = useState(0);
 	const [charIdx, setCharIdx] = useState(0);
 	const [phase, setPhase] = useState<"typing-cmd" | "typing-answer" | "idle">("typing-cmd");
-	const bottomRef = useRef<HTMLDivElement>(null);
+	const terminalBodyRef = useRef<HTMLDivElement>(null);
 
 	const handleCopy = async () => {
 		await navigator.clipboard.writeText("npx better-ts-stack");
@@ -104,9 +104,15 @@ export const TerminalPreview = () => {
 		setTimeout(() => setCopied(false), 2000);
 	};
 
-	// Auto-scroll as new content appears
+	// Keep scroll confined to the terminal body so the page itself is not forced.
 	useEffect(() => {
-		bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+		const terminalBody = terminalBodyRef.current;
+		if (!terminalBody) return;
+
+		terminalBody.scrollTo({
+			top: terminalBody.scrollHeight,
+			behavior: "smooth",
+		});
 	}, [completedLines.length, currentPartial]);
 
 	// Animation driver
@@ -248,12 +254,13 @@ export const TerminalPreview = () => {
 				</div>
 
 				{/* Body */}
-				<div className="bg-terminal-bg p-5 min-h-[220px] max-h-[340px] overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border space-y-0.5">
+				<div
+					ref={terminalBodyRef}
+					className="bg-terminal-bg p-5 min-h-[220px] max-h-[340px] overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border space-y-0.5">
 					{completedLines.map((line, i) => (
 						<ComputedLine key={i} line={line} />
 					))}
 					{activeLineEl}
-					<div ref={bottomRef} />
 				</div>
 
 				{/* Copy button */}

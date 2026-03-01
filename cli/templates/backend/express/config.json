@@ -10,7 +10,7 @@
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
     "format": "prettier --write \"src/**/*.ts\"",
-    "type-check": "tsc --noEmit"
+    "type:check": "tsc --noEmit"
   },
   "dependencies": {
     "express": "^4.18.2",

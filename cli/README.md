@@ -2,7 +2,7 @@
 
 > Build production-ready full-stack projects in seconds
 
-A powerful CLI tool that generates fully configured TypeScript projects with backend, frontend (coming soon), database integration, Docker support, and more—all through an interactive setup.
+A powerful CLI tool that generates fully configured TypeScript projects with backend, full-stack frontend, database integration, Docker support, and more—all through an interactive setup.
 
 ## Installation & Usage
 
@@ -23,10 +23,10 @@ Answer a few simple questions and get a complete project ready to run.
 - Modular architecture—choose only what you need
 - Production-ready configuration out of the box
 - Backend support (Express.js with TypeScript)
-- Frontend support (React, Next.js, Vue - coming soon)
+- Full-stack frontend support (Next.js 16)
 - Optional Docker support with multi-stage builds
 - Database integration (PostgreSQL with Prisma or MongoDB with Mongoose)
-- JWT authentication ready (coming soon)
+- Authentication support (JWT for Express, Better Auth for Next.js)
 - TypeScript with strict mode enabled
 - ESLint + Prettier pre-configured
 - Hot reload for development
@@ -36,7 +36,7 @@ Answer a few simple questions and get a complete project ready to run.
 
 After running the CLI, you'll have a fully configured project with:
 
-- Backend server with TypeScript (Express.js currently, more coming soon)
+- Backend server with TypeScript (Express.js)
 - TypeScript configuration with strict mode
 - Environment variable management
 - Error handling and logging
@@ -51,7 +51,7 @@ After running the CLI, you'll have a fully configured project with:
 The CLI will guide you through:
 
 1. **Project name** – Name of your project
-2. **Project type** – Backend, Frontend, or Full-stack (frontend coming soon)
+2. **Project type** – Backend API or Full-stack app
 3. **Package manager** – npm, pnpm, or bun
 4. **Database** – None, PostgreSQL (Prisma), or MongoDB (Mongoose)
 5. **Port** – Server port (default: 3000)

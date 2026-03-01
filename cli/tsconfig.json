@@ -13,11 +13,11 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "moduleResolution": "node",
+    "moduleResolution": "node10",
+    "ignoreDeprecations": "6.0",
     "allowSyntheticDefaultImports": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "ignoreDeprecations": "5.0",
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true
   },

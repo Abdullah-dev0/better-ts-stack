@@ -1,8 +1,21 @@
 // Module registry for accessing base templates and feature modules
 import fs from "fs-extra";
 import path from "path";
+import { z } from "zod";
 
 import { buildError, ModuleConfig } from "../types";
+
+const moduleConfigSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  description: z.string().min(1),
+  type: z.enum(["base", "database", "feature"]),
+  dependencies: z.record(z.string(), z.string()).default({}),
+  devDependencies: z.record(z.string(), z.string()).default({}),
+  scripts: z.record(z.string(), z.string()).default({}),
+  envVars: z.record(z.string(), z.string()).default({}),
+  templateFiles: z.array(z.string()).default([]),
+});
 
 // Determines the absolute filesystem path for a given module ID
 function resolveModulePath(id: string) {
@@ -24,8 +37,8 @@ async function loadModuleConfig(modulePath: string): Promise<ModuleConfig> {
 
   try {
     const configContent = await fs.readFile(configPath, "utf-8");
-    // Type annotation provides runtime validation expectation
-    const config = JSON.parse(configContent) as ModuleConfig;
+    const rawConfig = JSON.parse(configContent) as unknown;
+    const config = moduleConfigSchema.parse(rawConfig);
     return config;
   } catch (error) {
     throw buildError(

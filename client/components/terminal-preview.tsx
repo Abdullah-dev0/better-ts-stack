@@ -44,7 +44,7 @@ const SETUP_SCRIPT: LineKind[] = [
 	},
 	{ kind: "output", text: "✓  Express + TypeScript configured", color: "text-emerald-400" },
 	{ kind: "output", text: "✓  Prisma schema generated", color: "text-emerald-400" },
-	{ kind: "output", text: "✓  Next.js 15 + Tailwind ready", color: "text-emerald-400" },
+	{ kind: "output", text: "✓  Next.js 16 + Tailwind ready", color: "text-emerald-400" },
 	{ kind: "output", text: "✓  Docker Compose configured", color: "text-emerald-400" },
 	{ kind: "output", text: "✓  JWT auth scaffolded", color: "text-emerald-400" },
 	{ kind: "spacer" },

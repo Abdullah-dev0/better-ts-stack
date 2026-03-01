@@ -29,10 +29,7 @@ export function buildTemplateContext(config: ProjectConfig) {
     framework,
     port: 3000, // Default port
     useDocker: config.useDocker ?? false,
-    useAuth:
-      typeof config.useAuth === "boolean"
-        ? config.useAuth
-        : config.useAuth !== "none",
+    useAuth: config.useAuth,
     helpers: {
       lowercase,
       uppercase,

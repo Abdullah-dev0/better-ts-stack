@@ -2,20 +2,20 @@ import * as fs from "fs-extra";
 import * as path from "path";
 import { z } from "zod";
 
-// Validates project name: lowercase, numbers, hyphens, or "." for current dir
+// Validates project name: lowercase letters, numbers, and hyphens
 export const projectNameSchema = z
   .string()
   .min(1, "Project name is required")
   .refine(
-    (name) => name === "." || /^[a-z0-9-]+$/.test(name),
-    'Project name must be "." for current directory, or lowercase with only letters, numbers, and hyphens'
+    (name) => /^[a-z0-9-]+$/.test(name),
+    "Project name must be lowercase and can contain only letters, numbers, and hyphens"
   )
   .refine(
-    (name) => name === "." || (!name.startsWith("-") && !name.endsWith("-")),
+    (name) => !name.startsWith("-") && !name.endsWith("-"),
     "Project name cannot start or end with a hyphen"
   )
   .refine(
-    (name) => name === "." || name.length <= 214,
+    (name) => name.length <= 214,
     "Project name must be 214 characters or less (npm package name limit)"
   );
 

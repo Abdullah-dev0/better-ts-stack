@@ -172,7 +172,7 @@ export const backendFrameworkOptions = [
 ];
 
 export const frontendFrameworkOptions = [
-  { value: "nextjs" as const, label: "Next.js 15 (App Router)" },
+  { value: "nextjs" as const, label: "Next.js 16 (App Router)" },
 ];
 
 // Database type options (what database system)

@@ -15,9 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-	title: "Nexus - Ship Type-Safety by Default",
+	title: "better-ts-stack - Ship Type-Safety by Default",
 	description:
-		"Nexus scaffolds end-to-end type-safe TypeScript projects (Next.js, Prisma, tRPC, Tailwind) with zero-config. Eliminate boundary errors between your database and UI.",
+		"better-ts-stack scaffolds end-to-end type-safe TypeScript projects with zero-config. Eliminate boundary errors between your database and UI.",
 	keywords: ["TypeScript", "Next.js", "Prisma", "tRPC", "type safety", "CLI tool", "scaffolding"],
 };
 

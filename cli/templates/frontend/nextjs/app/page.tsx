@@ -24,7 +24,7 @@ export default function Home() {
         <div className="mt-4 flex flex-col gap-3 text-sm font-medium sm:flex-row">
           <Link
             className="flex h-10 items-center justify-center rounded-full bg-black px-6 text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-100 dark:text-black dark:hover:bg-zinc-300"
-            href="https://github.com/AbdullahAlfaraj/better-ts-stack"
+            href="https://github.com/Abdullah-dev0/better-ts-stack"
             target="_blank"
             rel="noreferrer"
           >
@@ -32,7 +32,7 @@ export default function Home() {
           </Link>
           <a
             className="flex h-10 items-center justify-center rounded-full border border-zinc-300 px-6 text-zinc-800 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-900"
-            href="https://github.com/AbdullahAlfaraj/better-ts-stack"
+            href="https://github.com/Abdullah-dev0/better-ts-stack"
             target="_blank"
             rel="noreferrer"
           >

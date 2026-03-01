@@ -48,7 +48,7 @@ export const HERO_CONFIG = {
 		primary: {
 			text: "Get Started",
 			icon: "ArrowRight",
-			href: "/docs/cli",
+			href: "/docs/installation",
 		},
 		secondary: {
 			text: "View Documentation",
@@ -236,13 +236,13 @@ export const FOOTER_CONFIG = {
 	pages: [
 		{ href: "/", label: "Home" },
 		{ href: "/docs", label: "Docs" },
-		{ href: "/docs/cli", label: "CLI" },
+		{ href: "/docs/usage", label: "Usage" },
 		{ href: "/docs/structure", label: "Architecture" },
 	],
 	resources: [
 		{ href: "/docs", label: "Documentation" },
-		{ href: "/docs/cli", label: "Getting Started" },
-		{ href: "/docs/examples", label: "Examples" },
+		{ href: "/docs/installation", label: "Getting Started" },
+		{ href: "/docs/templates", label: "Templates" },
 	],
 } as const;
 

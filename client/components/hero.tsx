@@ -57,12 +57,23 @@ export const HeroSection = () => {
 			</FloatingIcon>
 
 			<div className="relative z-10 max-w-4xl mx-auto text-center">
-				{/* Badge */}
-				<FadeInUp className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-8">
-					<Sparkles className="w-3.5 h-3.5 text-primary" />
-					<span className="text-xs font-medium text-primary">{HERO_CONFIG.badge.text}</span>
-					<span className="px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wider bg-[oklch(0.72_0.19_145)] text-white">
-						BETA
+				{/* Badge row: Beta + tagline */}
+				<FadeInUp className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-8">
+					{/* Beta badge - modern, minimal, sleek */}
+					<span
+						className="group inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full
+							border border-primary/20 bg-primary/6 dark:bg-primary/8 backdrop-blur-sm
+							shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)]
+							hover:border-primary/35 hover:bg-primary/10 transition-colors duration-200">
+						<span className="h-1 w-1 rounded-full bg-primary/70" aria-hidden />
+						<span className="text-[11px] font-semibold tracking-[0.18em] uppercase text-primary/95">
+							Beta
+						</span>
+					</span>
+					{/* Tagline */}
+					<span className="inline-flex items-center gap-2 text-sm text-muted-foreground">
+						<Sparkles className="w-3.5 h-3.5 text-primary/70" />
+						{HERO_CONFIG.badge.text}
 					</span>
 				</FadeInUp>
 

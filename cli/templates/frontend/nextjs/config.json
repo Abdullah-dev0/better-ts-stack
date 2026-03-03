@@ -25,5 +25,5 @@
     "typescript": "^5"
   },
   "envVars": { "NODE_ENV": "development", "PORT": "3000" },
-  "templateFiles": []
+  "templateFiles": ["proxy.ts.hbs"]
 }

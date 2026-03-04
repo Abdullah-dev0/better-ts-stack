@@ -39,8 +39,9 @@ export const HERO_CONFIG = {
 		text: "Bold & Confident",
 	},
 	headline: {
-		main: "Type-safe. Production-ready.",
-		accent: "No nonsense.",
+		main: "Build your full stack.",
+		second: "One command.",
+		accent: "Zero hassle.",
 	},
 	subheadline:
 		"From one CLI command to production—without the chaos. Zero config. Maximum confidence. Your backend, but better.",

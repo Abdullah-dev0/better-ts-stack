@@ -83,11 +83,26 @@ export const HeroSection = () => {
 					</span>
 				</FadeInUp>
 
-				{/* Headline */}
-				<FadeInUp delay={0.1} className="text-5xl md:text-7xl font-bold tracking-tight text-foreground mb-6">
-					{HERO_CONFIG.headline.main}
-					<br />
-					<span className="text-gradient">{HERO_CONFIG.headline.accent}</span>
+				{/* Headline — three lines, tight leading, tilted animated underline on accent only */}
+				<FadeInUp delay={0.1} className="mb-6">
+					<h1
+						className="text-5xl md:text-7xl font-bold tracking-tight text-foreground leading-[1.08]
+							font-sans text-center">
+						<span className="block">{HERO_CONFIG.headline.main}</span>
+						<span className="block">{HERO_CONFIG.headline.second}</span>
+						<span className="block font-mono text-[0.92em] tracking-tight">
+							<span className="relative inline-block text-gradient">
+								{HERO_CONFIG.headline.accent}
+								{/* Tilted animated underline — thicker, slanted, draws in */}
+								<span
+									className="absolute -bottom-1 left-0 right-0 h-1.5 rounded-sm
+										bg-linear-to-r from-primary/80 via-primary to-primary/80
+										origin-left -skew-x-8 animate-(--animate-underline-grow)"
+									aria-hidden
+								/>
+							</span>
+						</span>
+					</h1>
 				</FadeInUp>
 
 				{/* Subheadline */}

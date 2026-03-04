@@ -59,17 +59,23 @@ export const HeroSection = () => {
 			<div className="relative z-10 max-w-4xl mx-auto text-center">
 				{/* Badge row: Beta + tagline */}
 				<FadeInUp className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-8">
-					{/* Beta badge - modern, minimal, sleek */}
-					<span
+					{/* Beta badge - floating, visible, animated */}
+					<FloatingIcon
+						duration={3.5}
+						yRange={[0, -8, 0]}
 						className="group inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full
-							border border-primary/20 bg-primary/6 dark:bg-primary/8 backdrop-blur-sm
-							shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)]
-							hover:border-primary/35 hover:bg-primary/10 transition-colors duration-200">
-						<span className="h-1 w-1 rounded-full bg-primary/70" aria-hidden />
+							border border-primary/25 bg-primary/8 dark:bg-primary/10 backdrop-blur-sm
+							shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]
+							ring-1 ring-primary/10 ring-offset-2 ring-offset-background
+							hover:border-primary/40 hover:bg-primary/12 transition-colors duration-200">
+						<span
+							className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse"
+							aria-hidden
+						/>
 						<span className="text-[11px] font-semibold tracking-[0.18em] uppercase text-primary/95">
 							Beta
 						</span>
-					</span>
+					</FloatingIcon>
 					{/* Tagline */}
 					<span className="inline-flex items-center gap-2 text-sm text-muted-foreground">
 						<Sparkles className="w-3.5 h-3.5 text-primary/70" />

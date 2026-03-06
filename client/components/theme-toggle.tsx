@@ -23,8 +23,9 @@ export const ThemeToggle = () => {
 			variant="ghost"
 			size="icon"
 			onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-			className="glass-card rounded-lg cursor-pointer">
+			className="rounded-lg cursor-pointer hover:bg-transparent hover:text-foreground">
 			{resolvedTheme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
 		</Button>
 	);
 };
+

@@ -3,9 +3,9 @@ title: Troubleshooting
 description: Common issues and solutions
 ---
 
-import { Callout } from 'fumadocs-ui/components/callout';
-import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
-import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { Callout } from "fumadocs-ui/components/callout";
+import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 
 ## Common Issues
 
@@ -95,11 +95,13 @@ npx better-ts-stack
 **Solution:**
 
 Valid names:
+
 - `my-api`
 - `cool-app-v2`
 - `customer_portal`
 
 Invalid names:
+
 - `my app` (contains space)
 - `.hidden` (starts with dot)
 - `` (empty)
@@ -273,7 +275,8 @@ docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
 cat .env | grep JWT_SECRET
 
 # Should be 32+ characters
-JWT_SECRET="your-super-secret-key-min-32-chars"
+# The default is 1h — use a longer value only if intentional
+JWT_EXPIRES_IN=1h
 
 # Restart server after changing .env
 ```
@@ -368,5 +371,6 @@ lsof -i :5432
 ```
 
 <Callout type="info">
-  Still having issues? [Open an issue on GitHub](https://github.com/abdullah-dev0/better-ts-stack/issues) with your error message and steps to reproduce.
+	Still having issues? [Open an issue on GitHub](https://github.com/abdullah-dev0/better-ts-stack/issues) with your
+	error message and steps to reproduce.
 </Callout>

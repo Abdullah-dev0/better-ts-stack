@@ -1,23 +1,21 @@
 # better-ts-stack
 
-> Build production-ready full-stack projects in seconds
+> Build production-ready TypeScript projects in seconds
 
-A powerful CLI tool that generates fully configured TypeScript projects with backend, full-stack frontend, database integration, Docker support, and more—all through an interactive setup.
+An interactive CLI tool that generates fully configured TypeScript projects with your choice of backend framework, database, authentication, and Docker support—all through a guided prompt flow.
 
 ## ✨ Features
 
-- 🚀 Interactive CLI with smart prompts
-- 📦 Modular architecture—choose only what you need
-- 🔧 Production-ready configuration out of the box
-- 🎯 Backend support (Express.js with TypeScript)
-- 🌐 Full-stack frontend support (Next.js 16)
-- � Optional Docker support with multi-stage builds
-- � Database integration (PostgreSQL with Prisma or MongoDB with Mongoose)
-- 🔐 Authentication support (JWT for Express, Better Auth for Next.js)
-- � TypeScript with strict mode enabled
+- 🚀 Interactive CLI with guided prompts — no flags or subcommands needed
+- 📦 Modular architecture — include only what you need
+- 🎯 Backend API template (Express.js with TypeScript)
+- 🌐 Full-stack template (Next.js 16 with App Router)
+- 🗄️ Database integration: PostgreSQL (Prisma or Drizzle) or MongoDB (Mongoose)
+- 🔐 Authentication: JWT for Express, Better Auth for Next.js (requires a database)
+- 🐳 Optional Docker support with multi-stage builds
+- 🔧 TypeScript with strict mode enabled
 - 🎨 ESLint + Prettier pre-configured
-- 🔄 Hot reload for development
-- 📚 Comprehensive documentation and examples
+- ♻️ Hot reload for development
 
 ## 🚀 Quick Start
 
@@ -30,99 +28,102 @@ npm install -g better-ts-stack
 better-ts-stack
 ```
 
-Answer a few simple questions and get a complete project ready to run.
+Answer the prompts and get a project ready to run.
 
-## 📋 What You Get
+## 📋 Prompt Flow
 
-After running the CLI, you'll have a fully configured project with:
+The CLI guides you through these questions in order:
 
-- Backend server with TypeScript (Express.js)
-- Frontend application (Next.js 16 for full-stack projects)
-- TypeScript configuration with strict mode
-- Environment variable management
-- Error handling and logging
-- Database integration (if selected)
-- Docker configuration (if selected)
-- Git repository initialized (optional)
-- Dependencies installed (optional)
-- Clear next steps and documentation
+1. **Project name** — becomes the folder name and `package.json` name
+2. **Application type** — `Backend API` or `Full-stack`
+   - **Backend**: prompts for framework (Express; NestJS coming soon)
+   - **Full-stack**: auto-selects Next.js (no framework prompt)
+3. **Database type** — `none`, `PostgreSQL`, or `MongoDB`
+4. **ORM/ODM** (if a database is selected):
+   - PostgreSQL → `Prisma` or `Drizzle`
+   - MongoDB → `Prisma` (adapter) or `Mongoose`
+5. **Package manager** — `npm`, `pnpm`, or `bun`
+6. **Docker** — include Docker configuration? (yes/no)
+7. **Authentication** — add auth?
+   - Express: JWT-based auth (always available)
+   - Next.js: Better Auth (only prompted when a database is selected)
+8. **Git** — initialize a git repository and create an initial commit? (yes/no)
+9. **Install dependencies** — run the install command now? (yes/no)
 
-## 🎯 Interactive Setup
+> **Note**: The CLI does not ask for a port. The server port defaults to `3000` via the `PORT` environment variable.
 
-The CLI will guide you through setup with questions like:
+## 📦 What You Get
 
-1. **Project name** - Name of your project
-2. **Project type** - Backend API or Full-stack app
-3. **Package manager** - npm, pnpm, or bun
-4. **Database** - None, PostgreSQL (Prisma), or MongoDB (Mongoose)
-5. **Port** - Server port (default: 3000)
-6. **Docker** - Include Docker configuration?
-7. **Git** - Initialize git repository?
-8. **Install dependencies** - Install packages now?
+After running the CLI you have a fully configured project with:
 
-## 📦 Available Modules
+- TypeScript in strict mode across all generated files
+- ESLint and Prettier configuration
+- Environment variable setup (`.env.example` / `.env`)
+- A health check endpoint (`GET /health`) for backend projects
+- Database connection and ORM setup (if selected)
+- Authentication scaffolding (if selected)
+- Docker files (if selected)
+- Optional git repository with an initial commit
 
-### Backend Modules
+## 🧩 Available Modules
 
-#### Express Base (Always Included)
+### Backend — Express (always included for `backend` type)
 
 - Express.js server with TypeScript
-- Middleware setup (cors, helmet, compression)
-- Environment configuration
-- Error handling
-- Health check endpoint
-- Development and production scripts
+- Middleware: `cors`, `helmet`, `morgan`
+- Health check route at `/health`
+- `dev`, `build`, `start`, `lint`, `format`, `type:check` scripts
 
-#### Prisma (PostgreSQL)
+### Frontend — Next.js (always included for `fullstack` type)
 
-- Prisma ORM configuration
-- PostgreSQL connection setup
-- Example schema and models
-- Migration scripts
-- Type-safe database queries
+- Next.js 16 with React 19 and App Router
+- Tailwind CSS v4
+- `dev`, `build`, `start`, `lint` scripts
+- A proxy configuration file (`proxy.ts`) rendered from a Handlebars template
 
-#### Mongoose (MongoDB)
+### Database modules
 
-- Mongoose ODM configuration
-- MongoDB connection setup
-- Example schemas and models
-- Connection pooling
-- Type definitions
+| Combination                         | Template files generated                                    |
+| ----------------------------------- | ----------------------------------------------------------- |
+| PostgreSQL + Prisma (Express)       | `prisma/schema.prisma`, `src/lib/prisma.ts`                 |
+| PostgreSQL + Prisma (Next.js)       | `prisma/schema.prisma`, `lib/prisma.ts`, `prisma.config.ts` |
+| PostgreSQL + Drizzle (Next.js only) | `lib/schema.ts`, `lib/db.ts`, `drizzle.config.ts`           |
+| MongoDB + Mongoose (Express only)   | `src/lib/db.ts.hbs` (rendered)                              |
 
-### Frontend Modules
+### Auth modules
 
-#### Next.js
+| Context           | Implementation                  | Generated files                                                                                                                           |
+| ----------------- | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Express backend   | JWT + bcrypt                    | `src/lib/jwt.ts`, `src/middleware/requireAuth.ts`, `src/services/userStore.ts`, `src/routes/auth.ts`, `src/controllers/authController.ts` |
+| Next.js fullstack | Better Auth (requires database) | `lib/auth.ts`, `lib/auth-client.ts`, `app/api/auth/[...all]/route.ts`                                                                     |
 
-- Next.js 16 with App Router
-- Server and client components
-- API routes integration
-- Optimized production builds
+### Docker module
 
-### Infrastructure Modules
+| Files generated                             |
+| ------------------------------------------- |
+| `Dockerfile` (multi-stage, framework-aware) |
+| `docker-compose.yml`                        |
+| `.dockerignore`                             |
 
-#### Docker
+Scripts added: `docker:build`, `docker:up`, `docker:down`, `docker:logs`
 
-- Multi-stage Dockerfile
-- Docker Compose configuration
-- Production-optimized builds
-- Development and production environments
-- .dockerignore file
+## 🔧 Technology Stack
 
-## 🔧 Technology Stack Used
-
-### Backend
-
-- **Runtime**: Node.js with TypeScript 5.3+
-- **Framework**: Express.js
-- **Validation**: Zod
-- **Development**: tsx for hot reload
+| Layer              | Technology                                    |
+| ------------------ | --------------------------------------------- |
+| Runtime            | Node.js 18+ with TypeScript 5.x               |
+| Backend framework  | Express.js 4                                  |
+| Frontend framework | Next.js 16 / React 19                         |
+| Database ORMs      | Prisma, Drizzle, Mongoose                     |
+| Auth               | JWT (`jsonwebtoken` + `bcrypt`) / Better Auth |
+| Hot reload         | `tsx watch` (Express) / `next dev` (Next.js)  |
+| Linting            | ESLint 9 with TypeScript plugin               |
+| Formatting         | Prettier                                      |
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome. Please open an issue or submit a pull request.
 
-Built with modern best practices for full-stack TypeScript development.
+## 📄 License
 
----
-
-**Ready to build your next project?** Run `npx better-ts-stack` and get started in seconds!
+MIT

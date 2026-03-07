@@ -1,60 +1,53 @@
 ---
 title: Database Module
-description: PostgreSQL with Prisma/Drizzle or MongoDB with Mongoose
+description: PostgreSQL with Prisma or Drizzle, or MongoDB with Mongoose
 ---
 
-import { Callout } from 'fumadocs-ui/components/callout';
-import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { Callout } from "fumadocs-ui/components/callout";
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 
-## Database Module Overview
+## Overview
 
-The Database Module sets up database connectivity with your choice of ORM/ODM, providing type-safe database access for your application.
+The Database module adds database connectivity to your project. Selection happens in two steps during the CLI prompts:
+
+1. **Database type** — `none`, `postgresql`, or `mongodb`
+2. **ORM/ODM** — shown only when a database was selected
 
 ## Available Options
 
-| Database | ORM/ODM | Best For | Type Safety |
-|----------|---------|----------|-------------|
-| **PostgreSQL** | Prisma | Relational data, complex queries | Full (auto-generated) |
-| **PostgreSQL** | Drizzle | SQL-first approach | Full |
-| **MongoDB** | Mongoose | Flexible schemas, JSON data | Partial |
+| Database   | ORM/ODM  | Available in         | Type safety                 |
+| ---------- | -------- | -------------------- | --------------------------- |
+| PostgreSQL | Prisma   | Backend + Full-stack | Full (auto-generated types) |
+| PostgreSQL | Drizzle  | **Full-stack only**  | Full                        |
+| MongoDB    | Mongoose | **Backend only**     | Partial                     |
+| MongoDB    | Prisma   | Backend + Full-stack | Full (via connector)        |
+
+<Callout type="info">
+	Drizzle is only available for Next.js (full-stack) projects. Mongoose is only available for Express (backend)
+	projects.
+</Callout>
 
 ---
 
 ## PostgreSQL + Prisma
 
-The most popular choice, offering excellent type safety and developer experience.
+### Generated files
 
-### Generated Files
-
-<Tabs items={['Express', 'Next.js']}>
-  <Tab value="Express">
-    ```text
-    prisma/
-      schema.prisma          # Database schema
-      migrations/            # Migration files (generated)
-    src/
-      lib/prisma.ts          # Prisma client singleton
-    ```
-  </Tab>
-  <Tab value="Next.js">
-    ```text
-    prisma/
-      schema.prisma          # Database schema
-      migrations/            # Migration files (generated)
-    prisma.config.ts         # Prisma config + datasource URL
-    lib/
-      prisma.ts              # Prisma client singleton
-      generated/client/      # Generated Prisma Client output
-    ```
-  </Tab>
+<Tabs items={["Express", "Next.js"]}>
+	<Tab value="Express">
+		```text prisma/ schema.prisma # Database schema src/ lib/ prisma.ts # Prisma client singleton ```
+	</Tab>
+	<Tab value="Next.js">
+		```text prisma/ schema.prisma # Database schema (rendered from .hbs template) prisma.config.ts # Datasource URL
+		configuration lib/ prisma.ts # Prisma client with pg adapter ```
+	</Tab>
 </Tabs>
 
-### Schema Example
+### schema.prisma
 
-<Tabs items={['Express', 'Next.js']}>
+<Tabs items={['Express', 'Next.js (base)']}>
   <Tab value="Express">
     ```prisma
-    // prisma/schema.prisma
     generator client {
       provider = "prisma-client-js"
     }
@@ -63,22 +56,11 @@ The most popular choice, offering excellent type safety and developer experience
       provider = "postgresql"
       url      = env("DATABASE_URL")
     }
-
-    model User {
-      id        String   @id @default(uuid())
-      email     String   @unique
-      name      String?
-      password  String
-      createdAt DateTime @default(now())
-      updatedAt DateTime @updatedAt
-
-      @@map("users")
-    }
     ```
+
   </Tab>
-  <Tab value="Next.js">
+  <Tab value="Next.js (base)">
     ```prisma
-    // prisma/schema.prisma
     generator client {
       provider = "prisma-client-js"
       output   = "../lib/generated/client"
@@ -88,15 +70,17 @@ The most popular choice, offering excellent type safety and developer experience
       provider = "postgresql"
     }
     ```
+
+    <Callout type="info">
+      In Next.js projects, `DATABASE_URL` is sourced from `prisma.config.ts`
+      rather than directly from `env()`. If Better Auth is also enabled, the
+      generated schema includes Better Auth core tables.
+    </Callout>
+
   </Tab>
 </Tabs>
 
-<Callout type="info">
-  In Next.js projects, Prisma reads `DATABASE_URL` from `prisma.config.ts`.
-  If Better Auth is enabled, `schema.prisma` includes Better Auth core tables.
-</Callout>
-
-### Prisma Client Setup
+### Prisma client setup
 
 <Tabs items={['Express', 'Next.js']}>
   <Tab value="Express">
@@ -111,23 +95,24 @@ The most popular choice, offering excellent type safety and developer experience
     export const prisma =
       globalForPrisma.prisma ??
       new PrismaClient({
-        log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
+        log: process.env.NODE_ENV === "development"
+          ? ["query", "error", "warn"]
+          : ["error"],
       });
 
     if (process.env.NODE_ENV !== "production") {
       globalForPrisma.prisma = prisma;
     }
     ```
+
   </Tab>
   <Tab value="Next.js">
     ```typescript
     // lib/prisma.ts
     import { PrismaPg } from "@prisma/adapter-pg";
-    import { PrismaClient } from "../generated/client";
+    import { PrismaClient } from "../lib/generated/client";
 
-    const globalForPrisma = global as unknown as {
-      prisma: PrismaClient;
-    };
+    const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
     const adapter = new PrismaPg({
       connectionString: process.env.DATABASE_URL,
@@ -135,302 +120,166 @@ The most popular choice, offering excellent type safety and developer experience
 
     const prisma =
       globalForPrisma.prisma ||
-      new PrismaClient({
-        adapter,
-      });
+      new PrismaClient({ adapter });
 
     if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
     export default prisma;
     ```
+
   </Tab>
 </Tabs>
 
-### Available Scripts
+### Commands
+
+<Tabs items={["Express", "Next.js"]}>
+	<Tab value="Express">
+		```bash npm run prisma:generate # prisma generate npm run prisma:migrate # prisma migrate dev npm run prisma:studio
+		# prisma studio npm run prisma:seed # tsx prisma/seed.ts ```
+	</Tab>
+	<Tab value="Next.js">
+		```bash npm run prisma:generate # prisma generate npm run prisma:migrate # prisma migrate dev npm run prisma:studio
+		# prisma studio ```
+	</Tab>
+</Tabs>
+
+### Environment variable
 
 ```bash
-# Generated in package.json by Prisma module
-npm run prisma:generate
-npm run prisma:migrate
-npm run prisma:studio
-
-# Optional direct CLI commands
-npx prisma migrate deploy
-```
-
-### Usage in Code
-
-```typescript
-import { prisma } from './lib/prisma';
-
-// Create user
-const user = await prisma.user.create({
-  data: {
-    email: 'user@example.com',
-    password: 'hashed-password',
-    name: 'John Doe'
-  }
-});
-
-// Find user
-const found = await prisma.user.findUnique({
-  where: { email: 'user@example.com' }
-});
-
-// Update user
-const updated = await prisma.user.update({
-  where: { id: user.id },
-  data: { name: 'Jane Doe' }
-});
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/postgres?schema=public"
 ```
 
 ---
 
-## PostgreSQL + Drizzle
+## PostgreSQL + Drizzle _(Next.js only)_
 
-For developers who prefer writing SQL directly with full type safety.
-
-### Generated Files
+### Generated files
 
 ```text
 lib/
-  schema.ts              # Table definitions
-  db.ts                  # Database connection
-drizzle/                 # SQL migration files (generated)
-```
-
-### Schema Example
-
-```typescript
-// lib/schema.ts
-import { pgTable, uuid, varchar, timestamp } from 'drizzle-orm/pg-core';
-
-export const users = pgTable('users', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  email: varchar('email', { length: 255 }).notNull().unique(),
-  password: varchar('password', { length: 255 }).notNull(),
-  name: varchar('name', { length: 255 }),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow()
-});
+  schema.ts              # Table definitions (rendered from .hbs template)
+  db.ts                  # Drizzle database connection
+drizzle.config.ts        # Drizzle Kit configuration
 ```
 
 <Callout type="tip">
-  If you also enable **Better Auth** with Drizzle, the generated `lib/schema.ts`
-  includes Better Auth core tables (`user`, `session`, `account`,
-  `verification`) instead of only the sample `users` table.
+	If Better Auth is also selected, the generated `lib/schema.ts` contains Better Auth core tables (`user`, `session`,
+	`account`, `verification`) instead of a sample table.
 </Callout>
 
-### Database Connection
+### schema.ts (base, without Better Auth)
+
+```typescript
+// lib/schema.ts
+import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
+
+export const users = pgTable("users", {
+	id: text("id").primaryKey(),
+	name: text("name").notNull(),
+	email: text("email").notNull().unique(),
+	createdAt: timestamp("created_at").defaultNow(),
+});
+```
+
+### Database connection
 
 ```typescript
 // lib/db.ts
-import { drizzle } from 'drizzle-orm/node-postgres';
-import { Pool } from 'pg';
-import * as schema from './schema';
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
+import * as schema from "./schema";
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL
+	connectionString: process.env.DATABASE_URL,
 });
 
 export const db = drizzle(pool, { schema });
 ```
 
-### Usage in Code
+### Commands
 
-```typescript
-import { db } from './db';
-import { users } from './schema';
-import { eq } from 'drizzle-orm';
+```bash
+npm run db:generate   # drizzle-kit generate
+npm run db:migrate    # drizzle-kit migrate
+npm run db:studio     # drizzle-kit studio
+```
 
-// Insert
-const newUser = await db.insert(users).values({
-  email: 'user@example.com',
-  password: 'hashed-password'
-}).returning();
+### Environment variable
 
-// Select
-const user = await db.select().from(users).where(eq(users.email, 'user@example.com'));
-
-// Update
-await db.update(users)
-  .set({ name: 'Jane Doe' })
-  .where(eq(users.id, userId));
+```bash
+DATABASE_URL="postgresql://user:password@localhost:5432/mydb?schema=public"
 ```
 
 ---
 
-## MongoDB + Mongoose
+## MongoDB + Mongoose _(Express only)_
 
-Best for flexible, document-based data models.
+### Generated files
 
-### Generated Files
-
-```
+```text
 src/
-└── models/
-    └── User.ts         # Mongoose model
+  lib/
+    db.ts              # Mongoose connection helper (rendered from .hbs template)
+  models/
+    User.ts            # Example Mongoose model
 ```
 
-### Model Example
-
-```typescript
-// src/models/User.ts
-import mongoose, { Schema, Document } from 'mongoose';
-
-export interface IUser extends Document {
-  email: string;
-  password: string;
-  name?: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-const UserSchema: Schema = new Schema({
-  email: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  password: {
-    type: String,
-    required: true
-  },
-  name: {
-    type: String
-  }
-}, {
-  timestamps: true
-});
-
-export default mongoose.model<IUser>('User', UserSchema);
-```
-
-### Database Connection
+### Connection helper
 
 ```typescript
 // src/lib/db.ts
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 export async function connectDB() {
-  try {
-    await mongoose.connect(process.env.MONGODB_URI!);
-    console.log('✅ MongoDB connected');
-  } catch (error) {
-    console.error('❌ MongoDB connection error:', error);
-    process.exit(1);
-  }
+	try {
+		await mongoose.connect(process.env.MONGODB_URI!);
+		console.log("MongoDB connected");
+	} catch (error) {
+		console.error("MongoDB connection error:", error);
+		process.exit(1);
+	}
 }
 ```
 
-### Usage in Code
+### Mongoose adds no extra scripts
 
-```typescript
-import User from './models/User';
+Mongoose does not contribute additional `npm run` scripts. The connection is established by calling `connectDB()` in your application entry point.
 
-// Create
-const user = await User.create({
-  email: 'user@example.com',
-  password: 'hashed-password'
-});
-
-// Find
-const found = await User.findOne({ email: 'user@example.com' });
-
-// Update
-await User.findByIdAndUpdate(userId, { name: 'Jane Doe' });
-```
-
----
-
-## Environment Variables
-
-### PostgreSQL
+### Environment variable
 
 ```bash
-DATABASE_URL="postgresql://user:password@localhost:5432/dbname?schema=public"
-```
-
-### MongoDB
-
-```bash
-MONGODB_URI="mongodb://localhost:27017/dbname"
-# or
-MONGODB_URI="mongodb+srv://user:password@cluster.mongodb.net/dbname"
+MONGODB_URI="mongodb://localhost:27017/myapp"
 ```
 
 ---
 
-## Docker Integration
-
-When Docker is enabled, the database module includes:
-
-### PostgreSQL Service
-
-```yaml
-# docker-compose.yml
-services:
-  postgres:
-    image: postgres:15-alpine
-    environment:
-      POSTGRES_DB: myapp
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-  app:
-    # ... your app configuration
-    depends_on:
-      - postgres
-```
-
-### MongoDB Service
-
-```yaml
-services:
-  mongodb:
-    image: mongo:7
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
-```
-
----
-
-## Migration Strategy
+## Migration tips
 
 ### Prisma
 
 ```bash
-# Development
+# Create and apply a migration in development
 npx prisma migrate dev --name descriptive_name
 
-# Production
+# Apply pending migrations in production
 npx prisma migrate deploy
-
-# Reset (careful!)
-npx prisma migrate reset
 ```
 
 ### Drizzle
 
 ```bash
-# Generate migration
-npx drizzle-kit generate
+# Generate SQL migration files from schema changes
+npm run db:generate
 
-# Run migration
-npx drizzle-kit migrate
+# Run pending migrations
+npm run db:migrate
 ```
 
 ### Mongoose
 
-Mongoose handles schema changes automatically in development. For production, consider migration tools like `migrate-mongo`.
+Mongoose applies schema changes at runtime. For production migrations, use a tool such as `migrate-mongo`.
 
 <Callout type="tip">
-  **Recommendation:** Use Prisma for new projects. It offers the best developer experience with excellent TypeScript support.
+	Start with **PostgreSQL + Prisma** if you are unsure. It has the broadest support across both Express and Next.js, and
+	offers the richest developer experience with generated TypeScript types.
 </Callout>
-

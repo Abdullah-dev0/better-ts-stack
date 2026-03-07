@@ -1,13 +1,13 @@
 # better-ts-stack
 
-> Build production-ready full-stack projects in seconds
+> Build production-ready TypeScript projects in seconds
 
-A powerful CLI tool that generates fully configured TypeScript projects with backend, full-stack frontend, database integration, Docker support, and more—all through an interactive setup.
+An interactive CLI tool that generates fully configured TypeScript projects with your choice of backend framework, database, authentication, and Docker support.
 
 ## Installation & Usage
 
 ```bash
-# Using npx (recommended – no install)
+# Using npx (recommended — no install required)
 npx better-ts-stack
 
 # Or install globally
@@ -15,49 +15,40 @@ npm install -g better-ts-stack
 better-ts-stack
 ```
 
-Answer a few simple questions and get a complete project ready to run.
+Answer the prompts and get a fully configured project ready to run.
 
-## Features
+## Prompt Flow
 
-- Interactive CLI with smart prompts
-- Modular architecture—choose only what you need
-- Production-ready configuration out of the box
-- Backend support (Express.js with TypeScript)
-- Full-stack frontend support (Next.js 16)
-- Optional Docker support with multi-stage builds
-- Database integration (PostgreSQL with Prisma or MongoDB with Mongoose)
-- Authentication support (JWT for Express, Better Auth for Next.js)
-- TypeScript with strict mode enabled
-- ESLint + Prettier pre-configured
-- Hot reload for development
-- Comprehensive documentation and examples
+The CLI is entirely interactive — there are no subcommands or flags. It will guide you through:
+
+1. **Project name** — becomes the folder name and `package.json` name
+2. **Application type** — `Backend API` or `Full-stack`
+   - **Backend**: prompts for framework (Express; NestJS coming soon)
+   - **Full-stack**: auto-selects Next.js
+3. **Database type** — `none`, `PostgreSQL`, or `MongoDB`
+4. **ORM/ODM** (only shown when a database is selected):
+   - PostgreSQL → `Prisma` or `Drizzle`
+   - MongoDB → `Prisma` (adapter) or `Mongoose`
+5. **Package manager** — `npm`, `pnpm`, or `bun`
+6. **Docker** — include Docker configuration?
+7. **Authentication** — add auth?
+   - Express: JWT-based auth
+   - Next.js: Better Auth (only prompted when a database is selected)
+8. **Git** — initialize a git repository with an initial commit?
+9. **Install dependencies** — run the install command now?
+
+> The CLI does not prompt for a port. The server port defaults to `3000` via the `PORT` environment variable.
 
 ## What You Get
 
-After running the CLI, you'll have a fully configured project with:
-
-- Backend server with TypeScript (Express.js)
-- TypeScript configuration with strict mode
-- Environment variable management
-- Error handling and logging
-- Database integration (if selected)
-- Docker configuration (if selected)
-- Git repository initialized (optional)
-- Dependencies installed (optional)
-- Clear next steps and documentation
-
-## Interactive Setup
-
-The CLI will guide you through:
-
-1. **Project name** – Name of your project
-2. **Project type** – Backend API or Full-stack app
-3. **Package manager** – npm, pnpm, or bun
-4. **Database** – None, PostgreSQL (Prisma), or MongoDB (Mongoose)
-5. **Port** – Server port (default: 3000)
-6. **Docker** – Include Docker configuration?
-7. **Git** – Initialize git repository?
-8. **Install dependencies** – Install packages now?
+- TypeScript in strict mode
+- ESLint + Prettier pre-configured
+- Environment variable setup (`.env.example` / `.env`)
+- Health check endpoint at `/health` (backend projects)
+- Database connection and ORM setup (if selected)
+- Authentication scaffolding (if selected)
+- Docker files (if selected)
+- Optional git repository with an initial commit
 
 ## Requirements
 
@@ -65,8 +56,9 @@ The CLI will guide you through:
 
 ## Links
 
-- [GitHub repository](https://github.com/Abdullah-dev0/better-ts-stack)
-- [Issue tracker](https://github.com/Abdullah-dev0/better-ts-stack/issues)
+- [Documentation](https://better-ts-stack.vercel.app/docs)
+- [GitHub Repository](https://github.com/Abdullah-dev0/better-ts-stack)
+- [Issue Tracker](https://github.com/Abdullah-dev0/better-ts-stack/issues)
 
 ## License
 

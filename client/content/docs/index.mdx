@@ -1,6 +1,6 @@
 ---
 title: Getting Started
-description: Quick start guide for Better-TS-Stack - generate production-ready TypeScript projects in seconds
+description: Quick start guide for better-ts-stack — generate production-ready TypeScript projects in seconds
 ---
 
 import { Step, Steps } from "fumadocs-ui/components/steps";
@@ -9,42 +9,40 @@ import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 import { Cards, Card } from "fumadocs-ui/components/card";
 import { Terminal, Zap, Shield, Container, Database, Layout } from "lucide-react";
 
-## What is Better-TS-Stack?
+## What is better-ts-stack?
 
-Better-TS-Stack is an interactive CLI tool that generates fully configured TypeScript projects with your choice of backend, frontend, database, and DevOps tools. No configuration files to wrestle with—just answer a few prompts and get a production-ready codebase.
+better-ts-stack is an interactive CLI tool that generates fully configured TypeScript projects with your choice of backend framework, database, authentication, and Docker support. No config files to edit by hand — just answer a few prompts and get a production-ready codebase.
 
-<Callout type="info" title="Perfect for">
-	- Starting new full-stack TypeScript projects - Prototyping APIs with type-safe backends - Learning modern TypeScript
-	patterns - Standardizing project structure across teams
+<Callout type="info" title="Good for">
+	- Starting new TypeScript backend or full-stack projects - Prototyping APIs with a type-safe Express setup - Learning
+	modern TypeScript project structure - Standardizing project scaffolding across a team
 </Callout>
 
 ## Quick Start
-
-Get a new project running in under 2 minutes:
 
 <Steps>
 
 <Step>
 ### Run the CLI
 
-<Tabs items={['npx (recommended)', 'Global Install', 'pnpm', 'bun']}>
+<Tabs items={['npx (recommended)', 'Global install', 'pnpm dlx', 'bunx']}>
   <Tab value="npx (recommended)">
     ```bash
     npx better-ts-stack
     ```
   </Tab>
-  <Tab value="Global Install">
+  <Tab value="Global install">
     ```bash
     npm install -g better-ts-stack
     better-ts-stack
     ```
   </Tab>
-  <Tab value="pnpm">
+  <Tab value="pnpm dlx">
     ```bash
     pnpm dlx better-ts-stack
     ```
   </Tab>
-  <Tab value="bun">
+  <Tab value="bunx">
     ```bash
     bunx better-ts-stack
     ```
@@ -53,55 +51,65 @@ Get a new project running in under 2 minutes:
 </Step>
 
 <Step>
-### Answer the Prompts
+### Answer the prompts
 
-The CLI will guide you through:
+The CLI is fully interactive — there are no flags or subcommands. You will be asked:
 
-1. **Project name** — What to call your new project
-2. **Application type** — Backend API only, or full-stack with frontend
-3. **Backend framework** — Express (NestJS coming soon)
-4. **Database** — PostgreSQL with Prisma, MongoDB with Mongoose, or Drizzle
-5. **Authentication** — Optional JWT auth for Express or Better Auth for Next.js
-6. **Docker** — Optional Docker Compose setup
-7. **Package manager** — npm, pnpm, or bun
+1. **Project name** — becomes your folder name and `package.json` name
+2. **Application type** — `Backend API` or `Full-stack`
+   - **Backend**: select a framework (Express now; NestJS coming soon)
+   - **Full-stack**: Next.js is auto-selected
+3. **Database type** — `none`, `PostgreSQL`, or `MongoDB`
+4. **ORM/ODM** (only shown when a database is selected)
+   - PostgreSQL → `Prisma` or `Drizzle`
+   - MongoDB → `Prisma` or `Mongoose`
+5. **Package manager** — `npm`, `pnpm`, or `bun`
+6. **Docker** — include Docker configuration?
+7. **Authentication** — add auth?
+   - Express: JWT-based auth (always available when asked)
+   - Next.js: Better Auth (only prompted if a database was selected)
+8. **Git** — initialize a repository with an initial commit?
+9. **Install dependencies** — run the install command now?
 
+<Callout type="info">
+  The CLI does not ask for a port number. The server port defaults to `3000`
+  via the `PORT` environment variable.
+</Callout>
 </Step>
 
 <Step>
-### Start Developing
+### Start developing
 
 ```bash
 cd your-project-name
-npm install  # or pnpm install, bun install
+npm install   # skip if you chose to install during setup
 npm run dev
 ```
-
-Your project is now running with hot reload enabled!
 
 </Step>
 
 </Steps>
 
-## What's Included?
+## What's Included
 
 <Cards>
 	<Card title="Backend API" icon={<Database className="text-blue-400" />}>
-		Express.js with TypeScript, Zod validation, and proper error handling
+		Express.js server with TypeScript, cors, helmet, morgan middleware, and a health check endpoint
 	</Card>
-	<Card title="Frontend App" icon={<Layout className="text-green-400" />}>
-		Next.js 16 with React 19, Tailwind CSS v4, and App Router
+	<Card title="Full-stack App" icon={<Layout className="text-green-400" />}>
+		Next.js 16 with React 19, App Router, Tailwind CSS v4, and a proxy configuration
 	</Card>
-	<Card title="Type-Safe Database" icon={<Shield className="text-purple-400" />}>
-		Prisma or Drizzle ORM with auto-generated types
+	<Card title="Type-safe Database" icon={<Shield className="text-purple-400" />}>
+		PostgreSQL with Prisma or Drizzle, or MongoDB with Mongoose — your choice
 	</Card>
 	<Card title="Authentication" icon={<Zap className="text-yellow-400" />}>
-		JWT tokens for Express, Better Auth for Next.js
+		JWT + bcrypt for Express, Better Auth (with Prisma or Drizzle adapter) for Next.js
 	</Card>
 	<Card title="Docker Ready" icon={<Container className="text-blue-400" />}>
-		Multi-stage Dockerfile and docker-compose.yml
+		Multi-stage Dockerfile and docker-compose.yml generated on request
 	</Card>
-	<Card title="Developer Tools" icon={<Terminal className="text-primary" />}>
-		ESLint, Prettier, TypeScript strict mode, Husky hooks
+	<Card title="Developer Tooling" icon={<Terminal className="text-primary" />}>
+		ESLint 9, Prettier, TypeScript strict mode, and hot reload out of the box
 	</Card>
 </Cards>
 
@@ -109,24 +117,23 @@ Your project is now running with hot reload enabled!
 
 - **Node.js** 18.0.0 or higher
 - **Package manager** — npm, pnpm, or bun
-- **Git** — For repository initialization (optional)
 
-<Callout type="warn">Make sure you have Node.js 18+ installed. Check with: `node --version`</Callout>
+<Callout type="warn">Check your Node.js version before running: `node --version`</Callout>
 
 ## Next Steps
 
 <Cards>
 	<Card title="Installation Options" href="/docs/installation">
-		Learn about global vs npx installation, package manager differences
+		npx vs global install, package manager differences
 	</Card>
 	<Card title="Interactive Usage" href="/docs/usage">
-		Deep dive into the CLI prompts and options
+		Full prompt-by-prompt walkthrough
 	</Card>
 	<Card title="Modules" href="/docs/modules">
-		Explore backend, frontend, database, auth, and Docker options
+		Backend, frontend, database, auth, and Docker options in detail
 	</Card>
 	<Card title="Project Structure" href="/docs/structure">
-		Understand the generated project organization
+		Understand the generated file layout
 	</Card>
 </Cards>
 

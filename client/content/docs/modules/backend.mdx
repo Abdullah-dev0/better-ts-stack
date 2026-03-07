@@ -3,113 +3,88 @@ title: Backend Module
 description: Express.js backend with TypeScript, routing, and middleware
 ---
 
-import { Callout } from 'fumadocs-ui/components/callout';
-import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { Callout } from "fumadocs-ui/components/callout";
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 
-## Backend Module Overview
+## Overview
 
-The Backend Module generates a production-ready Express.js server with TypeScript, following industry best practices for API development.
+The Backend module generates a production-ready Express.js server with TypeScript. It is the foundation of every **Backend API** project.
 
-## What's Generated
+## What You Get
 
 ```
 src/
-├── index.ts              # Server entry point
-├── app.ts                # Express app configuration
-├── routes/
-│   ├── index.ts          # Route aggregator
-│   └── health.ts         # Health check endpoint
-├── middleware/
-│   └── errorHandler.ts   # Global error handling
-├── lib/
-│   └── (auth, db)        # Auth and DB utilities (if selected)
-└── types/
-    └── index.ts          # Shared TypeScript types
+├── index.ts          # Entry point — configures middleware, mounts routes, starts server
+└── routes/
+    └── health.ts     # GET /health endpoint
 ```
+
+<Callout type="info">
+	The base backend template generates exactly these two source files. No `app.ts`, `routes/index.ts`,
+	`middleware/errorHandler.ts`, or `types/` directory are included in the base output. Additional source files are added
+	by optional modules (database, auth).
+</Callout>
 
 ---
 
-## Core Files
+## Generated Files
 
-### index.ts — Entry Point
+### src/index.ts
 
-```typescript
-import app from './app';
-import { config } from './config';
-
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
-```
-
-### app.ts — Express Configuration
+The entry point configures and starts the Express app:
 
 ```typescript
-import express from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
-import routes from './routes';
-import { errorHandler } from './middleware/errorHandler';
+import express, { Express, Request, Response } from "express";
+import cors from "cors";
+import helmet from "helmet";
+import morgan from "morgan";
+import dotenv from "dotenv";
+import healthRouter from "./routes/health";
 
-const app = express();
+dotenv.config();
 
-// Security middleware
+const app: Express = express();
+const port = process.env.PORT || 3000;
+
 app.use(helmet());
-
-// CORS
-app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3001',
-  credentials: true
-}));
-
-// Body parsing
+app.use(cors());
+app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Routes
-app.use('/api', routes);
+app.use("/health", healthRouter);
 
-// Error handling (always last)
-app.use(errorHandler);
+// 404 handler
+app.use((_req: Request, res: Response) => {
+	res.status(404).json({ error: "Not Found" });
+});
+
+// Error handler
+app.use((err: Error, _req: Request, res: Response) => {
+	console.error(err.stack);
+	res.status(500).json({ error: "Internal Server Error" });
+});
+
+app.listen(port, () => {
+	console.log(`Server is running on http://localhost:${port}`);
+});
 
 export default app;
 ```
 
----
+When the **auth** module is selected, `src/index.ts` additionally imports and mounts the auth router at `/auth`.
 
-## Routing Structure
+### src/routes/health.ts
 
-Routes follow a clean separation pattern:
+A simple `GET /health` endpoint:
 
 ```typescript
-// src/routes/index.ts
-import { Router } from 'express';
-import healthRouter from './health';
+import { Router } from "express";
 
 const router = Router();
 
-router.use('/health', healthRouter);
-// Additional routes auto-registered here
-
-export default router;
-```
-
-### Health Check Endpoint
-
-```typescript
-// src/routes/health.ts
-import { Router } from 'express';
-
-const router = Router();
-
-router.get('/', (req, res) => {
-  res.json({
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime()
-  });
+router.get("/", (_req, res) => {
+	res.json({ status: "ok" });
 });
 
 export default router;
@@ -117,142 +92,101 @@ export default router;
 
 ---
 
-## Error Handling
-
-Built-in error middleware provides consistent API error responses:
-
-```typescript
-// src/middleware/errorHandler.ts
-import { Request, Response, NextFunction } from 'express';
-
-export function errorHandler(
-  err: Error,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  console.error('Error:', err);
-  
-  res.status(500).json({
-    error: {
-      code: 'INTERNAL_ERROR',
-      message: process.env.NODE_ENV === 'production' 
-        ? 'Internal server error' 
-        : err.message,
-      timestamp: new Date().toISOString()
-    }
-  });
-}
-```
-
----
-
-## Available Scripts
+## Commands
 
 ```bash
-npm run dev       # tsx watch src/index.ts
-npm run build     # tsc (compiles to dist/)
-npm run start     # node dist/index.js
-npm run lint      # eslint src
+npm run dev        # tsx watch src/index.ts (hot reload)
+npm run build      # tsc (compile to dist/)
+npm run start      # node dist/index.js
+npm run lint       # eslint src
+npm run lint:fix   # eslint src --fix
+npm run format     # prettier --write "src/**/*.ts"
 npm run type:check # tsc --noEmit
 ```
 
+> With **bun** as the package manager, `dev` runs `bun --watch src/index.ts` instead.
+
 ---
 
-## Integration with Other Modules
+## Dependencies
 
-### With Database Module
-
-If you select a database, the backend module:
-
-- Adds database connection setup
-- Includes example models/entities
-- Provides typed database client
-- Adds database health checks
-
-### With Auth Module
-
-If you enable auth, the backend module:
-
-- Adds `/api/auth/*` routes (register, login, logout)
-- Includes JWT middleware for protected routes
-- Provides `req.user` typing
-- Adds user context to requests
-
-### Example: Protected Route
-
-```typescript
-import { Router } from 'express';
-import { authMiddleware } from '../middleware/auth';
-
-const router = Router();
-
-// Public route
-router.get('/public', (req, res) => {
-  res.json({ message: 'Hello World' });
-});
-
-// Protected route
-router.get('/profile', authMiddleware, (req, res) => {
-  res.json({ user: req.user });
-});
-
-export default router;
-```
+| Package   | Role                            |
+| --------- | ------------------------------- |
+| `express` | HTTP framework                  |
+| `cors`    | Cross-origin resource sharing   |
+| `helmet`  | Security headers                |
+| `morgan`  | HTTP request logger             |
+| `dotenv`  | Loads `.env` into `process.env` |
 
 ---
 
 ## Environment Variables
 
 ```bash
-# Server
-PORT=3000
 NODE_ENV=development
-
-# CORS
-CORS_ORIGIN=http://localhost:3001
-
-# Database (if selected)
-DATABASE_URL="postgresql://user:pass@localhost:5432/db"
-
-# Auth (if selected)
-JWT_SECRET="your-secret-key"
-JWT_EXPIRES_IN="7d"
+PORT=3000
 ```
+
+Additional variables are added by the database and auth modules.
+
+---
+
+## Integration with Other Modules
+
+### + Database module
+
+If a database module is selected, the build adds:
+
+- A database client singleton (`src/lib/prisma.ts` or `src/lib/db.ts`)
+- The relevant ORM package and scripts
+
+### + Auth module
+
+If auth is selected, the build adds:
+
+- `src/lib/jwt.ts` — JWT sign/verify utilities
+- `src/middleware/requireAuth.ts` — Bearer token validation middleware
+- `src/services/userStore.ts` — User lookup helper
+- `src/controllers/authController.ts` — Register/login handlers
+- `src/routes/auth.ts` — Router mounted at `/auth`
+- `JWT_SECRET` and `JWT_EXPIRES_IN` environment variables
+
+### + Docker module
+
+If Docker is selected, the build adds `Dockerfile`, `docker-compose.yml`, and `.dockerignore` plus four `docker:*` scripts.
 
 ---
 
 ## Extending the Backend
 
-### Add New Routes
+### Add a route
 
-1. Create file: `src/routes/users.ts`
-2. Implement route handlers
-3. Register in `src/routes/index.ts`
-
-### Add Middleware
-
-1. Create file: `src/middleware/custom.ts`
-2. Implement middleware function
-3. Register in `src/app.ts`
-
-### Add Controllers
-
-For complex applications, separate logic into controllers:
+1. Create `src/routes/users.ts`
+2. Implement your route handlers
+3. Register the router in `src/index.ts`:
 
 ```typescript
-// src/controllers/user.controller.ts
-export class UserController {
-  async getAll(req: Request, res: Response) {
-    // Implementation
-  }
-  
-  async getById(req: Request, res: Response) {
-    // Implementation
-  }
-}
+import usersRouter from "./routes/users";
+app.use("/users", usersRouter);
 ```
 
-<Callout type="tip">
-  The generated structure scales from simple APIs to complex microservices.
-</Callout>
+### Use the requireAuth middleware
+
+```typescript
+import { Router } from "express";
+import { requireAuth } from "../middleware/requireAuth";
+
+const router = Router();
+
+router.get("/profile", requireAuth, (req, res) => {
+	res.json({ message: "Protected route" });
+});
+
+export default router;
+```
+
+<Callout type="info">The middleware is named `requireAuth` in the generated file, not `authMiddleware`.</Callout>
+
+### NestJS (coming soon)
+
+NestJS appears in the framework selection prompt but displays a warning if selected and re-prompts. It is not yet generated.

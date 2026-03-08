@@ -1,0 +1,156 @@
+---
+title: Modules Overview
+description: The modular architecture of better-ts-stack projects
+---
+
+import { Callout } from "fumadocs-ui/components/callout";
+import { Card, Cards } from "fumadocs-ui/components/card";
+import { Container, Database, Layout, Server, Shield } from "lucide-react";
+
+## Modular by Design
+
+better-ts-stack composes projects from independent modules. Each module contributes its own template files, npm dependencies, scripts, and environment variables. Only the modules you select are included.
+
+---
+
+## Available Modules
+
+<Cards>
+  <Card title="Backend" href="/docs/modules/backend" icon={<Server className="text-blue-400" />}>
+    Express.js server with TypeScript, routing, and middleware — the foundation of every `backend` app type project
+  </Card>
+
+<Card
+  title="Frontend"
+  href="/docs/modules/frontend"
+  icon={<Layout className="text-green-400" />}
+>
+  Next.js 16 with React 19 and Tailwind CSS v4 — automatically selected for
+  every `fullstack` app type project
+</Card>
+
+<Card
+  title="Database"
+  href="/docs/modules/database"
+  icon={<Database className="text-purple-400" />}
+>
+  PostgreSQL (Prisma or Drizzle) or MongoDB (Mongoose) — selected in a two-step
+  prompt
+</Card>
+
+<Card
+  title="Auth"
+  href="/docs/modules/auth"
+  icon={<Shield className="text-yellow-400" />}
+>
+  JWT + bcrypt for Express, Better Auth for Next.js (requires a database)
+</Card>
+
+  <Card title="Docker" href="/docs/modules/docker" icon={<Container className="text-blue-400" />}>
+    Multi-stage Dockerfile and docker-compose.yml — optional for any app type
+  </Card>
+</Cards>
+
+---
+
+## How Modules Are Selected
+
+The CLI prompts govern which modules are included:
+
+| Prompt answer                             | Module(s) activated                    |
+| ----------------------------------------- | -------------------------------------- |
+| App type = `backend`                      | Express base module                    |
+| App type = `fullstack`                    | Next.js base module (auto)             |
+| Database = `postgresql` + ORM = `prisma`  | Prisma module for the chosen framework |
+| Database = `postgresql` + ORM = `drizzle` | Drizzle module (Next.js only)          |
+| Database = `mongodb` + ORM = `mongoose`   | Mongoose module (Express only)         |
+| Auth = `yes` (Express)                    | JWT auth module                        |
+| Auth = `yes` (Next.js, database selected) | Better Auth module                     |
+| Docker = `yes`                            | Docker module                          |
+
+<Callout type="info">
+  Better Auth is only prompted for Next.js projects when a database has been
+  selected. If database type is `none`, auth is skipped automatically.
+</Callout>
+
+---
+
+## How Module Merging Works
+
+When you select multiple modules, the CLI merges their `config.json` configurations:
+
+- **Dependencies**: merged into a single `package.json`
+- **Scripts**: merged — later modules can add new scripts
+- **Environment variables**: merged into `.env.example` / `.env`
+- **Template files**: each module's files are copied into the project
+
+### Example: Express + PostgreSQL + Prisma + JWT Auth
+
+The final `package.json` will include:
+
+```json
+{
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "morgan": "^1.10.0",
+    "dotenv": "^16.3.1",
+    "@prisma/client": "^7.4.1",
+    "bcrypt": "^5.1.1",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "lint": "eslint src",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "type:check": "tsc --noEmit",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio",
+    "prisma:seed": "tsx prisma/seed.ts"
+  }
+}
+```
+
+---
+
+## Module Availability Matrix
+
+| Module               | Backend (Express) | Full-stack (Next.js) |
+| -------------------- | ----------------- | -------------------- |
+| Express base         | ✅ Always         | —                    |
+| Next.js base         | —                 | ✅ Always            |
+| PostgreSQL + Prisma  | ✅                | ✅                   |
+| PostgreSQL + Drizzle | —                 | ✅                   |
+| MongoDB + Mongoose   | ✅                | —                    |
+| JWT Auth             | ✅                | —                    |
+| Better Auth          | —                 | ✅ (requires DB)     |
+| Docker               | ✅                | ✅                   |
+| NestJS               | 🔜 Coming soon    | —                    |
+
+---
+
+## Extending After Generation
+
+All generated code is plain TypeScript — edit any file freely.
+
+### Adding to the backend
+
+- New routes → `src/routes/`
+- New middleware → `src/middleware/`
+- New controllers → `src/controllers/`
+
+### Adding to the frontend
+
+- New pages → `app/`
+- New API routes → `app/api/`
+- New components → `components/`
+
+### Adding to the database
+
+- Prisma: edit `prisma/schema.prisma`, then run `npm run prisma:migrate`
+- Drizzle: edit `lib/schema.ts`, then run `npm run db:generate && npm run db:migrate`
+- Mongoose: add new model files to `src/models/`

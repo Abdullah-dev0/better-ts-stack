@@ -1,0 +1,377 @@
+---
+title: Project Templates
+description: What files and code better-ts-stack actually generates
+---
+
+import { Callout } from "fumadocs-ui/components/callout";
+import { File, Files, Folder } from "fumadocs-ui/components/files";
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
+
+## Template System
+
+better-ts-stack uses **Handlebars** (`.hbs`) templates to generate projects. Templates live in `cli/templates/` and are composed based on your selected modules, with each module contributing its own files, dependencies, and scripts.
+
+```
+cli/templates/
+├── backend/
+│   └── express/           # Express base template
+│       ├── src/
+│       │   ├── index.ts
+│       │   └── routes/health.ts
+│       └── config.json    # base scripts, deps, envVars
+├── frontend/
+│   └── nextjs/            # Next.js base template
+│       ├── app/           # layout.tsx, page.tsx, globals.css
+│       ├── public/
+│       ├── proxy.ts.hbs   # rendered to proxy.ts
+│       └── config.json
+└── modules/
+    ├── auth/
+    │   ├── express/       # JWT auth files
+    │   └── nextjs/        # Better Auth files
+    ├── docker/            # Dockerfile, docker-compose.yml, .dockerignore
+    ├── prisma/
+    │   ├── express/
+    │   └── nextjs/
+    ├── drizzle/
+    │   └── nextjs/
+    └── mongoose/          # src/lib/db.ts.hbs, src/models/User.ts
+```
+
+---
+
+## Backend API Template (Express)
+
+Selecting **Backend API** with Express generates:
+
+<Files>
+  <Folder name="my-api" defaultOpen>
+    <Folder name="src" defaultOpen>
+      <File name="index.ts" />
+      <Folder name="routes">
+        <File name="health.ts" />
+      </Folder>
+    </Folder>
+    <File name="package.json" />
+    <File name="tsconfig.json" />
+    <File name=".env" />
+    <File name=".env.example" />
+    <File name=".eslintrc.js" />
+    <File name="eslint.config.mjs" />
+    <File name=".prettierrc" />
+    <File name=".gitignore" />
+  </Folder>
+</Files>
+
+<Callout type="info">
+  The base backend template generates exactly two source files: `src/index.ts`
+  and `src/routes/health.ts`. There is no `app.ts`, `routes/index.ts`,
+  `middleware/errorHandler.ts`, `types/` directory, or `README.md` in the base
+  output.
+</Callout>
+
+### src/index.ts
+
+The entry point configures Express middleware, mounts the health route, and starts the server:
+
+```typescript
+import cors from "cors";
+import dotenv from "dotenv";
+import express, { Express, Request, Response } from "express";
+import helmet from "helmet";
+import morgan from "morgan";
+
+import healthRouter from "./routes/health";
+
+dotenv.config();
+
+const app: Express = express();
+const port = process.env.PORT || 3000;
+
+app.use(helmet());
+app.use(cors());
+app.use(morgan("dev"));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use("/health", healthRouter);
+
+// 404 handler
+app.use((_req: Request, res: Response) => {
+  res.status(404).json({ error: "Not Found" });
+});
+
+// Error handler
+app.use((err: Error, _req: Request, res: Response) => {
+  console.error(err.stack);
+  res.status(500).json({ error: "Internal Server Error" });
+});
+
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
+});
+
+export default app;
+```
+
+### Generated package.json scripts
+
+```json
+{
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "type:check": "tsc --noEmit"
+  }
+}
+```
+
+> With **bun** as the package manager, `dev` becomes `bun --watch src/index.ts`.
+
+---
+
+## Full-stack Template (Next.js)
+
+Selecting **Full-stack** generates a single Next.js 16 application at the project root. There are no separate `backend/` or `frontend/` subdirectories.
+
+<Files>
+  <Folder name="my-app" defaultOpen>
+    <Folder name="app" defaultOpen>
+      <File name="layout.tsx" />
+      <File name="page.tsx" />
+      <File name="globals.css" />
+    </Folder>
+    <Folder name="public">
+      <File name="(static assets)" />
+    </Folder>
+    <File name="proxy.ts" />
+    <File name="next.config.ts" />
+    <File name="postcss.config.mjs" />
+    <File name="tsconfig.json" />
+    <File name="eslint.config.mjs" />
+    <File name="next-env.d.ts" />
+    <File name="package.json" />
+    <File name=".env" />
+    <File name=".env.example" />
+    <File name=".gitignore" />
+  </Folder>
+</Files>
+
+<Callout type="info">
+  The Next.js base template does not generate `components/ui`, `lib/utils.ts`,
+  or any example API client. Those can be added by you after generation.
+</Callout>
+
+### Generated package.json scripts
+
+```json
+{
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  }
+}
+```
+
+---
+
+## With Database Modules
+
+### PostgreSQL + Prisma
+
+<Tabs items={['Express', 'Next.js']}>
+  <Tab value="Express">
+    <Files>
+      <Folder name="prisma" defaultOpen>
+        <File name="schema.prisma" />
+      </Folder>
+      <Folder name="src" defaultOpen>
+        <Folder name="lib">
+          <File name="prisma.ts" />
+        </Folder>
+      </Folder>
+    </Files>
+
+    Scripts added to `package.json`:
+    ```bash
+    npm run prisma:generate
+    npm run prisma:migrate   # prisma migrate dev
+    npm run prisma:studio
+    npm run prisma:seed      # tsx prisma/seed.ts
+    ```
+
+    Environment variable added: `DATABASE_URL`
+
+  </Tab>
+  <Tab value="Next.js">
+    <Files>
+      <Folder name="prisma" defaultOpen>
+        <File name="schema.prisma" />
+      </Folder>
+      <File name="prisma.config.ts" />
+      <Folder name="lib" defaultOpen>
+        <File name="prisma.ts" />
+      </Folder>
+    </Files>
+
+    Scripts added to `package.json`:
+    ```bash
+    npm run prisma:generate
+    npm run prisma:migrate   # prisma migrate dev
+    npm run prisma:studio
+    ```
+
+    Environment variable added: `DATABASE_URL`
+
+    <Callout type="info">
+      In Next.js projects, Prisma reads `DATABASE_URL` through `prisma.config.ts`.
+      If Better Auth is also enabled, the generated `schema.prisma` includes the
+      Better Auth core tables.
+    </Callout>
+
+  </Tab>
+</Tabs>
+
+### PostgreSQL + Drizzle _(Next.js only)_
+
+<Files>
+  <Folder name="lib" defaultOpen>
+    <File name="schema.ts" />
+    <File name="db.ts" />
+  </Folder>
+  <File name="drizzle.config.ts" />
+</Files>
+
+Scripts added to `package.json`:
+
+```bash
+npm run db:generate  # drizzle-kit generate
+npm run db:migrate   # drizzle-kit migrate
+npm run db:studio    # drizzle-kit studio
+```
+
+Environment variable added: `DATABASE_URL`
+
+<Callout type="tip">
+  If Better Auth is also enabled with Drizzle, the generated `lib/schema.ts`
+  contains the Better Auth core tables instead of a sample table.
+</Callout>
+
+### MongoDB + Mongoose _(Express only)_
+
+<Files>
+  <Folder name="src" defaultOpen>
+    <Folder name="lib">
+      <File name="db.ts" />
+    </Folder>
+    <Folder name="models">
+      <File name="User.ts" />
+    </Folder>
+  </Folder>
+</Files>
+
+Environment variable added: `MONGODB_URI`
+
+> Mongoose adds no extra npm scripts. The connection is established in `src/lib/db.ts`.
+
+---
+
+## With Auth Module
+
+<Tabs items={['Express — JWT', 'Next.js — Better Auth']}>
+  <Tab value="Express — JWT">
+    <Files>
+      <Folder name="src" defaultOpen>
+        <Folder name="lib">
+          <File name="jwt.ts" />
+        </Folder>
+        <Folder name="middleware">
+          <File name="requireAuth.ts" />
+        </Folder>
+        <Folder name="services">
+          <File name="userStore.ts" />
+        </Folder>
+        <Folder name="controllers">
+          <File name="authController.ts" />
+        </Folder>
+        <Folder name="routes">
+          <File name="auth.ts" />
+        </Folder>
+      </Folder>
+    </Files>
+
+    Environment variables added: `JWT_SECRET`, `JWT_EXPIRES_IN`
+
+    The auth router is mounted at `/auth` in `src/index.ts`.
+
+  </Tab>
+  <Tab value="Next.js — Better Auth">
+    <Files>
+      <Folder name="lib" defaultOpen>
+        <File name="auth.ts" />
+        <File name="auth-client.ts" />
+      </Folder>
+      <Folder name="app" defaultOpen>
+        <Folder name="api">
+          <Folder name="auth">
+            <Folder name="[...all]">
+              <File name="route.ts" />
+            </Folder>
+          </Folder>
+        </Folder>
+      </Folder>
+    </Files>
+
+    Environment variables added: `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`
+
+    <Callout type="info">
+      Better Auth in Next.js is only generated when a database is selected.
+      The `lib/auth.ts` template uses the matching adapter (Prisma or Drizzle)
+      based on your ORM choice.
+    </Callout>
+
+  </Tab>
+</Tabs>
+
+---
+
+## With Docker Module
+
+<Files>
+  <Folder name="project-root" defaultOpen>
+    <File name="Dockerfile" />
+    <File name="docker-compose.yml" />
+    <File name=".dockerignore" />
+  </Folder>
+</Files>
+
+The `Dockerfile` is framework-aware: it uses a Next.js standalone output stage for Full-stack projects and a Node.js multi-stage build for Express backends.
+
+Scripts added to `package.json`:
+
+```bash
+npm run docker:build  # docker build -t <projectName> .
+npm run docker:up     # docker-compose up -d
+npm run docker:down   # docker-compose down
+npm run docker:logs   # docker-compose logs -f
+```
+
+---
+
+## Supported Combinations
+
+| App type   | Database   | ORM/ODM  | Auth        | Status         |
+| ---------- | ---------- | -------- | ----------- | -------------- |
+| Backend    | none       | —        | JWT         | ✅             |
+| Backend    | PostgreSQL | Prisma   | JWT         | ✅             |
+| Backend    | MongoDB    | Mongoose | JWT         | ✅             |
+| Full-stack | none       | —        | —           | ✅             |
+| Full-stack | PostgreSQL | Prisma   | Better Auth | ✅             |
+| Full-stack | PostgreSQL | Drizzle  | Better Auth | ✅             |
+| Backend    | NestJS     | —        | —           | 🔜 Coming soon |

@@ -1,0 +1,126 @@
+---
+title: Installation
+description: Install better-ts-stack globally or run on-demand with npx
+---
+
+import { Callout } from "fumadocs-ui/components/callout";
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
+
+## Installation Methods
+
+### Method 1: npx (Recommended)
+
+Run without installing anything:
+
+```bash
+npx better-ts-stack
+```
+
+**Pros**
+
+- Always fetches the latest published version
+- No global installation needed
+- No permission issues
+
+**Cons**
+
+- Slight startup delay on the first run (downloads the package)
+- Requires an internet connection
+
+---
+
+### Method 2: Global install
+
+Install once and run from anywhere:
+
+<Tabs items={["npm", "pnpm", "bun"]}>
+  <Tab value="npm">
+    ```bash npm install -g better-ts-stack better-ts-stack ```
+  </Tab>
+  <Tab value="pnpm">
+    ```bash pnpm add -g better-ts-stack better-ts-stack ```
+  </Tab>
+  <Tab value="bun">```bash bun add -g better-ts-stack better-ts-stack ```</Tab>
+</Tabs>
+
+**Pros**
+
+- Faster execution on repeat runs
+- Works offline after first install
+
+**Cons**
+
+- Manual update required (`npm update -g better-ts-stack`)
+- May require elevated permissions on some systems
+
+<Callout type="info">
+  **Update a global install:** ```bash npm update -g better-ts-stack ```
+</Callout>
+
+---
+
+### Method 3: pnpm dlx / bunx
+
+Equivalent to `npx` for pnpm and Bun users:
+
+```bash
+pnpm dlx better-ts-stack
+# or
+bunx better-ts-stack
+```
+
+---
+
+## Troubleshooting
+
+### "Command not found" after global install
+
+Your package manager's global bin directory may not be in your `PATH`.
+
+<Tabs items={['Linux / macOS', 'Windows']}>
+  <Tab value="Linux / macOS">
+    ```bash
+    # Find where npm installs global packages
+    npm config get prefix
+
+    # Add <prefix>/bin to your shell profile (~/.bashrc or ~/.zshrc):
+    export PATH="$PATH:$(npm config get prefix)/bin"
+    ```
+
+  </Tab>
+  <Tab value="Windows">
+    ```powershell
+    # Find the global location
+    npm config get prefix
+
+    # Add that path (+ \node_modules\.bin) to your PATH
+    # via System Properties > Environment Variables
+    ```
+
+  </Tab>
+</Tabs>
+
+### Permission errors on Linux / macOS
+
+Avoid running npm with `sudo`. Instead, configure npm to use a user-writable directory:
+
+```bash
+mkdir ~/.npm-global
+npm config set prefix '~/.npm-global'
+echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.bashrc
+source ~/.bashrc
+
+# Now install without sudo
+npm install -g better-ts-stack
+```
+
+---
+
+## Which Method Should You Use?
+
+| Scenario                | Recommended method          |
+| ----------------------- | --------------------------- |
+| First time trying it    | `npx better-ts-stack`       |
+| Frequent everyday use   | Global install              |
+| CI/CD pipeline          | `npx better-ts-stack`       |
+| Specific version pinned | `npx better-ts-stack@x.y.z` |

@@ -35,13 +35,22 @@ The Database module adds database connectivity to your project. Selection happen
 
 <Tabs items={["Express", "Next.js"]}>
   <Tab value="Express">
-    ```text prisma/ schema.prisma # Database schema src/ lib/ prisma.ts # Prisma
-    client singleton ```
+    ```text
+    prisma/
+      schema.prisma   # Database schema
+    src/
+      lib/
+        prisma.ts     # Prisma client singleton
+    ```
   </Tab>
   <Tab value="Next.js">
-    ```text prisma/ schema.prisma # Database schema (rendered from .hbs
-    template) prisma.config.ts # Datasource URL configuration lib/ prisma.ts #
-    Prisma client with pg adapter ```
+    ```text
+    prisma/
+      schema.prisma    # Database schema (rendered from .hbs template)
+    prisma.config.ts   # Datasource URL configuration
+    lib/
+      prisma.ts        # Prisma client with pg adapter
+    ```
   </Tab>
 </Tabs>
 
@@ -136,13 +145,19 @@ The Database module adds database connectivity to your project. Selection happen
 
 <Tabs items={["Express", "Next.js"]}>
   <Tab value="Express">
-    ```bash npm run prisma:generate # prisma generate npm run prisma:migrate #
-    prisma migrate dev npm run prisma:studio # prisma studio npm run prisma:seed
-    # tsx prisma/seed.ts ```
+    ```bash
+    npm run prisma:generate # prisma generate
+    npm run prisma:migrate  # prisma migrate dev
+    npm run prisma:studio   # prisma studio
+    npm run prisma:seed     # tsx prisma/seed.ts
+    ```
   </Tab>
   <Tab value="Next.js">
-    ```bash npm run prisma:generate # prisma generate npm run prisma:migrate #
-    prisma migrate dev npm run prisma:studio # prisma studio ```
+    ```bash
+    npm run prisma:generate # prisma generate
+    npm run prisma:migrate  # prisma migrate dev
+    npm run prisma:studio   # prisma studio
+    ```
   </Tab>
 </Tabs>
 

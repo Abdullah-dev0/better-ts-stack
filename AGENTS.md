@@ -4,16 +4,25 @@
 
 TypeScript CLI monorepo that generates fully configured TypeScript projects with backend, frontend, database, Docker support via interactive setup.
 
-**Structure:** `cli/` (Node.js CLI generator), `client/` (Next.js 16 + React 19 docs site)
+**Structure:** Turborepo monorepo with `apps/cli` (Node.js CLI generator), `apps/docs` (Next.js 16 + React 19 docs site), and `packages/eslint-config` and `packages/prettier-config` (shared configs).
 
-> Note: This is a multi-package repository without npm workspaces. Run commands from individual directories.
+> Run commands from the repo root using Turbo, or from individual package directories.
 
 ## Build, Lint & Development Commands
 
-### CLI (cli/)
+### From repo root (recommended)
 
 ```bash
-cd cli
+npm run dev            # Run dev in all packages
+npm run build          # Build all packages
+npm run lint           # Lint all packages
+npm run type:check     # Type-check all packages
+```
+
+### CLI (apps/cli/)
+
+```bash
+cd apps/cli
 npm run dev            # CLI with hot reload (tsx)
 npm run build          # Compile TypeScript
 npm run start          # Run compiled CLI
@@ -24,10 +33,10 @@ npm run format:check   # Check formatting
 npm run type:check     # TypeScript check (no emit)
 ```
 
-### Client (client/)
+### Docs (apps/docs/)
 
 ```bash
-cd client
+cd apps/docs
 npm run dev            # Next.js dev server
 npm run build          # Production build
 npm run start          # Run production server
@@ -48,7 +57,7 @@ No test framework configured. When added: CLI: `npx vitest run <file>`, Client: 
 
 **Client:** ES2017, ESNext modules, strict, react-jsx, `@/*` path alias
 
-### Formatting (Prettier - CLI only)
+### Formatting (Prettier - shared via `@better-ts-stack/prettier-config`)
 
 Semi-colons required, double quotes, ES5 trailing commas, print width 80, tab width 2 spaces, arrow functions always parentheses, LF line endings.
 
@@ -56,23 +65,24 @@ Semi-colons required, double quotes, ES5 trailing commas, print width 80, tab wi
 
 ### ESLint Rules
 
-- CLI: no-unused-vars (error), no-floating-promises (error), no-explicit-any (warn), no-console (off)
-- Client: eslint-config-next with core-web-vitals
+- CLI: uses `@better-ts-stack/eslint-config/node`, no-unused-vars (error), no-floating-promises (error), no-explicit-any (warn), no-console (off)
+- Docs: eslint-config-next with core-web-vitals
 
 ### Naming Conventions
 
-| Type | Convention | Example |
-|------|------------|---------|
-| Functions/variables | camelCase | `buildProject` |
-| Types/Interfaces | PascalCase | `ProjectConfig` |
-| Constants | UPPER_SNAKE_CASE | `DEFAULT_PORT` |
-| React components | PascalCase | `Button` |
-| Files | match main export | `button.tsx` |
-| Booleans | is/has prefix | `isEnabled` |
+| Type                | Convention        | Example         |
+| ------------------- | ----------------- | --------------- |
+| Functions/variables | camelCase         | `buildProject`  |
+| Types/Interfaces    | PascalCase        | `ProjectConfig` |
+| Constants           | UPPER_SNAKE_CASE  | `DEFAULT_PORT`  |
+| React components    | PascalCase        | `Button`        |
+| Files               | match main export | `button.tsx`    |
+| Booleans            | is/has prefix     | `isEnabled`     |
 
 ### Import Patterns
 
 **CLI:** Use `node:` prefix for built-ins, named exports for utilities
+
 ```typescript
 import path from "node:path";
 import { cwd } from "node:process";
@@ -80,7 +90,8 @@ import fs from "fs-extra";
 import { buildError } from "./types";
 ```
 
-**Client:** Use `@/` path alias, prefer server components
+**Docs:** Use `@/` path alias, prefer server components
+
 ```typescript
 import * as React from "react";
 import { cn } from "@/lib/utils";
@@ -96,6 +107,7 @@ import { cn } from "@/lib/utils";
 
 - Default: Server Components (no directive needed)
 - Use `"use client"` only when needed (useState, useEffect, event handlers)
+
 ```typescript
 "use client";
 import * as React from "react";
@@ -106,7 +118,7 @@ export function Component({ children, ...props }: React.ComponentProps<typeof So
 
 ## Architecture
 
-### CLI (`cli/src/`)
+### CLI (`apps/cli/src/`)
 
 ```
 src/
@@ -122,7 +134,7 @@ src/
 
 Patterns: Barrel exports via `index.ts`, feature folders, pure functions, async/await, Zod validation, consola logging
 
-### Client (`client/`)
+### Docs (`apps/docs/`)
 
 ```
 app/
@@ -138,7 +150,7 @@ components/
 
 Patterns: Next.js App Router, Server Components default, Tailwind CSS v4, Radix UI, fumadocs
 
-### Templates (`cli/templates/`)
+### Templates (`apps/cli/templates/`)
 
 - `backend/express/` - Express.js template
 - `frontend/nextjs/` - Next.js template
@@ -146,19 +158,21 @@ Patterns: Next.js App Router, Server Components default, Tailwind CSS v4, Radix 
 
 ## Module System
 
-Modules in `cli/templates/modules/` have `ModuleConfig` with: id, name, type ("base" | "database" | "feature"), dependencies, devDependencies, scripts, envVars, templateFiles.
+Modules in `apps/cli/templates/modules/` have `ModuleConfig` with: id, name, type ("base" | "database" | "feature"), dependencies, devDependencies, scripts, envVars, templateFiles.
 
 ## Dependencies
 
 **CLI:** @clack/prompts, consola, fs-extra, handlebars, zod
 
-**Client:** next, react 19, @radix-ui/react-slot, tailwindcss v4, motion, fumadocs-ui, lucide-react
+**Docs:** next, react 19, @radix-ui/react-slot, tailwindcss v4, motion, fumadocs-ui, lucide-react
+
+**Shared packages:** `@better-ts-stack/eslint-config`, `@better-ts-stack/prettier-config`
 
 ## Important Notes
 
 - Node.js 18+ required
-- Run `npm run lint && npm run type:check` before committing (in each workspace)
+- Run `npm run lint && npm run type:check` from root before committing
 - CLI console output is expected (not an error)
 - Use `buildError()` for all CLI error handling
-- Husky + lint-staged configured in CLI: runs ESLint fix and Prettier on staged files
+- Husky + lint-staged configured at repo root: runs ESLint fix and Prettier on staged files
 - No Cursor or Copilot rules configured

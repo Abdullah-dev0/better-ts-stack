@@ -1,0 +1,306 @@
+---
+title: Project Structure
+description: Understanding the file layout of a generated better-ts-stack project
+---
+
+import { Callout } from "fumadocs-ui/components/callout";
+import { File, Files, Folder } from "fumadocs-ui/components/files";
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
+
+## Overview
+
+The exact layout of a generated project depends on the options you select. This page shows the realistic structures for common combinations.
+
+---
+
+## Backend API — Express
+
+### Base (no optional modules)
+
+<Files>
+  <Folder name="my-api" defaultOpen>
+    <Folder name="src" defaultOpen>
+      <File name="index.ts" />
+      <Folder name="routes">
+        <File name="health.ts" />
+      </Folder>
+    </Folder>
+    <File name="package.json" />
+    <File name="tsconfig.json" />
+    <File name=".env" />
+    <File name=".env.example" />
+    <File name=".eslintrc.js" />
+    <File name="eslint.config.mjs" />
+    <File name=".prettierrc" />
+    <File name=".gitignore" />
+  </Folder>
+</Files>
+
+<Callout type="info">
+  The base Express template generates only `src/index.ts` and
+  `src/routes/health.ts`. No `app.ts`, `routes/index.ts`,
+  `middleware/errorHandler.ts`, `types/`, or `README.md` are created.
+</Callout>
+
+### With PostgreSQL + Prisma + JWT Auth + Docker
+
+<Files>
+  <Folder name="my-api" defaultOpen>
+    <Folder name="prisma" defaultOpen>
+      <File name="schema.prisma" />
+    </Folder>
+    <Folder name="src" defaultOpen>
+      <File name="index.ts" />
+      <Folder name="lib">
+        <File name="prisma.ts" />
+        <File name="jwt.ts" />
+      </Folder>
+      <Folder name="middleware">
+        <File name="requireAuth.ts" />
+      </Folder>
+      <Folder name="services">
+        <File name="userStore.ts" />
+      </Folder>
+      <Folder name="controllers">
+        <File name="authController.ts" />
+      </Folder>
+      <Folder name="routes">
+        <File name="health.ts" />
+        <File name="auth.ts" />
+      </Folder>
+    </Folder>
+    <File name="Dockerfile" />
+    <File name="docker-compose.yml" />
+    <File name=".dockerignore" />
+    <File name="package.json" />
+    <File name="tsconfig.json" />
+    <File name=".env" />
+    <File name=".env.example" />
+    <File name=".gitignore" />
+  </Folder>
+</Files>
+
+### With MongoDB + Mongoose + JWT Auth
+
+<Files>
+  <Folder name="my-api" defaultOpen>
+    <Folder name="src" defaultOpen>
+      <File name="index.ts" />
+      <Folder name="lib">
+        <File name="db.ts" />
+        <File name="jwt.ts" />
+      </Folder>
+      <Folder name="middleware">
+        <File name="requireAuth.ts" />
+      </Folder>
+      <Folder name="services">
+        <File name="userStore.ts" />
+      </Folder>
+      <Folder name="controllers">
+        <File name="authController.ts" />
+      </Folder>
+      <Folder name="models">
+        <File name="User.ts" />
+      </Folder>
+      <Folder name="routes">
+        <File name="health.ts" />
+        <File name="auth.ts" />
+      </Folder>
+    </Folder>
+    <File name="package.json" />
+    <File name="tsconfig.json" />
+    <File name=".env" />
+    <File name=".env.example" />
+    <File name=".gitignore" />
+  </Folder>
+</Files>
+
+---
+
+## Full-stack — Next.js
+
+A full-stack project is a **single Next.js application** at the project root. There is no separate `backend/` or `frontend/` directory.
+
+### Base (no optional modules)
+
+<Files>
+  <Folder name="my-app" defaultOpen>
+    <Folder name="app" defaultOpen>
+      <File name="layout.tsx" />
+      <File name="page.tsx" />
+      <File name="globals.css" />
+    </Folder>
+    <Folder name="public">
+      <File name="(static assets)" />
+    </Folder>
+    <File name="proxy.ts" />
+    <File name="next.config.ts" />
+    <File name="postcss.config.mjs" />
+    <File name="tsconfig.json" />
+    <File name="eslint.config.mjs" />
+    <File name="next-env.d.ts" />
+    <File name="package.json" />
+    <File name=".env" />
+    <File name=".env.example" />
+    <File name=".gitignore" />
+  </Folder>
+</Files>
+
+### With PostgreSQL + Prisma + Better Auth + Docker
+
+<Files>
+  <Folder name="my-app" defaultOpen>
+    <Folder name="app" defaultOpen>
+      <File name="layout.tsx" />
+      <File name="page.tsx" />
+      <File name="globals.css" />
+      <Folder name="api">
+        <Folder name="auth">
+          <Folder name="[...all]">
+            <File name="route.ts" />
+          </Folder>
+        </Folder>
+      </Folder>
+    </Folder>
+    <Folder name="lib" defaultOpen>
+      <File name="auth.ts" />
+      <File name="auth-client.ts" />
+      <File name="prisma.ts" />
+    </Folder>
+    <Folder name="prisma" defaultOpen>
+      <File name="schema.prisma" />
+    </Folder>
+    <Folder name="public">
+      <File name="(static assets)" />
+    </Folder>
+    <File name="proxy.ts" />
+    <File name="prisma.config.ts" />
+    <File name="next.config.ts" />
+    <File name="postcss.config.mjs" />
+    <File name="tsconfig.json" />
+    <File name="eslint.config.mjs" />
+    <File name="Dockerfile" />
+    <File name="docker-compose.yml" />
+    <File name=".dockerignore" />
+    <File name="package.json" />
+    <File name=".env" />
+    <File name=".env.example" />
+    <File name=".gitignore" />
+  </Folder>
+</Files>
+
+### With PostgreSQL + Drizzle + Better Auth
+
+<Files>
+  <Folder name="my-app" defaultOpen>
+    <Folder name="app" defaultOpen>
+      <File name="layout.tsx" />
+      <File name="page.tsx" />
+      <File name="globals.css" />
+      <Folder name="api">
+        <Folder name="auth">
+          <Folder name="[...all]">
+            <File name="route.ts" />
+          </Folder>
+        </Folder>
+      </Folder>
+    </Folder>
+    <Folder name="lib" defaultOpen>
+      <File name="auth.ts" />
+      <File name="auth-client.ts" />
+      <File name="db.ts" />
+      <File name="schema.ts" />
+    </Folder>
+    <Folder name="public">
+      <File name="(static assets)" />
+    </Folder>
+    <File name="proxy.ts" />
+    <File name="drizzle.config.ts" />
+    <File name="next.config.ts" />
+    <File name="package.json" />
+    <File name=".env" />
+    <File name=".env.example" />
+    <File name=".gitignore" />
+  </Folder>
+</Files>
+
+---
+
+## Key File Descriptions
+
+### Backend
+
+| File                                | Purpose                                                            |
+| ----------------------------------- | ------------------------------------------------------------------ |
+| `src/index.ts`                      | Entry point — configures Express, mounts routes, starts the server |
+| `src/routes/health.ts`              | `GET /health` endpoint                                             |
+| `src/lib/prisma.ts`                 | Prisma client singleton                                            |
+| `src/lib/db.ts`                     | Mongoose connection helper                                         |
+| `src/lib/jwt.ts`                    | JWT sign/verify utilities                                          |
+| `src/middleware/requireAuth.ts`     | Bearer token validation middleware                                 |
+| `src/services/userStore.ts`         | In-memory or DB-backed user lookup for auth                        |
+| `src/controllers/authController.ts` | Register/login request handlers                                    |
+| `src/routes/auth.ts`                | Auth router mounted at `/auth`                                     |
+| `prisma/schema.prisma`              | Prisma schema — edit to add your models                            |
+
+### Full-stack (Next.js)
+
+| File                 | Purpose                                          |
+| -------------------- | ------------------------------------------------ |
+| `app/layout.tsx`     | Root layout with font and metadata               |
+| `app/page.tsx`       | Home page                                        |
+| `app/globals.css`    | Tailwind CSS v4 import + base styles             |
+| `proxy.ts`           | Dev proxy configuration (rendered from template) |
+| `next.config.ts`     | Next.js configuration                            |
+| `postcss.config.mjs` | PostCSS setup for Tailwind                       |
+| `lib/auth.ts`        | Better Auth server configuration                 |
+| `lib/auth-client.ts` | `createAuthClient()` for client components       |
+| `lib/prisma.ts`      | Prisma client with `@prisma/adapter-pg`          |
+| `lib/db.ts`          | Drizzle database connection                      |
+| `lib/schema.ts`      | Drizzle table definitions                        |
+| `prisma.config.ts`   | Prisma datasource URL configuration              |
+| `drizzle.config.ts`  | Drizzle Kit configuration                        |
+
+---
+
+## Environment Variables
+
+Variables are written to `.env.example` (and `.env`) based on selected modules.
+
+### Backend — base
+
+```bash
+NODE_ENV=development
+PORT=3000
+```
+
+### + PostgreSQL (Prisma or Drizzle)
+
+```bash
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/postgres?schema=public"
+```
+
+### + MongoDB (Mongoose)
+
+```bash
+MONGODB_URI="mongodb://localhost:27017/myapp"
+```
+
+### + JWT Auth (Express)
+
+```bash
+JWT_SECRET=please-change-me
+JWT_EXPIRES_IN=1h
+```
+
+### + Better Auth (Next.js)
+
+```bash
+BETTER_AUTH_SECRET=please-change-me-to-a-random-string
+BETTER_AUTH_URL=http://localhost:3000
+```
+
+<Callout type="warn">
+  Always copy `.env.example` to `.env` and replace placeholder values before
+  starting the server. Never commit `.env` to git.
+</Callout>

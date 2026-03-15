@@ -1,4 +1,4 @@
----
+﻿---
 title: Frontend Module
 description: Next.js 16 with React 19, Tailwind CSS v4, and App Router
 ---
@@ -8,7 +8,7 @@ import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 
 ## Overview
 
-The Frontend module generates a Next.js 16 application with React 19 and Tailwind CSS v4. It is automatically selected when you choose the **Full-stack** application type — there is no framework prompt.
+The Frontend module generates a Next.js 16 application with React 19 and Tailwind CSS v4. It is automatically selected when you choose the **Full-stack** application type - there is no framework prompt.
 
 <Callout type="info">
   The frontend module produces a **single Next.js project** at the project root.
@@ -19,11 +19,11 @@ The Frontend module generates a Next.js 16 application with React 19 and Tailwin
 
 ```
 app/
-├── layout.tsx       # Root layout with fonts and metadata
-├── page.tsx         # Home page
-└── globals.css      # Tailwind CSS v4 import + base styles
+|-- layout.tsx       # Root layout with fonts and metadata
+|-- page.tsx         # Home page
+\-- globals.css      # Tailwind CSS v4 import + base styles
 public/              # Static assets (Next.js defaults)
-proxy.ts             # Dev proxy configuration (rendered from proxy.ts.hbs)
+proxy.ts             # Dev proxy configuration
 next.config.ts       # Next.js configuration
 postcss.config.mjs   # PostCSS setup for Tailwind
 tsconfig.json        # TypeScript configuration
@@ -142,9 +142,9 @@ npm run lint   # eslint
 
 If Better Auth is selected (requires a database), the auth module adds:
 
-- `lib/auth.ts` — server-side Better Auth configuration with the matching adapter
-- `lib/auth-client.ts` — `createAuthClient()` for use in client components
-- `app/api/auth/[...all]/route.ts` — the Better Auth route handler
+- `lib/auth.ts` - server-side Better Auth configuration with the matching adapter
+- `lib/auth-client.ts` - `createAuthClient()` for use in client components
+- `app/api/auth/[...all]/route.ts` - the Better Auth route handler
 
 <Tabs items={['Prisma adapter', 'Drizzle adapter']}>
   <Tab value="Prisma adapter">
@@ -272,3 +272,6 @@ export function Header() {
   client"` at the top of the file. All other components default to Server
   Components.
 </Callout>
+
+
+

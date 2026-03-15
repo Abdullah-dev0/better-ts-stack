@@ -3,7 +3,10 @@
   "name": "Prisma ORM",
   "description": "Prisma ORM with PostgreSQL database support",
   "type": "database",
-  "dependencies": { "@prisma/client": "^7.4.1" },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.4.1",
+    "@prisma/client": "^7.4.1"
+  },
   "devDependencies": { "prisma": "^7.4.1" },
   "scripts": {
     "prisma:generate": "prisma generate",

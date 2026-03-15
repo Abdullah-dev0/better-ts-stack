@@ -1,8 +1,8 @@
-import { Request, Response } from 'express';
-import bcrypt from 'bcrypt';
-import { signToken } from '../lib/jwt';
-import { AuthenticatedRequest } from '../middleware/requireAuth';
-import { createUser, findUserByEmail, toPublicUser } from '../services/userStore';
+import { Request, Response } from "express";
+import bcrypt from "bcrypt";
+import { signToken } from "../lib/jwt";
+import { AuthenticatedRequest } from "../middleware/requireAuth";
+import { createUser, findUserByEmail, toPublicUser } from "../services/userStore";
 
 const SALT_ROUNDS = 10;
 
@@ -17,17 +17,20 @@ interface LoginBody {
   password?: string;
 }
 
-export async function register(req: Request, res: Response): Promise<void> {
-  const { email, password, name } = req.body as RegisterBody;
+export async function register(
+  req: Request<object, unknown, RegisterBody>,
+  res: Response,
+): Promise<void> {
+  const { email, password, name } = req.body;
 
   if (!email || !password) {
-    res.status(400).json({ error: 'Email and password are required' });
+    res.status(400).json({ error: "Email and password are required" });
     return;
   }
 
   const existingUser = await findUserByEmail(email);
   if (existingUser) {
-    res.status(409).json({ error: 'User already exists' });
+    res.status(409).json({ error: "User already exists" });
     return;
   }
 
@@ -38,25 +41,28 @@ export async function register(req: Request, res: Response): Promise<void> {
   res.status(201).json({ user: toPublicUser(user), token });
 }
 
-export async function login(req: Request, res: Response): Promise<void> {
-  const { email, password } = req.body as LoginBody;
+export async function login(
+  req: Request<object, unknown, LoginBody>,
+  res: Response,
+): Promise<void> {
+  const { email, password } = req.body;
 
   if (!email || !password) {
-    res.status(400).json({ error: 'Email and password are required' });
+    res.status(400).json({ error: "Email and password are required" });
     return;
   }
 
   const user = await findUserByEmail(email);
 
   if (!user) {
-    res.status(401).json({ error: 'Invalid credentials' });
+    res.status(401).json({ error: "Invalid credentials" });
     return;
   }
 
   const isValidPassword = await bcrypt.compare(password, user.password);
 
   if (!isValidPassword) {
-    res.status(401).json({ error: 'Invalid credentials' });
+    res.status(401).json({ error: "Invalid credentials" });
     return;
   }
 
@@ -67,7 +73,7 @@ export async function login(req: Request, res: Response): Promise<void> {
 
 export function me(req: AuthenticatedRequest, res: Response): void {
   if (!req.user) {
-    res.status(401).json({ error: 'Unauthorized' });
+    res.status(401).json({ error: "Unauthorized" });
     return;
   }
 

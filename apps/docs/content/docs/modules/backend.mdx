@@ -1,4 +1,4 @@
----
+﻿---
 title: Backend Module
 description: Express.js backend with TypeScript, routing, and middleware
 ---
@@ -14,9 +14,9 @@ The Backend module generates a production-ready Express.js server with TypeScrip
 
 ```
 src/
-├── index.ts          # Entry point — configures middleware, mounts routes, starts server
-└── routes/
-    └── health.ts     # GET /health endpoint
+|-- index.ts          # Entry point - configures middleware, mounts routes, starts server
+\-- routes/
+    \-- health.ts     # GET /health endpoint
 ```
 
 <Callout type="info">
@@ -146,11 +146,11 @@ If a database module is selected, the build adds:
 
 If auth is selected, the build adds:
 
-- `src/lib/jwt.ts` — JWT sign/verify utilities
-- `src/middleware/requireAuth.ts` — Bearer token validation middleware
-- `src/services/userStore.ts` — User lookup helper
-- `src/controllers/authController.ts` — Register/login handlers
-- `src/routes/auth.ts` — Router mounted at `/auth`
+- `src/lib/jwt.ts` - JWT sign/verify utilities
+- `src/middleware/requireAuth.ts` - Bearer token validation middleware
+- `src/services/userStore.ts` - User lookup helper
+- `src/controllers/authController.ts` - Register/login handlers
+- `src/routes/auth.ts` - Router mounted at `/auth`
 - `JWT_SECRET` and `JWT_EXPIRES_IN` environment variables
 
 ### + Docker module
@@ -197,3 +197,5 @@ export default router;
 ### NestJS (coming soon)
 
 NestJS appears in the framework selection prompt but displays a warning if selected and re-prompts. It is not yet generated.
+
+

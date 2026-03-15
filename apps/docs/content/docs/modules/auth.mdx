@@ -1,4 +1,4 @@
----
+﻿---
 title: Auth Module
 description: JWT authentication for Express, Better Auth for Next.js
 ---
@@ -13,7 +13,7 @@ The Auth module adds user authentication to your project. The implementation is 
 | Stack                  | Implementation | Requires database                                   |
 | ---------------------- | -------------- | --------------------------------------------------- |
 | **Express backend**    | JWT + bcrypt   | No (uses in-memory user store by default)           |
-| **Next.js full-stack** | Better Auth    | **Yes — only prompted when a database is selected** |
+| **Next.js full-stack** | Better Auth    | **Yes - only prompted when a database is selected** |
 
 <Callout type="info">
   For Next.js projects, the auth prompt is automatically skipped if you chose
@@ -23,22 +23,22 @@ The Auth module adds user authentication to your project. The implementation is 
 
 ---
 
-## Express — JWT Auth
+## Express - JWT Auth
 
 ### Generated files
 
 ```text
 src/
-├── lib/
-│   └── jwt.ts               # JWT sign/verify utilities
-├── middleware/
-│   └── requireAuth.ts       # Bearer token validation middleware
-├── services/
-│   └── userStore.ts         # User lookup helper
-├── controllers/
-│   └── authController.ts    # Register/login request handlers
-└── routes/
-    └── auth.ts              # Router mounted at /auth
+|-- lib/
+|   \-- jwt.ts               # JWT sign/verify utilities
+|-- middleware/
+|   \-- requireAuth.ts       # Bearer token validation middleware
+|-- services/
+|   \-- userStore.ts         # User lookup helper
+|-- controllers/
+|   \-- authController.ts    # Register/login request handlers
+\-- routes/
+    \-- auth.ts              # Router mounted at /auth
 ```
 
 The auth router is registered in `src/index.ts`:
@@ -51,7 +51,7 @@ app.use("/auth", authRouter);
 
 ---
 
-### JWT utility — src/lib/jwt.ts
+### JWT utility - src/lib/jwt.ts
 
 ```typescript
 import jwt from "jsonwebtoken";
@@ -74,7 +74,7 @@ export function verifyToken(token: string): AuthTokenPayload {
 
 ---
 
-### Auth middleware — src/middleware/requireAuth.ts
+### Auth middleware - src/middleware/requireAuth.ts
 
 ```typescript
 import { NextFunction, Request, Response } from "express";
@@ -143,26 +143,26 @@ JWT_EXPIRES_IN=1h
 
 ---
 
-## Next.js — Better Auth
+## Next.js - Better Auth
 
 ### Generated files
 
 ```text
 lib/
-├── auth.ts                          # Better Auth server configuration
-└── auth-client.ts                   # createAuthClient() for client components
+|-- auth.ts                          # Better Auth server configuration
+\-- auth-client.ts                   # createAuthClient() for client components
 app/
-└── api/auth/[...all]/route.ts       # Better Auth route handler
+\-- api/auth/[...all]/route.ts       # Better Auth route handler
 ```
 
 The adapter used in `lib/auth.ts` is determined by your ORM selection:
 
-- **Prisma** → `prismaAdapter` from `better-auth/adapters/prisma`
-- **Drizzle** → `drizzleAdapter` from `better-auth/adapters/drizzle`
+- **Prisma** -> `prismaAdapter` from `better-auth/adapters/prisma`
+- **Drizzle** -> `drizzleAdapter` from `better-auth/adapters/drizzle`
 
 ---
 
-### Better Auth configuration — lib/auth.ts
+### Better Auth configuration - lib/auth.ts
 
 <Tabs items={['Prisma adapter', 'Drizzle adapter']}>
   <Tab value="Prisma adapter">
@@ -201,7 +201,7 @@ The adapter used in `lib/auth.ts` is determined by your ORM selection:
   </Tab>
 </Tabs>
 
-### Route handler — app/api/auth/[...all]/route.ts
+### Route handler - app/api/auth/[...all]/route.ts
 
 ```typescript
 import { toNextJsHandler } from "better-auth/next-js";
@@ -211,7 +211,7 @@ import { auth } from "@/lib/auth";
 export const { GET, POST } = toNextJsHandler(auth);
 ```
 
-### Client helper — lib/auth-client.ts
+### Client helper - lib/auth-client.ts
 
 ```typescript
 import { createAuthClient } from "better-auth/react";
@@ -266,6 +266,8 @@ BETTER_AUTH_URL=http://localhost:3000
 
 1. Set `JWT_SECRET` or `BETTER_AUTH_SECRET` to a long, random string before deploying
 2. Keep tokens short-lived (`JWT_EXPIRES_IN=1h` is the generated default)
-3. Use HTTPS in production — never send tokens over plain HTTP
+3. Use HTTPS in production - never send tokens over plain HTTP
 4. Add rate limiting to auth endpoints to prevent brute-force attacks
 5. Never log or store plain-text passwords
+
+

@@ -1,4 +1,4 @@
----
+﻿---
 title: Interactive Usage
 description: Full walkthrough of the better-ts-stack CLI prompt flow
 ---
@@ -9,7 +9,7 @@ import { Step, Steps } from "fumadocs-ui/components/steps";
 
 ## How the CLI Works
 
-better-ts-stack is entirely **interactive**. There are no subcommands or flags — just run the command and answer the prompts. The CLI generates a complete, configured project based on your choices.
+better-ts-stack is entirely **interactive**. There are no subcommands or flags - just run the command and answer the prompts. The CLI generates a complete, configured project based on your choices.
 
 <Callout type="info">
   Run `npx better-ts-stack` and follow the prompts. That is the only interface.
@@ -32,9 +32,8 @@ You will see an animated banner with the product name and a brief welcome messag
 ### Project name
 
 ```
-◆  Project name:
-│  my-awesome-project
-└
+? Project name:
+  my-awesome-project
 ```
 
 **Rules:**
@@ -51,16 +50,15 @@ You will see an animated banner with the product name and a brief welcome messag
 ### Application type
 
 ```
-◆  Application type:
-│  ● Backend API
-│  ○ Full-stack
-└
+? Application type:
+  (*) Backend API
+  ( ) Full-stack
 ```
 
 | Option          | What it generates                                      |
 | --------------- | ------------------------------------------------------ |
 | **Backend API** | Express.js server (prompts for framework next)         |
-| **Full-stack**  | Next.js 16 app — framework is auto-selected, no prompt |
+| **Full-stack**  | Next.js 16 app - framework is auto-selected, no prompt |
 
 <Callout type="info">
   **Full-stack** generates a single Next.js project at the root of your chosen
@@ -72,15 +70,14 @@ You will see an animated banner with the product name and a brief welcome messag
 ### Backend framework *(Backend API only)*
 
 ```
-◆  Select a backend framework:
-│  ● Express
-│  ○ NestJS (coming soon)
-└
+? Select a backend framework:
+  (*) Express
+  ( ) NestJS (coming soon)
 ```
 
 **Available now:** Express.js
 
-**Coming soon:** NestJS — selecting it shows a warning and re-prompts.
+**Coming soon:** NestJS - selecting it shows a warning and re-prompts.
 
 > This prompt does **not** appear for Full-stack projects. Next.js is selected automatically.
 
@@ -90,11 +87,10 @@ You will see an animated banner with the product name and a brief welcome messag
 ### Database type
 
 ```
-◆  Select a database:
-│  ● none
-│  ○ postgresql
-│  ○ mongodb
-└
+? Select a database:
+  (*) none
+  ( ) postgresql
+  ( ) mongodb
 ```
 
 | Choice         | Availability                                    |
@@ -111,10 +107,9 @@ You will see an animated banner with the product name and a brief welcome messag
 For **PostgreSQL**:
 
 ```
-◆  Select an ORM for postgresql:
-│  ● prisma
-│  ○ drizzle
-└
+? Select an ORM for postgresql:
+  (*) prisma
+  ( ) drizzle
 ```
 
 | ORM     | Available in                               |
@@ -125,10 +120,9 @@ For **PostgreSQL**:
 For **MongoDB**:
 
 ```
-◆  Select an ORM for mongodb:
-│  ● prisma
-│  ○ mongoose
-└
+? Select an ORM for mongodb:
+  (*) prisma
+  ( ) mongoose
 ```
 
 | ODM      | Notes                      |
@@ -144,11 +138,10 @@ For **MongoDB**:
 ### Package manager
 
 ```
-◆  Select a package manager:
-│  ● npm
-│  ○ pnpm
-│  ○ bun
-└
+? Select a package manager:
+  (*) npm
+  ( ) pnpm
+  ( ) bun
 ```
 
 The generated `dev` script and install commands are tailored to your choice. With `bun`, the `dev` script uses `bun --watch` instead of `tsx watch`.
@@ -159,9 +152,8 @@ The generated `dev` script and install commands are tailored to your choice. Wit
 ### Docker
 
 ```
-◆  Use Docker?
-│  ○ yes  ● no
-└
+? Use Docker?
+  ( ) yes  (*) no
 ```
 
 If yes, three files are added: `Dockerfile`, `docker-compose.yml`, and `.dockerignore`.
@@ -172,14 +164,13 @@ If yes, three files are added: `Dockerfile`, `docker-compose.yml`, and `.dockeri
 ### Authentication
 
 ```
-◆  Add authentication?
-│  ○ Yes  ● No
-└
+? Add authentication?
+  ( ) Yes  (*) No
 ```
 
-**Express backend** — JWT-based auth with `jsonwebtoken` and `bcrypt`. Always prompted regardless of database selection.
+**Express backend** - JWT-based auth with `jsonwebtoken` and `bcrypt`. Always prompted regardless of database selection.
 
-**Next.js full-stack** — Better Auth with a database adapter. **This prompt only appears if you selected a database.** If you chose `none` for database, auth is skipped automatically.
+**Next.js full-stack** - Better Auth with a database adapter. **This prompt only appears if you selected a database.** If you chose `none` for database, auth is skipped automatically.
 
 </Step>
 
@@ -187,9 +178,8 @@ If yes, three files are added: `Dockerfile`, `docker-compose.yml`, and `.dockeri
 ### Git initialization
 
 ```
-◆  Init git?
-│  ● yes  ○ no
-└
+? Init git?
+  (*) yes  ( ) no
 ```
 
 If yes, the CLI runs `git init` and creates an initial commit after generating the project files.
@@ -200,9 +190,8 @@ If yes, the CLI runs `git init` and creates an initial commit after generating t
 ### Install dependencies
 
 ```
-◆  Install dependencies now?
-│  ○ yes  ● no
-└
+? Install dependencies now?
+  ( ) yes  (*) no
 ```
 
 If yes, the CLI runs your chosen package manager's install command after generating the project.
@@ -226,9 +215,8 @@ Package Mgr:     npm
 Git Init:        Yes
 Install Deps:    No
 
-◆  Looks good? Ready to build?
-│  ● Yes  ○ No
-└
+? Looks good? Ready to build?
+  (*) Yes  ( ) No
 ```
 
 Select **Yes** to start generation, or **No** to cancel without making changes.
@@ -238,7 +226,7 @@ Select **Yes** to start generation, or **No** to cancel without making changes.
 <Step>
 ### Generation and next steps
 
-The CLI copies template files, processes Handlebars templates, merges module configurations, then optionally installs dependencies and initializes git.
+The CLI generates your project based on your selections, then optionally installs dependencies and initializes git.
 
 On success you will see output similar to:
 
@@ -256,7 +244,7 @@ npm run dev
 
 ## After Generation
 
-### Scripts — Backend (Express)
+### Scripts - Backend (Express)
 
 ```bash
 npm run dev        # tsx watch src/index.ts (hot reload)
@@ -275,7 +263,7 @@ npm run prisma:migrate
 npm run prisma:studio
 ```
 
-With database (Mongoose): no additional scripts — connection is handled in `src/lib/db.ts`.
+With database (Mongoose): no additional scripts - connection is handled in `src/lib/db.ts`.
 
 With Docker:
 
@@ -286,7 +274,7 @@ npm run docker:down
 npm run docker:logs
 ```
 
-### Scripts — Full-stack (Next.js)
+### Scripts - Full-stack (Next.js)
 
 ```bash
 npm run dev    # next dev
@@ -315,13 +303,17 @@ npm run db:studio
 
 ## Tips
 
-1. **Use descriptive project names** — they become folder names and `package.json` names
-2. **Start with defaults** — PostgreSQL + Prisma + Express is the most tested combination
-3. **Add Docker from the start** — easier than retrofitting it later
-4. **Check `.env.example`** — copy it to `.env` and fill in values before starting the server
-5. **Review the generated code** — all files are plain TypeScript; edit them freely
+1. **Use descriptive project names** - they become folder names and `package.json` names
+2. **Start with defaults** - PostgreSQL + Prisma + Express is the most tested combination
+3. **Add Docker from the start** - easier than retrofitting it later
+4. **Check `.env.example`** - copy it to `.env` and fill in values before starting the server
+5. **Review the generated code** - all files are plain TypeScript; edit them freely
 
 <Callout type="info">
   The CLI generates production-ready code as a starting point. Always review and
   test before deploying.
 </Callout>
+
+
+
+

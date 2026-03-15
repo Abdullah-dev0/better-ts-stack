@@ -1,4 +1,4 @@
----
+﻿---
 title: Project Templates
 description: What files and code better-ts-stack actually generates
 ---
@@ -7,39 +7,10 @@ import { Callout } from "fumadocs-ui/components/callout";
 import { File, Files, Folder } from "fumadocs-ui/components/files";
 import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 
-## Template System
-
-better-ts-stack uses **Handlebars** (`.hbs`) templates to generate projects. Templates live in `cli/templates/` and are composed based on your selected modules, with each module contributing its own files, dependencies, and scripts.
-
-```
-cli/templates/
-├── backend/
-│   └── express/           # Express base template
-│       ├── src/
-│       │   ├── index.ts
-│       │   └── routes/health.ts
-│       └── config.json    # base scripts, deps, envVars
-├── frontend/
-│   └── nextjs/            # Next.js base template
-│       ├── app/           # layout.tsx, page.tsx, globals.css
-│       ├── public/
-│       ├── proxy.ts.hbs   # rendered to proxy.ts
-│       └── config.json
-└── modules/
-    ├── auth/
-    │   ├── express/       # JWT auth files
-    │   └── nextjs/        # Better Auth files
-    ├── docker/            # Dockerfile, docker-compose.yml, .dockerignore
-    ├── prisma/
-    │   ├── express/
-    │   └── nextjs/
-    ├── drizzle/
-    │   └── nextjs/
-    └── mongoose/          # src/lib/db.ts.hbs, src/models/User.ts
-```
+This page shows what files and scripts are generated for each selection in
+the CLI.
 
 ---
-
 ## Backend API Template (Express)
 
 Selecting **Backend API** with Express generates:
@@ -284,8 +255,8 @@ Environment variable added: `MONGODB_URI`
 
 ## With Auth Module
 
-<Tabs items={['Express — JWT', 'Next.js — Better Auth']}>
-  <Tab value="Express — JWT">
+<Tabs items={['Express - JWT', 'Next.js - Better Auth']}>
+  <Tab value="Express - JWT">
     <Files>
       <Folder name="src" defaultOpen>
         <Folder name="lib">
@@ -311,7 +282,7 @@ Environment variable added: `MONGODB_URI`
     The auth router is mounted at `/auth` in `src/index.ts`.
 
   </Tab>
-  <Tab value="Next.js — Better Auth">
+  <Tab value="Next.js - Better Auth">
     <Files>
       <Folder name="lib" defaultOpen>
         <File name="auth.ts" />
@@ -368,10 +339,14 @@ npm run docker:logs   # docker-compose logs -f
 
 | App type   | Database   | ORM/ODM  | Auth        | Status         |
 | ---------- | ---------- | -------- | ----------- | -------------- |
-| Backend    | none       | —        | JWT         | ✅             |
-| Backend    | PostgreSQL | Prisma   | JWT         | ✅             |
-| Backend    | MongoDB    | Mongoose | JWT         | ✅             |
-| Full-stack | none       | —        | —           | ✅             |
-| Full-stack | PostgreSQL | Prisma   | Better Auth | ✅             |
-| Full-stack | PostgreSQL | Drizzle  | Better Auth | ✅             |
-| Backend    | NestJS     | —        | —           | 🔜 Coming soon |
+| Backend    | none       | -        | JWT         | Yes          |
+| Backend    | PostgreSQL | Prisma   | JWT         | Yes          |
+| Backend    | MongoDB    | Mongoose | JWT         | Yes          |
+| Full-stack | none       | -        | -           | Yes          |
+| Full-stack | PostgreSQL | Prisma   | Better Auth | Yes          |
+| Full-stack | PostgreSQL | Drizzle  | Better Auth | Yes          |
+| Backend    | NestJS     | -        | -           | Coming soon |
+
+
+
+

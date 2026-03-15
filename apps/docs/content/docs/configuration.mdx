@@ -1,4 +1,4 @@
----
+﻿---
 title: Configuration
 description: Environment variables, package.json, and TypeScript configuration
 ---
@@ -50,9 +50,9 @@ BETTER_AUTH_URL=http://localhost:3000
 
 You can create separate files for different environments:
 
-- `.env.development` — Development-specific
-- `.env.production` — Production-specific
-- `.env.test` — Testing environment
+- `.env.development` - Development-specific
+- `.env.production` - Production-specific
+- `.env.test` - Testing environment
 
 <Callout type="warn">
   **Never commit `.env` files to version control!** Use `.env.example` as a
@@ -228,7 +228,7 @@ See full Dockerfile in [Docker Module](/docs/modules/docker).
 
 ### docker-compose.yml
 
-The generated file is minimal — only the app service is defined:
+The generated file is minimal - only the app service is defined:
 
 ```yaml
 version: "3.8"
@@ -386,3 +386,4 @@ Add to `tsconfig.json`:
   All configuration files are editable after generation. Customize them to fit
   your project's specific needs.
 </Callout>
+

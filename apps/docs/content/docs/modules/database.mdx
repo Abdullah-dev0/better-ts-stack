@@ -1,4 +1,4 @@
----
+﻿---
 title: Database Module
 description: PostgreSQL with Prisma or Drizzle, or MongoDB with Mongoose
 ---
@@ -10,8 +10,8 @@ import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 
 The Database module adds database connectivity to your project. Selection happens in two steps during the CLI prompts:
 
-1. **Database type** — `none`, `postgresql`, or `mongodb`
-2. **ORM/ODM** — shown only when a database was selected
+1. **Database type** - `none`, `postgresql`, or `mongodb`
+2. **ORM/ODM** - shown only when a database was selected
 
 ## Available Options
 
@@ -46,7 +46,7 @@ The Database module adds database connectivity to your project. Selection happen
   <Tab value="Next.js">
     ```text
     prisma/
-      schema.prisma    # Database schema (rendered from .hbs template)
+      schema.prisma    # Database schema
     prisma.config.ts   # Datasource URL configuration
     lib/
       prisma.ts        # Prisma client with pg adapter
@@ -175,7 +175,7 @@ DATABASE_URL="postgresql://postgres:postgres@localhost:5432/postgres?schema=publ
 
 ```text
 lib/
-  schema.ts              # Table definitions (rendered from .hbs template)
+  schema.ts              # Table definitions
   db.ts                  # Drizzle database connection
 drizzle.config.ts        # Drizzle Kit configuration
 ```
@@ -239,7 +239,7 @@ DATABASE_URL="postgresql://user:password@localhost:5432/mydb?schema=public"
 ```text
 src/
   lib/
-    db.ts              # Mongoose connection helper (rendered from .hbs template)
+    db.ts              # Mongoose connection helper
   models/
     User.ts            # Example Mongoose model
 ```
@@ -304,3 +304,5 @@ Mongoose applies schema changes at runtime. For production migrations, use a too
   support across both Express and Next.js, and offers the richest developer
   experience with generated TypeScript types.
 </Callout>
+
+

@@ -1,4 +1,4 @@
----
+﻿---
 title: Project Structure
 description: Understanding the file layout of a generated better-ts-stack project
 ---
@@ -13,7 +13,7 @@ The exact layout of a generated project depends on the options you select. This 
 
 ---
 
-## Backend API — Express
+## Backend API - Express
 
 ### Base (no optional modules)
 
@@ -117,7 +117,7 @@ The exact layout of a generated project depends on the options you select. This 
 
 ---
 
-## Full-stack — Next.js
+## Full-stack - Next.js
 
 A full-stack project is a **single Next.js application** at the project root. There is no separate `backend/` or `frontend/` directory.
 
@@ -232,7 +232,7 @@ A full-stack project is a **single Next.js application** at the project root. Th
 
 | File                                | Purpose                                                            |
 | ----------------------------------- | ------------------------------------------------------------------ |
-| `src/index.ts`                      | Entry point — configures Express, mounts routes, starts the server |
+| `src/index.ts`                      | Entry point - configures Express, mounts routes, starts the server |
 | `src/routes/health.ts`              | `GET /health` endpoint                                             |
 | `src/lib/prisma.ts`                 | Prisma client singleton                                            |
 | `src/lib/db.ts`                     | Mongoose connection helper                                         |
@@ -241,7 +241,7 @@ A full-stack project is a **single Next.js application** at the project root. Th
 | `src/services/userStore.ts`         | In-memory or DB-backed user lookup for auth                        |
 | `src/controllers/authController.ts` | Register/login request handlers                                    |
 | `src/routes/auth.ts`                | Auth router mounted at `/auth`                                     |
-| `prisma/schema.prisma`              | Prisma schema — edit to add your models                            |
+| `prisma/schema.prisma`              | Prisma schema - edit to add your models                            |
 
 ### Full-stack (Next.js)
 
@@ -267,7 +267,7 @@ A full-stack project is a **single Next.js application** at the project root. Th
 
 Variables are written to `.env.example` (and `.env`) based on selected modules.
 
-### Backend — base
+### Backend - base
 
 ```bash
 NODE_ENV=development
@@ -304,3 +304,4 @@ BETTER_AUTH_URL=http://localhost:3000
   Always copy `.env.example` to `.env` and replace placeholder values before
   starting the server. Never commit `.env` to git.
 </Callout>
+

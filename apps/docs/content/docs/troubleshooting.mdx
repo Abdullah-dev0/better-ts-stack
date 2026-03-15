@@ -1,4 +1,4 @@
----
+﻿---
 title: Troubleshooting
 description: Common issues and solutions
 ---
@@ -275,7 +275,7 @@ docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
 cat .env | grep JWT_SECRET
 
 # Should be 32+ characters
-# The default is 1h — use a longer value only if intentional
+# The default is 1h - use a longer value only if intentional
 JWT_EXPIRES_IN=1h
 
 # Restart server after changing .env
@@ -339,10 +339,10 @@ npm cache clean --force
 
 If you're still stuck:
 
-1. **Check the logs** — Run with `DEBUG=* npm run dev` for verbose output
-2. **Check GitHub Issues** — Search [existing issues](https://github.com/abdullah-dev0/better-ts-stack/issues)
-3. **Create minimal reproduction** — Strip down to the simplest case that fails
-4. **Check versions** — Ensure Node.js 18+, npm 9+, TypeScript 5+
+1. **Check the logs** - Run with `DEBUG=* npm run dev` for verbose output
+2. **Check GitHub Issues** - Search [existing issues](https://github.com/abdullah-dev0/better-ts-stack/issues)
+3. **Create minimal reproduction** - Strip down to the simplest case that fails
+4. **Check versions** - Ensure Node.js 18+, npm 9+, TypeScript 5+
 
 ### Debug Mode
 
@@ -375,3 +375,4 @@ lsof -i :5432
   GitHub](https://github.com/abdullah-dev0/better-ts-stack/issues) with your
   error message and steps to reproduce.
 </Callout>
+

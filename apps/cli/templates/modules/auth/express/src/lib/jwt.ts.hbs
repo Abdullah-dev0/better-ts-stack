@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import jwt, { type SignOptions } from "jsonwebtoken";
 
 export interface AuthTokenPayload {
   sub: string;
@@ -10,15 +10,15 @@ const { JWT_SECRET, JWT_EXPIRES_IN } = process.env;
 
 function ensureSecret(): string {
   if (!JWT_SECRET) {
-    throw new Error('JWT_SECRET is not set');
+    throw new Error("JWT_SECRET is not set");
   }
   return JWT_SECRET;
 }
 
 export function signToken(payload: AuthTokenPayload): string {
   const secret = ensureSecret();
-  const expiresIn = JWT_EXPIRES_IN || '1h';
-  return jwt.sign(payload, secret, { expiresIn });
+  const expiresIn = JWT_EXPIRES_IN || "1h";
+  return jwt.sign(payload, secret, { expiresIn } as SignOptions);
 }
 
 export function verifyToken(token: string): AuthTokenPayload {

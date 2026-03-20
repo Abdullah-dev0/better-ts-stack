@@ -5,6 +5,22 @@ import path from "path";
 
 import { buildError, TemplateContext } from "../types";
 
+async function restoreGitignore(targetDir: string): Promise<void> {
+  const npmIgnorePath = path.join(targetDir, ".npmignore");
+  const gitIgnorePath = path.join(targetDir, ".gitignore");
+
+  const [hasNpmIgnore, hasGitIgnore] = await Promise.all([
+    fs.pathExists(npmIgnorePath),
+    fs.pathExists(gitIgnorePath),
+  ]);
+
+  // npm can rewrite template .gitignore files to .npmignore when the CLI is
+  // published, so normalize the generated project back to .gitignore.
+  if (hasNpmIgnore && !hasGitIgnore) {
+    await fs.move(npmIgnorePath, gitIgnorePath);
+  }
+}
+
 // Copies files from a module to the destination, skipping config.json
 export async function copyModuleFiles(
   moduleDir: string,
@@ -23,6 +39,8 @@ export async function copyModuleFiles(
         return basename !== "config.json";
       },
     });
+
+    await restoreGitignore(targetDir);
   } catch (error) {
     throw buildError(
       error,

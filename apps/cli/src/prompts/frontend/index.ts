@@ -105,7 +105,7 @@ export const collectFrontendChoices = async (): Promise<PromptChoices> => {
       },
       initGit: () =>
         confirm({
-          message: "Init git?",
+          message: "Initialize a git repository?",
           initialValue: true,
         }),
 

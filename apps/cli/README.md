@@ -34,7 +34,7 @@ The CLI is entirely interactive — there are no subcommands or flags. It will g
 7. **Authentication** — add auth?
    - Express: JWT-based auth
    - Next.js: Better Auth (only prompted when a database is selected)
-8. **Git** — initialize a git repository with an initial commit?
+8. **Git** — initialize a git repository?
 9. **Install dependencies** — run the install command now?
 
 > The CLI does not prompt for a port. The server port defaults to `3000` via the `PORT` environment variable.
@@ -48,7 +48,7 @@ The CLI is entirely interactive — there are no subcommands or flags. It will g
 - Database connection and ORM setup (if selected)
 - Authentication scaffolding (if selected)
 - Docker files (if selected)
-- Optional git repository with an initial commit
+- Optional git repository initialization
 
 ## Requirements
 

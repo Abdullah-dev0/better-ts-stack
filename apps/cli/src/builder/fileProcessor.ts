@@ -6,16 +6,23 @@ import path from "path";
 import { buildError, TemplateContext } from "../types";
 
 async function restoreGitignore(targetDir: string): Promise<void> {
+  const templateGitignorePath = path.join(targetDir, "gitignore");
   const npmIgnorePath = path.join(targetDir, ".npmignore");
   const gitIgnorePath = path.join(targetDir, ".gitignore");
 
-  const [hasNpmIgnore, hasGitIgnore] = await Promise.all([
+  const [hasTemplateGitignore, hasNpmIgnore, hasGitIgnore] = await Promise.all([
+    fs.pathExists(templateGitignorePath),
     fs.pathExists(npmIgnorePath),
     fs.pathExists(gitIgnorePath),
   ]);
 
-  // npm can rewrite template .gitignore files to .npmignore when the CLI is
-  // published, so normalize the generated project back to .gitignore.
+  // Prefer a plain "gitignore" template file because npm packaging preserves
+  // it reliably, then fall back to ".npmignore" for already-published builds.
+  if (hasTemplateGitignore && !hasGitIgnore) {
+    await fs.move(templateGitignorePath, gitIgnorePath);
+    return;
+  }
+
   if (hasNpmIgnore && !hasGitIgnore) {
     await fs.move(npmIgnorePath, gitIgnorePath);
   }

@@ -133,8 +133,8 @@ Selecting **Full-stack** generates a single Next.js 16 application at the projec
 </Files>
 
 <Callout type="info">
-  The Next.js base template does not generate `components/ui`, `lib/utils.ts`,
-  or any example API client. Those can be added by you after generation.
+  The Next.js base template includes a shadcn-compatible UI foundation:
+  `components.json`, `lib/utils.ts`, and a small `components/ui` starter set.
 </Callout>
 
 ### Generated package.json scripts
@@ -284,11 +284,28 @@ Environment variable added: `MONGODB_URI`
   </Tab>
   <Tab value="Next.js - Better Auth">
     <Files>
+      <Folder name="components" defaultOpen>
+        <Folder name="auth">
+          <File name="sign-in-form.tsx" />
+          <File name="sign-up-form.tsx" />
+          <File name="sign-out-button.tsx" />
+        </Folder>
+      </Folder>
       <Folder name="lib" defaultOpen>
         <File name="auth.ts" />
         <File name="auth-client.ts" />
+        <File name="auth-schema.ts" />
       </Folder>
       <Folder name="app" defaultOpen>
+        <Folder name="sign-in">
+          <File name="page.tsx" />
+        </Folder>
+        <Folder name="sign-up">
+          <File name="page.tsx" />
+        </Folder>
+        <Folder name="dashboard">
+          <File name="page.tsx" />
+        </Folder>
         <Folder name="api">
           <Folder name="auth">
             <Folder name="[...all]">
@@ -300,6 +317,9 @@ Environment variable added: `MONGODB_URI`
     </Files>
 
     Environment variables added: `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`
+
+    The generated auth flow includes login/signup pages, a protected dashboard
+    example, and optimistic proxy redirects to `/sign-in`.
 
     <Callout type="info">
       Better Auth in Next.js is only generated when a database is selected.

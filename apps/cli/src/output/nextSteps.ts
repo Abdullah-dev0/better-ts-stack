@@ -17,6 +17,7 @@ export function generateNextSteps(
   if (isFullstack) {
     if (config.useAuth) {
       steps.push("Set BETTER_AUTH_SECRET and BETTER_AUTH_URL in .env");
+      steps.push("Visit /sign-up to create your first account");
     }
   } else {
     if (config.useAuth) {

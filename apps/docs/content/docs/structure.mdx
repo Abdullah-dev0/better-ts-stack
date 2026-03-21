@@ -130,9 +130,21 @@ A full-stack project is a **single Next.js application** at the project root. Th
       <File name="page.tsx" />
       <File name="globals.css" />
     </Folder>
+    <Folder name="components" defaultOpen>
+      <Folder name="ui">
+        <File name="button.tsx" />
+        <File name="card.tsx" />
+        <File name="field.tsx" />
+        <File name="input.tsx" />
+      </Folder>
+    </Folder>
+    <Folder name="lib">
+      <File name="utils.ts" />
+    </Folder>
     <Folder name="public">
       <File name="(static assets)" />
     </Folder>
+    <File name="components.json" />
     <File name="proxy.ts" />
     <File name="next.config.ts" />
     <File name="postcss.config.mjs" />
@@ -154,6 +166,15 @@ A full-stack project is a **single Next.js application** at the project root. Th
       <File name="layout.tsx" />
       <File name="page.tsx" />
       <File name="globals.css" />
+      <Folder name="sign-in">
+        <File name="page.tsx" />
+      </Folder>
+      <Folder name="sign-up">
+        <File name="page.tsx" />
+      </Folder>
+      <Folder name="dashboard">
+        <File name="page.tsx" />
+      </Folder>
       <Folder name="api">
         <Folder name="auth">
           <Folder name="[...all]">
@@ -162,10 +183,25 @@ A full-stack project is a **single Next.js application** at the project root. Th
         </Folder>
       </Folder>
     </Folder>
+    <Folder name="components" defaultOpen>
+      <Folder name="auth">
+        <File name="sign-in-form.tsx" />
+        <File name="sign-up-form.tsx" />
+        <File name="sign-out-button.tsx" />
+      </Folder>
+      <Folder name="ui">
+        <File name="button.tsx" />
+        <File name="card.tsx" />
+        <File name="field.tsx" />
+        <File name="input.tsx" />
+      </Folder>
+    </Folder>
     <Folder name="lib" defaultOpen>
       <File name="auth.ts" />
       <File name="auth-client.ts" />
+      <File name="auth-schema.ts" />
       <File name="prisma.ts" />
+      <File name="utils.ts" />
     </Folder>
     <Folder name="prisma" defaultOpen>
       <File name="schema.prisma" />
@@ -197,6 +233,15 @@ A full-stack project is a **single Next.js application** at the project root. Th
       <File name="layout.tsx" />
       <File name="page.tsx" />
       <File name="globals.css" />
+      <Folder name="sign-in">
+        <File name="page.tsx" />
+      </Folder>
+      <Folder name="sign-up">
+        <File name="page.tsx" />
+      </Folder>
+      <Folder name="dashboard">
+        <File name="page.tsx" />
+      </Folder>
       <Folder name="api">
         <Folder name="auth">
           <Folder name="[...all]">
@@ -205,11 +250,26 @@ A full-stack project is a **single Next.js application** at the project root. Th
         </Folder>
       </Folder>
     </Folder>
+    <Folder name="components" defaultOpen>
+      <Folder name="auth">
+        <File name="sign-in-form.tsx" />
+        <File name="sign-up-form.tsx" />
+        <File name="sign-out-button.tsx" />
+      </Folder>
+      <Folder name="ui">
+        <File name="button.tsx" />
+        <File name="card.tsx" />
+        <File name="field.tsx" />
+        <File name="input.tsx" />
+      </Folder>
+    </Folder>
     <Folder name="lib" defaultOpen>
       <File name="auth.ts" />
       <File name="auth-client.ts" />
+      <File name="auth-schema.ts" />
       <File name="db.ts" />
       <File name="schema.ts" />
+      <File name="utils.ts" />
     </Folder>
     <Folder name="public">
       <File name="(static assets)" />
@@ -249,12 +309,15 @@ A full-stack project is a **single Next.js application** at the project root. Th
 | -------------------- | ------------------------------------------------ |
 | `app/layout.tsx`     | Root layout with font and metadata               |
 | `app/page.tsx`       | Home page                                        |
-| `app/globals.css`    | Tailwind CSS v4 import + base styles             |
+| `app/globals.css`    | Tailwind CSS v4 import + design tokens           |
 | `proxy.ts`           | Dev proxy configuration (rendered from template) |
 | `next.config.ts`     | Next.js configuration                            |
 | `postcss.config.mjs` | PostCSS setup for Tailwind                       |
+| `components.json`    | shadcn CLI-compatible component metadata         |
+| `lib/utils.ts`       | Shared `cn()` helper for UI components           |
 | `lib/auth.ts`        | Better Auth server configuration                 |
 | `lib/auth-client.ts` | `createAuthClient()` for client components       |
+| `lib/auth-schema.ts` | Shared auth form validation and error parsing    |
 | `lib/prisma.ts`      | Prisma client with `@prisma/adapter-pg`          |
 | `lib/db.ts`          | Drizzle database connection                      |
 | `lib/schema.ts`      | Drizzle table definitions                        |

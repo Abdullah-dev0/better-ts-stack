@@ -150,8 +150,17 @@ JWT_EXPIRES_IN=1h
 ```text
 lib/
 |-- auth.ts                          # Better Auth server configuration
-\-- auth-client.ts                   # createAuthClient() for client components
+|-- auth-client.ts                   # createAuthClient() for client components
+|-- auth-schema.ts                   # Zod schemas and auth error helper
+components/
+\-- auth/
+    |-- sign-in-form.tsx             # Client login form
+    |-- sign-up-form.tsx             # Client signup form
+    \-- sign-out-button.tsx          # Client sign-out action
 app/
+|-- sign-in/page.tsx                 # Session-aware login route
+|-- sign-up/page.tsx                 # Session-aware signup route
+|-- dashboard/page.tsx               # Protected example page
 \-- api/auth/[...all]/route.ts       # Better Auth route handler
 ```
 
@@ -232,6 +241,15 @@ if (result.error) {
 }
 ```
 
+### Generated auth routes
+
+- `/sign-in` redirects to `/dashboard` when the user already has a session
+- `/sign-up` redirects to `/dashboard` when the user already has a session
+- `/dashboard` redirects to `/sign-in` when no session exists
+
+The generated forms use React Hook Form + Zod for field validation and Better
+Auth client helpers for the submit actions.
+
 ### Schema changes
 
 - **Prisma + Better Auth**: the generated `prisma/schema.prisma` includes Better Auth core tables.
@@ -254,8 +272,11 @@ BETTER_AUTH_URL=http://localhost:3000
 ```json
 {
   "dependencies": {
+    "@hookform/resolvers": "^5.2.1",
     "better-auth": "^1.4.19",
-    "mongodb": "^6.0.0"
+    "mongodb": "^6.0.0",
+    "react-hook-form": "^7.62.0",
+    "zod": "^4.1.5"
   }
 }
 ```

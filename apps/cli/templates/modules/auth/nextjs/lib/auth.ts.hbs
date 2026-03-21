@@ -21,7 +21,7 @@ export const auth = betterAuth({
   database: prismaAdapter(client, { provider: "postgresql" }),
   {{/if}}
   {{#if (eq database 'drizzle')}}
-  database: drizzleAdapter(db, { provider: "postgresql" }),
+  database: drizzleAdapter(db, { provider: "pg" }),
   {{/if}}
   {{#if (eq database 'mongoose')}}
   database: mongodbAdapter(db, { client }),

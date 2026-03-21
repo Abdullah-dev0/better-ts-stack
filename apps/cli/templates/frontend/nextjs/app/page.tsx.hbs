@@ -1,0 +1,98 @@
+import Link from "next/link";
+
+import { ArrowRight } from "lucide-react";
+
+import { buttonVariants } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+
+const featureList = [
+  "Next.js 16 App Router",
+  "React 19 and TypeScript",
+  "Tailwind CSS v4",
+  {{#if useAuth}}"Better Auth-ready session flow",{{/if}}
+  {{#if (eq database "prisma")}}"Prisma database tooling",{{/if}}
+  {{#if (eq database "drizzle")}}"Drizzle database tooling",{{/if}}
+];
+
+export default function Home() {
+  return (
+    <main className="relative min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top,_rgba(14,165,233,0.14),_transparent_30%),linear-gradient(180deg,_#fcfcfd_0%,_#f8fafc_45%,_#eef2ff_100%)] text-slate-950">
+      <div className="absolute inset-x-0 top-0 h-72 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.18),_transparent_55%)]" />
+      <div className="relative mx-auto flex min-h-screen max-w-6xl flex-col justify-center gap-12 px-6 py-16 sm:px-10 lg:px-12">
+        <section className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+          <div className="space-y-6">
+            <span className="inline-flex w-fit items-center rounded-full border border-sky-200 bg-white/80 px-3 py-1 text-xs font-medium uppercase tracking-[0.24em] text-sky-700 shadow-sm backdrop-blur">
+              Created with better-ts-stack
+            </span>
+            <div className="space-y-4">
+              <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl">
+                Ship your stack faster with a polished TypeScript foundation.
+              </h1>
+              <p className="max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">
+                Your project already includes the core app shell, database wiring,
+                and a shadcn-compatible UI foundation so you can keep building
+                instead of setting up boilerplate.
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              {{#if useAuth}}
+              <Link
+                href="/sign-up"
+                className={cn(buttonVariants({ size: "lg" }), "gap-2")}
+              >
+                Create an account
+                <ArrowRight className="size-4" />
+              </Link>
+              <Link
+                href="/sign-in"
+                className={buttonVariants({ variant: "outline", size: "lg" })}
+              >
+                Login
+              </Link>
+              {{else}}
+              <Link
+                href="https://github.com/Abdullah-dev0/better-ts-stack"
+                target="_blank"
+                rel="noreferrer"
+                className={cn(buttonVariants({ size: "lg" }), "gap-2")}
+              >
+                Explore the docs
+                <ArrowRight className="size-4" />
+              </Link>
+              <Link
+                href="https://nextjs.org/docs"
+                target="_blank"
+                rel="noreferrer"
+                className={buttonVariants({ variant: "outline", size: "lg" })}
+              >
+                Next.js guide
+              </Link>
+              {{/if}}
+            </div>
+          </div>
+
+          <Card className="border-white/70 bg-white/80 shadow-xl shadow-slate-200/70 backdrop-blur">
+            <CardHeader>
+              <CardTitle>Included in this starter</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <ul className="space-y-3 text-sm text-slate-600">
+                {featureList.map((feature) => (
+                  <li key={feature} className="flex items-center gap-3">
+                    <span className="size-2 rounded-full bg-sky-500" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="rounded-2xl border border-slate-200 bg-slate-950 px-4 py-3 text-sm text-slate-100">
+                Start editing <code className="font-mono">app/page.tsx</code> and
+                shape the project around your product instead of setup chores.
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+      </div>
+    </main>
+  );
+}

@@ -3,7 +3,13 @@
   "name": "Better Auth",
   "description": "Better Auth for Next.js with optional Prisma or Drizzle adapter",
   "type": "feature",
-  "dependencies": { "better-auth": "^1.4.19", "mongodb": "^6.0.0" },
+  "dependencies": {
+    "@hookform/resolvers": "^5.2.1",
+    "better-auth": "^1.4.19",
+    "mongodb": "^6.0.0",
+    "react-hook-form": "^7.62.0",
+    "zod": "^4.1.5"
+  },
   "devDependencies": {},
   "scripts": {},
   "envVars": {
@@ -13,6 +19,13 @@
   "templateFiles": [
     "lib/auth.ts.hbs",
     "lib/auth-client.ts",
-    "app/api/auth/[...all]/route.ts"
+    "app/api/auth/[...all]/route.ts",
+    "app/dashboard/page.tsx",
+    "app/sign-in/page.tsx",
+    "app/sign-up/page.tsx",
+    "components/auth/sign-in-form.tsx",
+    "components/auth/sign-up-form.tsx",
+    "components/auth/sign-out-button.tsx",
+    "lib/auth-schema.ts"
   ]
 }

@@ -62,6 +62,7 @@ Every generated project includes the essentials:
 - `.env.example` and `.env` setup
 - Ready-to-run project scripts
 - Health check endpoint at `/health` for backend projects
+- shadcn-compatible UI foundation for Next.js projects
 - Database wiring and schema setup when selected
 - Authentication scaffolding when selected
 - Docker files when selected

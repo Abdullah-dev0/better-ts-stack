@@ -1,6 +1,6 @@
 {
   "name": "better-ts-stack",
-  "version": "1.0.5",
+  "version": "1.0.7",
   "description": "A powerful CLI tool that generates fully configured TypeScript projects with backend, frontend, database integration, Docker support, and more--all through an interactive setup.",
   "keywords": [
     "cli",
@@ -11,7 +11,7 @@
     "prisma",
     "template"
   ],
-  "homepage": "https://github.com/Abdullah-dev0/better-ts-stack#readme",
+  "homepage": "https://better-ts-stack.abdullahtech.me",
   "bugs": {
     "url": "https://github.com/Abdullah-dev0/better-ts-stack/issues"
   },

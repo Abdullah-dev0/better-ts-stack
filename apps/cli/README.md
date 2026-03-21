@@ -1,13 +1,13 @@
 # better-ts-stack
 
-> Build production-ready TypeScript projects in seconds
+> Generate production-ready TypeScript apps from an interactive CLI
 
-An interactive CLI tool that generates fully configured TypeScript projects with your choice of backend framework, database, authentication, and Docker support.
+`better-ts-stack` scaffolds backend and full-stack TypeScript projects with sensible defaults, batteries-included tooling, and optional database, auth, Docker, and git setup.
 
-## Installation & Usage
+## Quick Start
 
 ```bash
-# Using npx (recommended — no install required)
+# Run instantly with npx
 npx better-ts-stack
 
 # Or install globally
@@ -15,39 +15,56 @@ npm install -g better-ts-stack
 better-ts-stack
 ```
 
-Answer the prompts and get a fully configured project ready to run.
+Run the command, answer the prompts, and the CLI generates a ready-to-work project for you.
 
-## Prompt Flow
+## What It Can Scaffold
 
-The CLI is entirely interactive — there are no subcommands or flags. It will guide you through:
+| Project type | Stack | Optional setup |
+| --- | --- | --- |
+| Backend API | Express + TypeScript | PostgreSQL, MongoDB, Prisma, Drizzle, Mongoose, JWT auth, Docker, git |
+| Full-stack app | Next.js 16 + React 19 + TypeScript | PostgreSQL, MongoDB, Prisma, Better Auth, Docker, git |
 
-1. **Project name** — becomes the folder name and `package.json` name
-2. **Application type** — `Backend API` or `Full-stack`
-   - **Backend**: prompts for framework (Express; NestJS coming soon)
-   - **Full-stack**: auto-selects Next.js
-3. **Database type** — `none`, `PostgreSQL`, or `MongoDB`
-4. **ORM/ODM** (only shown when a database is selected):
-   - PostgreSQL → `Prisma` or `Drizzle`
-   - MongoDB → `Prisma` (adapter) or `Mongoose`
-5. **Package manager** — `npm`, `pnpm`, or `bun`
-6. **Docker** — include Docker configuration?
-7. **Authentication** — add auth?
-   - Express: JWT-based auth
-   - Next.js: Better Auth (only prompted when a database is selected)
-8. **Git** — initialize a git repository?
-9. **Install dependencies** — run the install command now?
+Notes:
 
-> The CLI does not prompt for a port. The server port defaults to `3000` via the `PORT` environment variable.
+- Express is the current backend implementation.
+- NestJS appears in the prompt flow as "Coming Soon".
+- Better Auth is only available for full-stack projects when a database is selected.
+
+## Interactive Prompt Flow
+
+The CLI is fully interactive. There are no subcommands or flags.
+
+You will be guided through:
+
+1. Project name
+2. Application type: `Backend API` or `Full-stack App`
+3. Backend framework for backend apps: `Express` (`NestJS` is coming soon)
+4. Database: `none`, `PostgreSQL`, or `MongoDB`
+5. ORM/ODM when a database is selected
+   - PostgreSQL: `Prisma` or `Drizzle`
+   - MongoDB: `Prisma` or `Mongoose`
+6. Package manager: `npm`, `pnpm`, or `bun`
+7. Docker setup
+8. Authentication
+   - Express apps: JWT-based auth
+   - Next.js apps: Better Auth when a database is enabled
+9. Git initialization
+10. Dependency installation
+
+The CLI does not ask for a port. Backend projects default to `PORT=3000`.
 
 ## What You Get
 
-- TypeScript in strict mode
-- ESLint + Prettier pre-configured
-- Environment variable setup (`.env.example` / `.env`)
-- Health check endpoint at `/health` (backend projects)
-- Database connection and ORM setup (if selected)
-- Authentication scaffolding (if selected)
-- Docker files (if selected)
+Every generated project includes the essentials:
+
+- TypeScript with strict mode enabled
+- ESLint and Prettier pre-configured
+- `.env.example` and `.env` setup
+- Ready-to-run project scripts
+- Health check endpoint at `/health` for backend projects
+- Database wiring and schema setup when selected
+- Authentication scaffolding when selected
+- Docker files when selected
 - Optional git repository initialization
 
 ## Requirements
@@ -56,7 +73,7 @@ The CLI is entirely interactive — there are no subcommands or flags. It will g
 
 ## Links
 
-- [Documentation](https://better-ts-stack.vercel.app/docs)
+- [Documentation](https://better-ts-stack.abdullahtech.me/docs)
 - [GitHub Repository](https://github.com/Abdullah-dev0/better-ts-stack)
 - [Issue Tracker](https://github.com/Abdullah-dev0/better-ts-stack/issues)
 

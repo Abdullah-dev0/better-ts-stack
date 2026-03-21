@@ -7,6 +7,7 @@ import { HERO_CONFIG } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 import { FadeInUp, FloatingIcon, FloatingOrb } from "./motion";
+import { NpmDownloadsStrip } from "./npm-downloads-strip";
 import { TerminalPreview } from "./terminal-preview";
 
 export const HeroSection = () => {
@@ -112,9 +113,11 @@ export const HeroSection = () => {
           {HERO_CONFIG.subheadline}
         </FadeInUp>
 
+        <NpmDownloadsStrip />
+
         {/* Tech stack keyword pills */}
         <FadeInUp
-          delay={0.25}
+          delay={0.28}
           className="mb-10 flex flex-wrap items-center justify-center gap-2"
         >
           {[
@@ -139,7 +142,7 @@ export const HeroSection = () => {
 
         {/* CTA Buttons */}
         <FadeInUp
-          delay={0.3}
+          delay={0.34}
           className="mb-16 flex flex-col items-center justify-center gap-4 sm:flex-row"
         >
           <Link

@@ -23,7 +23,7 @@ export const NAVBAR_CONFIG = {
   links: [
     { href: "/docs", label: "Docs", external: false },
     {
-      href: "https://github.com/abdullah-dev0",
+      href: "https://github.com/Abdullah-dev0/better-ts-stack",
       label: "GitHub",
       external: true,
     },
@@ -281,19 +281,17 @@ export const FOOTER_CONFIG = {
     text: "Open source under MIT.",
   },
   social: [
-    { href: "https://github.com", icon: "Github", label: "GitHub" },
-    { href: "https://twitter.com", icon: "Twitter", label: "Twitter" },
+    {
+      href: "https://github.com/Abdullah-dev0/better-ts-stack",
+      icon: "Github",
+      label: "GitHub",
+    },
   ],
   pages: [
     { href: "/", label: "Home" },
     { href: "/docs", label: "Docs" },
     { href: "/docs/usage", label: "Usage" },
     { href: "/docs/structure", label: "Architecture" },
-  ],
-  resources: [
-    { href: "/docs", label: "Documentation" },
-    { href: "/docs/installation", label: "Getting Started" },
-    { href: "/docs/templates", label: "Templates" },
   ],
 } as const;
 

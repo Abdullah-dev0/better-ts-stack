@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { FOOTER_CONFIG } from "@/lib/constants";
@@ -17,9 +18,13 @@ export function Footer() {
           {/* Brand Column */}
           <div className="space-y-4">
             <div className="flex items-center justify-center gap-2">
-              <div className="bg-primary text-primary-foreground flex h-8 w-8 items-center justify-center rounded-lg text-sm font-bold">
-                {FOOTER_CONFIG.brand.logo}
-              </div>
+              <Image
+                src="/icon.png"
+                alt=""
+                width={32}
+                height={32}
+                className="rounded-lg"
+              />
               <span className="text-foreground text-lg font-bold tracking-tight">
                 {FOOTER_CONFIG.brand.name}
               </span>

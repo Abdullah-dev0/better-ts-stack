@@ -82,7 +82,7 @@ Every generated project includes the essentials:
 
 MIT
 
-## Release 1.0.0
+## Release 1.0.8
 
 Requires Node.js 24+. Dependencies and templates use current stable releases, with TypeScript 6.0.3 held for typescript-eslint compatibility and Node.js types aligned to 24.x. Express and Next.js support PostgreSQL with Prisma or Drizzle and MongoDB with Mongoose. Prisma generation runs before builds; Docker uses Node.js 24 and Compose v2.
 

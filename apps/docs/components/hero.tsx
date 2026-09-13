@@ -64,23 +64,7 @@ export const HeroSection = () => {
       </FloatingIcon>
 
       <div className="relative z-10 mx-auto max-w-4xl text-center">
-        {/* Badge row: Beta + tagline */}
-        <FadeInUp className="mb-8 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
-          {/* Beta badge - floating, visible, animated */}
-          <FloatingIcon
-            duration={3.5}
-            yRange={[0, -8, 0]}
-            className="group border-primary/25 bg-primary/8 dark:bg-primary/10 ring-primary/10 ring-offset-background hover:border-primary/40 hover:bg-primary/12 inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)] ring-1 ring-offset-2 backdrop-blur-sm transition-colors duration-200"
-          >
-            <span
-              className="bg-primary h-1.5 w-1.5 animate-pulse rounded-full"
-              aria-hidden
-            />
-            <span className="text-primary/95 text-[11px] font-semibold tracking-[0.18em] uppercase">
-              Beta
-            </span>
-          </FloatingIcon>
-          {/* Tagline */}
+        <FadeInUp className="mb-8 flex items-center justify-center">
           <span className="text-muted-foreground inline-flex items-center gap-2 text-sm">
             <Sparkles className="text-primary/70 h-3.5 w-3.5" />
             {HERO_CONFIG.badge.text}

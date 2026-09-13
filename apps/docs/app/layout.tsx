@@ -17,19 +17,67 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const title = "better-ts-stack - Ship Type-Safety by Default";
+const description =
+  "Scaffold end-to-end type-safe TypeScript projects with zero config. Build your backend, frontend, database, authentication, and Docker setup in one command.";
+
 export const metadata: Metadata = {
-  title: "better-ts-stack - Ship Type-Safety by Default",
-  description:
-    "better-ts-stack scaffolds end-to-end type-safe TypeScript projects with zero-config. Eliminate boundary errors between your database and UI.",
+  metadataBase: new URL("https://better-ts-stack.abdullahtech.me"),
+  title: {
+    default: title,
+    template: "%s | better-ts-stack",
+  },
+  description,
+  applicationName: "better-ts-stack",
   keywords: [
     "TypeScript",
     "Next.js",
+    "React",
+    "drizzle",
     "Prisma",
     "tRPC",
     "type safety",
     "CLI tool",
     "scaffolding",
   ],
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "/",
+    siteName: "better-ts-stack",
+    title,
+    description,
+    images: [
+      {
+        url: "/social-card.png",
+        width: 1200,
+        height: 630,
+        alt: "better-ts-stack homepage showing its one-command TypeScript stack builder",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+    images: [
+      {
+        url: "/social-card.png",
+        alt: "better-ts-stack homepage showing its one-command TypeScript stack builder",
+      },
+    ],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
 };
 
 export default function RootLayout({

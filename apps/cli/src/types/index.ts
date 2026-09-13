@@ -26,7 +26,7 @@ export interface Dependencies {
 export type BackendFramework = "express" | "nestjs";
 
 // Supported frontend frameworks
-export type FrontendFramework = "nextjs";
+export type FrontendFramework = "nextjs" | "tanstack";
 
 // Main configuration object for the build pipeline
 export interface ProjectConfig {
@@ -155,7 +155,7 @@ export interface TemplateContext {
 // Type-safe option definitions
 export const applicationTypeOptions = [
   { value: "backend" as const, label: "Backend API (Express/NestJS)" },
-  { value: "fullstack" as const, label: "Full-stack App (Next.js)" },
+  { value: "fullstack" as const, label: "Full-stack App (Next.js/TanStack)" },
 ];
 
 export const backendFrameworkOptions = [
@@ -165,6 +165,11 @@ export const backendFrameworkOptions = [
 
 export const frontendFrameworkOptions = [
   { value: "nextjs" as const, label: "Next.js 16 (App Router)" },
+  {
+    value: "tanstack" as const,
+    label: "TanStack Start (React)",
+    hint: "(Release Candidate)",
+  },
 ];
 
 // Database type options (what database system)

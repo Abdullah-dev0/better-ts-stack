@@ -8,6 +8,8 @@ import {
   backendFrameworkOptions,
   DatabaseType,
   databaseTypeOptions,
+  FrontendFramework,
+  frontendFrameworkOptions,
   mongodbOrmOptions,
   OrmOption,
   PackageManager,
@@ -22,19 +24,26 @@ export async function collectStackChoices(
   return group<{ [K in keyof PromptChoices]: PromptChoices[K] | symbol }>(
     {
       framework: async () => {
-        if (applicationType === "fullstack") return "nextjs" as const;
-
-        while (true) {
-          const selection = await select<BackendFramework>({
-            message: "Select a backend framework:",
-            options: backendFrameworkOptions,
-            initialValue: "express",
-          });
-          if (isCancel(selection) || selection !== "nestjs") return selection;
-          consola.warn(
-            "This framework is coming soon! Please select another option."
-          );
+        if (applicationType === "backend") {
+          while (true) {
+            const selection = await select<BackendFramework>({
+              message: "Select a backend framework:",
+              options: backendFrameworkOptions,
+              initialValue: "express",
+            });
+            if (isCancel(selection) || selection !== "nestjs")
+              return selection;
+            consola.warn(
+              "This framework is coming soon! Please select another option."
+            );
+          }
         }
+
+        return select<FrontendFramework>({
+          message: "Select a frontend framework:",
+          options: frontendFrameworkOptions,
+          initialValue: "nextjs",
+        });
       },
       databaseType: () =>
         select<DatabaseType>({

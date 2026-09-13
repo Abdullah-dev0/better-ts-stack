@@ -20,8 +20,7 @@ export function kebabCase(str: string): string {
 }
 
 export function buildTemplateContext(config: ProjectConfig) {
-  const framework =
-    config.applicationType === "backend" ? config.framework : "nextjs";
+  const framework = config.framework;
   return {
     projectName: config.projectName,
     packageManager: config.packageManager,

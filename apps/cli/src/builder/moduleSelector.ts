@@ -3,8 +3,7 @@ import { ProjectConfig } from "../types";
 // Determines which base and feature modules to include based on user configuration
 export function selectModules(config: ProjectConfig) {
   // Determine framework for module integration
-  const framework =
-    config.applicationType === "backend" ? config.framework : "nextjs";
+  const framework = config.framework;
 
   // Select base template based on app type
   const base =

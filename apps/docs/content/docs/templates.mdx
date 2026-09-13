@@ -106,39 +106,13 @@ export default app;
 
 ---
 
-## Full-stack Template (Next.js)
+## Full-stack Templates
 
-Selecting **Full-stack** generates a single Next.js 16 application at the project root. There are no separate `backend/` or `frontend/` subdirectories.
+Selecting **Full-stack** generates a single application at the project root. There are no separate `backend/` or `frontend/` subdirectories. You pick the frontend framework in the prompt.
 
-<Files>
-  <Folder name="my-app" defaultOpen>
-    <Folder name="app" defaultOpen>
-      <File name="layout.tsx" />
-      <File name="page.tsx" />
-      <File name="globals.css" />
-    </Folder>
-    <Folder name="public">
-      <File name="(static assets)" />
-    </Folder>
-    <File name="proxy.ts" />
-    <File name="next.config.ts" />
-    <File name="postcss.config.mjs" />
-    <File name="tsconfig.json" />
-    <File name="eslint.config.mjs" />
-    <File name="next-env.d.ts" />
-    <File name="package.json" />
-    <File name=".env" />
-    <File name=".env.example" />
-    <File name=".gitignore" />
-  </Folder>
-</Files>
+### Next.js
 
-<Callout type="info">
-  The Next.js base template includes a shadcn-compatible UI foundation:
-  `components.json`, `lib/utils.ts`, and a small `components/ui` starter set.
-</Callout>
-
-### Generated package.json scripts
+#### Generated package.json scripts
 
 ```json
 {
@@ -153,11 +127,48 @@ Selecting **Full-stack** generates a single Next.js 16 application at the projec
 
 ---
 
+### TanStack Start
+
+```
+src/
+|-- routes/           # File-based routes (__root.tsx, index.tsx)
+|-- routeTree.gen.ts  # Generated route tree
+|-- router.tsx        # createRouter() + QueryClient + SSR query integration
+|-- lib/utils.ts      # cn() helper
+|-- components/ui/    # shadcn-compatible base UI primitives
+|-- styles/app.css    # Tailwind CSS v4 import + base styles
+vite.config.ts        # tanstackStart() + tailwind + react plugins
+components.json       # shadcn CLI-compatible component config
+package.json          # "type": "module"
+```
+
+The template uses the `~/*` path alias mapped to `src/*`. The build produces a
+fetch-compatible SSR handler via Vite (no Nitro), and the `start` script serves
+it with `srvx`. The CLI includes the initial route tree, and TanStack Router
+regenerates it during Vite development and builds.
+
+#### Generated package.json scripts
+
+```json
+{
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "start": "srvx --prod -s ../client dist/server/server.js",
+    "preview": "vite preview",
+    "type:check": "tsc --noEmit",
+    "lint": "eslint src"
+  }
+}
+```
+
+---
+
 ## With Database Modules
 
 ### PostgreSQL + Prisma
 
-<Tabs items={['Express', 'Next.js']}>
+<Tabs items={['Express', 'Next.js', 'TanStack']}>
   <Tab value="Express">
     <Files>
       <Folder name="prisma" defaultOpen>
@@ -207,6 +218,36 @@ Selecting **Full-stack** generates a single Next.js 16 application at the projec
     </Callout>
 
   </Tab>
+  <Tab value="TanStack">
+    <Files>
+      <Folder name="prisma" defaultOpen>
+        <File name="schema.prisma" />
+      </Folder>
+      <File name="prisma.config.ts" />
+      <Folder name="src" defaultOpen>
+        <Folder name="lib">
+          <File name="prisma.ts" />
+        </Folder>
+      </Folder>
+    </Files>
+
+    Scripts added to `package.json`:
+    ```bash
+    npm run prisma:generate
+    npm run prisma:migrate   # prisma migrate dev
+    npm run prisma:studio
+    npm run build             # prebuild: prisma generate
+    ```
+
+    Environment variable added: `DATABASE_URL`
+
+    <Callout type="info">
+      The Prisma client generator writes to `generated/` (output `../generated`
+      relative to `prisma/schema.prisma`), imported from `src/lib/prisma.ts`
+      via `../../generated/client`.
+    </Callout>
+
+  </Tab>
 </Tabs>
 
 ### PostgreSQL + Drizzle
@@ -219,6 +260,9 @@ Selecting **Full-stack** generates a single Next.js 16 application at the projec
   <File name="drizzle.config.ts" />
 </Files>
 
+> For TanStack Start, the schema and client live in `src/lib/schema.ts` and
+> `src/lib/db.ts` (`drizzle.config.ts` points at `./src/lib/schema.ts`).
+
 Scripts added to `package.json`:
 
 ```bash
@@ -230,8 +274,9 @@ npm run db:studio    # drizzle-kit studio
 Environment variable added: `DATABASE_URL`
 
 <Callout type="tip">
-  If Better Auth is also enabled with Drizzle, the generated `lib/schema.ts`
-  contains the Better Auth core tables instead of a sample table.
+  If Better Auth is also enabled with Drizzle, the generated `lib/schema.ts` (or
+  `src/lib/schema.ts` for TanStack) contains the Better Auth core tables instead
+  of a sample table.
 </Callout>
 
 ### MongoDB + Mongoose
@@ -255,7 +300,7 @@ Environment variable added: `MONGODB_URI`
 
 ## With Auth Module
 
-<Tabs items={['Express - JWT', 'Next.js - Better Auth']}>
+<Tabs items={['Express - JWT', 'Next.js - Better Auth', 'TanStack - Better Auth']}>
   <Tab value="Express - JWT">
     <Files>
       <Folder name="src" defaultOpen>
@@ -318,13 +363,47 @@ Environment variable added: `MONGODB_URI`
 
     Environment variables added: `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`
 
-    The generated auth flow includes login/signup pages, a protected dashboard
-    example, and optimistic proxy redirects to `/sign-in`.
-
     <Callout type="info">
       Better Auth in Next.js is only generated when a database is selected.
-      The `lib/auth.ts` template uses the matching adapter (Prisma or Drizzle)
-      based on your ORM choice.
+      The `lib/auth.ts` template uses the matching adapter (Prisma, Drizzle,
+      or MongoDB) based on your ORM choice.
+    </Callout>
+
+  </Tab>
+  <Tab value="TanStack - Better Auth">
+    <Files>
+      <Folder name="src" defaultOpen>
+        <Folder name="components">
+          <Folder name="auth">
+            <File name="sign-in-form.tsx" />
+            <File name="sign-up-form.tsx" />
+            <File name="sign-out-button.tsx" />
+          </Folder>
+        </Folder>
+        <Folder name="lib">
+          <File name="auth.ts" />
+          <File name="auth-client.ts" />
+          <File name="auth-functions.ts" />
+          <File name="auth-schema.ts" />
+        </Folder>
+        <Folder name="routes">
+          <Folder name="api/auth">
+            <File name="$.ts" />
+          </Folder>
+          <File name="sign-in.tsx" />
+          <File name="sign-up.tsx" />
+          <File name="dashboard.tsx" />
+        </Folder>
+      </Folder>
+    </Files>
+
+    Environment variables added: `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`
+
+    <Callout type="info">
+      TanStack Better Auth uses `tanstackStartCookies()` from
+      `better-auth/tanstack-start`, server functions (`createServerFn`) for session
+      access, and a file-based API route (`src/routes/api/auth/$.ts`) for the
+      Better Auth handler. Only generated when a database is selected.
     </Callout>
 
   </Tab>
@@ -342,7 +421,7 @@ Environment variable added: `MONGODB_URI`
   </Folder>
 </Files>
 
-The `Dockerfile` is framework-aware: it uses a Next.js standalone output stage for Full-stack projects and a Node.js multi-stage build for Express backends.
+The `Dockerfile` is framework-aware: it uses a Next.js standalone output stage for Next.js projects, an `srvx`-based production stage for TanStack Start, and a Node.js multi-stage build for Express backends. Both full-stack images run `npm run build` (and Prisma generate for the database variant) and copy the build output to a non-root Alpine production image.
 
 Scripts added to `package.json`:
 
@@ -357,12 +436,17 @@ npm run docker:logs   # docker compose logs -f
 
 ## Supported Combinations
 
-| App type   | Database   | ORM/ODM  | Auth        | Status      |
-| ---------- | ---------- | -------- | ----------- | ----------- |
-| Backend    | none       | -        | JWT         | Yes         |
-| Backend    | PostgreSQL | Prisma   | JWT         | Yes         |
-| Backend    | MongoDB    | Mongoose | JWT         | Yes         |
-| Full-stack | none       | -        | -           | Yes         |
-| Full-stack | PostgreSQL | Prisma   | Better Auth | Yes         |
-| Full-stack | PostgreSQL | Drizzle  | Better Auth | Yes         |
-| Backend    | NestJS     | -        | -           | Coming soon |
+| Framework | App type   | Database   | ORM/ODM  | Auth        | Status      |
+| --------- | ---------- | ---------- | -------- | ----------- | ----------- |
+| Express   | Backend    | none       | -        | JWT         | Yes         |
+| Express   | Backend    | PostgreSQL | Prisma   | JWT         | Yes         |
+| Express   | Backend    | MongoDB    | Mongoose | JWT         | Yes         |
+| Next.js   | Full-stack | none       | -        | -           | Yes         |
+| Next.js   | Full-stack | PostgreSQL | Prisma   | Better Auth | Yes         |
+| Next.js   | Full-stack | PostgreSQL | Drizzle  | Better Auth | Yes         |
+| Next.js   | Full-stack | MongoDB    | Mongoose | Better Auth | Yes         |
+| TanStack  | Full-stack | none       | -        | -           | Yes         |
+| TanStack  | Full-stack | PostgreSQL | Prisma   | Better Auth | Yes         |
+| TanStack  | Full-stack | PostgreSQL | Drizzle  | Better Auth | Yes         |
+| TanStack  | Full-stack | MongoDB    | Mongoose | Better Auth | Yes         |
+| -         | Backend    | NestJS     | -        | -           | Coming soon |

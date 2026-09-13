@@ -66,7 +66,7 @@ The CLI is fully interactive - there are no flags or subcommands. You will be as
 1. **Project name** - becomes your folder name and `package.json` name
 2. **Application type** - `Backend API` or `Full-stack`
    - **Backend**: select a framework (Express now; NestJS coming soon)
-   - **Full-stack**: Next.js is auto-selected
+   - **Full-stack**: select a frontend framework (Next.js 16 or TanStack Start)
 3. **Database type** - `none`, `PostgreSQL`, or `MongoDB`
 4. **ORM/ODM** (only shown when a database is selected)
    - PostgreSQL -> `Prisma` or `Drizzle`
@@ -75,7 +75,7 @@ The CLI is fully interactive - there are no flags or subcommands. You will be as
 6. **Docker** - include Docker configuration?
 7. **Authentication** - add auth?
    - Express: JWT-based auth (always available when asked)
-   - Next.js: Better Auth (only prompted if a database was selected)
+   - Next.js / TanStack: Better Auth (only prompted if a database was selected)
 8. **Git** - initialize a repository with an initial commit?
 9. **Install dependencies** - run the install command now?
 
@@ -106,8 +106,8 @@ npm run dev
     health check endpoint
   </Card>
   <Card title="Full-stack App" icon={<Layout className="text-green-400" />}>
-    Next.js 16 with React 19, App Router, Tailwind CSS v4, and a proxy
-    configuration
+    Next.js 16 or TanStack Start with React 19, Tailwind CSS v4, and file-based
+    routing
   </Card>
   <Card
     title="Type-safe Database"
@@ -116,8 +116,8 @@ npm run dev
     PostgreSQL with Prisma or Drizzle, or MongoDB with Mongoose - your choice
   </Card>
   <Card title="Authentication" icon={<Zap className="text-yellow-400" />}>
-    JWT + bcrypt for Express, Better Auth (with Prisma or Drizzle adapter) for
-    Next.js
+    JWT + bcrypt for Express, Better Auth (with Prisma, Drizzle, or MongoDB
+    adapter) for Next.js and TanStack Start
   </Card>
   <Card title="Docker Ready" icon={<Container className="text-blue-400" />}>
     Multi-stage Dockerfile and docker-compose.yml generated on request

@@ -14,7 +14,7 @@ npm run docker:logs
 npm run docker:down
 ```
 
-These scripts use docker build and docker compose. Both framework images use Node.js 24 Alpine, a build stage, and a non-root runtime user. Express runs dist/index.js; Next.js runs its standalone server.js output. Build errors stop the image build.
+These scripts use docker build and docker compose. All framework images use Node.js 24 Alpine, a build stage, and a non-root runtime user. Express runs `dist/index.js`; Next.js runs its standalone `server.js` output; TanStack Start runs `srvx` against the Vite `dist/server/server.js` handler (with `npm ci --omit=dev` so the production-only `srvx` runtime dependency is available). For Prisma projects, the generated client is copied from the build stage into the production image. Build errors stop the image build.
 
 The image build installs dependencies with npm, regardless of the package manager selected for local development. Commit a package-lock.json to use npm ci in Docker; otherwise the image uses npm install.
 

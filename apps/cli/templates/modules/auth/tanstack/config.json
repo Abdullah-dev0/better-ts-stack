@@ -1,0 +1,33 @@
+{
+  "id": "auth",
+  "name": "Better Auth",
+  "description": "Better Auth for TanStack Start with optional Prisma, Drizzle, or MongoDB adapter",
+  "type": "feature",
+  "dependencies": {
+    "@hookform/resolvers": "^5.9.1",
+    "better-auth": "^1.7.3",
+    "dotenv": "^17.4.2",
+    "mongodb": "^7.6.0",
+    "react-hook-form": "^7.87.0",
+    "zod": "^4.5.4"
+  },
+  "devDependencies": {},
+  "scripts": {},
+  "envVars": {
+    "BETTER_AUTH_SECRET": "please-change-me-to-a-random-string",
+    "BETTER_AUTH_URL": "http://localhost:3000"
+  },
+  "templateFiles": [
+    "src/lib/auth.ts.hbs",
+    "src/lib/auth-client.ts",
+    "src/lib/auth-functions.ts",
+    "src/routes/api/auth/$.ts",
+    "src/routes/dashboard.tsx",
+    "src/routes/sign-in.tsx",
+    "src/routes/sign-up.tsx",
+    "src/components/auth/sign-in-form.tsx",
+    "src/components/auth/sign-up-form.tsx",
+    "src/components/auth/sign-out-button.tsx",
+    "src/lib/auth-schema.ts"
+  ]
+}

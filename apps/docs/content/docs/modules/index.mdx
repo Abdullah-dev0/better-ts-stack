@@ -25,8 +25,8 @@ better-ts-stack composes projects from independent modules. Each module contribu
   href="/docs/modules/frontend"
   icon={<Layout className="text-green-400" />}
 >
-  Next.js 16 with React 19 and Tailwind CSS v4 - automatically selected for
-  every `fullstack` app type project
+  Next.js 16 or TanStack Start with React 19 and Tailwind CSS v4 - selected via
+  the full-stack framework prompt
 </Card>
 
 <Card
@@ -43,7 +43,8 @@ better-ts-stack composes projects from independent modules. Each module contribu
   href="/docs/modules/auth"
   icon={<Shield className="text-yellow-400" />}
 >
-  JWT + bcrypt for Express, Better Auth for Next.js (requires a database)
+  JWT + bcrypt for Express, Better Auth for Next.js and TanStack Start (requires
+  a database)
 </Card>
 
   <Card title="Docker" href="/docs/modules/docker" icon={<Container className="text-blue-400" />}>
@@ -57,20 +58,22 @@ better-ts-stack composes projects from independent modules. Each module contribu
 
 The CLI prompts govern which modules are included:
 
-| Prompt answer                             | Module(s) activated                     |
-| ----------------------------------------- | --------------------------------------- |
-| App type = `backend`                      | Express base module                     |
-| App type = `fullstack`                    | Next.js base module (auto)              |
-| Database = `postgresql` + ORM = `prisma`  | Prisma module for the chosen framework  |
-| Database = `postgresql` + ORM = `drizzle` | Drizzle module for the chosen framework |
-| Database = `mongodb` + ORM = `mongoose`   | Mongoose module (Express and Next.js)   |
-| Auth = `yes` (Express)                    | JWT auth module                         |
-| Auth = `yes` (Next.js, database selected) | Better Auth module                      |
-| Docker = `yes`                            | Docker module                           |
+| Prompt answer                                        | Module(s) activated                          |
+| ---------------------------------------------------- | -------------------------------------------- |
+| App type = `backend`                                 | Express base module                          |
+| App type = `fullstack` + framework = `nextjs`        | Next.js base module                          |
+| App type = `fullstack` + framework = `tanstack`      | TanStack Start base module                   |
+| Database = `postgresql` + ORM = `prisma`             | Prisma module for the chosen framework       |
+| Database = `postgresql` + ORM = `drizzle`            | Drizzle module for the chosen framework      |
+| Database = `mongodb` + ORM = `mongoose`              | Mongoose module (Express, Next.js, TanStack) |
+| Auth = `yes` (Express)                               | JWT auth module                              |
+| Auth = `yes` (Next.js / TanStack, database selected) | Better Auth module                           |
+| Docker = `yes`                                       | Docker module                                |
 
 <Callout type="info">
-  Better Auth is only prompted for Next.js projects when a database has been
-  selected. If database type is `none`, auth is skipped automatically.
+  Better Auth is only prompted for Next.js and TanStack Start projects when a
+  database has been selected. If database type is `none`, auth is skipped
+  automatically.
 </Callout>
 
 ---
@@ -119,17 +122,18 @@ The final `package.json` will include:
 
 ## Module Availability Matrix
 
-| Module               | Backend (Express) | Full-stack (Next.js) |
-| -------------------- | ----------------- | -------------------- |
-| Express base         | Always            | -                    |
-| Next.js base         | -                 | Always               |
-| PostgreSQL + Prisma  | Yes               | Yes                  |
-| PostgreSQL + Drizzle | Yes               | Yes                  |
-| MongoDB + Mongoose   | Yes               | Yes                  |
-| JWT Auth             | Yes               | -                    |
-| Better Auth          | -                 | Yes (requires DB)    |
-| Docker               | Yes               | Yes                  |
-| NestJS               | Coming soon       | -                    |
+| Module               | Backend (Express) | Full-stack (Next.js) | Full-stack (TanStack) |
+| -------------------- | ----------------- | -------------------- | --------------------- |
+| Express base         | Always            | -                    | -                     |
+| Next.js base         | -                 | Always               | -                     |
+| TanStack base        | -                 | -                    | Always                |
+| PostgreSQL + Prisma  | Yes               | Yes                  | Yes                   |
+| PostgreSQL + Drizzle | Yes               | Yes                  | Yes                   |
+| MongoDB + Mongoose   | Yes               | Yes                  | Yes                   |
+| JWT Auth             | Yes               | -                    | -                     |
+| Better Auth          | -                 | Yes (requires DB)    | Yes (requires DB)     |
+| Docker               | Yes               | Yes                  | Yes                   |
+| NestJS               | Coming soon       | -                    | -                     |
 
 ---
 
@@ -145,9 +149,8 @@ All generated code is plain TypeScript - edit any file freely.
 
 ### Adding to the frontend
 
-- New pages -> `app/`
-- New API routes -> `app/api/`
-- New components -> `components/`
+- Next.js: new pages -> `app/`, API routes -> `app/api/`, components -> `components/`
+- TanStack Start: new routes -> `src/routes/` (Vite regenerates `src/routeTree.gen.ts` during dev/build), server functions -> `createServerFn`, components -> `src/components/`
 
 ### Adding to the database
 

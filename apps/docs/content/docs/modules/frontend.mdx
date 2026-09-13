@@ -1,6 +1,6 @@
 ﻿---
 title: Frontend Module
-description: Next.js 16 with React 19, Tailwind CSS v4, and App Router
+description: Next.js 16 or TanStack Start with React 19 and Tailwind CSS v4
 ---
 
 import { Callout } from "fumadocs-ui/components/callout";
@@ -8,11 +8,11 @@ import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 
 ## Overview
 
-The Frontend module generates a Next.js 16 application with React 19 and Tailwind CSS v4. It is automatically selected when you choose the **Full-stack** application type - there is no framework prompt.
+The Frontend module generates a full-stack React application. When you choose the **Full-stack** application type, the CLI prompts you to pick between **Next.js 16** (App Router) and **TanStack Start** (RC). Both ship with React 19 and Tailwind CSS v4.
 
 <Callout type="info">
-  The frontend module produces a **single Next.js project** at the project root.
-  There are no separate `frontend/` or `backend/` subdirectories.
+  The frontend module produces a **single project** at the project root. There
+  are no separate `frontend/` or `backend/` subdirectories.
 </Callout>
 
 ## What You Get
@@ -164,7 +164,7 @@ If Better Auth is selected (requires a database), the auth module adds:
     import client from "./prisma";
 
     export const auth = betterAuth({
-      database: prismaAdapter(client, { provider: "postgres" }),
+      database: prismaAdapter(client, { provider: "postgresql" }),
       emailAndPassword: { enabled: true },
       plugins: [nextCookies()],
       secret: process.env.BETTER_AUTH_SECRET,
@@ -182,7 +182,7 @@ If Better Auth is selected (requires a database), the auth module adds:
     import { db } from "./db";
 
     export const auth = betterAuth({
-      database: drizzleAdapter(db, { provider: "postgres" }),
+      database: drizzleAdapter(db, { provider: "pg" }),
       emailAndPassword: { enabled: true },
       plugins: [nextCookies()],
       secret: process.env.BETTER_AUTH_SECRET,
@@ -241,7 +241,89 @@ With a database added, the relevant `DATABASE_URL` or `MONGODB_URI` is also incl
 
 ---
 
-## Extending the Frontend
+## TanStack Start
+
+TanStack Start uses the Vite dev server, TanStack Router (type-safe file-based routing), and React Query with SSR. It is available in the full-stack framework prompt.
+
+```
+src/
+|-- routes/           # File-based routes (__root.tsx, index.tsx)
+|-- routeTree.gen.ts  # Generated route tree
+|-- router.tsx        # createRouter() + QueryClient + SSR query integration
+|-- lib/utils.ts      # cn() helper for class merging
+|-- components/ui/    # shadcn-compatible base UI primitives
+|-- styles/app.css    # Tailwind CSS v4 import + base styles
+vite.config.ts        # tanstackStart() + tailwind + react plugins
+components.json       # shadcn CLI-compatible component config
+```
+
+### Key conventions
+
+- **`~/*` path alias** mapped to `./src/*` (TanStack-native, resolved by `tsconfigPaths: true` in the Vite config). Use `~/components/...` and `~/lib/...` in imports.
+- **File-based routing** lives in `src/routes/`. TanStack Router regenerates
+  `src/routeTree.gen.ts` during Vite development and builds.
+- **No Nitro**: the build produces `dist/server/server.js` (a fetch-compatible handler) plus `dist/client`. The `start` script serves it with `srvx`:
+
+```bash
+npm run build   # vite build
+npm run start   # srvx --prod -s ../client dist/server/server.js
+npm run dev     # vite dev
+npm run type:check  # tsc --noEmit
+npm run lint    # eslint src
+```
+
+- `PORT` controls the server port (default 3000).
+- The generated `package.json` sets `"type": "module"` so the ESM-only TanStack Vite plugin loads correctly.
+
+### Commands
+
+```bash
+bun run dev       # vite dev
+bun run build     # vite build
+bun run start     # srvx --prod -s ../client dist/server/server.js
+bun run type:check
+bun run lint
+```
+
+### Integration with Auth Module
+
+If Better Auth is selected (requires a database), the auth module additionally generates:
+
+- `src/lib/auth.ts` - `betterAuth()` with `tanstackStartCookies()` and the matching adapter
+- `src/lib/auth-client.ts` - `createAuthClient()` for client components
+- `src/lib/auth-functions.ts` - `getSession()` server function built on `createServerFn` + `auth.api.getSession`
+- `src/routes/api/auth/$.ts` - the Better Auth route handler via `auth.handler(request)`
+- `src/routes/sign-in.tsx` / `src/routes/sign-up.tsx` - login/signup routes with `beforeLoad` redirect when signed in
+- `src/routes/dashboard.tsx` - protected route example using `redirect({ to: "/sign-in" })` in `beforeLoad`
+- `src/components/auth/*` - login, signup, and sign-out UI components
+
+```typescript
+// src/lib/auth.ts
+import { betterAuth } from "better-auth";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { tanstackStartCookies } from "better-auth/tanstack-start";
+
+import { db } from "./db";
+
+export const auth = betterAuth({
+  database: drizzleAdapter(db, { provider: "pg" }),
+  emailAndPassword: { enabled: true },
+  plugins: [tanstackStartCookies()],
+  secret: process.env.BETTER_AUTH_SECRET,
+  baseURL: process.env.BETTER_AUTH_URL,
+});
+```
+
+<Callout type="info">
+  `setupRouterSsrQueryIntegration` connects TanStack Query to router SSR.
+  Authentication is checked separately by `getSession()` in each route's
+  `beforeLoad`, and protected routes expose the returned user through route
+  context.
+</Callout>
+
+---
+
+## Extending Next.js
 
 ### Add a page
 

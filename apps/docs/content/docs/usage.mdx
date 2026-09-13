@@ -58,10 +58,10 @@ You will see an animated banner with the product name and a brief welcome messag
 | Option          | What it generates                                      |
 | --------------- | ------------------------------------------------------ |
 | **Backend API** | Express.js server (prompts for framework next)         |
-| **Full-stack**  | Next.js 16 app - framework is auto-selected, no prompt |
+| **Full-stack**  | Next.js 16 or TanStack Start (prompts for framework)   |
 
 <Callout type="info">
-  **Full-stack** generates a single Next.js project at the root of your chosen
+  **Full-stack** generates a single project at the root of your chosen
   directory, not a separate `backend/` + `frontend/` monorepo.
 </Callout>
 </Step>
@@ -79,7 +79,23 @@ You will see an animated banner with the product name and a brief welcome messag
 
 **Coming soon:** NestJS - selecting it shows a warning and re-prompts.
 
-> This prompt does **not** appear for Full-stack projects. Next.js is selected automatically.
+> This prompt does **not** appear for Full-stack projects.
+
+</Step>
+
+<Step>
+### Frontend framework *(Full-stack only)*
+
+```
+? Select a frontend framework:
+  (*) Next.js 16 (App Router)
+  ( ) TanStack Start (React)      (Release Candidate)
+```
+
+| Option               | What it generates                                      |
+| -------------------- | ------------------------------------------------------ |
+| **Next.js 16**       | App Router, `next dev`/`next build`, standalone server |
+| **TanStack Start**   | File-based routing, `vite dev`, served by `srvx`       |
 
 </Step>
 
@@ -112,10 +128,10 @@ For **PostgreSQL**:
   ( ) drizzle
 ```
 
-| ORM     | Available in                               |
-| ------- | ------------------------------------------ |
-| Prisma  | Backend (Express) and Full-stack (Next.js) |
-| Drizzle | Backend (Express) and Full-stack (Next.js) |
+| ORM     | Available in                                                       |
+| ------- | ------------------------------------------------------------------ |
+| Prisma  | Backend (Express) and Full-stack (Next.js and TanStack Start)      |
+| Drizzle | Backend (Express) and Full-stack (Next.js and TanStack Start)      |
 
 For **MongoDB**:
 
@@ -125,9 +141,9 @@ For **MongoDB**:
   ( ) mongoose
 ```
 
-| ODM      | Notes                  |
-| -------- | ---------------------- |
-| Mongoose | Express and Next.js |
+| ODM      | Notes                          |
+| -------- | ------------------------------ |
+| Mongoose | Express, Next.js, and TanStack |
 
 > If you select **none** for database type, this prompt is skipped entirely.
 
@@ -169,7 +185,7 @@ If yes, three files are added: `Dockerfile`, `docker-compose.yml`, and `.dockeri
 
 **Express backend** - JWT-based auth with `jsonwebtoken` and `bcrypt`. Always prompted regardless of database selection.
 
-**Next.js full-stack** - Better Auth with a database adapter. **This prompt only appears if you selected a database.** If you chose `none` for database, auth is skipped automatically.
+**Next.js / TanStack full-stack** - Better Auth with a database adapter. **This prompt only appears if you selected a database.** If you chose `none` for database, auth is skipped automatically.
 
 </Step>
 
@@ -280,6 +296,16 @@ npm run dev    # next dev
 npm run build  # next build
 npm run start  # next start
 npm run lint   # eslint
+```
+
+### Scripts - Full-stack (TanStack Start)
+
+```bash
+npm run dev         # vite dev
+npm run build       # vite build (dist/server/server.js + dist/client)
+npm run start       # srvx --prod -s ../client dist/server/server.js
+npm run type:check  # tsc --noEmit
+npm run lint        # eslint src
 ```
 
 With database (Prisma):

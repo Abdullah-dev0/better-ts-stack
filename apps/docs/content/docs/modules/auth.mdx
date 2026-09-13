@@ -1,6 +1,6 @@
 ﻿---
 title: Auth Module
-description: JWT authentication for Express, Better Auth for Next.js
+description: JWT authentication for Express, Better Auth for Next.js and TanStack Start
 ---
 
 import { Callout } from "fumadocs-ui/components/callout";
@@ -10,15 +10,16 @@ import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 
 The Auth module adds user authentication to your project. The implementation is framework-specific:
 
-| Stack                  | Implementation | Requires database                                   |
-| ---------------------- | -------------- | --------------------------------------------------- |
-| **Express backend**    | JWT + bcrypt   | No (uses in-memory user store by default)           |
-| **Next.js full-stack** | Better Auth    | **Yes - only prompted when a database is selected** |
+| Stack                   | Implementation | Requires database                                   |
+| ----------------------- | -------------- | --------------------------------------------------- |
+| **Express backend**     | JWT + bcrypt   | No (uses in-memory user store by default)           |
+| **Next.js full-stack**  | Better Auth    | **Yes - only prompted when a database is selected** |
+| **TanStack full-stack** | Better Auth    | **Yes - only prompted when a database is selected** |
 
 <Callout type="info">
-  For Next.js projects, the auth prompt is automatically skipped if you chose
-  `none` for the database type. Better Auth requires a database-backed adapter
-  to function.
+  For Next.js and TanStack Start projects, the auth prompt is automatically
+  skipped if you chose `none` for the database type. Better Auth requires a
+  database-backed adapter to function.
 </Callout>
 
 ---
@@ -168,12 +169,13 @@ The adapter used in `lib/auth.ts` is determined by your ORM selection:
 
 - **Prisma** -> `prismaAdapter` from `better-auth/adapters/prisma`
 - **Drizzle** -> `drizzleAdapter` from `better-auth/adapters/drizzle`
+- **MongoDB** -> `mongodbAdapter` from `better-auth/adapters/mongodb`
 
 ---
 
 ### Better Auth configuration - lib/auth.ts
 
-<Tabs items={['Prisma adapter', 'Drizzle adapter']}>
+<Tabs items={['Prisma adapter', 'Drizzle adapter', 'MongoDB adapter']}>
   <Tab value="Prisma adapter">
     ```typescript
     import { betterAuth } from "better-auth";
@@ -182,7 +184,7 @@ The adapter used in `lib/auth.ts` is determined by your ORM selection:
     import client from "./prisma";
 
     export const auth = betterAuth({
-      database: prismaAdapter(client, { provider: "postgres" }),
+      database: prismaAdapter(client, { provider: "postgresql" }),
       emailAndPassword: { enabled: true },
       plugins: [nextCookies()],
       secret: process.env.BETTER_AUTH_SECRET,
@@ -199,7 +201,27 @@ The adapter used in `lib/auth.ts` is determined by your ORM selection:
     import { db } from "./db";
 
     export const auth = betterAuth({
-      database: drizzleAdapter(db, { provider: "postgres" }),
+      database: drizzleAdapter(db, { provider: "pg" }),
+      emailAndPassword: { enabled: true },
+      plugins: [nextCookies()],
+      secret: process.env.BETTER_AUTH_SECRET,
+      baseURL: process.env.BETTER_AUTH_URL,
+    });
+    ```
+
+  </Tab>
+  <Tab value="MongoDB adapter">
+    ```typescript
+    import { betterAuth } from "better-auth";
+    import { mongodbAdapter } from "better-auth/adapters/mongodb";
+    import { nextCookies } from "better-auth/next-js";
+    import { MongoClient } from "mongodb";
+
+    const client = new MongoClient(process.env.MONGODB_URI!);
+    const db = client.db();
+
+    export const auth = betterAuth({
+      database: mongodbAdapter(db, { client }),
       emailAndPassword: { enabled: true },
       plugins: [nextCookies()],
       secret: process.env.BETTER_AUTH_SECRET,
@@ -254,6 +276,7 @@ Auth client helpers for the submit actions.
 
 - **Prisma + Better Auth**: the generated `prisma/schema.prisma` includes Better Auth core tables.
 - **Drizzle + Better Auth**: the generated `lib/schema.ts` contains Better Auth core tables instead of a sample table.
+- **MongoDB + Better Auth**: authentication uses the native MongoDB adapter and its own collections.
 
 ### Environment variables added
 
@@ -273,7 +296,127 @@ BETTER_AUTH_URL=http://localhost:3000
 {
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
-    "better-auth": "^1.7.2",
+    "better-auth": "^1.7.3",
+    "mongodb": "^7.6.0",
+    "react-hook-form": "^7.87.0",
+    "zod": "^4.5.4"
+  }
+}
+```
+
+---
+
+## TanStack Start - Better Auth
+
+For TanStack Start, sessions use the `tanstackStartCookies()` plugin and server functions (`createServerFn`) instead of Next.js route handlers.
+
+### Generated files
+
+```text
+src/
+|-- lib/
+|   |-- auth.ts                    # Better Auth server configuration
+|   |-- auth-client.ts             # createAuthClient() for client components
+|   |-- auth-functions.ts          # getSession() server function
+|   \-- auth-schema.ts             # Zod schemas and auth error helper
+|-- components/
+|   \-- auth/
+|       |-- sign-in-form.tsx       # Client login form
+|       |-- sign-up-form.tsx       # Client signup form
+|       \-- sign-out-button.tsx    # Client sign-out action
+\-- routes/
+    |-- sign-in.tsx                # Session-aware login route
+    |-- sign-up.tsx                # Session-aware signup route
+    |-- dashboard.tsx              # Protected example page
+    \-- api/auth/$.ts              # Better Auth route handler
+```
+
+The adapter used in `src/lib/auth.ts` is determined by your ORM selection:
+
+- **Prisma** -> `prismaAdapter` from `better-auth/adapters/prisma`
+- **Drizzle** -> `drizzleAdapter` from `better-auth/adapters/drizzle`
+- **MongoDB** -> `mongodbAdapter` from `better-auth/adapters/mongodb`
+
+### Better Auth configuration - src/lib/auth.ts
+
+```typescript
+import { betterAuth } from "better-auth";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { tanstackStartCookies } from "better-auth/tanstack-start";
+
+import { db } from "./db";
+
+export const auth = betterAuth({
+  database: drizzleAdapter(db, { provider: "pg" }),
+  emailAndPassword: { enabled: true },
+  plugins: [tanstackStartCookies()],
+  secret: process.env.BETTER_AUTH_SECRET,
+  baseURL: process.env.BETTER_AUTH_URL,
+});
+```
+
+### Auth route handler - src/routes/api/auth/$.ts
+
+```typescript
+import { createFileRoute } from "@tanstack/react-router";
+
+import { auth } from "../../../lib/auth";
+
+export const Route = createFileRoute("/api/auth/$")({
+  server: {
+    handlers: {
+      GET: ({ request }) => auth.handler(request),
+      POST: ({ request }) => auth.handler(request),
+    },
+  },
+});
+```
+
+### Session server function - src/lib/auth-functions.ts
+
+```typescript
+import { createServerFn } from "@tanstack/react-start";
+import { getRequestHeaders } from "@tanstack/react-start/server";
+
+import { auth } from "./auth";
+
+export const getSession = createServerFn({ method: "GET" }).handler(
+  async () => {
+    return await auth.api.getSession({
+      headers: getRequestHeaders(),
+    });
+  }
+);
+```
+
+Protected routes call `auth.api.getSession` in `beforeLoad` and `redirect({ to: "/sign-in" })` when no session exists. The router is wired with `setupRouterSsrQueryIntegration` in `src/router.tsx`.
+
+### Schema changes
+
+- **Prisma + Better Auth**: the generated `prisma/schema.prisma` includes Better Auth core tables.
+- **Drizzle + Better Auth**: the generated `src/lib/schema.ts` contains Better Auth core tables instead of a sample table.
+- **MongoDB + Better Auth**: authentication uses the native MongoDB adapter and its own collections.
+
+### Environment variables added
+
+```bash
+BETTER_AUTH_SECRET=please-change-me-to-a-random-string
+BETTER_AUTH_URL=http://localhost:3000
+```
+
+<Callout type="warn">
+  Do **not** prefix `BETTER_AUTH_SECRET` or `BETTER_AUTH_URL` with anything like
+  `NEXT_PUBLIC_`. These are server-side variables only.
+</Callout>
+
+### Dependencies added
+
+```json
+{
+  "dependencies": {
+    "@hookform/resolvers": "^5.9.1",
+    "better-auth": "^1.7.3",
+    "dotenv": "^17.4.2",
     "mongodb": "^7.6.0",
     "react-hook-form": "^7.87.0",
     "zod": "^4.5.4"

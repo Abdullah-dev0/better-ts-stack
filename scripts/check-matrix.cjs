@@ -3,8 +3,8 @@ const path = require("node:path");
 const { spawnSync } = require("node:child_process");
 const matrix = JSON.parse(fs.readFileSync(process.argv[2]));
 const framework = process.argv[3];
-if (!["express", "nextjs"].includes(framework))
-  throw new Error("Choose express or nextjs");
+if (!["express", "nextjs", "tanstack"].includes(framework))
+  throw new Error("Choose express, nextjs, or tanstack");
 const filter = process.argv[4];
 const results = [];
 for (const c of matrix.cases.filter(

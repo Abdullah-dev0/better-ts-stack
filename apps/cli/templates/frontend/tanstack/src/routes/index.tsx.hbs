@@ -1,0 +1,102 @@
+import { createFileRoute{{#if useAuth}}, Link{{/if}} } from "@tanstack/react-router";
+import { ArrowRight } from "lucide-react";
+
+import { buttonVariants } from "~/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { cn } from "~/lib/utils";
+
+export const Route = createFileRoute("/")({
+  component: Home,
+});
+
+const featureList = [
+  "TanStack Start SSR",
+  "TanStack Router and Query",
+  "React 19 and TypeScript",
+  "Tailwind CSS v4",
+  {{#if useAuth}}"Better Auth-ready session flow",{{/if}}
+  {{#if (eq database "prisma")}}"Prisma database tooling",{{/if}}
+  {{#if (eq database "drizzle")}}"Drizzle database tooling",{{/if}}
+];
+
+function Home() {
+  return (
+    <main className="min-h-screen bg-background text-foreground">
+      <div className="mx-auto flex min-h-screen max-w-6xl flex-col justify-center gap-12 px-6 py-16 sm:px-10 lg:px-12">
+        <section className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+          <div className="space-y-6">
+            <span className="inline-flex w-fit items-center rounded-full border border-border bg-card px-3 py-1 text-xs font-medium uppercase tracking-[0.24em] text-muted-foreground shadow-sm">
+              Created with better-ts-stack
+            </span>
+            <div className="space-y-4">
+              <h1 className="max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl">
+                Ship your stack faster with a polished TypeScript foundation.
+              </h1>
+              <p className="max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
+                Your project already includes the core app shell, database wiring,
+                and a shadcn-compatible UI foundation so you can keep building
+                instead of setting up boilerplate.
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              {{#if useAuth}}
+              <Link
+                to="/sign-up"
+                className={cn(buttonVariants({ size: "lg" }), "gap-2")}
+              >
+                Create an account
+                <ArrowRight className="size-4" />
+              </Link>
+              <Link
+                to="/sign-in"
+                className={buttonVariants({ variant: "outline", size: "lg" })}
+              >
+                Login
+              </Link>
+              {{else}}
+              <a
+                href="https://github.com/Abdullah-dev0/better-ts-stack"
+                target="_blank"
+                rel="noreferrer"
+                className={cn(buttonVariants({ size: "lg" }), "gap-2")}
+              >
+                Explore the docs
+                <ArrowRight className="size-4" />
+              </a>
+              <a
+                href="https://tanstack.com/start/latest"
+                target="_blank"
+                rel="noreferrer"
+                className={buttonVariants({ variant: "outline", size: "lg" })}
+              >
+                TanStack guide
+              </a>
+              {{/if}}
+            </div>
+          </div>
+
+          <Card className="border-border bg-card shadow-sm">
+            <CardHeader>
+              <CardTitle>Included in this starter</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <ul className="space-y-3 text-sm text-muted-foreground">
+                {featureList.map((feature) => (
+                  <li key={feature} className="flex items-center gap-3">
+                    <span className="size-2 rounded-full bg-primary" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="rounded-2xl border border-border bg-muted px-4 py-3 text-sm text-muted-foreground">
+                Start editing{" "}
+                <code className="font-mono">src/routes/index.tsx</code> and
+                shape the project around your product instead of setup chores.
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+      </div>
+    </main>
+  );
+}

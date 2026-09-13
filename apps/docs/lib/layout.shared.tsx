@@ -1,5 +1,7 @@
 import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
-import { BookOpen, Github } from "lucide-react";
+import { BookOpen } from "lucide-react";
+
+import { Github } from "@/components/icons/github";
 
 export function baseOptions(): BaseLayoutProps {
   return {

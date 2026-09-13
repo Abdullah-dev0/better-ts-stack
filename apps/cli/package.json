@@ -1,6 +1,6 @@
 {
   "name": "better-ts-stack",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "description": "A powerful CLI tool that generates fully configured TypeScript projects with backend, frontend, database integration, Docker support, and more--all through an interactive setup.",
   "keywords": [
     "cli",
@@ -43,24 +43,24 @@
     "type:check": "tsc --noEmit"
   },
   "dependencies": {
-    "@clack/prompts": "^0.11.0",
-    "consola": "^3.2.3",
-    "fs-extra": "^11.1.1",
-    "handlebars": "^4.7.8",
-    "zod": "^3.22.4"
+    "@clack/prompts": "^1.7.0",
+    "consola": "^3.4.2",
+    "fs-extra": "^11.4.0",
+    "handlebars": "^4.7.9",
+    "zod": "^4.5.4"
   },
   "devDependencies": {
     "@better-ts-stack/eslint-config": "*",
     "@better-ts-stack/prettier-config": "*",
     "@types/fs-extra": "^11.0.4",
-    "@types/node": "^20.10.5",
-    "eslint": "^9.17.0",
-    "prettier": "^3.1.1",
-    "tsx": "^4.7.0",
-    "typescript": "^5.3.3"
+    "@types/node": "^24.13.3",
+    "eslint": "^10.10.0",
+    "prettier": "^3.9.6",
+    "tsx": "^4.23.13",
+    "typescript": "^6.0.3"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=24.0.0"
   },
   "prettier": "@better-ts-stack/prettier-config"
 }

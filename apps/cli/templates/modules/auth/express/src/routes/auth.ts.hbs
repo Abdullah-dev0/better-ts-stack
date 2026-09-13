@@ -2,7 +2,7 @@ import { Request, Response, NextFunction, Router } from 'express';
 import { login, me, register } from '../controllers/authController';
 import { requireAuth } from '../middleware/requireAuth';
 
-const router = Router();
+const router: Router = Router();
 
 function asyncHandler(
   fn: (req: Request, res: Response, next: NextFunction) => Promise<void>

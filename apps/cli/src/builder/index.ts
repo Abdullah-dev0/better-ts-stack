@@ -96,9 +96,7 @@ export async function build(
     // 8. Process Handlebars templates
     consola.info("Processing template files...");
     try {
-      const allTemplateFiles = modules.flatMap(
-        (m) => m.config.templateFiles || []
-      );
+      const allTemplateFiles = modules.flatMap((m) => m.config.templateFiles);
       if (allTemplateFiles.length > 0) {
         await processTemplateFiles(
           targetDir,
@@ -121,24 +119,12 @@ export async function build(
 
     // 9. Generate package.json
     consola.info("Generating package.json...");
-    await generatePackageJson(targetDir, mergedConfig, config).catch((e) => {
-      throw buildError(
-        e,
-        "PACKAGE_JSON_ERROR",
-        "Failed to generate package.json"
-      );
-    });
+    await generatePackageJson(targetDir, mergedConfig, config);
     consola.success("package.json generated");
 
     // 10. Generate environment files
     consola.info("Generating environment files...");
-    await generateEnvFile(targetDir, mergedConfig.envVars).catch((e) => {
-      throw buildError(
-        e,
-        "ENV_FILE_ERROR",
-        "Failed to generate environment files"
-      );
-    });
+    await generateEnvFile(targetDir, mergedConfig.envVars);
     consola.success("Environment files generated");
 
     // 11. Install dependencies (optional)

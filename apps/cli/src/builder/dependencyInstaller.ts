@@ -3,23 +3,12 @@ import consola from "consola";
 
 import type { PackageManager } from "../types";
 
-// Returns the installation command for the given package manager
-function getInstallCommand(packageManager: PackageManager): string {
-  const commands: Record<PackageManager, string> = {
-    npm: "npm install",
-    pnpm: "pnpm install",
-    bun: "bun install",
-  };
-
-  return commands[packageManager];
-}
-
 // Installs project dependencies in the target directory
 export function installDependencies(
   packageManager: PackageManager,
   cwd: string
 ): boolean {
-  const command = getInstallCommand(packageManager);
+  const command = `${packageManager} install`;
 
   consola.info(`Installing dependencies with ${packageManager}...`);
   consola.debug(`Running: ${command}`);

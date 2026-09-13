@@ -7,10 +7,13 @@
   "devDependencies": {},
   "scripts": {
     "docker:build": "docker build -t {{projectName}} .",
-    "docker:up": "docker-compose up -d",
-    "docker:down": "docker-compose down",
-    "docker:logs": "docker-compose logs -f"
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f"
   },
   "envVars": {},
-  "templateFiles": ["docker-compose.yml.hbs", "Dockerfile.hbs"]
+  "templateFiles": [
+    "docker-compose.yml.hbs",
+    "Dockerfile.hbs"
+  ]
 }

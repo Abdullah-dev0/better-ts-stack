@@ -1,6 +1,6 @@
 {{#if (eq framework 'nextjs')}}
 # Base stage
-FROM node:20-alpine AS base
+FROM node:24-alpine AS base
 WORKDIR /app
 RUN apk add --no-cache libc6-compat
 
@@ -13,10 +13,16 @@ RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+{{#if (eq database 'prisma')}}
+RUN DATABASE_URL="postgresql://postgres:postgres@localhost:5432/postgres" npm run build
+{{else if (eq database 'mongoose')}}
+RUN MONGODB_URI="mongodb://localhost:27017/build" npm run build
+{{else}}
 RUN npm run build
+{{/if}}
 
 # Production stage
-FROM node:20-alpine AS runner
+FROM node:24-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 
@@ -35,7 +41,7 @@ CMD ["node", "server.js"]
 
 {{else}}
 # Build stage
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 WORKDIR /app
 
 COPY package*.json ./
@@ -44,10 +50,16 @@ RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 COPY . .
 
 # Only build if package.json has a build script
-RUN npm run build || echo "No build script found, skipping build step"
+{{#if (eq database 'prisma')}}
+RUN DATABASE_URL="postgresql://postgres:postgres@localhost:5432/postgres" npm run build
+{{else if (eq database 'mongoose')}}
+RUN MONGODB_URI="mongodb://localhost:27017/build" npm run build
+{{else}}
+RUN npm run build
+{{/if}}
 
 # Production stage
-FROM node:20-alpine
+FROM node:24-alpine
 WORKDIR /app
 ENV NODE_ENV=production
 
@@ -59,13 +71,11 @@ COPY package*.json ./
 RUN if [ -f package-lock.json ]; then npm ci --omit=dev; else npm install --omit=dev; fi
 
 # Copy built files (if TypeScript) or source files (if JavaScript)
-COPY --from=builder --chown=expressuser:nodejs /app/dist ./dist 2>/dev/null || \
-     COPY --chown=expressuser:nodejs /app/src ./src 2>/dev/null || \
-     COPY --chown=expressuser:nodejs /app/*.js ./
+COPY --from=builder --chown=expressuser:nodejs /app/dist ./dist
 
 USER expressuser
 EXPOSE {{port}}
 ENV PORT={{port}}
 
-CMD ["node", "{{entrypoint}}"]
+CMD ["node", "dist/index.js"]
 {{/if}}

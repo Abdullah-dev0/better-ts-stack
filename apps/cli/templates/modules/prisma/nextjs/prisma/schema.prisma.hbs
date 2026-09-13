@@ -2,8 +2,8 @@
 // Learn more: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
-  output   = "../generated/client"
+  provider = "prisma-client"
+  output   = "../generated"
 }
 
 datasource db {
@@ -60,6 +60,7 @@ model Account {
   updatedAt             DateTime  @updatedAt
 
   @@index([userId])
+  @@unique([providerId, accountId])
   @@map("account")
 }
 

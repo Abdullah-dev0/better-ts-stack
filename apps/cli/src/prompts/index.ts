@@ -8,15 +8,14 @@ import {
   ProjectConfig,
 } from "../types";
 import { validateProjectName } from "../validators";
-import { collectBackendChoices } from "./backend";
-import { collectFrontendChoices } from "./frontend";
+import { collectStackChoices } from "./stack";
 
 // Collects user input via interactive prompts
 export async function collectUserChoices() {
   const projectName = await text({
     message: "Project name:",
     placeholder: "my-awesome-project",
-    validate: (value) => validateProjectName(value),
+    validate: (value) => validateProjectName(value ?? ""),
   });
 
   if (isCancel(projectName)) {
@@ -35,15 +34,7 @@ export async function collectUserChoices() {
     process.exit(0);
   }
 
-  let userChoices;
-  if (applicationType === "backend") {
-    userChoices = await collectBackendChoices();
-  } else if (applicationType === "fullstack") {
-    userChoices = await collectFrontendChoices();
-  } else {
-    cancel("Invalid application type selected.");
-    process.exit(0);
-  }
+  const userChoices = await collectStackChoices(applicationType);
 
   // Derive database field from databaseType + orm for backward compatibility
   const database = deriveDatabase(userChoices.databaseType, userChoices.orm);

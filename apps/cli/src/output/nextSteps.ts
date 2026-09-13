@@ -12,7 +12,9 @@ export function generateNextSteps(
   steps.push(`cd ${config.projectName}`);
 
   // Step 2: Set environment variables
-  steps.push("Copy .env.example to .env and set your environment variables");
+  steps.push(
+    "Review the generated .env and set your database connection details"
+  );
 
   if (isFullstack) {
     if (config.useAuth) {
@@ -30,17 +32,16 @@ export function generateNextSteps(
 
   // Step 3: Install dependencies if not already done
   if (!depsInstalled) {
-    const installCmd = getInstallCommand(config.packageManager);
-    steps.push(installCmd);
+    steps.push(`${config.packageManager} install`);
   }
 
   // Step 4: Database-specific steps
   if (config.database === "prisma") {
-    steps.push(`${getRunCommand(config.packageManager)} prisma:generate`);
-    steps.push(`${getRunCommand(config.packageManager)} prisma:migrate`);
+    steps.push(`${config.packageManager} run prisma:generate`);
+    steps.push(`${config.packageManager} run prisma:migrate`);
   } else if (config.database === "drizzle") {
-    steps.push(`${getRunCommand(config.packageManager)} db:generate`);
-    steps.push(`${getRunCommand(config.packageManager)} db:migrate`);
+    steps.push(`${config.packageManager} run db:generate`);
+    steps.push(`${config.packageManager} run db:migrate`);
   } else if (config.database === "mongoose") {
     steps.push(
       "Ensure MongoDB is running locally or update MONGODB_URI in .env"
@@ -48,37 +49,9 @@ export function generateNextSteps(
   }
 
   // Step 5: Start dev server
-  steps.push(`${getRunCommand(config.packageManager)} dev`);
+  steps.push(`${config.packageManager} run dev`);
 
   return steps;
-}
-
-// Returns the dependency installation command for a package manager
-function getInstallCommand(packageManager: string): string {
-  switch (packageManager) {
-    case "npm":
-      return "npm install";
-    case "pnpm":
-      return "pnpm install";
-    case "bun":
-      return "bun install";
-    default:
-      return "npm install";
-  }
-}
-
-// Returns the script execution prefix for a package manager
-function getRunCommand(packageManager: string): string {
-  switch (packageManager) {
-    case "npm":
-      return "npm run";
-    case "pnpm":
-      return "pnpm run";
-    case "bun":
-      return "bun run";
-    default:
-      return "npm run";
-  }
 }
 
 // Formats the next steps into a success message string

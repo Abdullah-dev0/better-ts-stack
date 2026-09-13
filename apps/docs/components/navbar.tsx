@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 
 import Link from "next/link";
 
-import { Github, Menu, X, Zap } from "lucide-react";
+import { Menu, X, Zap } from "lucide-react";
 
+import { Github } from "@/components/icons/github";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { NAVBAR_CONFIG } from "@/lib/constants";
 import { cn } from "@/lib/utils";

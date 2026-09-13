@@ -1,6 +1,7 @@
 // Utilities for merging module configurations and generating project files
 import fs from "fs-extra";
 import Handlebars from "handlebars";
+import { randomBytes } from "node:crypto";
 import path from "path";
 
 import {
@@ -16,16 +17,14 @@ export function processScriptVariables(
   scripts: Record<string, string>,
   context: TemplateContext
 ): Record<string, string> {
-  const helpers = {
-    ...context.helpers,
-  };
-
   const processedScripts: Record<string, string> = {};
 
   for (const [scriptName, scriptCommand] of Object.entries(scripts)) {
     try {
       const template = Handlebars.compile(scriptCommand, { noEscape: true });
-      processedScripts[scriptName] = template(context, { helpers });
+      processedScripts[scriptName] = template(context, {
+        helpers: context.helpers,
+      });
     } catch (error) {
       throw buildError(
         error,
@@ -46,6 +45,7 @@ export function mergeConfigurations(
   const merged: MergedConfig = {
     dependencies: {},
     devDependencies: {},
+    overrides: {},
     scripts: {},
     envVars: {},
   };
@@ -53,26 +53,14 @@ export function mergeConfigurations(
   // Merge each module's configuration
   // Later modules override earlier ones
   for (const module of modules) {
-    // Merge dependencies
-    if (module.dependencies) {
-      Object.assign(merged.dependencies, module.dependencies);
-    }
-
-    // Merge devDependencies
-    if (module.devDependencies) {
-      Object.assign(merged.devDependencies, module.devDependencies);
-    }
-
-    // Merge scripts - process variables before merging
-    if (module.scripts) {
-      const processedScripts = processScriptVariables(module.scripts, context);
-      Object.assign(merged.scripts, processedScripts);
-    }
-
-    // Merge environment variables
-    if (module.envVars) {
-      Object.assign(merged.envVars, module.envVars);
-    }
+    Object.assign(merged.dependencies, module.dependencies);
+    Object.assign(merged.devDependencies, module.devDependencies);
+    Object.assign(merged.overrides, module.overrides);
+    Object.assign(
+      merged.scripts,
+      processScriptVariables(module.scripts, context)
+    );
+    Object.assign(merged.envVars, module.envVars);
   }
 
   return merged;
@@ -86,9 +74,14 @@ export async function generatePackageJson(
 ): Promise<void> {
   try {
     const isFullstack = config.applicationType === "fullstack";
+    const overrides = Object.keys(mergedConfig.overrides).length
+      ? mergedConfig.overrides
+      : undefined;
     const packageJson = {
       name: config.projectName,
       version: "1.0.0",
+      private: true,
+      engines: { node: ">=24.0.0" },
       description: `Project created with better-ts-stack using ${config.database !== "none" ? config.database : "no database"}`,
       ...(isFullstack ? {} : { main: "dist/index.js" }),
       scripts: mergedConfig.scripts,
@@ -99,6 +92,11 @@ export async function generatePackageJson(
       license: "MIT",
       dependencies: mergedConfig.dependencies,
       devDependencies: mergedConfig.devDependencies,
+      overrides,
+      pnpm:
+        config.packageManager === "pnpm" && overrides
+          ? { overrides }
+          : undefined,
     };
 
     const packageJsonPath = path.join(targetDir, "package.json");
@@ -127,18 +125,24 @@ export async function generateEnvFile(
     envContent +=
       "# Copy this file to .env and update with your actual values\n\n";
 
+    let localEnvContent = envContent;
+
     // Add each environment variable
     for (const [key, value] of Object.entries(envVars)) {
+      const resolvedValue = ["JWT_SECRET", "BETTER_AUTH_SECRET"].includes(key)
+        ? randomBytes(32).toString("hex")
+        : value;
       envContent += `${key}=${value}\n`;
+      localEnvContent += `${key}=${resolvedValue}\n`;
     }
 
     // Write .env.example
     const envExamplePath = path.join(targetDir, ".env.example");
     await fs.writeFile(envExamplePath, envContent, "utf-8");
 
-    // Copy .env.example to .env
+    // Keep generated secrets out of the shareable example file.
     const envPath = path.join(targetDir, ".env");
-    await fs.copy(envExamplePath, envPath);
+    await fs.writeFile(envPath, localEnvContent, "utf-8");
   } catch (error) {
     throw buildError(
       error,

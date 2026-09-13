@@ -93,11 +93,11 @@ You will see an animated banner with the product name and a brief welcome messag
   ( ) mongodb
 ```
 
-| Choice         | Availability                                    |
-| -------------- | ----------------------------------------------- |
-| **none**       | Backend and Full-stack                          |
-| **PostgreSQL** | Backend and Full-stack                          |
-| **MongoDB**    | Backend only (Mongoose), or with Prisma adapter |
+| Choice         | Availability                      |
+| -------------- | --------------------------------- |
+| **none**       | Backend and Full-stack            |
+| **PostgreSQL** | Backend and Full-stack            |
+| **MongoDB**    | Backend and full-stack (Mongoose) |
 
 </Step>
 
@@ -115,7 +115,7 @@ For **PostgreSQL**:
 | ORM     | Available in                               |
 | ------- | ------------------------------------------ |
 | Prisma  | Backend (Express) and Full-stack (Next.js) |
-| Drizzle | Full-stack (Next.js) only                  |
+| Drizzle | Backend (Express) and Full-stack (Next.js) |
 
 For **MongoDB**:
 
@@ -125,10 +125,9 @@ For **MongoDB**:
   ( ) mongoose
 ```
 
-| ODM      | Notes                      |
-| -------- | -------------------------- |
-| Prisma   | Uses the MongoDB connector |
-| Mongoose | Backend (Express) only     |
+| ODM      | Notes                  |
+| -------- | ---------------------- |
+| Mongoose | Express and Next.js |
 
 > If you select **none** for database type, this prompt is skipped entirely.
 
@@ -313,7 +312,3 @@ npm run db:studio
   The CLI generates production-ready code as a starting point. Always review and
   test before deploying.
 </Callout>
-
-
-
-

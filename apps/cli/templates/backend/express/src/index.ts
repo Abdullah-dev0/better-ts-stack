@@ -1,14 +1,17 @@
-import express, { Express, Request, Response } from 'express';
+import 'dotenv/config';
+import express, { Express, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import dotenv from 'dotenv';
+{{#if (eq database 'mongoose')}}
+import { connectDB } from './lib/db';
+{{/if}}
 import healthRouter from './routes/health';
 {{#if useAuth}}
 import authRouter from './routes/auth';
 {{/if}}
 
-dotenv.config();
+
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
@@ -32,15 +35,27 @@ app.use((_req: Request, res: Response) => {
 });
 
 // Error handler
-app.use((err: Error, _req: Request, res: Response) => {
+app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Internal Server Error' });
 });
 
+{{#if (eq database 'mongoose')}}
+void awaitDatabase().catch((error: unknown) => {
+  console.error(error);
+  process.exitCode = 1;
+});
+async function awaitDatabase(): Promise<void> {
+  await connectDB();
+  app.listen(port);
+}
+{{else}}
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port} 
     Health: http://localhost:${port}/health
     `);
 });
+
+{{/if}}
 
 export default app;

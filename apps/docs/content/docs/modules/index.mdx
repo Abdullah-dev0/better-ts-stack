@@ -57,16 +57,16 @@ better-ts-stack composes projects from independent modules. Each module contribu
 
 The CLI prompts govern which modules are included:
 
-| Prompt answer                             | Module(s) activated                    |
-| ----------------------------------------- | -------------------------------------- |
-| App type = `backend`                      | Express base module                    |
-| App type = `fullstack`                    | Next.js base module (auto)             |
-| Database = `postgresql` + ORM = `prisma`  | Prisma module for the chosen framework |
-| Database = `postgresql` + ORM = `drizzle` | Drizzle module (Next.js only)          |
-| Database = `mongodb` + ORM = `mongoose`   | Mongoose module (Express only)         |
-| Auth = `yes` (Express)                    | JWT auth module                        |
-| Auth = `yes` (Next.js, database selected) | Better Auth module                     |
-| Docker = `yes`                            | Docker module                          |
+| Prompt answer                             | Module(s) activated                     |
+| ----------------------------------------- | --------------------------------------- |
+| App type = `backend`                      | Express base module                     |
+| App type = `fullstack`                    | Next.js base module (auto)              |
+| Database = `postgresql` + ORM = `prisma`  | Prisma module for the chosen framework  |
+| Database = `postgresql` + ORM = `drizzle` | Drizzle module for the chosen framework |
+| Database = `mongodb` + ORM = `mongoose`   | Mongoose module (Express and Next.js)   |
+| Auth = `yes` (Express)                    | JWT auth module                         |
+| Auth = `yes` (Next.js, database selected) | Better Auth module                      |
+| Docker = `yes`                            | Docker module                           |
 
 <Callout type="info">
   Better Auth is only prompted for Next.js projects when a database has been
@@ -91,14 +91,14 @@ The final `package.json` will include:
 ```json
 {
   "dependencies": {
-    "express": "^4.18.2",
-    "cors": "^2.8.5",
-    "helmet": "^7.1.0",
-    "morgan": "^1.10.0",
-    "dotenv": "^16.3.1",
-    "@prisma/client": "^7.4.1",
-    "bcrypt": "^5.1.1",
-    "jsonwebtoken": "^9.0.2"
+    "express": "^5.2.1",
+    "cors": "^2.8.6",
+    "helmet": "^8.3.0",
+    "morgan": "^1.12.0",
+    "dotenv": "^17.4.2",
+    "@prisma/client": "^7.10.0",
+    "bcrypt": "^6.0.0",
+    "jsonwebtoken": "^9.0.3"
   },
   "scripts": {
     "dev": "tsx watch src/index.ts",
@@ -110,7 +110,7 @@ The final `package.json` will include:
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
-    "prisma:seed": "tsx prisma/seed.ts"
+    "prebuild": "prisma generate"
   }
 }
 ```
@@ -124,8 +124,8 @@ The final `package.json` will include:
 | Express base         | Always            | -                    |
 | Next.js base         | -                 | Always               |
 | PostgreSQL + Prisma  | Yes               | Yes                  |
-| PostgreSQL + Drizzle | -                 | Yes                  |
-| MongoDB + Mongoose   | Yes               | -                    |
+| PostgreSQL + Drizzle | Yes               | Yes                  |
+| MongoDB + Mongoose   | Yes               | Yes                  |
 | JWT Auth             | Yes               | -                    |
 | Better Auth          | -                 | Yes (requires DB)    |
 | Docker               | Yes               | Yes                  |
@@ -154,6 +154,3 @@ All generated code is plain TypeScript - edit any file freely.
 - Prisma: edit `prisma/schema.prisma`, then run `npm run prisma:migrate`
 - Drizzle: edit `lib/schema.ts`, then run `npm run db:generate && npm run db:migrate`
 - Mongoose: add new model files to `src/models/`
-
-
-

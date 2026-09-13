@@ -47,13 +47,13 @@ npm run type:check     # TypeScript check (no emit)
 
 ### Running Tests
 
-No test framework configured. When added: CLI: `npx vitest run <file>`, Client: `npx jest <file>`
+Template checks: `npm run test:templates`, then `node scripts/check-matrix.cjs <matrix.json> express` or `nextjs`. No test framework configured. When added: CLI: `npx vitest run <file>`, Client: `npx jest <file>`
 
 ## Code Style Guidelines
 
 ### TypeScript Configuration
 
-**CLI:** ES2020, CommonJS, strict, noUnusedLocals, noUnusedParameters, noImplicitReturns
+**CLI:** ES2020, NodeNext resolution (CommonJS output), strict, noUnusedLocals, noUnusedParameters, noImplicitReturns
 
 **Client:** ES2017, ESNext modules, strict, react-jsx, `@/*` path alias
 
@@ -84,9 +84,10 @@ Semi-colons required, double quotes, ES5 trailing commas, print width 80, tab wi
 **CLI:** Use `node:` prefix for built-ins, named exports for utilities
 
 ```typescript
+import fs from "fs-extra";
 import path from "node:path";
 import { cwd } from "node:process";
-import fs from "fs-extra";
+
 import { buildError } from "./types";
 ```
 
@@ -94,6 +95,7 @@ import { buildError } from "./types";
 
 ```typescript
 import * as React from "react";
+
 import { cn } from "@/lib/utils";
 ```
 
@@ -170,7 +172,7 @@ Modules in `apps/cli/templates/modules/` have `ModuleConfig` with: id, name, typ
 
 ## Important Notes
 
-- Node.js 18+ required
+- Node.js 24+ required
 - Run `npm run lint && npm run type:check` from root before committing
 - CLI console output is expected (not an error)
 - Use `buildError()` for all CLI error handling

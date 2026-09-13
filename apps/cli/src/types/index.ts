@@ -60,16 +60,6 @@ export type PromptChoices = Omit<
   "projectName" | "applicationType" | "database"
 >;
 
-/** Type guard to validate OrmOption values */
-export function isValidOrmOption(value: unknown): value is OrmOption {
-  return (
-    value === "prisma" ||
-    value === "mongoose" ||
-    value === "drizzle" ||
-    value === "none"
-  );
-}
-
 /**
  * Derives the database option from database type and ORM selection.
  * Returns "none" if either is "none", otherwise returns the ORM which
@@ -95,6 +85,7 @@ export interface ModuleConfig {
   type: ModuleType;
   dependencies: Dependencies;
   devDependencies: Dependencies;
+  overrides: Dependencies;
   scripts: Record<string, string>;
   envVars: Record<string, string>;
   templateFiles: string[];
@@ -110,6 +101,7 @@ export interface Module {
 export interface MergedConfig {
   dependencies: Dependencies;
   devDependencies: Dependencies;
+  overrides: Dependencies;
   scripts: Record<string, string>;
   envVars: Record<string, string>;
 }
@@ -184,7 +176,6 @@ export const databaseTypeOptions = [
 
 // ORM options for MongoDB
 export const mongodbOrmOptions = [
-  { value: "prisma" as const, label: "Prisma (Type-safe ORM)" },
   { value: "mongoose" as const, label: "Mongoose (MongoDB ODM)" },
 ];
 

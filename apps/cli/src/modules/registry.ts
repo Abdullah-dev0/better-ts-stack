@@ -12,6 +12,7 @@ const moduleConfigSchema = z.object({
   type: z.enum(["base", "database", "feature"]),
   dependencies: z.record(z.string(), z.string()).default({}),
   devDependencies: z.record(z.string(), z.string()).default({}),
+  overrides: z.record(z.string(), z.string()).default({}),
   scripts: z.record(z.string(), z.string()).default({}),
   envVars: z.record(z.string(), z.string()).default({}),
   templateFiles: z.array(z.string()).default([]),
@@ -23,11 +24,7 @@ function resolveModulePath(id: string) {
   if (id.startsWith("backend/") || id.startsWith("frontend/")) {
     return path.join(__dirname, `../../templates/${id}`);
   }
-  // Compound module ids: auth/express, auth/nextjs, prisma/express, etc.
-  if (id.includes("/")) {
-    return path.join(__dirname, `../../templates/modules/${id}`);
-  }
-  // Simple module ids: docker, mongoose
+  // Feature modules: auth/express, prisma/nextjs, docker, mongoose, etc.
   return path.join(__dirname, `../../templates/modules/${id}`);
 }
 

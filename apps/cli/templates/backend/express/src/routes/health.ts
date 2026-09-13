@@ -1,10 +1,10 @@
-import { Router, Request, Response } from 'express';
+import { Request, Response, Router } from "express";
 
-const router = Router();
+const router: Router = Router();
 
-router.get('/', (_req: Request, res: Response) => {
+router.get("/", (_req: Request, res: Response) => {
   res.status(200).json({
-    status: 'ok',
+    status: "ok",
     timestamp: new Date().toISOString(),
   });
 });

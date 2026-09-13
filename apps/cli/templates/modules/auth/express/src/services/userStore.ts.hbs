@@ -1,8 +1,12 @@
+{{#if (eq database 'drizzle')}}
+import { eq } from "drizzle-orm";
+import { db } from "../lib/db";
+import { users } from "../lib/schema";
+{{/if}}
 {{#if (eq database 'none')}}
 import crypto from 'crypto';
 {{/if}}
 {{#if (eq database 'prisma')}}
-import type { User } from '../../app/generated/prisma';
 import { prisma } from '../lib/prisma';
 {{/if}}
 {{#if (eq database 'mongoose')}}
@@ -26,23 +30,20 @@ export interface CreateUserInput {
 const users: AuthUser[] = [];
 {{/if}}
 
-export async function findUserByEmail(email: string): Promise<AuthUser | null> {
+export {{#unless (eq database 'none')}}async {{/unless}}function findUserByEmail(email: string): Promise<AuthUser | null> {
+  {{#if (eq database 'drizzle')}}
+  const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  return user ?? null;
+  {{/if}}
   {{#if (eq database 'prisma')}}
-  const user: User | null = await prisma.user.findUnique({ where: { email } });
-  if (!user) return null;
-  return {
-    id: user.id,
-    email: user.email,
-    name: user.name,
-    password: user.password,
-  };
+  return await prisma.user.findUnique({ where: { email } });
   {{/if}}
 
   {{#if (eq database 'mongoose')}}
   const user = await UserModel.findOne({ email }).exec();
   if (!user) return null;
   return {
-    id: user.id,
+    id: String(user._id),
     email: user.email,
     name: user.name,
     password: user.password,
@@ -51,37 +52,24 @@ export async function findUserByEmail(email: string): Promise<AuthUser | null> {
 
   {{#if (eq database 'none')}}
   const user = users.find((candidate) => candidate.email === email);
-  return user ?? null;
+  return Promise.resolve(user ?? null);
   {{/if}}
 }
 
-export async function createUser(data: CreateUserInput): Promise<AuthUser> {
+export {{#unless (eq database 'none')}}async {{/unless}}function createUser(data: CreateUserInput): Promise<AuthUser> {
+  {{#if (eq database 'drizzle')}}
+  const [user] = await db.insert(users).values(data).returning();
+  return user;
+  {{/if}}
   {{#if (eq database 'prisma')}}
-  const user: User = await prisma.user.create({
-    data: {
-      email: data.email,
-      name: data.name,
-      password: data.password,
-    },
-  });
-
-  return {
-    id: user.id,
-    email: user.email,
-    name: user.name,
-    password: user.password,
-  };
+  return await prisma.user.create({ data });
   {{/if}}
 
   {{#if (eq database 'mongoose')}}
-  const user = await UserModel.create({
-    email: data.email,
-    name: data.name,
-    password: data.password,
-  });
+  const user = await UserModel.create(data);
 
   return {
-    id: user.id,
+    id: String(user._id),
     email: user.email,
     name: user.name,
     password: user.password,
@@ -97,7 +85,7 @@ export async function createUser(data: CreateUserInput): Promise<AuthUser> {
   };
 
   users.push(newUser);
-  return newUser;
+  return Promise.resolve(newUser);
   {{/if}}
 }
 

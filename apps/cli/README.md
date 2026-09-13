@@ -19,10 +19,10 @@ Run the command, answer the prompts, and the CLI generates a ready-to-work proje
 
 ## What It Can Scaffold
 
-| Project type | Stack | Optional setup |
-| --- | --- | --- |
-| Backend API | Express + TypeScript | PostgreSQL, MongoDB, Prisma, Drizzle, Mongoose, JWT auth, Docker, git |
-| Full-stack app | Next.js 16 + React 19 + TypeScript | PostgreSQL, MongoDB, Prisma, Better Auth, Docker, git |
+| Project type   | Stack                              | Optional setup                                                        |
+| -------------- | ---------------------------------- | --------------------------------------------------------------------- |
+| Backend API    | Express + TypeScript               | PostgreSQL, MongoDB, Prisma, Drizzle, Mongoose, JWT auth, Docker, git |
+| Full-stack app | Next.js 16 + React 19 + TypeScript | PostgreSQL, MongoDB, Prisma, Better Auth, Docker, git                 |
 
 Notes:
 
@@ -42,7 +42,7 @@ You will be guided through:
 4. Database: `none`, `PostgreSQL`, or `MongoDB`
 5. ORM/ODM when a database is selected
    - PostgreSQL: `Prisma` or `Drizzle`
-   - MongoDB: `Prisma` or `Mongoose`
+   - MongoDB: `Mongoose`
 6. Package manager: `npm`, `pnpm`, or `bun`
 7. Docker setup
 8. Authentication
@@ -70,7 +70,7 @@ Every generated project includes the essentials:
 
 ## Requirements
 
-- Node.js 18 or later
+- Node.js 24 or later
 
 ## Links
 
@@ -81,3 +81,9 @@ Every generated project includes the essentials:
 ## License
 
 MIT
+
+## Release 1.0.0
+
+Requires Node.js 24+. Dependencies and templates use current stable releases, with TypeScript 6.0.3 held for typescript-eslint compatibility and Node.js types aligned to 24.x. Express and Next.js support PostgreSQL with Prisma or Drizzle and MongoDB with Mongoose. Prisma generation runs before builds; Docker uses Node.js 24 and Compose v2.
+
+See [upgrade notes](https://better-ts-stack.abdullahtech.me/docs/upgrade-notes) for compatibility changes and maintainer publishing commands.

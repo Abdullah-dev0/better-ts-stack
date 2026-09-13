@@ -36,7 +36,7 @@ export default async function Page(props: PageProps<"/docs/[[...mdxPath]]">) {
 }
 
 export async function generateStaticParams() {
-  return source.generateParams();
+  return source.generateParams("mdxPath");
 }
 
 export async function generateMetadata(

@@ -28,7 +28,7 @@ export function validateProjectName(name: string): string | undefined {
   }
 
   // Return the first error message
-  const firstError = result.error.errors[0];
+  const firstError = result.error.issues[0];
   return firstError.message;
 }
 

@@ -8,17 +8,21 @@
     "lint:fix": "turbo run lint:fix",
     "type:check": "turbo run type:check",
     "format": "turbo run format",
-    "format:check": "turbo run format:check"
+    "format:check": "turbo run format:check",
+    "test:templates": "npm run build --workspace better-ts-stack && node scripts/generate-matrix.cjs"
   },
   "devDependencies": {
     "husky": "^9.1.7",
-    "lint-staged": "^16.2.7",
-    "turbo": "^2.3.0"
+    "lint-staged": "^17.5.0",
+    "turbo": "^2.10.12"
   },
-  "packageManager": "npm@10.0.0",
+  "packageManager": "npm@11.19.1",
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
-  "version": "0.0.1"
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=24.0.0"
+  }
 }

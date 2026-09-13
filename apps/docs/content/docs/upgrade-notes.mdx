@@ -1,0 +1,77 @@
+---
+title: Upgrade notes for 1.0.0
+description: Stable dependency upgrades, runtime changes, and template fixes
+---
+
+This release requires **Node.js 24 or later**, both for the CLI and generated applications. Existing generated projects are independent: upgrading the CLI changes new projects, and does not migrate an existing application's code or database.
+
+## Dependency updates
+
+Workspace dependencies and template dependencies were checked against npm's published stable versions. Main upgrades include Next.js 16.3.4, React 19.2.8, Express 5.2.1, Prisma 7.10.0, Drizzle ORM 0.45.2, Mongoose 9.9.5, Better Auth 1.7.3, Zod 4.5.4, Tailwind CSS 4.3.3, ESLint 10.10.0, and the Fumadocs 16.15.7 / MDX 15.4.0 releases.
+
+Two intentional compatibility choices apply:
+
+- TypeScript stays on stable 6.0.3 because the latest typescript-eslint 8.69.0 supports TypeScript below 6.1. TypeScript 7.0.2 is stable, but is outside that supported range.
+- Node.js types use the latest 24.x release, 24.13.3, to match the minimum runtime rather than expose Node.js 26-only APIs.
+
+Prisma's npm `latest` tag pointed at 8.0.0-rc.13 during the audit. This release deliberately uses stable 7.10.0. Stable releases already current were retained. The lockfile records the workspace's resolved dependency tree.
+
+## Transitive dependency fixes
+
+Generated Prisma projects override deepmerge-ts to 8.0.2 and mysql2 to 3.24.3. Generated Drizzle projects override esbuild to 0.28.2. These stable releases address advisories in the current stable tooling dependency trees. The generator includes npm/Bun overrides and the equivalent pnpm configuration. Recheck these overrides when upgrading Prisma or Drizzle in the future.
+
+## Template fixes
+
+- Express uses version 5 and matching request types. Its error handler has all four required parameters, and dotenv loads before authentication modules.
+- Express now has a working Drizzle module, including persistent JWT user storage and migration commands.
+- MongoDB choices use Mongoose. Prisma 7 supports PostgreSQL in these templates; the previous MongoDB/Prisma choice generated an incompatible PostgreSQL schema.
+- Express Mongoose authentication connects Mongoose before starting the server and uses a reload-safe model. Optional user names match the registration API.
+- Prisma generates its client before builds, with matching output directories and imports. Removed the seed command that referenced a nonexistent file.
+- Better Auth 1.7.3 account schemas use a unique providerId/accountId pair. This patch restores the earlier account model; applications that adopted the issuer field in 1.7.0–1.7.2 should follow the [Better Auth migration guide](https://better-auth.com/docs/guides/1-7-upgrade-guide).
+- Drizzle passes its schema to the Next.js database client for Better Auth.
+- Generated authentication secrets are random per project. Configure production secrets and database URLs for your deployment.
+- Express router types are explicit so declaration emission also works with pnpm.
+- pnpm-generated Express projects start with Node.js rather than trying to execute a JavaScript path as a pnpm command.
+- Docker uses Node.js 24, valid build/copy instructions, Compose v2, and runtime environment loading. Build errors stop the Docker build.
+
+## Docs and tooling
+
+The CLI uses NodeNext module resolution for current Node.js interoperability and Zod 4 validation errors. Next.js ESLint configuration uses the official compatibility adapter for existing React lint rules under ESLint 10. A local GitHub SVG replaces Lucide's removed brand icon export. Documentation static parameters now match the `mdxPath` route.
+
+Run `npm run test:templates` from the repository root to build the CLI and generate all 90 supported feature/package-manager/Docker combinations in a temporary directory. The output gives the matrix path. Run `node scripts/check-matrix.cjs <matrix.json> express` and the same command with `nextjs` to install, build, type-check, and lint the distinct npm application stacks. These commands use disposable generated projects, not production databases.
+
+## Validation results
+
+Verified on September 6, 2026:
+
+- Workspace production build, lint, and TypeScript checks passed.
+- All 90 supported configurations generated successfully. All 15 distinct npm application stacks passed installation, build, type-check, and lint.
+- All 15 stacks passed HTTP smoke tests. Authentication checks covered registration, login, sessions or JWTs, and protected routes, using disposable PostgreSQL and MongoDB databases where applicable. The three Next.js authentication stacks were rechecked with Better Auth 1.7.3.
+- Representative Express/Prisma and Next.js/Prisma projects built with pnpm and Bun. A damaged local pnpm store required a fresh temporary store before the Next.js build passed.
+- Representative Express and Next.js Docker images built, including Prisma and MongoDB variants. This was representative Docker coverage, not 90 separate container builds.
+- Workspace and all seven generated authentication dependency trees reported zero known npm audit vulnerabilities at verification time.
+- The pre-release 0.2.0 CLI package installed in an isolated directory and generated an Express/Drizzle/auth/Docker project successfully.
+
+Next.js MongoDB authentication requires the database preparation described in the [database documentation](/docs/modules/database). These smoke tests do not replace application-specific production acceptance testing.
+
+## Code simplification
+
+Backend and frontend setup now share one prompt flow and one cancellation handler. Redundant config checks, repeated error wrapping, and duplicate package-manager command helpers were removed. Express authentication uses Prisma results directly and passes user creation input directly to Prisma and Mongoose; public responses still explicitly exclude passwords.
+
+The cleanup was checked with all 90 generated configurations, prompt branching and cancellation checks, and builds, lint, and registration/login smoke tests for the changed Express database templates. All 90 package manifests and environment examples matched the pre-cleanup output.
+
+## Publishing the CLI
+
+Only a maintainer should publish after reviewing the changes and validation results. From the repository root:
+
+```bash
+npm ci
+npm run build
+npm run lint
+npm run type:check
+npm pack --workspace better-ts-stack --dry-run
+npm login
+npm publish --workspace better-ts-stack --access public --tag latest
+```
+
+The CLI version is 1.0.0. Its prepack hook rebuilds the CLI, and the published package includes the compiled CLI and templates. Nothing is published by the upgrade workflow itself.

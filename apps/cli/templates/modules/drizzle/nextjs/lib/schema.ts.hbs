@@ -1,5 +1,5 @@
 {{#if useAuth}}
-import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, pgTable, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -56,7 +56,7 @@ export const account = pgTable("account", {
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
-});
+}, (table) => [uniqueIndex("account_provider_account_id_unique").on(table.providerId, table.accountId)]);
 
 export const verification = pgTable("verification", {
   id: text("id").primaryKey(),

@@ -4,8 +4,8 @@
   "description": "MongoDB database integration using Mongoose ODM",
   "type": "database",
   "dependencies": {
-    "mongoose": "^8.0.0",
-    "mongodb": "^6.0.0"
+    "mongoose": "^9.9.5",
+    "mongodb": "^7.6.0"
   },
   "devDependencies": {},
   "scripts": {},

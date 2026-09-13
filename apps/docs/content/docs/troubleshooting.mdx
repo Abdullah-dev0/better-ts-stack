@@ -197,7 +197,7 @@ Cmd+Shift+P > TypeScript: Restart TS Server
 # Check TypeScript version
 npx tsc --version
 
-# Should be 5.x
+# Should be 6.0.x
 # If not, update:
 npm install -D typescript@latest
 
@@ -248,16 +248,16 @@ docker ps
 
 ```bash
 # Check logs
-docker-compose logs app
+docker compose logs app
 
 # Rebuild without cache
-docker-compose build --no-cache
+docker compose build --no-cache
 
 # Check .env file exists
 cp .env.example .env
 
 # Start with explicit files
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 ```
 
 ---
@@ -342,7 +342,7 @@ If you're still stuck:
 1. **Check the logs** - Run with `DEBUG=* npm run dev` for verbose output
 2. **Check GitHub Issues** - Search [existing issues](https://github.com/abdullah-dev0/better-ts-stack/issues)
 3. **Create minimal reproduction** - Strip down to the simplest case that fails
-4. **Check versions** - Ensure Node.js 18+, npm 9+, TypeScript 5+
+4. **Check versions** - Ensure Node.js 24+, npm 9+, TypeScript 6.0
 
 ### Debug Mode
 
@@ -360,7 +360,7 @@ DEBUG=* npx better-ts-stack
 
 ```bash
 # Verify Node.js version
-node --version  # Should be 18.0.0+
+node --version  # Should be 24.0.0+
 
 # Verify npm version
 npm --version   # Should be 9.0.0+
@@ -375,4 +375,3 @@ lsof -i :5432
   GitHub](https://github.com/abdullah-dev0/better-ts-stack/issues) with your
   error message and steps to reproduce.
 </Callout>
-

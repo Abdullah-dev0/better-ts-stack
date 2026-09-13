@@ -1,7 +1,6 @@
 node_modules
 npm-debug.log
-.env
-.env.local
+.env*
 .git
 .gitignore
 README.md
@@ -11,3 +10,5 @@ dist
 coverage
 .DS_Store
 *.log
+
+.next

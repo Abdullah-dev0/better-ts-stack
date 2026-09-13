@@ -24,6 +24,8 @@ export const auth = betterAuth({
   database: drizzleAdapter(db, { provider: "pg" }),
   {{/if}}
   {{#if (eq database 'mongoose')}}
+  // Transactions require a replica set. Create user/session/account/verification
+  // collections before the first sign-up; see the database setup documentation.
   database: mongodbAdapter(db, { client }),
   {{/if}}
   emailAndPassword: {

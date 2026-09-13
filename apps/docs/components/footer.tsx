@@ -1,14 +1,12 @@
 import Link from "next/link";
 
-import { Github, Twitter } from "lucide-react";
-
 import { FOOTER_CONFIG } from "@/lib/constants";
 
 export function Footer() {
   return (
     <footer className="bg-background relative overflow-hidden py-16 text-center">
       {/* Giant Background Text - behind content */}
-      <div className="pointer-events-none z-0 flex items-start justify-center overflow-hidden select-none ">
+      <div className="pointer-events-none z-0 flex items-start justify-center overflow-hidden select-none">
         <h1 className="text-foreground/[0.07] text-4xl font-black tracking-tight whitespace-nowrap md:text-[10rem]">
           BETTER TS STACK
         </h1>
@@ -18,7 +16,7 @@ export function Footer() {
         <div className="grid grid-cols-1 items-center justify-center gap-10 md:grid-cols-3">
           {/* Brand Column */}
           <div className="space-y-4">
-            <div className="flex items-center gap-2 justify-center">
+            <div className="flex items-center justify-center gap-2">
               <div className="bg-primary text-primary-foreground flex h-8 w-8 items-center justify-center rounded-lg text-sm font-bold">
                 {FOOTER_CONFIG.brand.logo}
               </div>

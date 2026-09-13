@@ -11,6 +11,7 @@ This page shows what files and scripts are generated for each selection in
 the CLI.
 
 ---
+
 ## Backend API Template (Express)
 
 Selecting **Backend API** with Express generates:
@@ -174,7 +175,6 @@ Selecting **Full-stack** generates a single Next.js 16 application at the projec
     npm run prisma:generate
     npm run prisma:migrate   # prisma migrate dev
     npm run prisma:studio
-    npm run prisma:seed      # tsx prisma/seed.ts
     ```
 
     Environment variable added: `DATABASE_URL`
@@ -209,7 +209,7 @@ Selecting **Full-stack** generates a single Next.js 16 application at the projec
   </Tab>
 </Tabs>
 
-### PostgreSQL + Drizzle _(Next.js only)_
+### PostgreSQL + Drizzle
 
 <Files>
   <Folder name="lib" defaultOpen>
@@ -234,7 +234,7 @@ Environment variable added: `DATABASE_URL`
   contains the Better Auth core tables instead of a sample table.
 </Callout>
 
-### MongoDB + Mongoose _(Express only)_
+### MongoDB + Mongoose
 
 <Files>
   <Folder name="src" defaultOpen>
@@ -348,25 +348,21 @@ Scripts added to `package.json`:
 
 ```bash
 npm run docker:build  # docker build -t <projectName> .
-npm run docker:up     # docker-compose up -d
-npm run docker:down   # docker-compose down
-npm run docker:logs   # docker-compose logs -f
+npm run docker:up     # docker compose up -d
+npm run docker:down   # docker compose down
+npm run docker:logs   # docker compose logs -f
 ```
 
 ---
 
 ## Supported Combinations
 
-| App type   | Database   | ORM/ODM  | Auth        | Status         |
-| ---------- | ---------- | -------- | ----------- | -------------- |
-| Backend    | none       | -        | JWT         | Yes          |
-| Backend    | PostgreSQL | Prisma   | JWT         | Yes          |
-| Backend    | MongoDB    | Mongoose | JWT         | Yes          |
-| Full-stack | none       | -        | -           | Yes          |
-| Full-stack | PostgreSQL | Prisma   | Better Auth | Yes          |
-| Full-stack | PostgreSQL | Drizzle  | Better Auth | Yes          |
+| App type   | Database   | ORM/ODM  | Auth        | Status      |
+| ---------- | ---------- | -------- | ----------- | ----------- |
+| Backend    | none       | -        | JWT         | Yes         |
+| Backend    | PostgreSQL | Prisma   | JWT         | Yes         |
+| Backend    | MongoDB    | Mongoose | JWT         | Yes         |
+| Full-stack | none       | -        | -           | Yes         |
+| Full-stack | PostgreSQL | Prisma   | Better Auth | Yes         |
+| Full-stack | PostgreSQL | Drizzle  | Better Auth | Yes         |
 | Backend    | NestJS     | -        | -           | Coming soon |
-
-
-
-

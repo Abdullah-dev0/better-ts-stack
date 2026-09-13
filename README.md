@@ -41,7 +41,7 @@ The CLI guides you through these questions in order:
 3. **Database type** — `none`, `PostgreSQL`, or `MongoDB`
 4. **ORM/ODM** (if a database is selected):
    - PostgreSQL → `Prisma` or `Drizzle`
-   - MongoDB → `Prisma` (adapter) or `Mongoose`
+   - MongoDB → `Mongoose`
 5. **Package manager** — `npm`, `pnpm`, or `bun`
 6. **Docker** — include Docker configuration? (yes/no)
 7. **Authentication** — add auth?
@@ -83,12 +83,12 @@ After running the CLI you have a fully configured project with:
 
 ### Database modules
 
-| Combination                         | Template files generated                                    |
-| ----------------------------------- | ----------------------------------------------------------- |
-| PostgreSQL + Prisma (Express)       | `prisma/schema.prisma`, `src/lib/prisma.ts`                 |
-| PostgreSQL + Prisma (Next.js)       | `prisma/schema.prisma`, `lib/prisma.ts`, `prisma.config.ts` |
-| PostgreSQL + Drizzle (Next.js only) | `lib/schema.ts`, `lib/db.ts`, `drizzle.config.ts`           |
-| MongoDB + Mongoose (Express only)   | `src/lib/db.ts.hbs` (rendered)                              |
+| Combination                                | Template files generated                                                    |
+| ------------------------------------------ | --------------------------------------------------------------------------- |
+| PostgreSQL + Prisma (Express)              | `prisma/schema.prisma`, `src/lib/prisma.ts`                                 |
+| PostgreSQL + Prisma (Next.js)              | `prisma/schema.prisma`, `lib/prisma.ts`, `prisma.config.ts`                 |
+| PostgreSQL + Drizzle (Express and Next.js) | `src/lib/schema.ts` / `lib/schema.ts`, database helper, `drizzle.config.ts` |
+| MongoDB + Mongoose (Express and Next.js)   | `src/lib/db.ts`, `src/models/User.ts`                                       |
 
 ### Auth modules
 
@@ -111,13 +111,13 @@ Scripts added: `docker:build`, `docker:up`, `docker:down`, `docker:logs`
 
 | Layer              | Technology                                    |
 | ------------------ | --------------------------------------------- |
-| Runtime            | Node.js 18+ with TypeScript 5.x               |
-| Backend framework  | Express.js 4                                  |
+| Runtime            | Node.js 24+ with TypeScript 6.0               |
+| Backend framework  | Express.js 5                                  |
 | Frontend framework | Next.js 16 / React 19                         |
 | Database ORMs      | Prisma, Drizzle, Mongoose                     |
 | Auth               | JWT (`jsonwebtoken` + `bcrypt`) / Better Auth |
 | Hot reload         | `tsx watch` (Express) / `next dev` (Next.js)  |
-| Linting            | ESLint 9 with TypeScript plugin               |
+| Linting            | ESLint 10 with TypeScript plugin              |
 | Formatting         | Prettier                                      |
 
 ## 🤝 Contributing
@@ -127,3 +127,9 @@ Contributions are welcome. Please open an issue or submit a pull request.
 ## 📄 License
 
 MIT
+
+## Release 1.0.0
+
+Requires Node.js 24+. Dependencies and templates use current stable releases, with TypeScript 6.0.3 held for typescript-eslint compatibility and Node.js types aligned to 24.x. Express and Next.js support PostgreSQL with Prisma or Drizzle and MongoDB with Mongoose. Prisma generation runs before builds; Docker uses Node.js 24 and Compose v2.
+
+See [upgrade notes](https://better-ts-stack.abdullahtech.me/docs/upgrade-notes) for compatibility changes and maintainer publishing commands.

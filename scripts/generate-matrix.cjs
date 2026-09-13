@@ -8,10 +8,15 @@ const { build } = require("../apps/cli/dist/builder");
 async function main() {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), "better-ts-stack-"));
   const cases = [];
-  for (const framework of ["express", "nextjs"]) {
+  for (const framework of ["express", "nextjs", "tanstack"]) {
     for (const database of ["none", "prisma", "drizzle", "mongoose"]) {
       for (const useAuth of [false, true]) {
-        if (framework === "nextjs" && database === "none" && useAuth) continue;
+        if (
+          (framework === "nextjs" || framework === "tanstack") &&
+          database === "none" &&
+          useAuth
+        )
+          continue;
         for (const packageManager of ["npm", "pnpm", "bun"]) {
           for (const useDocker of [false, true]) {
             const name = `${framework}-${database}-${useAuth ? "auth" : "plain"}-${packageManager}-${useDocker ? "docker" : "local"}`;

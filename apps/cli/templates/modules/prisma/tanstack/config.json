@@ -1,0 +1,28 @@
+{
+  "id": "prisma",
+  "name": "Prisma ORM",
+  "description": "Prisma ORM for TanStack Start with PostgreSQL",
+  "type": "database",
+  "dependencies": {
+    "@prisma/client": "^7.10.0",
+    "@prisma/adapter-pg": "^7.10.0"
+  },
+  "devDependencies": {
+    "prisma": "^7.10.0",
+    "dotenv": "^17.4.2"
+  },
+  "scripts": {
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio",
+    "prebuild": "prisma generate"
+  },
+  "envVars": {
+    "DATABASE_URL": "postgresql://postgres:postgres@localhost:5432/postgres?schema=public"
+  },
+  "templateFiles": ["prisma/schema.prisma.hbs"],
+  "overrides": {
+    "deepmerge-ts": "^8.0.2",
+    "mysql2": "^3.24.3"
+  }
+}

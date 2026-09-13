@@ -39,6 +39,51 @@ ENV PORT={{port}} HOSTNAME=0.0.0.0
 
 CMD ["node", "server.js"]
 
+{{else if (eq framework 'tanstack')}}
+# Build stage
+FROM node:24-alpine AS builder
+WORKDIR /app
+
+COPY package*.json ./
+RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
+
+COPY . .
+
+# Only build if package.json has a build script
+{{#if (eq database 'prisma')}}
+RUN DATABASE_URL="postgresql://postgres:postgres@localhost:5432/postgres" npm run build
+{{else if (eq database 'mongoose')}}
+RUN MONGODB_URI="mongodb://localhost:27017/build" npm run build
+{{else}}
+RUN npm run build
+{{/if}}
+
+# Production stage
+FROM node:24-alpine
+WORKDIR /app
+ENV NODE_ENV=production
+
+# Create non-root user for security
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 tanstackuser
+
+COPY package*.json ./
+RUN if [ -f package-lock.json ]; then npm ci --omit=dev; else npm install --omit=dev; fi
+
+# Copy built output (dist/server/server.js + dist/client)
+COPY --from=builder --chown=tanstackuser:nodejs /app/dist ./dist
+
+# Include the Prisma client generated during the build stage
+{{#if (eq database 'prisma')}}
+COPY --from=builder --chown=tanstackuser:nodejs /app/generated ./generated
+{{/if}}
+
+USER tanstackuser
+EXPOSE {{port}}
+ENV PORT={{port}}
+
+CMD ["node_modules/.bin/srvx", "--prod", "-s", "../client", "dist/server/server.js"]
+
 {{else}}
 # Build stage
 FROM node:24-alpine AS builder

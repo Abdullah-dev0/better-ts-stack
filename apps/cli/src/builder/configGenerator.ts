@@ -83,10 +83,13 @@ export async function generatePackageJson(
       private: true,
       engines: { node: ">=24.0.0" },
       description: `Project created with better-ts-stack using ${config.database !== "none" ? config.database : "no database"}`,
+      ...(config.framework === "tanstack" ? { type: "module" } : {}),
       ...(isFullstack ? {} : { main: "dist/index.js" }),
       scripts: mergedConfig.scripts,
       keywords: isFullstack
-        ? ["nextjs", "react", "typescript"]
+        ? config.framework === "tanstack"
+          ? ["tanstack-start", "react", "typescript"]
+          : ["nextjs", "react", "typescript"]
         : ["backend", "typescript", "express"],
       author: "",
       license: "MIT",

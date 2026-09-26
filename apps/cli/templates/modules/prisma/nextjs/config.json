@@ -15,6 +15,7 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
+    "pretype:check": "prisma generate",
     "prebuild": "prisma generate"
   },
   "envVars": {

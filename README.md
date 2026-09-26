@@ -139,6 +139,10 @@ Contributions are welcome. Please open an issue or submit a pull request.
 
 MIT
 
+## Release 1.1.1
+
+Prisma starters now generate the client before `npm run type:check`, so a fresh installation can be checked without running a separate command first.
+
 ## Release 1.0.8
 
 Requires Node.js 24+. Dependencies and templates use current stable releases, with TypeScript 6.0.3 held for typescript-eslint compatibility and Node.js types aligned to 24.x. Express, Next.js, and TanStack Start support PostgreSQL with Prisma or Drizzle and MongoDB with Mongoose. Prisma generation runs before builds; Docker uses Node.js 24 and Compose v2.

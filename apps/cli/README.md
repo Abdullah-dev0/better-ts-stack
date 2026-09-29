@@ -1,8 +1,8 @@
 # better-ts-stack
 
-> Generate production-ready TypeScript apps from an interactive CLI
+> An interactive CLI that scaffolds TypeScript backend and full-stack projects.
 
-`better-ts-stack` scaffolds backend and full-stack TypeScript projects with sensible defaults, batteries-included tooling, and optional database, auth, Docker, and git setup.
+`better-ts-stack` creates an Express, Next.js, or TanStack Start project with TypeScript, ESLint, and Prettier set up. Database, authentication, Docker, and git are optional.
 
 ## Quick Start
 
@@ -15,30 +15,29 @@ npm install -g better-ts-stack
 better-ts-stack
 ```
 
-Run the command, answer the prompts, and the CLI generates a ready-to-work project for you.
+Run the command and answer the prompts. The CLI creates the project folder.
 
 ## What It Can Scaffold
 
-| Project type   | Stack                              | Optional setup                                                        |
-| -------------- | ---------------------------------- | --------------------------------------------------------------------- |
-| Backend API    | Express + TypeScript               | PostgreSQL, MongoDB, Prisma, Drizzle, Mongoose, JWT auth, Docker, git |
-| Full-stack app | Next.js 16 + React 19 + TypeScript | PostgreSQL, MongoDB, Prisma, Better Auth, Docker, git                 |
+| Project type   | Stack                                   | Optional setup                                                           |
+| -------------- | --------------------------------------- | ------------------------------------------------------------------------ |
+| Backend API    | Express 5 + TypeScript                  | PostgreSQL, MongoDB, Prisma, Drizzle, Mongoose, JWT auth, Docker, git    |
+| Full-stack app | Next.js 16 or TanStack Start + React 19 | PostgreSQL, MongoDB, Prisma, Drizzle, Mongoose, Better Auth, Docker, git |
 
 Notes:
 
-- Express is the current backend implementation.
-- NestJS appears in the prompt flow as "Coming Soon".
-- Better Auth is only available for full-stack projects when a database is selected.
+- Express is the only backend framework for now. NestJS is listed in the prompt as "coming soon".
+- Better Auth is only offered for full-stack projects that use a database.
 
 ## Interactive Prompt Flow
 
-The CLI is fully interactive. There are no subcommands or flags.
-
-You will be guided through:
+The CLI has no subcommands or flags. It asks, in order:
 
 1. Project name
 2. Application type: `Backend API` or `Full-stack App`
-3. Backend framework for backend apps: `Express` (`NestJS` is coming soon)
+3. Framework
+   - Backend: `Express` (`NestJS` is coming soon)
+   - Full-stack: `Next.js` or `TanStack Start`
 4. Database: `none`, `PostgreSQL`, or `MongoDB`
 5. ORM/ODM when a database is selected
    - PostgreSQL: `Prisma` or `Drizzle`
@@ -47,7 +46,7 @@ You will be guided through:
 7. Docker setup
 8. Authentication
    - Express apps: JWT-based auth
-   - Next.js apps: Better Auth when a database is enabled
+   - Next.js and TanStack Start apps: Better Auth, only when a database is selected
 9. Git initialization
 10. Dependency installation
 
@@ -55,14 +54,14 @@ The CLI does not ask for a port. Backend projects default to `PORT=3000`.
 
 ## What You Get
 
-Every generated project includes the essentials:
+Every generated project includes:
 
 - TypeScript with strict mode enabled
 - ESLint and Prettier pre-configured
 - `.env.example` and `.env` setup
 - Ready-to-run project scripts
 - Health check endpoint at `/health` for backend projects
-- shadcn-compatible UI foundation for Next.js projects
+- shadcn-compatible UI components for Next.js and TanStack Start projects
 - Database wiring and schema setup when selected
 - Authentication scaffolding when selected
 - Docker files when selected
@@ -81,13 +80,3 @@ Every generated project includes the essentials:
 ## License
 
 MIT
-
-## Release 1.1.2
-
-Frontend starters now allow committing `.env.example`, and Express starters allow committing lockfiles. Setup instructions follow installation, database preparation, and server startup before account creation. Git documentation now accurately describes repository initialization.
-
-## Release 1.0.8
-
-Requires Node.js 24+. Dependencies and templates use current stable releases, with TypeScript 6.0.3 held for typescript-eslint compatibility and Node.js types aligned to 24.x. Express and Next.js support PostgreSQL with Prisma or Drizzle and MongoDB with Mongoose. Prisma generation runs before builds; Docker uses Node.js 24 and Compose v2.
-
-See [upgrade notes](https://better-ts-stack.abdullahtech.me/docs/upgrade-notes) for compatibility changes and maintainer publishing commands.

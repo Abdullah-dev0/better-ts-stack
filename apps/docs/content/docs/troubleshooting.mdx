@@ -1,66 +1,59 @@
-﻿---
+---
 title: Troubleshooting
 description: Common issues and solutions
 ---
 
-import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
 import { Callout } from "fumadocs-ui/components/callout";
 import { Tab, Tabs } from "fumadocs-ui/components/tabs";
-
-## Common Issues
-
-Here are solutions to common problems you might encounter.
-
----
 
 ## Installation Issues
 
 ### "Command not found" after global install
 
-**Problem:** You installed globally but get "command not found"
+**Problem:** You installed the CLI globally, but your shell can't find `better-ts-stack`.
 
-**Solution:**
+**Solution:** Add npm's global bin folder to your `PATH`.
 
 <Tabs items={['Linux/Mac', 'Windows']}>
   <Tab value="Linux/Mac">
     ```bash
-    # Check npm global location
+    # Show npm's global folder
     npm config get prefix
-    
-    # Add to PATH in ~/.bashrc or ~/.zshrc
+
+    # Add its bin folder to PATH in ~/.bashrc or ~/.zshrc
     export PATH="$PATH:$(npm config get prefix)/bin"
-    
-    # Reload shell
+
+    # Reload your shell
     source ~/.bashrc  # or source ~/.zshrc
     ```
+
   </Tab>
   <Tab value="Windows">
     ```powershell
-    # Check npm global location
+    # Show npm's global folder
     npm config get prefix
-    
-    # Add to system PATH:
+
+    # Add that folder to PATH:
     # 1. Open System Properties > Environment Variables
-    # 2. Edit PATH variable
-    # 3. Add: C:\Users\<username>\AppData\Roaming\npm
+    # 2. Edit the PATH variable
+    # 3. Add the folder, usually C:\Users\<username>\AppData\Roaming\npm
     ```
+
   </Tab>
 </Tabs>
 
 ### Permission denied on Linux/Mac
 
-**Problem:** EACCES permission errors when installing globally
+**Problem:** You get `EACCES` errors when installing globally.
 
-**Solution:**
+**Solution:** Don't use `sudo`. Point npm at a folder in your home directory instead:
 
 ```bash
-# Don't use sudo! Instead, change npm's directory
 mkdir ~/.npm-global
 npm config set prefix '~/.npm-global'
 echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.bashrc
 source ~/.bashrc
 
-# Now install without sudo
 npm install -g better-ts-stack
 ```
 
@@ -70,41 +63,18 @@ npm install -g better-ts-stack
 
 ### "Target directory is not empty"
 
-**Problem:** The CLI says the directory already has files
+**Problem:** A folder with the project name already exists and contains files.
 
-**Solution:**
-
-```bash
-# Option 1: Use a different project name
-npx better-ts-stack
-# Enter: my-new-project
-
-# Option 2: Empty the directory
-rm -rf my-project/*
-npx better-ts-stack
-
-# Option 3: Create new directory
-mkdir my-project && cd my-project
-npx better-ts-stack
-```
+**Solution:** Run the CLI again with a different project name, or move or delete the existing folder first.
 
 ### "Invalid project name"
 
-**Problem:** Project name rejected
+**Problem:** The CLI rejects the project name.
 
-**Solution:**
+**Solution:** Use a name without spaces that doesn't start with a dot.
 
-Valid names:
-
-- `my-api`
-- `cool-app-v2`
-- `customer_portal`
-
-Invalid names:
-
-- `my app` (contains space)
-- `.hidden` (starts with dot)
-- `` (empty)
+- Valid: `my-api`, `cool-app-v2`, `customer_portal`
+- Invalid: `my app` (contains a space), `.hidden` (starts with a dot), or an empty name
 
 ---
 
@@ -112,12 +82,12 @@ Invalid names:
 
 ### "Cannot connect to database"
 
-**Problem:** App can't connect to PostgreSQL/MongoDB
+**Problem:** The app can't connect to PostgreSQL or MongoDB.
 
-**Solution:**
+**Solution:** Check that the database is running and that the URL in `.env` is correct.
 
 ```bash
-# Check if PostgreSQL is running
+# Check whether PostgreSQL is running
 pg_isready
 
 # Start PostgreSQL (Mac with Homebrew)
@@ -125,25 +95,30 @@ brew services start postgresql
 
 # Start PostgreSQL (Linux)
 sudo service postgresql start
+```
 
-# Check connection string in .env
+The connection string goes in `.env`:
+
+```bash
 DATABASE_URL="postgresql://user:password@localhost:5432/dbname"
 ```
 
+If the app runs in Docker, `localhost` points at the container, not your machine. See the [Docker module](/docs/modules/docker).
+
 ### Prisma migration errors
 
-**Problem:** Migration fails
+**Problem:** `npm run prisma:migrate` fails.
 
 **Solution:**
 
 ```bash
-# Reset database (careful - deletes data!)
+# Reset the database (deletes all data)
 npx prisma migrate reset
 
-# Or create new migration
+# Or create a new migration
 npx prisma migrate dev --name fix_migration
 
-# Push schema without migration
+# Or push the schema without creating a migration
 npx prisma db push
 ```
 
@@ -153,35 +128,38 @@ npx prisma db push
 
 ### "Port 3000 already in use"
 
-**Problem:** Another app is using port 3000
+**Problem:** Another process is using port 3000.
 
-**Solution:**
+**Solution:** Stop that process, or start the app on another port.
 
 ```bash
-# Find and kill process
+# Linux/Mac: find and stop the process on port 3000
 lsof -ti:3000 | xargs kill -9
 
-# Or use different port
+# Or use a different port
 PORT=3001 npm run dev
 ```
 
+### TanStack Start: CSS and JS return 404 after `npm start` (Windows)
+
+On Windows, Node.js 24 releases before 24.20 report different device IDs for the same file depending on how it is read. `srvx`, the TanStack production server, treats that as unsafe and refuses every static file, so pages load without styles or client JavaScript.
+
+Upgrade Node.js to 24.20 or later (`node --version`), then run `npm start` again. The generated `package.json` lists this in `engines`.
+
 ### "Cannot find module"
 
-**Problem:** Module not found errors
+**Problem:** Node or TypeScript can't find a module.
 
-**Solution:**
+**Solution:** Reinstall dependencies:
 
 ```bash
-# Reinstall dependencies
 rm -rf node_modules package-lock.json
 npm install
-
-# Check if .env file exists
-cp .env.example .env
-
-# Restart TypeScript server (VS Code)
-Cmd+Shift+P > TypeScript: Restart TS Server
 ```
+
+In a Prisma project, also run `npm run prisma:generate`. The generated client is not created until you do.
+
+If the error only shows in your editor, restart the TypeScript server. In VS Code, open the command palette and run **TypeScript: Restart TS Server**.
 
 ---
 
@@ -189,34 +167,31 @@ Cmd+Shift+P > TypeScript: Restart TS Server
 
 ### Type errors in generated code
 
-**Problem:** TypeScript errors after generation
+**Problem:** TypeScript reports errors right after generation.
 
-**Solution:**
+**Solution:** Check the TypeScript version. The templates use TypeScript 6.0, and typescript-eslint does not support TypeScript 7 yet.
 
 ```bash
-# Check TypeScript version
 npx tsc --version
 
-# Should be 6.0.x
-# If not, update:
-npm install -D typescript@latest
+# If it isn't 6.0.x:
+npm install -D typescript@~6.0.3
 
-# Run type check
 npm run type:check
 ```
 
 ### "Property does not exist on type"
 
-**Problem:** Type definitions missing
+**Problem:** Type definitions are missing or out of date.
 
 **Solution:**
 
 ```bash
-# Install missing types
+# Install missing type packages
 npm install -D @types/express @types/node @types/cors
 
-# Regenerate Prisma client (if using Prisma)
-npx prisma generate
+# Regenerate the Prisma client (Prisma projects only)
+npm run prisma:generate
 ```
 
 ---
@@ -225,40 +200,36 @@ npx prisma generate
 
 ### "Docker daemon not running"
 
-**Problem:** Docker commands fail
+**Problem:** Docker commands fail.
 
-**Solution:**
+**Solution:** Start Docker, then check that it responds.
 
 ```bash
-# Mac - Start Docker Desktop
+# Mac: start Docker Desktop
 open -a Docker
 
 # Linux
 sudo systemctl start docker
 
-# Check Docker status
+# Check that Docker is running
 docker ps
 ```
 
 ### Container fails to start
 
-**Problem:** Docker container exits immediately
+**Problem:** The container exits right after starting.
 
-**Solution:**
+**Solution:** Read the logs first. They usually show the cause, such as a missing environment variable or an unreachable database.
 
 ```bash
-# Check logs
-docker compose logs app
+# Show container logs
+npm run docker:logs
 
 # Rebuild without cache
 docker compose build --no-cache
-
-# Check .env file exists
-cp .env.example .env
-
-# Start with explicit files
-docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 ```
+
+Compose reads `.env`, so make sure it exists and that its database URLs work from inside the container.
 
 ---
 
@@ -266,72 +237,40 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 
 ### "Invalid token" errors
 
-**Problem:** JWT authentication fails
+**Problem:** Requests with a JWT are rejected.
 
 **Solution:**
 
-```bash
-# Check JWT_SECRET is set
-cat .env | grep JWT_SECRET
-
-# Should be 32+ characters
-# The default is 1h - use a longer value only if intentional
-JWT_EXPIRES_IN=1h
-
-# Restart server after changing .env
-```
-
-### "Password comparison failed"
-
-**Problem:** bcrypt comparison fails
-
-**Solution:**
-
-```bash
-# Ensure password was hashed during registration
-# Check database:
-npx prisma studio
-
-# Look at user.password - should be hashed string
-# If plaintext, registration isn't hashing passwords
-```
+- Check that `JWT_SECRET` is set in `.env`. The CLI writes a random value there.
+- Tokens expire after `JWT_EXPIRES_IN` (default `1h`). Log in again to get a new one.
+- Send the token as `Authorization: Bearer <token>`.
+- Restart the server after you change `.env`.
 
 ---
 
 ## Performance Issues
 
-### Slow TypeScript compilation
+### Slow TypeScript builds
 
-**Problem:** Build takes too long
+**Problem:** `npm run build` takes a long time.
 
-**Solution:**
+**Solution:** Turn on incremental compilation in `tsconfig.json`:
 
-```bash
-# Use incremental compilation
-# In tsconfig.json:
+```json
 {
   "compilerOptions": {
     "incremental": true
   }
 }
-
-# Use tsx for development (already included)
-npm run dev  # Uses tsx watch
 ```
+
+During development, `npm run dev` uses `tsx watch`, which skips type checking and restarts quickly.
 
 ### Large node_modules
 
-**Problem:** node_modules is huge
+**Problem:** `node_modules` takes up a lot of disk space.
 
-**Solution:**
-
-```bash
-# Use pnpm for better disk usage
-pnpm install
-
-# Or clean npm cache
-npm cache clean --force
-```
+**Solution:** pnpm stores packages once and links them into each project. Choose pnpm when you generate the project, or switch later with `pnpm install`.
 
 ---
 
@@ -339,39 +278,12 @@ npm cache clean --force
 
 If you're still stuck:
 
-1. **Check the logs** - Run with `DEBUG=* npm run dev` for verbose output
-2. **Check GitHub Issues** - Search [existing issues](https://github.com/abdullah-dev0/better-ts-stack/issues)
-3. **Create minimal reproduction** - Strip down to the simplest case that fails
-4. **Check versions** - Ensure Node.js 24+, npm 9+, TypeScript 6.0
-
-### Debug Mode
-
-Enable debug logging:
-
-```bash
-# Set debug environment variable
-export DEBUG=*
-
-# Run CLI with debug
-DEBUG=* npx better-ts-stack
-```
-
-### Check System Requirements
-
-```bash
-# Verify Node.js version
-node --version  # Should be 24.0.0+
-
-# Verify npm version
-npm --version   # Should be 9.0.0+
-
-# Check available ports
-lsof -i :3000
-lsof -i :5432
-```
+1. **Check versions.** You need Node.js 24 or later (`node --version`). TanStack Start projects on Windows need Node.js 24.20 or later.
+2. **Search [GitHub Issues](https://github.com/abdullah-dev0/better-ts-stack/issues)** for the same error.
+3. **Make a minimal reproduction.** Generate a fresh project with the fewest options that still show the problem.
 
 <Callout type="info">
   Still having issues? [Open an issue on
   GitHub](https://github.com/abdullah-dev0/better-ts-stack/issues) with your
-  error message and steps to reproduce.
+  error message, the options you picked, and steps to reproduce.
 </Callout>

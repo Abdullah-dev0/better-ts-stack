@@ -35,12 +35,26 @@ Install once and run from anywhere:
 
 <Tabs items={["npm", "pnpm", "bun"]}>
   <Tab value="npm">
-    ```bash npm install -g better-ts-stack better-ts-stack ```
+    ```bash
+    npm install -g better-ts-stack
+    better-ts-stack
+    ```
+
   </Tab>
   <Tab value="pnpm">
-    ```bash pnpm add -g better-ts-stack better-ts-stack ```
+    ```bash
+    pnpm add -g better-ts-stack
+    better-ts-stack
+    ```
+
   </Tab>
-  <Tab value="bun">```bash bun add -g better-ts-stack better-ts-stack ```</Tab>
+  <Tab value="bun">
+    ```bash
+    bun add -g better-ts-stack
+    better-ts-stack
+    ```
+
+  </Tab>
 </Tabs>
 
 **Pros**
@@ -93,8 +107,8 @@ Your package manager's global bin directory may not be in your `PATH`.
     # Find the global location
     npm config get prefix
 
-    # Add that path (+ \node_modules\.bin) to your PATH
-    # via System Properties > Environment Variables
+    # Add that folder (usually C:\Users\<username>\AppData\Roaming\npm)
+    # to your PATH via System Properties > Environment Variables
     ```
 
   </Tab>

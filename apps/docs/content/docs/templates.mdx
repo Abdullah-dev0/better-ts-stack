@@ -7,8 +7,7 @@ import { Callout } from "fumadocs-ui/components/callout";
 import { File, Files, Folder } from "fumadocs-ui/components/files";
 import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 
-This page shows what files and scripts are generated for each selection in
-the CLI.
+This page lists the files and scripts the CLI generates for each option.
 
 ---
 
@@ -35,12 +34,8 @@ Selecting **Backend API** with Express generates:
   </Folder>
 </Files>
 
-<Callout type="info">
-  The base backend template generates exactly two source files: `src/index.ts`
-  and `src/routes/health.ts`. There is no `app.ts`, `routes/index.ts`,
-  `middleware/errorHandler.ts`, `types/` directory, or `README.md` in the base
-  output.
-</Callout>
+The base template has two source files: `src/index.ts` and
+`src/routes/health.ts`.
 
 ### src/index.ts
 
@@ -48,14 +43,12 @@ The entry point configures Express middleware, mounts the health route, and star
 
 ```typescript
 import cors from "cors";
-import dotenv from "dotenv";
-import express, { Express, Request, Response } from "express";
+import "dotenv/config";
+import express, { Express, NextFunction, Request, Response } from "express";
 import helmet from "helmet";
 import morgan from "morgan";
 
 import healthRouter from "./routes/health";
-
-dotenv.config();
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
@@ -74,13 +67,14 @@ app.use((_req: Request, res: Response) => {
 });
 
 // Error handler
-app.use((err: Error, _req: Request, res: Response) => {
+app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   console.error(err.stack);
   res.status(500).json({ error: "Internal Server Error" });
 });
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Health: http://localhost:${port}/health`);
 });
 
 export default app;
@@ -108,7 +102,7 @@ export default app;
 
 ## Full-stack Templates
 
-Selecting **Full-stack** generates a single application at the project root. There are no separate `backend/` or `frontend/` subdirectories. You pick the frontend framework in the prompt.
+Selecting **Full-stack** generates one application at the project root, with no separate `backend/` or `frontend/` folders. You pick the framework in the next prompt.
 
 ### Next.js
 
@@ -427,7 +421,7 @@ Scripts added to `package.json`:
 
 ```bash
 npm run docker:build  # docker build -t <projectName> .
-npm run docker:up     # docker compose up -d
+npm run docker:up     # docker compose up -d --build
 npm run docker:down   # docker compose down
 npm run docker:logs   # docker compose logs -f
 ```
@@ -440,6 +434,7 @@ npm run docker:logs   # docker compose logs -f
 | --------- | ---------- | ---------- | -------- | ----------- | ----------- |
 | Express   | Backend    | none       | -        | JWT         | Yes         |
 | Express   | Backend    | PostgreSQL | Prisma   | JWT         | Yes         |
+| Express   | Backend    | PostgreSQL | Drizzle  | JWT         | Yes         |
 | Express   | Backend    | MongoDB    | Mongoose | JWT         | Yes         |
 | Next.js   | Full-stack | none       | -        | -           | Yes         |
 | Next.js   | Full-stack | PostgreSQL | Prisma   | Better Auth | Yes         |
@@ -449,4 +444,4 @@ npm run docker:logs   # docker compose logs -f
 | TanStack  | Full-stack | PostgreSQL | Prisma   | Better Auth | Yes         |
 | TanStack  | Full-stack | PostgreSQL | Drizzle  | Better Auth | Yes         |
 | TanStack  | Full-stack | MongoDB    | Mongoose | Better Auth | Yes         |
-| -         | Backend    | NestJS     | -        | -           | Coming soon |
+| NestJS    | Backend    | -          | -        | -           | Coming soon |

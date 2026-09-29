@@ -8,7 +8,7 @@ import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 
 ## Configuration Overview
 
-Better-TS-Stack generates projects with sensible defaults, but you'll need to configure environment variables and can customize various settings.
+This page lists the configuration files a generated project contains and the environment variables you need to set.
 
 ---
 
@@ -16,7 +16,7 @@ Better-TS-Stack generates projects with sensible defaults, but you'll need to co
 
 ### Backend (.env)
 
-The CLI writes these variables to `.env` and `.env.example` based on selected modules:
+The CLI writes these variables to `.env` and `.env.example`, depending on the modules you selected:
 
 ```bash
 # Base (always generated)
@@ -37,14 +37,19 @@ JWT_EXPIRES_IN=1h
 ### Full-stack / Next.js (.env)
 
 ```bash
-# Base (always generated)
-NODE_ENV=development
+# Base (always generated). NODE_ENV is set by next, vite, and srvx.
 PORT=3000
 
 # + Better Auth (requires database)
 BETTER_AUTH_SECRET=please-change-me-to-a-random-string
 BETTER_AUTH_URL=http://localhost:3000
 ```
+
+<Callout type="info">
+  `.env.example` keeps the placeholder values shown here. In `.env`, the CLI
+  replaces `JWT_SECRET` and `BETTER_AUTH_SECRET` with a random 64-character
+  value, so each project gets its own secret.
+</Callout>
 
 ### Environment-Specific Files
 
@@ -80,19 +85,22 @@ You can create separate files for different environments:
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "moduleResolution": "node",
     "declaration": true,
     "declarationMap": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "tests"]
+  "exclude": ["node_modules", "dist"]
 }
 ```
 
 ### Frontend tsconfig.json
 
-Next.js generates this automatically with modern settings:
+The Next.js template ships with this `tsconfig.json`:
 
 ```json
 {
@@ -108,7 +116,7 @@ Next.js generates this automatically with modern settings:
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
     "plugins": [
       {
@@ -177,31 +185,41 @@ Docker module adds: `docker:build`, `docker:up`, `docker:down`, `docker:logs`
 
 ## ESLint Configuration
 
-### Backend .eslintrc.json
+### Backend eslint.config.mjs
 
-```json
-{
-  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
-  "parser": "@typescript-eslint/parser",
-  "parserOptions": {
-    "ecmaVersion": 2020,
-    "sourceType": "module"
-  },
-  "plugins": ["@typescript-eslint"],
-  "rules": {
-    "@typescript-eslint/explicit-function-return-type": "off",
-    "@typescript-eslint/no-explicit-any": "warn",
-    "@typescript-eslint/no-unused-vars": [
-      "error",
-      { "argsIgnorePattern": "^_" }
-    ]
-  },
-  "env": {
-    "node": true,
-    "es2020": true
+ESLint 10 reads the flat config in `eslint.config.mjs`. The Express template uses `typescript-eslint` with type-aware rules. A shortened version:
+
+```javascript
+import eslint from "@eslint/js";
+import tseslint from "typescript-eslint";
+
+export default tseslint.config(
+  { ignores: ["dist", "node_modules", "src/generated/**"] },
+  eslint.configs.recommended,
+  ...tseslint.configs.recommended,
+  ...tseslint.configs.recommendedTypeChecked,
+  {
+    languageOptions: {
+      parserOptions: {
+        project: "./tsconfig.eslint.json",
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+    rules: {
+      "@typescript-eslint/explicit-function-return-type": "off",
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_" },
+      ],
+      "@typescript-eslint/no-floating-promises": "error",
+      "no-console": "off",
+    },
   }
-}
+);
 ```
+
+The template also contains an older `.eslintrc.js`. ESLint 10 ignores it, so you can delete it.
 
 ---
 
@@ -230,7 +248,7 @@ See full Dockerfile in [Docker Module](/docs/modules/docker).
 
 ### docker-compose.yml
 
-The generated file is minimal - only the app service is defined:
+The generated file defines only the app service:
 
 ```yaml
 services:
@@ -338,7 +356,7 @@ npx prisma migrate reset
 
 ### next.config.ts
 
-The generated file is intentionally minimal:
+Without Docker, the generated file is empty apart from the type import:
 
 ```typescript
 import type { NextConfig } from "next";
@@ -348,7 +366,9 @@ const nextConfig: NextConfig = {};
 export default nextConfig;
 ```
 
-Add options as your project grows. Refer to the [Next.js configuration docs](https://nextjs.org/docs/app/api-reference/config/next-config-js) for available options.
+If you choose Docker, it also sets `output: "standalone"`, which the Docker image runs with `node server.js`.
+
+Add options as you need them. See the [Next.js configuration docs](https://nextjs.org/docs/app/api-reference/config/next-config-js) for available options.
 
 ---
 
@@ -386,6 +406,5 @@ Add to `tsconfig.json`:
 ```
 
 <Callout type="info">
-  All configuration files are editable after generation. Customize them to fit
-  your project's specific needs.
+  You can edit any of these configuration files after generation.
 </Callout>

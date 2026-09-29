@@ -3,12 +3,9 @@ title: Backend Module
 description: Express.js backend with TypeScript, routing, and middleware
 ---
 
-import { Callout } from "fumadocs-ui/components/callout";
-import { Tab, Tabs } from "fumadocs-ui/components/tabs";
-
 ## Overview
 
-The Backend module generates a production-ready Express.js server with TypeScript. It is the foundation of every **Backend API** project.
+The Backend module generates an Express 5 server with TypeScript. Every **Backend API** project starts from it.
 
 ## What You Get
 
@@ -19,12 +16,7 @@ src/
     \-- health.ts     # GET /health endpoint
 ```
 
-<Callout type="info">
-  The base backend template generates exactly these two source files. No
-  `app.ts`, `routes/index.ts`, `middleware/errorHandler.ts`, or `types/`
-  directory are included in the base output. Additional source files are added
-  by optional modules (database, auth).
-</Callout>
+The database and auth modules add more files to `src/`.
 
 ---
 
@@ -36,14 +28,12 @@ The entry point configures and starts the Express app:
 
 ```typescript
 import cors from "cors";
-import dotenv from "dotenv";
-import express, { Express, Request, Response } from "express";
+import "dotenv/config";
+import express, { Express, NextFunction, Request, Response } from "express";
 import helmet from "helmet";
 import morgan from "morgan";
 
 import healthRouter from "./routes/health";
-
-dotenv.config();
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
@@ -62,31 +52,35 @@ app.use((_req: Request, res: Response) => {
 });
 
 // Error handler
-app.use((err: Error, _req: Request, res: Response) => {
+app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   console.error(err.stack);
   res.status(500).json({ error: "Internal Server Error" });
 });
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Health: http://localhost:${port}/health`);
 });
 
 export default app;
 ```
 
-When the **auth** module is selected, `src/index.ts` additionally imports and mounts the auth router at `/auth`.
+With the **auth** module, `src/index.ts` also mounts the auth router at `/auth`. With **Mongoose**, the server connects to MongoDB before it starts listening.
 
 ### src/routes/health.ts
 
-A simple `GET /health` endpoint:
+A `GET /health` endpoint:
 
 ```typescript
-import { Router } from "express";
+import { Request, Response, Router } from "express";
 
-const router = Router();
+const router: Router = Router();
 
-router.get("/", (_req, res) => {
-  res.json({ status: "ok" });
+router.get("/", (_req: Request, res: Response) => {
+  res.status(200).json({
+    status: "ok",
+    timestamp: new Date().toISOString(),
+  });
 });
 
 export default router;
@@ -189,13 +183,6 @@ router.get("/profile", requireAuth, (req, res) => {
 export default router;
 ```
 
-<Callout type="info">
-  The middleware is named `requireAuth` in the generated file, not
-  `authMiddleware`.
-</Callout>
-
 ### NestJS (coming soon)
 
-NestJS appears in the framework selection prompt but displays a warning if selected and re-prompts. It is not yet generated.
-
-
+NestJS is listed in the framework prompt, but it is not available yet. If you select it, the CLI shows a warning and asks again.

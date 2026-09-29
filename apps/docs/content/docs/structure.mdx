@@ -9,7 +9,7 @@ import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 
 ## Overview
 
-The exact layout of a generated project depends on the options you select. This page shows the realistic structures for common combinations.
+The layout of a generated project depends on the options you select. This page shows the file tree for common combinations.
 
 ---
 
@@ -36,11 +36,9 @@ The exact layout of a generated project depends on the options you select. This 
   </Folder>
 </Files>
 
-<Callout type="info">
-  The base Express template generates only `src/index.ts` and
-  `src/routes/health.ts`. No `app.ts`, `routes/index.ts`,
-  `middleware/errorHandler.ts`, `types/`, or `README.md` are created.
-</Callout>
+The base template has two source files: `src/index.ts` and
+`src/routes/health.ts`. `.eslintrc.js` is left over from older ESLint versions;
+ESLint 10 only reads `eslint.config.mjs`.
 
 ### With PostgreSQL + Prisma + JWT Auth + Docker
 
@@ -500,6 +498,7 @@ BETTER_AUTH_URL=http://localhost:3000
 ```
 
 <Callout type="warn">
-  Always copy `.env.example` to `.env` and replace placeholder values before
-  starting the server. Never commit `.env` to git.
+  The CLI creates both `.env` and `.env.example`. Replace placeholder values in
+  `.env`, such as database URLs, before starting the server. Never commit `.env`
+  to git.
 </Callout>

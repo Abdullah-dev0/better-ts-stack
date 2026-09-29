@@ -1,23 +1,23 @@
 # better-ts-stack
 
-> Build production-ready TypeScript projects in seconds
+> An interactive CLI that scaffolds TypeScript backend and full-stack projects.
 
-An interactive CLI tool that generates fully configured TypeScript projects with your choice of backend framework, database, authentication, and Docker support—all through a guided prompt flow.
+Answer a few prompts to pick a framework, database, authentication, and Docker setup. The CLI writes a project that is ready to install and run.
 
-## ✨ Features
+## Features
 
-- 🚀 Interactive CLI with guided prompts — no flags or subcommands needed
-- 📦 Modular architecture — include only what you need
-- 🎯 Backend API template (Express.js with TypeScript)
-- 🌐 Full-stack templates (Next.js 16 or TanStack Start with React)
-- 🗄️ Database integration: PostgreSQL (Prisma or Drizzle) or MongoDB (Mongoose)
-- 🔐 Authentication: JWT for Express, Better Auth for Next.js and TanStack Start (requires a database)
-- 🐳 Optional Docker support with multi-stage builds
-- 🔧 TypeScript with strict mode enabled
-- 🎨 ESLint + Prettier pre-configured
-- ♻️ Hot reload for development
+- Interactive prompts, no flags or subcommands
+- Only the modules you select are added
+- Backend API template (Express.js with TypeScript)
+- Full-stack templates (Next.js 16 or TanStack Start with React)
+- Database integration: PostgreSQL (Prisma or Drizzle) or MongoDB (Mongoose)
+- Authentication: JWT for Express, Better Auth for Next.js and TanStack Start (requires a database)
+- Optional Docker support with multi-stage builds
+- TypeScript with strict mode enabled
+- ESLint + Prettier pre-configured
+- Hot reload for development
 
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
 # Using npx (recommended)
@@ -28,9 +28,9 @@ npm install -g better-ts-stack
 better-ts-stack
 ```
 
-Answer the prompts and get a project ready to run.
+Answer the prompts and the CLI creates the project folder.
 
-## 📋 Prompt Flow
+## Prompt Flow
 
 The CLI guides you through these questions in order:
 
@@ -52,9 +52,9 @@ The CLI guides you through these questions in order:
 
 > **Note**: The CLI does not ask for a port. The server port defaults to `3000` via the `PORT` environment variable.
 
-## 📦 What You Get
+## What You Get
 
-After running the CLI you have a fully configured project with:
+A generated project includes:
 
 - TypeScript in strict mode across all generated files
 - ESLint and Prettier configuration
@@ -65,7 +65,7 @@ After running the CLI you have a fully configured project with:
 - Docker files (if selected)
 - Optional git repository initialization
 
-## 🧩 Available Modules
+## Available Modules
 
 ### Backend — Express (always included for `backend` type)
 
@@ -93,20 +93,20 @@ After running the CLI you have a fully configured project with:
 
 ### Database modules
 
-| Combination                                | Template files generated                                                    |
-| ------------------------------------------ | --------------------------------------------------------------------------- |
-| PostgreSQL + Prisma (Express)              | `prisma/schema.prisma`, `src/lib/prisma.ts`                                 |
-| PostgreSQL + Prisma (Next.js / TanStack)   | `prisma/schema.prisma`, `lib/prisma.ts` / `src/lib/prisma.ts`, `prisma.config.ts` |
-| PostgreSQL + Drizzle (Express / Next.js / TanStack) | `src/lib/schema.ts` / `lib/schema.ts`, database helper, `drizzle.config.ts` |
-| MongoDB + Mongoose (Express / Next.js / TanStack)   | `src/lib/db.ts`, `src/models/User.ts`                                       |
+| Combination                                         | Template files generated                                                          |
+| --------------------------------------------------- | --------------------------------------------------------------------------------- |
+| PostgreSQL + Prisma (Express)                       | `prisma/schema.prisma`, `src/lib/prisma.ts`                                       |
+| PostgreSQL + Prisma (Next.js / TanStack)            | `prisma/schema.prisma`, `lib/prisma.ts` / `src/lib/prisma.ts`, `prisma.config.ts` |
+| PostgreSQL + Drizzle (Express / Next.js / TanStack) | `src/lib/schema.ts` / `lib/schema.ts`, database helper, `drizzle.config.ts`       |
+| MongoDB + Mongoose (Express / Next.js / TanStack)   | `src/lib/db.ts`, `src/models/User.ts`                                             |
 
 ### Auth modules
 
-| Context           | Implementation                  | Generated files                                                                                                                           |
-| ----------------- | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| Express backend   | JWT + bcrypt                    | `src/lib/jwt.ts`, `src/middleware/requireAuth.ts`, `src/services/userStore.ts`, `src/routes/auth.ts`, `src/controllers/authController.ts` |
-| Next.js fullstack | Better Auth (requires database) | `lib/auth.ts`, `lib/auth-client.ts`, `app/api/auth/[...all]/route.ts`                                                                     |
-| TanStack fullstack | Better Auth (requires database) | `src/lib/auth.ts`, `src/lib/auth-client.ts`, `src/lib/auth-functions.ts`, `src/routes/api/auth/$.ts` |
+| Context            | Implementation                  | Generated files                                                                                                                           |
+| ------------------ | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Express backend    | JWT + bcrypt                    | `src/lib/jwt.ts`, `src/middleware/requireAuth.ts`, `src/services/userStore.ts`, `src/routes/auth.ts`, `src/controllers/authController.ts` |
+| Next.js fullstack  | Better Auth (requires database) | `lib/auth.ts`, `lib/auth-client.ts`, `app/api/auth/[...all]/route.ts`                                                                     |
+| TanStack fullstack | Better Auth (requires database) | `src/lib/auth.ts`, `src/lib/auth-client.ts`, `src/lib/auth-functions.ts`, `src/routes/api/auth/$.ts`                                      |
 
 ### Docker module
 
@@ -118,37 +118,23 @@ After running the CLI you have a fully configured project with:
 
 Scripts added: `docker:build`, `docker:up`, `docker:down`, `docker:logs`
 
-## 🔧 Technology Stack
+## Technology Stack
 
-| Layer              | Technology                                    |
-| ------------------ | --------------------------------------------- |
-| Runtime            | Node.js 24+ with TypeScript 6.0               |
-| Backend framework  | Express.js 5                                  |
-| Frontend framework | Next.js 16 / TanStack Start / React 19        |
-| Database ORMs      | Prisma, Drizzle, Mongoose                     |
-| Auth               | JWT (`jsonwebtoken` + `bcrypt`) / Better Auth |
+| Layer              | Technology                                                           |
+| ------------------ | -------------------------------------------------------------------- |
+| Runtime            | Node.js 24+ with TypeScript 6.0                                      |
+| Backend framework  | Express.js 5                                                         |
+| Frontend framework | Next.js 16 / TanStack Start / React 19                               |
+| Database ORMs      | Prisma, Drizzle, Mongoose                                            |
+| Auth               | JWT (`jsonwebtoken` + `bcrypt`) / Better Auth                        |
 | Hot reload         | `tsx watch` (Express) / `next dev` (Next.js) / `vite dev` (TanStack) |
-| Linting            | ESLint 10 with TypeScript plugin              |
-| Formatting         | Prettier                                      |
+| Linting            | ESLint 10 with TypeScript plugin                                     |
+| Formatting         | Prettier                                                             |
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome. Please open an issue or submit a pull request.
 
-## 📄 License
+## License
 
 MIT
-
-## Release 1.1.2
-
-Frontend starters now allow committing `.env.example`, and Express starters allow committing lockfiles. Setup instructions follow installation, database preparation, and server startup before account creation. Git documentation now accurately describes repository initialization.
-
-## Release 1.1.1
-
-Prisma starters now generate the client before `npm run type:check`, so a fresh installation can be checked without running a separate command first.
-
-## Release 1.0.8
-
-Requires Node.js 24+. Dependencies and templates use current stable releases, with TypeScript 6.0.3 held for typescript-eslint compatibility and Node.js types aligned to 24.x. Express, Next.js, and TanStack Start support PostgreSQL with Prisma or Drizzle and MongoDB with Mongoose. Prisma generation runs before builds; Docker uses Node.js 24 and Compose v2.
-
-See [upgrade notes](https://better-ts-stack.abdullahtech.me/docs/upgrade-notes) for compatibility changes and maintainer publishing commands.

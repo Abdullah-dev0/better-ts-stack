@@ -3,7 +3,7 @@ title: Docker Module
 description: Node.js 24 containers with Docker Compose v2
 ---
 
-The Docker option creates Dockerfile, docker-compose.yml, and .dockerignore. Docker Desktop or Docker Engine with Compose v2 must be running.
+The Docker option adds a `Dockerfile`, `docker-compose.yml`, and `.dockerignore`. You need Docker Desktop or Docker Engine with Compose v2 running.
 
 ## Build and run
 
@@ -14,16 +14,30 @@ npm run docker:logs
 npm run docker:down
 ```
 
-These scripts use docker build and docker compose. All framework images use Node.js 24 Alpine, a build stage, and a non-root runtime user. Express runs `dist/index.js`; Next.js runs its standalone `server.js` output; TanStack Start runs `srvx` against the Vite `dist/server/server.js` handler (with `npm ci --omit=dev` so the production-only `srvx` runtime dependency is available). For Prisma projects, the generated client is copied from the build stage into the production image. Build errors stop the image build.
+These scripts call `docker build` and `docker compose`.
 
-The image build installs dependencies with npm, regardless of the package manager selected for local development. Commit a package-lock.json to use npm ci in Docker; otherwise the image uses npm install.
+Every image uses Node.js 24 Alpine, a separate build stage, and a non-root user at runtime. What runs in the container depends on the framework:
 
-Prisma clients are generated during the build. Placeholder PostgreSQL and MongoDB URLs are used only during the build; it does not connect to a database or run migrations. Configure the real DATABASE_URL at runtime and apply migrations separately.
+- **Express** runs `dist/index.js`.
+- **Next.js** runs the standalone `server.js` output.
+- **TanStack Start** runs `srvx` against the Vite output in `dist/server/server.js`. The image installs production dependencies with `npm ci --omit=dev`, because `srvx` is needed at runtime.
+
+If the build fails, the image build stops with an error.
+
+The image always installs dependencies with npm, even if you picked pnpm or bun for local development. If a `package-lock.json` is committed, the image uses `npm ci`. Otherwise it uses `npm install`.
+
+### Prisma
+
+The Prisma client is generated during the image build and copied into the final image. The build uses placeholder database URLs, so it never connects to a database or runs migrations. Set the real `DATABASE_URL` at runtime and run migrations separately.
 
 ## Environment and databases
 
-Compose loads the generated .env file through env_file and sets NODE_ENV=production. Replace local connection URLs with addresses reachable from the container. localhost inside a container refers to that container, not your host database. Use a database service name on a shared Docker network, or the appropriate host address.
+Compose loads your `.env` file through `env_file` and sets `NODE_ENV=production`.
 
-The generated Compose file defines only the application service. Add database services or connect an external database as needed. Authentication secrets are generated per project; configure production secrets and BETTER_AUTH_URL for the deployed address.
+Inside a container, `localhost` means the container itself, not your machine. Change database URLs to an address the container can reach: a database service name on the same Docker network, or your host's address.
 
-.env is excluded from the image build context. Public build-time variables needed by your own Next.js code must be passed explicitly during the build. Never embed production secrets into a Dockerfile.
+The generated Compose file only defines the app service. Add a database service yourself, or point the app at an external database.
+
+Each project gets its own random auth secret in `.env`. For production, set your own secrets and set `BETTER_AUTH_URL` to the deployed address.
+
+`.env` is excluded from the build context. If your Next.js code needs public variables at build time, pass them to the build explicitly. Never put production secrets in the Dockerfile.

@@ -11,13 +11,20 @@ description: PostgreSQL with Prisma or Drizzle, or MongoDB with Mongoose
 | PostgreSQL | Drizzle    | Yes     | Yes     | Yes      |
 | MongoDB    | Mongoose 9 | Yes     | Yes     | Yes      |
 
-Stable Prisma 7 does not support MongoDB. The CLI offers Mongoose for MongoDB. NestJS remains unavailable.
+Prisma 7 does not support MongoDB, so the CLI offers Mongoose for MongoDB projects.
+
+The CLI does not start a database for you. Run PostgreSQL or MongoDB yourself, or use a hosted database, and use a separate database for each application.
 
 ## Prisma and PostgreSQL
 
-Set DATABASE_URL in .env to your PostgreSQL connection string. The generated prisma.config.ts loads it with dotenv. Connection URLs belong in this configuration, rather than the Prisma 7 schema.
+Set `DATABASE_URL` in `.env` to your PostgreSQL connection string. In Prisma 7 the connection URL is set in `prisma.config.ts`, not in `schema.prisma`. The generated `prisma.config.ts` reads it from `.env` with `dotenv`.
 
-The prisma-client generator writes TypeScript to src/generated/prisma in Express (CommonJS format) and generated in Next.js and TanStack Start. Client imports use the generated client entry point, which is generated/client in both full-stack templates. All three templates use the PostgreSQL driver adapter and reuse a development client instance.
+The Prisma client is generated into:
+
+- `src/generated/prisma` for Express (CommonJS)
+- `generated/` for Next.js and TanStack Start, imported from `generated/client`
+
+All three templates use the PostgreSQL driver adapter (`@prisma/adapter-pg`) and reuse one client instance during development reloads.
 
 ```bash
 npm run prisma:generate
@@ -25,15 +32,26 @@ npm run prisma:migrate
 npm run build
 ```
 
-The prebuild hook generates the client automatically. Before the first development run or standalone type check, run prisma:generate. No seed command is supplied because no seed file is generated. Add a seed implementation and configure it explicitly if your application needs one.
+`npm run build` generates the client automatically through a `prebuild` script. Before your first `npm run dev` or `npm run type:check`, run `npm run prisma:generate` yourself.
 
-Express generates a sample User model suitable for the JWT module. Next.js and TanStack Start with Better Auth generate User, Session, Account, and Verification models. Apply the migration before signing up.
+No seed script is included. If you need seed data, add a seed file and configure it in `prisma.config.ts`.
 
-For production deployments, run prisma migrate deploy against the target database using your deployment tooling; prisma:migrate is a development command.
+The generated models depend on the auth option:
+
+- Express includes a `User` model used by JWT auth.
+- Next.js and TanStack Start with Better Auth include `User`, `Session`, `Account`, and `Verification` models. Run the migration before you sign up.
+
+`prisma:migrate` runs `prisma migrate dev`, which is meant for development. In production, run `prisma migrate deploy` as part of your deployment.
 
 ## Drizzle and PostgreSQL
 
-Express stores its schema and connection in src/lib/schema.ts and src/lib/db.ts. Next.js uses lib/schema.ts and lib/db.ts. TanStack Start uses src/lib/schema.ts and src/lib/db.ts. All include drizzle.config.ts, PostgreSQL driver dependencies, and these commands:
+The schema and connection files are:
+
+- Express: `src/lib/schema.ts` and `src/lib/db.ts`
+- Next.js: `lib/schema.ts` and `lib/db.ts`
+- TanStack Start: `src/lib/schema.ts` and `src/lib/db.ts`
+
+Every framework also gets `drizzle.config.ts`, the PostgreSQL driver, and these scripts:
 
 ```bash
 npm run db:generate
@@ -41,24 +59,30 @@ npm run db:migrate
 npm run db:studio
 ```
 
-Set DATABASE_URL before running migrations. The Express JWT module persists users through Drizzle. Next.js and TanStack Start with Better Auth supply the four authentication tables and pass the schema to the Drizzle instance so its adapter can find them.
+Set `DATABASE_URL` before running migrations.
+
+With Express JWT auth, users are stored through Drizzle. With Better Auth in Next.js or TanStack Start, the schema contains the four Better Auth tables, and the schema is passed to the Drizzle client so the adapter can find them.
 
 ## Mongoose and MongoDB
 
-Set MONGODB_URI in .env. The module supplies src/lib/db.ts and src/models/User.ts. Express connects Mongoose before opening the HTTP listener; JWT authentication uses the Mongoose User model. The model can be reused during development reloads.
+Set `MONGODB_URI` in `.env`. The module adds `src/lib/db.ts` and `src/models/User.ts`.
 
-Next.js and TanStack Start Better Auth use the native MongoDB adapter and their own authentication collections. Authentication connections are configured in lib/auth.ts (Next.js) or src/lib/auth.ts (TanStack Start). The generated Mongoose helper remains available for application models; call connectDB before querying those models in server code.
+In Express, the server connects to MongoDB before it starts listening, and JWT auth uses the Mongoose `User` model. The model is registered in a way that survives development reloads.
 
-Next.js authentication enables MongoDB transactions. Use a replica set or MongoDB Atlas, and create the authentication collections in your application's database before starting the server. Pre-creating collections avoids a conflict between first-use index creation and the first sign-up transaction:
+In Next.js and TanStack Start, Better Auth uses the native MongoDB adapter and its own collections, configured in `lib/auth.ts` (Next.js) or `src/lib/auth.ts` (TanStack Start). The Mongoose helper is still there for your own models. Call `connectDB()` in server code before you query them.
+
+### Transactions and first sign-up (Next.js)
+
+Better Auth in Next.js uses MongoDB transactions, which need a replica set or MongoDB Atlas. Create the auth collections before you start the server. Otherwise, the first sign-up can fail because MongoDB tries to create indexes inside the transaction:
 
 ```javascript
-// Run once in mongosh, after selecting your application's database.
+// Run once in mongosh, in your application's database.
 db.createCollection("user");
 db.createCollection("session");
 db.createCollection("account");
 db.createCollection("verification");
 ```
 
-For local development with a standalone MongoDB server, the [MongoDB adapter](https://better-auth.com/docs/adapters/mongo) accepts `mongodbAdapter(db, { client, transaction: false })` in `lib/auth.ts`. This runs writes without transaction atomicity; keep transactions enabled for production.
+If you run a standalone MongoDB server locally, you can turn transactions off in `lib/auth.ts` with `mongodbAdapter(db, { client, transaction: false })`. See the [MongoDB adapter docs](https://better-auth.com/docs/adapters/mongo). Writes are then not atomic, so keep transactions on in production.
 
-Use a separate database for each application and keep credentials out of source control. PostgreSQL and MongoDB services are not created by the application generator.
+Keep database credentials out of source control.

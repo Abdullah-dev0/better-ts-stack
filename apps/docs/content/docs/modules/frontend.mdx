@@ -8,7 +8,7 @@ import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 
 ## Overview
 
-The Frontend module generates a full-stack React application. When you choose the **Full-stack** application type, the CLI prompts you to pick between **Next.js 16** (App Router) and **TanStack Start** (RC). Both ship with React 19 and Tailwind CSS v4.
+The Frontend module generates a full-stack React application. When you choose the **Full-stack** application type, the CLI asks you to pick **Next.js 16** (App Router) or **TanStack Start** (release candidate). Both use React 19 and Tailwind CSS v4.
 
 <Callout type="info">
   The frontend module produces a **single project** at the project root. There
@@ -35,9 +35,9 @@ next-env.d.ts        # Next.js TypeScript environment types
 ```
 
 <Callout type="info">
-  Every generated Next.js app now includes a shadcn-compatible Base UI
-  foundation so future auth, dashboard, and product screens can reuse the same
-  component patterns immediately.
+  The Next.js template includes a few shadcn-compatible UI components (`button`,
+  `card`, `field`, `input`). The auth pages use them, and you can add more with
+  the shadcn CLI.
 </Callout>
 
 ---
@@ -226,9 +226,10 @@ and call `authClient.signIn.email(...)` / `authClient.signUp.email(...)`.
 ## Environment Variables
 
 ```bash
-NODE_ENV=development
 PORT=3000
 ```
+
+`NODE_ENV` is not written to `.env`. The dev, build, and start commands set it, so `npm start` runs in production mode.
 
 With Better Auth added:
 
@@ -243,7 +244,7 @@ With a database added, the relevant `DATABASE_URL` or `MONGODB_URI` is also incl
 
 ## TanStack Start
 
-TanStack Start uses the Vite dev server, TanStack Router (type-safe file-based routing), and React Query with SSR. It is available in the full-stack framework prompt.
+TanStack Start uses the Vite dev server, TanStack Router for type-safe file-based routing, and React Query with SSR.
 
 ```
 src/

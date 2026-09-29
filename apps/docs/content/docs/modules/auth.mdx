@@ -8,13 +8,13 @@ import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 
 ## Overview
 
-The Auth module adds user authentication to your project. The implementation is framework-specific:
+The Auth module adds user authentication. Which implementation you get depends on the framework:
 
-| Stack                   | Implementation | Requires database                                   |
-| ----------------------- | -------------- | --------------------------------------------------- |
-| **Express backend**     | JWT + bcrypt   | No (uses in-memory user store by default)           |
-| **Next.js full-stack**  | Better Auth    | **Yes - only prompted when a database is selected** |
-| **TanStack full-stack** | Better Auth    | **Yes - only prompted when a database is selected** |
+| Stack                   | Implementation | Requires database                                      |
+| ----------------------- | -------------- | ------------------------------------------------------ |
+| **Express backend**     | JWT + bcrypt   | No (in-memory user store when no database is selected) |
+| **Next.js full-stack**  | Better Auth    | **Yes - only prompted when a database is selected**    |
+| **TanStack full-stack** | Better Auth    | **Yes - only prompted when a database is selected**    |
 
 <Callout type="info">
   For Next.js and TanStack Start projects, the auth prompt is automatically
@@ -49,6 +49,8 @@ import authRouter from "./routes/auth";
 
 app.use("/auth", authRouter);
 ```
+
+`POST /auth/register` trims and lowercases the email and requires a password of 8 characters to 72 bytes (bcrypt ignores anything longer). Invalid or missing fields return `400`, and an email that is already registered returns `409`, including when two sign-ups for the same email arrive at the same time.
 
 ---
 
@@ -93,7 +95,7 @@ export function requireAuth(
 ): void {
   const authHeader = req.headers.authorization;
 
-  if (!authHeader || !authHeader.startsWith("Bearer")) {
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
     res.status(401).json({ error: "Authorization header missing or invalid" });
     return;
   }
@@ -110,11 +112,6 @@ export function requireAuth(
   }
 }
 ```
-
-<Callout type="info">
-  The middleware is named **`requireAuth`** in the generated file. Import it by
-  that name when protecting routes.
-</Callout>
 
 ---
 
@@ -140,7 +137,9 @@ JWT_EXPIRES_IN=1h
 }
 ```
 
-### No additional scripts are added by the auth module.
+### Scripts
+
+The auth module does not add any scripts.
 
 ---
 
@@ -405,8 +404,9 @@ BETTER_AUTH_URL=http://localhost:3000
 ```
 
 <Callout type="warn">
-  Do **not** prefix `BETTER_AUTH_SECRET` or `BETTER_AUTH_URL` with anything like
-  `NEXT_PUBLIC_`. These are server-side variables only.
+  Do **not** prefix `BETTER_AUTH_SECRET` or `BETTER_AUTH_URL` with `VITE_`.
+  These are server-side variables only, and a `VITE_` prefix exposes them to the
+  browser bundle.
 </Callout>
 
 ### Dependencies added

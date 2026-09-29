@@ -12,22 +12,18 @@ export function generateNextSteps(
   steps.push(`cd ${config.projectName}`);
 
   // Step 2: Set environment variables
-  steps.push(
-    "Review the generated .env and set your database connection details"
-  );
+  if (config.database !== "none") {
+    steps.push(
+      "Review the generated .env and set your database connection details"
+    );
+  }
 
-  if (isFullstack) {
-    if (config.useAuth) {
-      steps.push("Set BETTER_AUTH_SECRET and BETTER_AUTH_URL in .env");
-      steps.push("Visit /sign-up to create your first account");
-    }
-  } else {
-    if (config.useAuth) {
-      steps.push("Set JWT_SECRET in .env (required for auth)");
-      steps.push(
-        "Create a user via POST /auth/register then login with /auth/login"
-      );
-    }
+  if (config.useAuth) {
+    steps.push(
+      isFullstack
+        ? "Review BETTER_AUTH_SECRET and BETTER_AUTH_URL in .env"
+        : "Review the generated JWT_SECRET in .env"
+    );
   }
 
   // Step 3: Install dependencies if not already done
@@ -50,6 +46,14 @@ export function generateNextSteps(
 
   // Step 5: Start dev server
   steps.push(`${config.packageManager} run dev`);
+
+  if (config.useAuth) {
+    steps.push(
+      isFullstack
+        ? "Visit /sign-up to create your first account"
+        : "Create a user via POST /auth/register then login with /auth/login"
+    );
+  }
 
   return steps;
 }

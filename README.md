@@ -47,7 +47,7 @@ The CLI guides you through these questions in order:
 7. **Authentication** — add auth?
    - Express: JWT-based auth (always available)
    - Next.js / TanStack Start: Better Auth (only prompted when a database is selected)
-8. **Git** — initialize a git repository and create an initial commit? (yes/no)
+8. **Git** — initialize a git repository? (yes/no)
 9. **Install dependencies** — run the install command now? (yes/no)
 
 > **Note**: The CLI does not ask for a port. The server port defaults to `3000` via the `PORT` environment variable.
@@ -63,7 +63,7 @@ After running the CLI you have a fully configured project with:
 - Database connection and ORM setup (if selected)
 - Authentication scaffolding (if selected)
 - Docker files (if selected)
-- Optional git repository with an initial commit
+- Optional git repository initialization
 
 ## 🧩 Available Modules
 
@@ -138,6 +138,10 @@ Contributions are welcome. Please open an issue or submit a pull request.
 ## 📄 License
 
 MIT
+
+## Release 1.1.2
+
+Frontend starters now allow committing `.env.example`, and Express starters allow committing lockfiles. Setup instructions follow installation, database preparation, and server startup before account creation. Git documentation now accurately describes repository initialization.
 
 ## Release 1.1.1
 

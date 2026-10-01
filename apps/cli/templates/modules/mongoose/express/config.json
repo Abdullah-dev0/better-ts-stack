@@ -1,7 +1,7 @@
 {
   "id": "mongoose",
   "name": "Mongoose (MongoDB)",
-  "description": "MongoDB database integration using Mongoose ODM",
+  "description": "MongoDB database integration for Express using Mongoose ODM",
   "type": "database",
   "dependencies": {
     "mongoose": "^9.9.5",
@@ -12,5 +12,5 @@
   "envVars": {
     "MONGODB_URI": "mongodb://localhost:27017/myapp"
   },
-  "templateFiles": ["src/lib/db.ts.hbs"]
+  "templateFiles": []
 }

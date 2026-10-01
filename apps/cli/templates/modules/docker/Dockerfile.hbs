@@ -13,6 +13,11 @@ RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+{{#if useAuth}}
+# next build loads the auth route, which initializes Better Auth. Use a
+# build-only secret here; the real BETTER_AUTH_SECRET is supplied at runtime.
+ENV BETTER_AUTH_SECRET="build-only-placeholder-secret-not-used-at-runtime"
+{{/if}}
 {{#if (eq database 'prisma')}}
 RUN DATABASE_URL="postgresql://postgres:postgres@localhost:5432/postgres" npm run build
 {{else if (eq database 'mongoose')}}

@@ -35,10 +35,25 @@ app.use((_req: Request, res: Response) => {
 });
 
 // Error handler
-app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Internal Server Error' });
-});
+app.use(
+  (
+    err: Error & { status?: number; statusCode?: number; expose?: boolean },
+    _req: Request,
+    res: Response,
+    _next: NextFunction,
+  ) => {
+    // Middleware such as express.json() sets 4xx statuses (bad JSON, body too large)
+    const status = err.status ?? err.statusCode ?? 500;
+
+    if (status >= 400 && status < 500) {
+      res.status(status).json({ error: err.expose ? err.message : 'Bad Request' });
+      return;
+    }
+
+    console.error(err.stack);
+    res.status(500).json({ error: 'Internal Server Error' });
+  },
+);
 
 {{#if (eq database 'mongoose')}}
 void awaitDatabase().catch((error: unknown) => {

@@ -77,6 +77,14 @@ export {{#unless (eq database 'none')}}async {{/unless}}function createUser(data
   {{/if}}
 
   {{#if (eq database 'none')}}
+  // Enforce unique emails like a database constraint would, so a sign-up that
+  // raced past the findUserByEmail check is rejected instead of duplicated
+  if (users.some((candidate) => candidate.email === data.email)) {
+    return Promise.reject(
+      Object.assign(new Error('User already exists'), { code: 'DUPLICATE_EMAIL' }),
+    );
+  }
+
   const newUser: AuthUser = {
     id: crypto.randomUUID(),
     email: data.email,
@@ -87,6 +95,20 @@ export {{#unless (eq database 'none')}}async {{/unless}}function createUser(data
   users.push(newUser);
   return Promise.resolve(newUser);
   {{/if}}
+}
+
+// Unique-constraint error codes: Prisma, PostgreSQL (Drizzle wraps it in `cause`),
+// MongoDB, and the in-memory store
+const DUPLICATE_KEY_CODES = new Set<unknown>(['P2002', '23505', 11000, 'DUPLICATE_EMAIL']);
+
+// True when an insert failed because the email is already taken (e.g. concurrent sign-ups)
+export function isDuplicateEmailError(error: unknown): boolean {
+  let current = error;
+  for (let depth = 0; depth < 5 && current && typeof current === 'object'; depth++) {
+    if (DUPLICATE_KEY_CODES.has((current as { code?: unknown }).code)) return true;
+    current = (current as { cause?: unknown }).cause;
+  }
+  return false;
 }
 
 export function toPublicUser(user: AuthUser): Omit<AuthUser, 'password'> {

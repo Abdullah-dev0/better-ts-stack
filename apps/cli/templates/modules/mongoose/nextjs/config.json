@@ -1,0 +1,16 @@
+{
+  "id": "mongoose",
+  "name": "Mongoose (MongoDB)",
+  "description": "MongoDB database integration for Next.js using Mongoose ODM",
+  "type": "database",
+  "dependencies": {
+    "mongoose": "^9.9.5",
+    "mongodb": "^7.6.0"
+  },
+  "devDependencies": {},
+  "scripts": {},
+  "envVars": {
+    "MONGODB_URI": "mongodb://localhost:27017/myapp"
+  },
+  "templateFiles": []
+}

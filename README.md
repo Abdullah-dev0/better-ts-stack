@@ -98,7 +98,7 @@ A generated project includes:
 | PostgreSQL + Prisma (Express)                       | `prisma/schema.prisma`, `src/lib/prisma.ts`                                       |
 | PostgreSQL + Prisma (Next.js / TanStack)            | `prisma/schema.prisma`, `lib/prisma.ts` / `src/lib/prisma.ts`, `prisma.config.ts` |
 | PostgreSQL + Drizzle (Express / Next.js / TanStack) | `src/lib/schema.ts` / `lib/schema.ts`, database helper, `drizzle.config.ts`       |
-| MongoDB + Mongoose (Express / Next.js / TanStack)   | `src/lib/db.ts`, `src/models/User.ts`                                             |
+| MongoDB + Mongoose (Express / Next.js / TanStack)   | `src/lib/db.ts` / `lib/db.ts`, `src/models/User.ts` / `models/User.ts`            |
 
 ### Auth modules
 

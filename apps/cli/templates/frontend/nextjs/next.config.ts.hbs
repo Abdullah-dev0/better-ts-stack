@@ -1,0 +1,12 @@
+import type { NextConfig } from "next";
+
+{{#if useDocker}}
+const nextConfig: NextConfig = {
+  // Standalone output is what the Docker image runs (node server.js)
+  output: "standalone",
+};
+{{else}}
+const nextConfig: NextConfig = {};
+{{/if}}
+
+export default nextConfig;

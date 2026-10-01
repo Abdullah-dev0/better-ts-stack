@@ -7,7 +7,7 @@
   "devDependencies": {},
   "scripts": {
     "docker:build": "docker build -t {{projectName}} .",
-    "docker:up": "docker compose up -d",
+    "docker:up": "docker compose up -d --build",
     "docker:down": "docker compose down",
     "docker:logs": "docker compose logs -f"
   },

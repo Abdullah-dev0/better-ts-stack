@@ -65,3 +65,5 @@ temp/
 # Vercel
 .vercel
 .turbo
+# Local bug tracking notes
+KNOWN_ISSUES.md

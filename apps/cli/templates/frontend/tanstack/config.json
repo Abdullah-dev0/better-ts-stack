@@ -40,7 +40,6 @@
     "vite": "^8.3.0"
   },
   "envVars": {
-    "NODE_ENV": "development",
     "PORT": "3000"
   },
   "templateFiles": [

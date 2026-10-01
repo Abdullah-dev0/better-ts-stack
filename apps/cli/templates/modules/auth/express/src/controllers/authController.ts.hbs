@@ -2,29 +2,64 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import { signToken } from "../lib/jwt";
 import { AuthenticatedRequest } from "../middleware/requireAuth";
-import { createUser, findUserByEmail, toPublicUser } from "../services/userStore";
+import {
+  createUser,
+  findUserByEmail,
+  isDuplicateEmailError,
+  toPublicUser,
+} from "../services/userStore";
 
 const SALT_ROUNDS = 10;
+const MIN_PASSWORD_LENGTH = 8;
+// bcrypt ignores bytes beyond 72, so longer passwords would be silently truncated
+const MAX_PASSWORD_BYTES = 72;
 
+// Request bodies are untrusted JSON, so fields may have any type
 interface RegisterBody {
-  email?: string;
-  password?: string;
-  name?: string | null;
+  email?: unknown;
+  password?: unknown;
+  name?: unknown;
 }
 
 interface LoginBody {
-  email?: string;
-  password?: string;
+  email?: unknown;
+  password?: unknown;
+}
+
+// Returns a trimmed, lowercased email, or null when the value is not a usable string
+function normalizeEmail(email: unknown): string | null {
+  if (typeof email !== "string") return null;
+  const normalized = email.trim().toLowerCase();
+  return normalized || null;
 }
 
 export async function register(
-  req: Request<object, unknown, RegisterBody>,
+  req: Request<object, unknown, RegisterBody | undefined>,
   res: Response,
 ): Promise<void> {
-  const { email, password, name } = req.body;
+  // Express 5 leaves req.body undefined when the request has no body
+  const body = req.body ?? {};
+  const email = normalizeEmail(body.email);
+  const password = body.password;
+  const name = body.name ?? null;
 
-  if (!email || !password) {
+  if (!email || typeof password !== "string" || !password) {
     res.status(400).json({ error: "Email and password are required" });
+    return;
+  }
+
+  if (
+    password.length < MIN_PASSWORD_LENGTH ||
+    Buffer.byteLength(password, "utf8") > MAX_PASSWORD_BYTES
+  ) {
+    res.status(400).json({
+      error: `Password must be at least ${MIN_PASSWORD_LENGTH} characters and at most ${MAX_PASSWORD_BYTES} bytes`,
+    });
+    return;
+  }
+
+  if (name !== null && typeof name !== "string") {
+    res.status(400).json({ error: "Name must be a string" });
     return;
   }
 
@@ -35,19 +70,33 @@ export async function register(
   }
 
   const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
-  const user = await createUser({ email, name, password: hashedPassword });
+
+  let user;
+  try {
+    user = await createUser({ email, name, password: hashedPassword });
+  } catch (error) {
+    // A concurrent request registered the same email after the check above
+    if (isDuplicateEmailError(error)) {
+      res.status(409).json({ error: "User already exists" });
+      return;
+    }
+    throw error;
+  }
+
   const token = signToken({ sub: user.id, email: user.email, name: user.name });
 
   res.status(201).json({ user: toPublicUser(user), token });
 }
 
 export async function login(
-  req: Request<object, unknown, LoginBody>,
+  req: Request<object, unknown, LoginBody | undefined>,
   res: Response,
 ): Promise<void> {
-  const { email, password } = req.body;
+  const body = req.body ?? {};
+  const email = normalizeEmail(body.email);
+  const password = body.password;
 
-  if (!email || !password) {
+  if (!email || typeof password !== "string" || !password) {
     res.status(400).json({ error: "Email and password are required" });
     return;
   }

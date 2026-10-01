@@ -65,15 +65,15 @@ With Express JWT auth, users are stored through Drizzle. With Better Auth in Nex
 
 ## Mongoose and MongoDB
 
-Set `MONGODB_URI` in `.env`. The module adds `src/lib/db.ts` and `src/models/User.ts`.
+Set `MONGODB_URI` in `.env`. The module adds a connection helper and a sample `User` model: `src/lib/db.ts` and `src/models/User.ts` in Express and TanStack Start, or `lib/db.ts` and `models/User.ts` in Next.js.
 
 In Express, the server connects to MongoDB before it starts listening, and JWT auth uses the Mongoose `User` model. The model is registered in a way that survives development reloads.
 
-In Next.js and TanStack Start, Better Auth uses the native MongoDB adapter and its own collections, configured in `lib/auth.ts` (Next.js) or `src/lib/auth.ts` (TanStack Start). The Mongoose helper is still there for your own models. Call `connectDB()` in server code before you query them.
+In Next.js and TanStack Start, Better Auth uses the native MongoDB adapter and its own collections, configured in `lib/auth.ts` (Next.js) or `src/lib/auth.ts` (TanStack Start). The Mongoose helper is still there for your own models. Call `connectDB()` in server code before you query them. It reuses one connection and throws an error if it can't connect, instead of exiting the process.
 
-### Transactions and first sign-up (Next.js)
+### Transactions and first sign-up (Next.js and TanStack Start)
 
-Better Auth in Next.js uses MongoDB transactions, which need a replica set or MongoDB Atlas. Create the auth collections before you start the server. Otherwise, the first sign-up can fail because MongoDB tries to create indexes inside the transaction:
+Better Auth in Next.js and TanStack Start uses MongoDB transactions, which need a replica set or MongoDB Atlas. Create the auth collections before you start the server. Otherwise, the first sign-up can fail because MongoDB tries to create indexes inside the transaction:
 
 ```javascript
 // Run once in mongosh, in your application's database.
@@ -83,6 +83,6 @@ db.createCollection("account");
 db.createCollection("verification");
 ```
 
-If you run a standalone MongoDB server locally, you can turn transactions off in `lib/auth.ts` with `mongodbAdapter(db, { client, transaction: false })`. See the [MongoDB adapter docs](https://better-auth.com/docs/adapters/mongo). Writes are then not atomic, so keep transactions on in production.
+If you run a standalone MongoDB server locally, you can turn transactions off in `lib/auth.ts` (Next.js) or `src/lib/auth.ts` (TanStack Start) with `mongodbAdapter(db, { client, transaction: false })`. See the [MongoDB adapter docs](https://better-auth.com/docs/adapters/mongo). Writes are then not atomic, so keep transactions on in production.
 
 Keep database credentials out of source control.

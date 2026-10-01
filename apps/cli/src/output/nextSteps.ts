@@ -1,5 +1,21 @@
 import { ProjectConfig } from "../types";
 
+const MONGODB_AUTH_SETUP_URL =
+  "https://better-ts-stack.abdullahtech.me/docs/modules/database#mongoose-and-mongodb";
+
+// Node 24 releases before 24.20 report mismatched file stats on Windows, which
+// makes srvx (TanStack's production server) reject every static asset
+const MIN_TANSTACK_WINDOWS_NODE = [24, 20];
+
+function isNodeBelow([major, minor]: number[]): boolean {
+  const [currentMajor, currentMinor] = process.versions.node
+    .split(".")
+    .map(Number);
+  return (
+    currentMajor < major || (currentMajor === major && currentMinor < minor)
+  );
+}
+
 // Generates a list of instructions for the user to follow after project creation
 export function generateNextSteps(
   config: ProjectConfig,
@@ -26,6 +42,17 @@ export function generateNextSteps(
     );
   }
 
+  if (
+    config.framework === "tanstack" &&
+    process.platform === "win32" &&
+    isNodeBelow(MIN_TANSTACK_WINDOWS_NODE)
+  ) {
+    steps.push(
+      `Upgrade Node.js to ${MIN_TANSTACK_WINDOWS_NODE.join(".")} or newer: on Windows, ` +
+        `Node ${process.versions.node} makes "npm start" return 404 for CSS, JS, and other static files`
+    );
+  }
+
   // Step 3: Install dependencies if not already done
   if (!depsInstalled) {
     steps.push(`${config.packageManager} install`);
@@ -42,6 +69,15 @@ export function generateNextSteps(
     steps.push(
       "Ensure MongoDB is running locally or update MONGODB_URI in .env"
     );
+
+    // Better Auth's MongoDB adapter uses transactions, which need a replica set
+    if (config.useAuth && isFullstack) {
+      steps.push(
+        "Better Auth uses MongoDB transactions: run MongoDB as a replica set (or use Atlas) " +
+          'and create the "user", "session", "account", and "verification" collections before signing up. ' +
+          `See ${MONGODB_AUTH_SETUP_URL}`
+      );
+    }
   }
 
   // Step 5: Start dev server

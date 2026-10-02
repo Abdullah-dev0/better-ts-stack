@@ -14,16 +14,15 @@ FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 {{#if useAuth}}
-# next build loads the auth route, which initializes Better Auth. Use a
-# build-only secret here; the real BETTER_AUTH_SECRET is supplied at runtime.
-ENV BETTER_AUTH_SECRET="build-only-placeholder-secret-not-used-at-runtime"
+# next build loads the auth route, which initializes Better Auth. The build gets
+# a placeholder secret for this command only; the real one is supplied at runtime.
 {{/if}}
 {{#if (eq database 'prisma')}}
-RUN DATABASE_URL="postgresql://postgres:postgres@localhost:5432/postgres" npm run build
+RUN {{#if useAuth}}BETTER_AUTH_SECRET="build-only-placeholder-secret-not-used-at-runtime" {{/if}}DATABASE_URL="postgresql://postgres:postgres@localhost:5432/postgres" npm run build
 {{else if (eq database 'mongoose')}}
-RUN MONGODB_URI="mongodb://localhost:27017/build" npm run build
+RUN {{#if useAuth}}BETTER_AUTH_SECRET="build-only-placeholder-secret-not-used-at-runtime" {{/if}}MONGODB_URI="mongodb://localhost:27017/build" npm run build
 {{else}}
-RUN npm run build
+RUN {{#if useAuth}}BETTER_AUTH_SECRET="build-only-placeholder-secret-not-used-at-runtime" {{/if}}npm run build
 {{/if}}
 
 # Production stage
@@ -73,7 +72,9 @@ RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 tanstackuser
 
 COPY package*.json ./
-RUN if [ -f package-lock.json ]; then npm ci --omit=dev; else npm install --omit=dev; fi
+# Clear the npm cache in the same layer so it does not ship in the image
+RUN if [ -f package-lock.json ]; then npm ci --omit=dev; else npm install --omit=dev; fi \
+    && npm cache clean --force
 
 # Copy built output (dist/server/server.js + dist/client)
 COPY --from=builder --chown=tanstackuser:nodejs /app/dist ./dist
@@ -118,7 +119,9 @@ RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 expressuser
 
 COPY package*.json ./
-RUN if [ -f package-lock.json ]; then npm ci --omit=dev; else npm install --omit=dev; fi
+# Clear the npm cache in the same layer so it does not ship in the image
+RUN if [ -f package-lock.json ]; then npm ci --omit=dev; else npm install --omit=dev; fi \
+    && npm cache clean --force
 
 # Copy built files (if TypeScript) or source files (if JavaScript)
 COPY --from=builder --chown=expressuser:nodejs /app/dist ./dist

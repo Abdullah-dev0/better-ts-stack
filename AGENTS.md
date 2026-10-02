@@ -47,7 +47,7 @@ npm run type:check     # TypeScript check (no emit)
 
 ### Running Tests
 
-Template checks: `npm run test:templates`, then `node scripts/check-matrix.cjs <matrix.json> express` or `nextjs`. No test framework configured. When added: CLI: `npx vitest run <file>`, Client: `npx jest <file>`
+Template checks: `npm run test:templates`, then `node scripts/check-matrix.cjs <matrix.json> express`, `nextjs`, or `tanstack` (install, build, type-check, lint). After that, `node scripts/smoke-matrix.cjs <matrix.json> <framework>` starts the built projects without a database in production mode and checks HTTP responses. No test framework configured. When added: CLI: `npx vitest run <file>`, Client: `npx jest <file>`
 
 ## Code Style Guidelines
 

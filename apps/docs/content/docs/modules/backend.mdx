@@ -91,9 +91,9 @@ export default router;
 ## Commands
 
 ```bash
-npm run dev        # tsx watch src/index.ts (hot reload)
+npm run dev        # tsx watch src/index.ts (hot reload, NODE_ENV=development)
 npm run build      # tsc (compile to dist/)
-npm run start      # node dist/index.js
+npm run start      # node dist/index.js (NODE_ENV=production)
 npm run lint       # eslint src
 npm run lint:fix   # eslint src --fix
 npm run format     # prettier --write "src/**/*.ts"
@@ -106,22 +106,24 @@ npm run type:check # tsc --noEmit
 
 ## Dependencies
 
-| Package   | Role                            |
-| --------- | ------------------------------- |
-| `express` | HTTP framework                  |
-| `cors`    | Cross-origin resource sharing   |
-| `helmet`  | Security headers                |
-| `morgan`  | HTTP request logger             |
-| `dotenv`  | Loads `.env` into `process.env` |
+| Package     | Role                                             |
+| ----------- | ------------------------------------------------ |
+| `express`   | HTTP framework                                   |
+| `cors`      | Cross-origin resource sharing                    |
+| `helmet`    | Security headers                                 |
+| `morgan`    | HTTP request logger                              |
+| `dotenv`    | Loads `.env` into `process.env`                  |
+| `cross-env` | Sets `NODE_ENV` in the `dev` and `start` scripts |
 
 ---
 
 ## Environment Variables
 
 ```bash
-NODE_ENV=development
 PORT=3000
 ```
+
+`NODE_ENV` is not written to `.env`. The `dev` script sets it to `development` and `start` sets it to `production` (through `cross-env`, so it works on Windows too).
 
 Additional variables are added by the database and auth modules.
 

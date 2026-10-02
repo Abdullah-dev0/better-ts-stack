@@ -158,6 +158,8 @@ For **MongoDB**:
 
 The generated `dev` script and install commands are tailored to your choice. With `bun`, the `dev` script uses `bun --watch` instead of `tsx watch`.
 
+With `pnpm`, the CLI also writes `pnpm-workspace.yaml`. It holds the dependency overrides and approves the install scripts of `bcrypt`, `esbuild`, `prisma`, `@prisma/engines`, and `unrs-resolver`. Without that approval, pnpm 11 and later stop `pnpm install` with an "Ignored build scripts" error.
+
 </Step>
 
 <Step>
@@ -260,9 +262,9 @@ npm run dev
 ### Scripts - Backend (Express)
 
 ```bash
-npm run dev        # tsx watch src/index.ts (hot reload)
+npm run dev        # tsx watch src/index.ts (hot reload, NODE_ENV=development)
 npm run build      # tsc (compile TypeScript to dist/)
-npm run start      # node dist/index.js
+npm run start      # node dist/index.js (NODE_ENV=production)
 npm run lint       # eslint src
 npm run format     # prettier --write "src/**/*.ts"
 npm run type:check # tsc --noEmit

@@ -100,10 +100,6 @@ export async function generatePackageJson(
       dependencies: mergedConfig.dependencies,
       devDependencies: mergedConfig.devDependencies,
       overrides,
-      pnpm:
-        config.packageManager === "pnpm" && overrides
-          ? { overrides }
-          : undefined,
     };
 
     const packageJsonPath = path.join(targetDir, "package.json");
@@ -117,6 +113,57 @@ export async function generatePackageJson(
       error,
       "PACKAGE_JSON_ERROR",
       "Failed to generate package.json"
+    );
+  }
+}
+
+// Template dependencies with install scripts. pnpm 11+ fails the install when
+// these are not approved; entries for packages a project lacks are ignored.
+const PNPM_BUILD_DEPENDENCIES = [
+  "@prisma/engines",
+  "bcrypt",
+  "esbuild",
+  "prisma",
+  "unrs-resolver",
+];
+
+// Writes pnpm-workspace.yaml, where pnpm 11+ reads overrides and build approvals
+// (it ignores the "pnpm" field in package.json)
+export async function generatePnpmWorkspace(
+  targetDir: string,
+  overrides: Record<string, string>
+): Promise<void> {
+  const lines: string[] = [];
+
+  if (Object.keys(overrides).length > 0) {
+    lines.push("overrides:");
+    for (const [name, version] of Object.entries(overrides)) {
+      lines.push(`  "${name}": "${version}"`);
+    }
+  }
+
+  lines.push("allowBuilds:");
+  for (const name of PNPM_BUILD_DEPENDENCIES) {
+    lines.push(`  "${name}": true`);
+  }
+
+  // pnpm 10 reads build approvals from this key instead
+  lines.push("onlyBuiltDependencies:");
+  for (const name of PNPM_BUILD_DEPENDENCIES) {
+    lines.push(`  - "${name}"`);
+  }
+
+  try {
+    await fs.writeFile(
+      path.join(targetDir, "pnpm-workspace.yaml"),
+      lines.join("\n") + "\n",
+      "utf-8"
+    );
+  } catch (error) {
+    throw buildError(
+      error,
+      "PNPM_WORKSPACE_ERROR",
+      "Failed to generate pnpm-workspace.yaml"
     );
   }
 }

@@ -57,8 +57,18 @@ async function main() {
             if (framework === "express")
               assert.equal(
                 manifest.scripts.start,
-                `${packageManager === "bun" ? "bun" : "node"} dist/index.js`
+                `cross-env NODE_ENV=production ${packageManager === "bun" ? "bun" : "node"} dist/index.js`
               );
+            // pnpm 11+ ignores package.json "pnpm" and needs build approvals
+            assert(!manifest.pnpm, `${name}: package.json pnpm field`);
+            assert.equal(
+              files.includes("pnpm-workspace.yaml"),
+              packageManager === "pnpm",
+              `${name}: pnpm-workspace.yaml`
+            );
+            // NODE_ENV comes from the scripts, so .env must not pin it
+            const env = await fs.readFile(path.join(target, ".env"), "utf8");
+            assert(!/^NODE_ENV=/m.test(env), `${name}: NODE_ENV in .env`);
             cases.push({ name, target, config });
           }
         }

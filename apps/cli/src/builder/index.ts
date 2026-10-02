@@ -8,6 +8,7 @@ import { validateDirectoryEmpty } from "../validators";
 import {
   generateEnvFile,
   generatePackageJson,
+  generatePnpmWorkspace,
   mergeConfigurations,
 } from "./configGenerator";
 import { installDependencies } from "./dependencyInstaller";
@@ -120,6 +121,9 @@ export async function build(
     // 9. Generate package.json
     consola.info("Generating package.json...");
     await generatePackageJson(targetDir, mergedConfig, config);
+    if (config.packageManager === "pnpm") {
+      await generatePnpmWorkspace(targetDir, mergedConfig.overrides);
+    }
     consola.success("package.json generated");
 
     // 10. Generate environment files

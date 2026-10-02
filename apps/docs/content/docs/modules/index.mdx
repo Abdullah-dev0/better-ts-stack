@@ -96,6 +96,7 @@ The final `package.json` will include:
   "dependencies": {
     "express": "^5.2.1",
     "cors": "^2.8.6",
+    "cross-env": "^10.1.0",
     "helmet": "^8.3.0",
     "morgan": "^1.12.0",
     "dotenv": "^17.4.2",
@@ -104,9 +105,9 @@ The final `package.json` will include:
     "jsonwebtoken": "^9.0.3"
   },
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "cross-env NODE_ENV=development tsx watch src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js",
+    "start": "cross-env NODE_ENV=production node dist/index.js",
     "lint": "eslint src",
     "format": "prettier --write \"src/**/*.ts\"",
     "type:check": "tsc --noEmit",

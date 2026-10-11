@@ -1,9 +1,15 @@
 // Utilities for copying files and processing Handlebars templates
 import fs from "fs-extra";
 import Handlebars from "handlebars";
-import path from "path";
+import { readdir } from "node:fs/promises";
+import path from "node:path";
 
 import { buildError, TemplateContext } from "../types";
+
+const TEMPLATE_EXTENSION = ".hbs";
+const MODULE_CONFIG_FILE = "config.json";
+// Names a template's .gitignore can be stored under, see restoreGitignore()
+const GITIGNORE_TEMPLATE_NAMES = ["gitignore", ".npmignore"];
 
 async function restoreGitignore(targetDir: string): Promise<void> {
   const templateGitignorePath = path.join(targetDir, "gitignore");
@@ -43,7 +49,7 @@ export async function copyModuleFiles(
       filter: (src: string) => {
         // Skip config.json files
         const basename = path.basename(src);
-        return basename !== "config.json";
+        return basename !== MODULE_CONFIG_FILE;
       },
     });
 
@@ -57,22 +63,39 @@ export async function copyModuleFiles(
   }
 }
 
+// Lists the files a module adds to a project, under the names they end up
+// with: no .hbs extension, and the gitignore template as .gitignore
+export async function listModuleFiles(moduleDir: string): Promise<string[]> {
+  const entries = await readdir(moduleDir, {
+    recursive: true,
+    withFileTypes: true,
+  });
+
+  return entries
+    .filter((entry) => entry.isFile() && entry.name !== MODULE_CONFIG_FILE)
+    .map((entry) => {
+      const file = path
+        .relative(moduleDir, path.join(entry.parentPath, entry.name))
+        .split(path.sep)
+        .join("/");
+
+      if (GITIGNORE_TEMPLATE_NAMES.includes(file)) return ".gitignore";
+      return file.endsWith(TEMPLATE_EXTENSION)
+        ? file.slice(0, -TEMPLATE_EXTENSION.length)
+        : file;
+    });
+}
+
 // Compiles and renders template content with Handlebars and provided context
 export function compileTemplate(
   content: string,
   context: TemplateContext
 ): string {
   try {
-    // Register helper functions with Handlebars
-    Object.entries(context.helpers).forEach(([name, fn]) => {
-      Handlebars.registerHelper(name, fn);
-    });
+    // The output is source code, not HTML, so values are written unescaped
+    const template = Handlebars.compile(content, { noEscape: true });
 
-    // Compile the template
-    const template = Handlebars.compile(content);
-
-    // Render with context
-    return template(context);
+    return template(context, { helpers: context.helpers });
   } catch (error) {
     throw buildError(
       error,
@@ -82,57 +105,39 @@ export function compileTemplate(
   }
 }
 
-// Processes multiple template files by replacing variables and handling extensions
+// Renders every .hbs file in the project and removes the .hbs extension
 export async function processTemplateFiles(
   targetDir: string,
-  context: TemplateContext,
-  templateFiles: string[]
+  context: TemplateContext
 ): Promise<void> {
-  for (const templateFile of templateFiles) {
-    await processTemplateFile(path.join(targetDir, templateFile), context);
+  const files = await readdir(targetDir, { recursive: true });
+
+  for (const file of files) {
+    if (file.endsWith(TEMPLATE_EXTENSION)) {
+      await processTemplateFile(path.join(targetDir, file), context);
+    }
   }
 }
 
-// Processes a single template file, replaces variables, and renames/deletes .hbs files
-export async function processTemplateFile(
+// Renders a single .hbs file next to itself and deletes the template
+async function processTemplateFile(
   filePath: string,
   context: TemplateContext
 ): Promise<void> {
   try {
-    // Check if file exists
-    const exists = await fs.pathExists(filePath);
-    if (!exists) {
-      return; // Skip if file doesn't exist
-    }
-
-    // Read template file
     const content = await fs.readFile(filePath, "utf-8");
-
-    // Compile and render template with Handlebars
     const rendered = compileTemplate(content, context);
 
-    // Determine output path (remove .hbs extension if present)
-    const outputPath = filePath.endsWith(".hbs")
-      ? filePath.slice(0, -4)
-      : filePath;
-
-    // Write processed content
-    await fs.writeFile(outputPath, rendered, "utf-8");
-
-    // Remove original .hbs file if it was renamed
-    if (outputPath !== filePath) {
-      await fs.remove(filePath);
-    }
+    await fs.writeFile(
+      filePath.slice(0, -TEMPLATE_EXTENSION.length),
+      rendered,
+      "utf-8"
+    );
+    await fs.remove(filePath);
   } catch (error) {
-    // Re-throw BuildErrors as-is
-    if (error && typeof error === "object" && "code" in error) {
-      throw error;
-    }
-
-    // Wrap other errors
     throw buildError(
       error,
-      "TEMPLATE_WRITE_ERROR",
+      "TEMPLATE_PROCESSING_ERROR",
       `Failed to process template file ${filePath}`
     );
   }

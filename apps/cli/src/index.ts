@@ -3,7 +3,7 @@ import path from "node:path";
 import { cwd } from "node:process";
 
 import { HELP_TEXT, parseCliArgs } from "./args";
-import { build } from "./builder";
+import { build, planBuild } from "./builder";
 import {
   collectProjectPath,
   collectStackChoices,
@@ -13,6 +13,7 @@ import {
   buildError,
   DEFAULT_CHOICES,
   getApplicationType,
+  isBuildError,
   ProjectConfig,
 } from "./types";
 import {
@@ -20,6 +21,7 @@ import {
   info,
   showBanner,
   showNextSteps,
+  showPlan,
   showSummary,
   success,
 } from "./ui";
@@ -65,11 +67,13 @@ async function main(): Promise<void> {
   showSummary(config, targetDir);
 
   if (args.dryRun) {
+    showPlan(await planBuild(config, targetDir));
     info("Dry run: no files were written.");
     return;
   }
 
-  if (!args.yes) await confirmBuild();
+  // Without a terminal nobody can answer, and every option came from a flag
+  if (!args.yes && process.stdin.isTTY) await confirmBuild();
 
   const result = await build(config, targetDir);
 
@@ -81,6 +85,6 @@ main()
   .then(() => process.exit(0))
   .catch((err) => {
     // Errors raised by the CLI carry a code and a message meant for the user
-    error(err instanceof Error && "code" in err ? err.message : String(err));
+    error(isBuildError(err) ? err.message : String(err));
     process.exit(1);
   });

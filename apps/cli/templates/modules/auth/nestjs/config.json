@@ -16,9 +16,5 @@
   "envVars": {
     "JWT_SECRET": "please-change-me",
     "JWT_EXPIRES_IN": "1h"
-  },
-  "templateFiles": [
-    "src/auth/auth.module.ts.hbs",
-    "src/auth/users.service.ts.hbs"
-  ]
+  }
 }

@@ -2,7 +2,7 @@
 import fs from "fs-extra";
 import Handlebars from "handlebars";
 import { randomBytes } from "node:crypto";
-import path from "path";
+import path from "node:path";
 
 import {
   buildError,
@@ -178,6 +178,9 @@ export async function generatePnpmWorkspace(
   }
 }
 
+// Variables that get a random value in .env instead of the module's default
+export const GENERATED_SECRETS = ["JWT_SECRET", "BETTER_AUTH_SECRET"];
+
 // Generates .env and .env.example files from merged environment variables
 export async function generateEnvFile(
   targetDir: string,
@@ -193,7 +196,7 @@ export async function generateEnvFile(
 
     // Add each environment variable
     for (const [key, value] of Object.entries(envVars)) {
-      const resolvedValue = ["JWT_SECRET", "BETTER_AUTH_SECRET"].includes(key)
+      const resolvedValue = GENERATED_SECRETS.includes(key)
         ? randomBytes(32).toString("hex")
         : value;
       envContent += `${key}=${value}\n`;

@@ -11,9 +11,5 @@
     "docker:down": "docker compose down",
     "docker:logs": "docker compose logs -f"
   },
-  "envVars": {},
-  "templateFiles": [
-    "docker-compose.yml.hbs",
-    "Dockerfile.hbs"
-  ]
+  "envVars": {}
 }

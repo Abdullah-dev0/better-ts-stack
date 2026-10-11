@@ -11,6 +11,5 @@
   "scripts": {},
   "envVars": {
     "MONGODB_URI": "mongodb://localhost:27017/myapp"
-  },
-  "templateFiles": []
+  }
 }

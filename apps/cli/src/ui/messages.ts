@@ -2,7 +2,7 @@
 import path from "node:path";
 import { cwd } from "node:process";
 
-import { DEFAULT_PORT, ProjectConfig } from "../types";
+import { BuildPlan, DEFAULT_PORT, ProjectConfig } from "../types";
 import { amber, bold, dim, lavender, lime, pink, red } from "./theme";
 
 // "better-ts-stack" in the figlet Big font
@@ -77,6 +77,37 @@ export function showSummary(config: ProjectConfig, targetDir: string) {
   write(`  ${pink("Setup")}  ${setup.filter(Boolean).join(" · ")}`);
   write(`  ${pink("Path ")}  ${path.relative(cwd(), targetDir) || "."}`);
   write();
+}
+
+// Prints a titled list, or nothing when the list is empty
+function showSection(title: string, lines: string[]) {
+  if (lines.length === 0) return;
+
+  write(`  ${amber(bold(title))} ${dim(`(${lines.length})`)}`);
+  for (const line of lines) write(`  ${line}`);
+  write();
+}
+
+// Formats name/value pairs as two aligned columns
+function toColumns(entries: Record<string, string>): string[] {
+  const width = Math.max(0, ...Object.keys(entries).map((key) => key.length));
+  return Object.entries(entries).map(
+    ([key, value]) => `${key.padEnd(width)}  ${dim(value)}`
+  );
+}
+
+// Shows everything a build would produce, for --dry-run
+export function showPlan(plan: BuildPlan) {
+  showSection("Files", plan.files);
+  showSection("Dependencies", toColumns(plan.dependencies));
+  showSection("Dev dependencies", toColumns(plan.devDependencies));
+  showSection("Overrides", toColumns(plan.overrides));
+  showSection("Scripts", toColumns(plan.scripts));
+  showSection(
+    "Environment variables",
+    Object.entries(plan.envVars).map(([key, value]) => `${key}=${dim(value)}`)
+  );
+  showSection("Commands", plan.commands.map(lime));
 }
 
 // Shows the numbered next steps, with the commands to run highlighted

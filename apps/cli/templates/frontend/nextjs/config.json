@@ -33,6 +33,5 @@
   },
   "envVars": {
     "PORT": "3000"
-  },
-  "templateFiles": ["app/page.tsx.hbs", "proxy.ts.hbs", "next.config.ts.hbs"]
+  }
 }

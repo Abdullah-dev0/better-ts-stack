@@ -6,26 +6,13 @@
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
     "better-auth": "^1.7.3",
-    "mongodb": "^7.6.0",
     "react-hook-form": "^7.87.0",
-    "zod": "^4.5.4"
+    "zod": "^4.6.5"
   },
   "devDependencies": {},
   "scripts": {},
   "envVars": {
     "BETTER_AUTH_SECRET": "please-change-me-to-a-random-string",
     "BETTER_AUTH_URL": "http://localhost:3000"
-  },
-  "templateFiles": [
-    "lib/auth.ts.hbs",
-    "lib/auth-client.ts",
-    "app/api/auth/[...all]/route.ts",
-    "app/dashboard/page.tsx",
-    "app/sign-in/page.tsx",
-    "app/sign-up/page.tsx",
-    "components/auth/sign-in-form.tsx",
-    "components/auth/sign-up-form.tsx",
-    "components/auth/sign-out-button.tsx",
-    "lib/auth-schema.ts"
-  ]
+  }
 }

@@ -21,7 +21,6 @@
   "envVars": {
     "DATABASE_URL": "postgresql://postgres:postgres@localhost:5432/postgres?schema=public"
   },
-  "templateFiles": ["prisma/schema.prisma.hbs"],
   "overrides": {
     "deepmerge-ts": "^8.0.2",
     "mysql2": "^3.24.3"

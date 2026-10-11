@@ -307,7 +307,7 @@ export const TerminalPreview = () => {
         {/* Body */}
         <div
           ref={terminalBodyRef}
-          className="bg-terminal-bg scrollbar-thumb-border max-h-[340px] min-h-[220px] scrollbar-thin scrollbar-track-transparent space-y-0.5 overflow-y-auto p-5"
+          className="bg-terminal-bg scrollbar-thumb-border max-h-[340px] min-h-[220px] scrollbar-thin scrollbar-track-transparent space-y-0.5 overflow-y-auto p-5 text-left whitespace-pre"
         >
           {completedLines.map((line, i) => (
             <ComputedLine key={i} line={line} />

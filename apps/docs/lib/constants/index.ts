@@ -79,7 +79,7 @@ export const ARCHITECTURE_FEATURES: Feature[] = [
     icon: "Server",
     title: "Backend Module",
     description:
-      "TypeScript backend with Express. Fully type-safe REST API with automatic validation using Zod. NestJS support coming soon.",
+      "TypeScript backend with Express or NestJS. Type-safe REST API with request validation using Zod.",
     color: "text-module-backend",
     badge: null,
     size: "large",
@@ -124,7 +124,7 @@ export const ARCHITECTURE_FEATURES: Feature[] = [
     icon: "Shield",
     title: "Auth Module",
     description:
-      "Optional JWT authentication with session management. Add auth to your project with one prompt.",
+      "Optional JWT authentication with session management. Add auth with one prompt or the --auth flag.",
     color: "text-primary",
     badge: null,
     size: "normal",
@@ -167,7 +167,7 @@ export const STACK_ITEMS: StackItem[] = [
   {
     icon: "Server",
     label: "API Layer",
-    sub: "Express + TypeScript",
+    sub: "Express or NestJS + TypeScript",
     color: "text-muted-foreground",
   },
   {
@@ -224,7 +224,7 @@ export const CORRECTNESS_SECTION = {
   templates: {
     title: "Ready-Made Templates. Zero Setup.",
     description:
-      "Pick your stack, choose your package manager (npm, pnpm, bun), and get a production-ready TypeScript project with Express backend, optional JWT authentication, and end-to-end type safety. No configuration needed.",
+      "Pick your stack, choose your package manager (npm, pnpm, bun), and get a production-ready TypeScript project with an Express or NestJS backend, optional JWT authentication, and end-to-end type safety. No configuration needed.",
   },
 } as const;
 

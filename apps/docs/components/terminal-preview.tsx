@@ -18,72 +18,66 @@ const SETUP_SCRIPT: LineKind[] = [
   { kind: "cmd", text: "npx better-ts-stack" },
   { kind: "spacer" },
   {
-    kind: "prompt",
-    question: "? Project name:",
-    answer: " my-app",
+    kind: "output",
+    text: "┌  better-ts-stack",
     color: "text-primary",
   },
   {
     kind: "prompt",
-    question: "? Select backend:",
-    answer: " Express + TypeScript",
+    question: "◇  Project name:",
+    answer: " my-api",
     color: "text-primary",
   },
   {
     kind: "prompt",
-    question: "? Select database:",
-    answer: " Prisma + MongoDB",
+    question: "◇  Application type:",
+    answer: " Backend API",
     color: "text-primary",
   },
   {
     kind: "prompt",
-    question: "? Include frontend?",
-    answer: " Yes — Next.js + Tailwind",
+    question: "◇  Select a backend framework:",
+    answer: " NestJS",
     color: "text-primary",
   },
   {
     kind: "prompt",
-    question: "? Include Docker?",
+    question: "◇  Select a database:",
+    answer: " PostgreSQL",
+    color: "text-primary",
+  },
+  {
+    kind: "prompt",
+    question: "◇  Select an ORM for postgresql:",
+    answer: " Prisma",
+    color: "text-primary",
+  },
+  {
+    kind: "prompt",
+    question: "◇  Use Docker?",
     answer: " Yes",
     color: "text-primary",
   },
   {
     kind: "prompt",
-    question: "? Add JWT auth?",
+    question: "◇  Add authentication?",
     answer: " Yes",
     color: "text-primary",
   },
   { kind: "spacer" },
   {
     kind: "output",
-    text: "✓  Scaffolding type-safe project...",
+    text: "◇  Stack  nestjs · prisma · auth · docker",
+    color: "text-muted-foreground",
+  },
+  {
+    kind: "output",
+    text: "◆  Git repository initialized",
     color: "text-emerald-400",
   },
   {
     kind: "output",
-    text: "✓  Express + TypeScript configured",
-    color: "text-emerald-400",
-  },
-  {
-    kind: "output",
-    text: "✓  Prisma schema generated",
-    color: "text-emerald-400",
-  },
-  {
-    kind: "output",
-    text: "✓  Next.js 16 + Tailwind ready",
-    color: "text-emerald-400",
-  },
-  {
-    kind: "output",
-    text: "✓  Docker Compose configured",
-    color: "text-emerald-400",
-  },
-  { kind: "output", text: "✓  JWT auth scaffolded", color: "text-emerald-400" },
-  { kind: "spacer" },
-  {
-    kind: "output",
-    text: "→  Done! Run  cd my-app && npm run dev",
+    text: "└  Done. Your app will run at http://localhost:3000",
     color: "text-primary",
   },
 ];
@@ -312,7 +306,7 @@ export const TerminalPreview = () => {
         {/* Body */}
         <div
           ref={terminalBodyRef}
-          className="bg-terminal-bg scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border max-h-[340px] min-h-[220px] space-y-0.5 overflow-y-auto p-5"
+          className="bg-terminal-bg scrollbar-thumb-border max-h-[340px] min-h-[220px] scrollbar-thin scrollbar-track-transparent space-y-0.5 overflow-y-auto p-5"
         >
           {completedLines.map((line, i) => (
             <ComputedLine key={i} line={line} />

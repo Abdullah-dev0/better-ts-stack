@@ -5,11 +5,13 @@ import { cwd } from "node:process";
 import { DEFAULT_PORT, ProjectConfig } from "../types";
 import { amber, bold, dim, lavender, lime, pink, red } from "./theme";
 
-// "better-ts-stack" drawn with box characters
+// "better-ts-stack" in the figlet Standard font
 const WORDMARK = [
-  "┌┐ ┌─┐┌┬┐┌┬┐┌─┐┬─┐   ┌┬┐┌─┐   ┌─┐┌┬┐┌─┐┌─┐┬┌─",
-  "├┴┐├┤  │  │ ├┤ ├┬┘─── │ └─┐───└─┐ │ ├─┤│  ├┴┐",
-  "└─┘└─┘ ┴  ┴ └─┘┴└─    ┴ └─┘   └─┘ ┴ ┴ ┴└─┘┴ ┴",
+  "  _          _   _                 _                 _             _",
+  " | |__   ___| |_| |_ ___ _ __     | |_ ___       ___| |_ __ _  ___| | __",
+  " | '_ \\ / _ \\ __| __/ _ \\ '__|____| __/ __|_____/ __| __/ _` |/ __| |/ /",
+  " | |_) |  __/ |_| ||  __/ | |_____| |_\\__ \\_____\\__ \\ || (_| | (__|   <",
+  " |_.__/ \\___|\\__|\\__\\___|_|        \\__|___/     |___/\\__\\__,_|\\___|_|\\_\\",
 ];
 
 function write(line = "") {
@@ -21,21 +23,37 @@ export const info = (message: string) => write(dim(`· ${message}`));
 export const warn = (message: string) => write(`${amber("!")} ${message}`);
 export const error = (message: string) => write(`${red("×")} ${message}`);
 
-// Opens the session with the wordmark, tagline, and key hints
-export function showBanner(version: string) {
-  const fitsWordmark = (process.stdout.columns ?? 80) >= WORDMARK[0].length + 2;
+const WORDMARK_WIDTH = Math.max(...WORDMARK.map((line) => line.length));
+
+function greeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning.";
+  if (hour < 18) return "Good afternoon.";
+  return "Good evening.";
+}
+
+// Opens the session with the wordmark, tagline, and key hints. An interactive
+// session starts on a cleared screen; console.clear() does nothing when piped
+export function showBanner(version: string, isInteractive: boolean) {
+  if (isInteractive) console.clear();
 
   write();
-  if (fitsWordmark) {
-    for (const line of WORDMARK) write(`  ${amber(line)}`);
+  if ((process.stdout.columns ?? 80) > WORDMARK_WIDTH) {
+    for (const line of WORDMARK) write(lime(line));
   } else {
-    write(`  ${amber(bold("better-ts-stack"))}`);
+    write(lime(bold("better-ts-stack")));
   }
   write();
-  write(`  ${lavender(bold("TypeScript projects, ready to run."))}`);
-  write(
-    `  ${dim(`v${version} · ↑↓ to move · enter to confirm · ctrl+c to cancel`)}`
-  );
+  write(lavender(bold("TypeScript projects, ready to run.")));
+  if (isInteractive) {
+    write(dim(greeting()));
+    write(lime(bold("Answer a few questions to get started.")));
+    write(
+      dim(`v${version} · ↑↓ to move · enter to confirm · ctrl+c to cancel`)
+    );
+  } else {
+    write(dim(`v${version}`));
+  }
   write();
 }
 

@@ -43,7 +43,7 @@ async function main(): Promise<void> {
     return;
   }
 
-  showBanner(version);
+  showBanner(version, !args.yes);
 
   const projectPath = await collectProjectPath(args.projectPath, args.yes);
   const targetDir = path.resolve(cwd(), projectPath);

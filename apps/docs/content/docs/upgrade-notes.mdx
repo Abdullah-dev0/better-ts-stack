@@ -13,7 +13,7 @@ Upgrading the CLI only changes projects you generate from now on. It does not ch
 - **Flags.** Every prompt has a flag, and `--yes` runs the CLI without prompts. `--dry-run`, `--help`, and `--version` were added. See [flags](/docs/usage#flags).
 - **Project paths.** The project can be created in a nested path (`apps/api`) or in the current directory (`.`).
 - **Request validation.** Express JWT auth validates request bodies with Zod.
-- **New look.** The CLI has a new design: a wordmark banner, `$` prompts that collapse to one `✓` line when answered, a compact summary, and highlighted next steps. It no longer clears the terminal.
+- **New look.** The CLI has a new design: a wordmark banner, `$` prompts that collapse to one `✓` line when answered, a compact summary, and highlighted next steps. An interactive run starts on a cleared screen; runs with `--yes` do not clear it.
 
 ### Changed behavior
 

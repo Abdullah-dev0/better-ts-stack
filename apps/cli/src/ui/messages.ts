@@ -5,13 +5,14 @@ import { cwd } from "node:process";
 import { DEFAULT_PORT, ProjectConfig } from "../types";
 import { amber, bold, dim, lavender, lime, pink, red } from "./theme";
 
-// "better-ts-stack" in the figlet Standard font
+// "better-ts-stack" in the figlet Big font
 const WORDMARK = [
-  "  _          _   _                 _                 _             _",
-  " | |__   ___| |_| |_ ___ _ __     | |_ ___       ___| |_ __ _  ___| | __",
-  " | '_ \\ / _ \\ __| __/ _ \\ '__|____| __/ __|_____/ __| __/ _` |/ __| |/ /",
-  " | |_) |  __/ |_| ||  __/ | |_____| |_\\__ \\_____\\__ \\ || (_| | (__|   <",
-  " |_.__/ \\___|\\__|\\__\\___|_|        \\__|___/     |___/\\__\\__,_|\\___|_|\\_\\",
+  "  _          _   _                   _                  _             _",
+  " | |        | | | |                 | |                | |           | |",
+  " | |__   ___| |_| |_ ___ _ __ ______| |_ ___ ______ ___| |_ __ _  ___| | __",
+  " | '_ \\ / _ \\ __| __/ _ \\ '__|______| __/ __|______/ __| __/ _` |/ __| |/ /",
+  " | |_) |  __/ |_| ||  __/ |         | |_\\__ \\      \\__ \\ || (_| | (__|   <",
+  " |_.__/ \\___|\\__|\\__\\___|_|          \\__|___/      |___/\\__\\__,_|\\___|_|\\_\\",
 ];
 
 function write(line = "") {
@@ -71,7 +72,6 @@ export function showSummary(config: ProjectConfig, targetDir: string) {
     config.installDeps && "install dependencies",
   ];
 
-  write();
   write(`  ${amber(bold(config.projectName))}`);
   write(`  ${pink("Stack")}  ${stack.filter(Boolean).join(" · ")}`);
   write(`  ${pink("Setup")}  ${setup.filter(Boolean).join(" · ")}`);

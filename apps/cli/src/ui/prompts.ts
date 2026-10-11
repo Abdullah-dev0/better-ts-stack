@@ -13,9 +13,10 @@ export interface SelectOption<T> {
 // A prompt waiting for input: "$ Project name"
 const question = (message: string) => `${lime("$")} ${bold(message)}`;
 
-// An answered prompt, collapsed to one line: "✓ Project name  my-app"
+// An answered prompt, collapsed to one line: "✓ Project name  my-app". The
+// trailing newline leaves a blank line before the next prompt
 const answered = (message: string, answer: string) =>
-  `${lime("✓")} ${dim(message)}  ${answer}`;
+  `${lime("✓")} ${dim(message)}  ${answer}\n`;
 
 const cancelled = (message: string) => `${red("×")} ${dim(message)}`;
 

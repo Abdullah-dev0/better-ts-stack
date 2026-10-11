@@ -23,7 +23,7 @@ better-ts-stack is an interactive CLI that generates TypeScript projects. You ch
 <Callout type="info" title="Good for">
 
 - Starting a new TypeScript backend or full-stack project
-- Prototyping an API with Express and TypeScript
+- Prototyping an API with Express or NestJS
 - Learning how a TypeScript project is structured
 - Using the same project setup across a team
 
@@ -105,7 +105,7 @@ npm run dev
 
 <Cards>
   <Card title="Backend API" icon={<Database className="text-blue-400" />}>
-    Express.js server with TypeScript, cors, helmet, morgan middleware, and a
+    Express or NestJS server with TypeScript, security headers, CORS, and a
     health check endpoint
   </Card>
   <Card title="Full-stack App" icon={<Layout className="text-green-400" />}>
@@ -119,14 +119,14 @@ npm run dev
     PostgreSQL with Prisma or Drizzle, or MongoDB with Mongoose - your choice
   </Card>
   <Card title="Authentication" icon={<Zap className="text-yellow-400" />}>
-    JWT + bcrypt for Express, Better Auth (with Prisma, Drizzle, or MongoDB
-    adapter) for Next.js and TanStack Start
+    JWT + bcrypt for Express and NestJS, Better Auth (with Prisma, Drizzle, or
+    MongoDB adapter) for Next.js and TanStack Start
   </Card>
   <Card title="Docker Ready" icon={<Container className="text-blue-400" />}>
     Multi-stage Dockerfile and docker-compose.yml generated on request
   </Card>
   <Card title="Developer Tooling" icon={<Terminal className="text-primary" />}>
-    ESLint 10, Prettier, TypeScript strict mode, and hot reload out of the box
+    ESLint 10, Prettier, TypeScript strict mode, and hot reload already set up
   </Card>
 </Cards>
 
@@ -145,8 +145,8 @@ npm run dev
   <Card title="Installation Options" href="/docs/installation">
     npx vs global install, package manager differences
   </Card>
-  <Card title="Interactive Usage" href="/docs/usage">
-    Full prompt-by-prompt walkthrough
+  <Card title="Usage" href="/docs/usage">
+    Every prompt and command-line flag
   </Card>
   <Card title="Modules" href="/docs/modules">
     Backend, frontend, database, auth, and Docker options in detail

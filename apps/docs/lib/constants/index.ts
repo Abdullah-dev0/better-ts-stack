@@ -17,8 +17,8 @@ export const NAVBAR_CONFIG = {
   },
   banner: {
     icon: "Zap",
-    text: "Opinionated in the right places. Flexible where it matters.",
-    tagline: "Build fast. Refactor fearlessly. Deploy confidently.",
+    text: "Version 2.0: NestJS, a flag for every prompt, and a new CLI.",
+    tagline: "npx better-ts-stack",
   },
   links: [
     { href: "/docs", label: "Docs", external: false },
@@ -40,15 +40,15 @@ export const NAVBAR_CONFIG = {
 export const HERO_CONFIG = {
   badge: {
     icon: "Sparkles",
-    text: "Bold & Confident",
+    text: "Version 2.0",
   },
   headline: {
-    main: "Build your full stack.",
+    main: "Scaffold a TypeScript project.",
     second: "One command.",
-    accent: "Zero hassle.",
+    accent: "Ready to run.",
   },
   subheadline:
-    "From one CLI command to production—without the chaos. Zero config. Maximum confidence. Your backend, but better.",
+    "Pick a framework, a database, authentication, and Docker. The CLI writes a project that installs, builds, and lints without extra setup.",
   cta: {
     primary: {
       text: "Get Started",
@@ -77,54 +77,53 @@ export interface Feature {
 export const ARCHITECTURE_FEATURES: Feature[] = [
   {
     icon: "Server",
-    title: "Backend Module",
+    title: "Backend",
     description:
-      "TypeScript backend with Express or NestJS. Type-safe REST API with request validation using Zod.",
+      "Express 5 or NestJS 12 with TypeScript, security headers, CORS, and a health check route.",
     color: "text-module-backend",
     badge: null,
     size: "large",
   },
   {
     icon: "Database",
-    title: "Prisma ORM",
+    title: "PostgreSQL",
     description:
-      "Type-safe database access with auto-generated types. Seamless integration with the backend module.",
+      "Prisma or Drizzle with a starter schema, a database client, and migration scripts.",
     color: "text-module-database",
     badge: null,
     size: "normal",
   },
   {
     icon: "Box",
-    title: "MongoDB + Mongoose",
-    description:
-      "Better MongoDB support with Mongoose schemas. Full type inference for documents.",
+    title: "MongoDB",
+    description: "A Mongoose connection and a typed User model.",
     color: "text-primary",
     badge: null,
     size: "normal",
   },
   {
     icon: "Container",
-    title: "Docker Ready",
+    title: "Docker",
     description:
-      "Pre-configured Docker Compose setup. One command to spin up your entire dev environment.",
+      "A multi-stage Dockerfile, a Compose file, and scripts to build and run the image.",
     color: "text-muted-foreground",
     badge: null,
     size: "normal",
   },
   {
     icon: "Layout",
-    title: "Frontend Module",
+    title: "Full-stack",
     description:
-      "Full-stack Next.js integration. Pre-configured with Tailwind CSS, React 19, and modern tooling.",
+      "Next.js 16 or TanStack Start with React 19, Tailwind CSS v4, and shadcn-style components.",
     color: "text-module-frontend",
     badge: null,
     size: "large",
   },
   {
     icon: "Shield",
-    title: "Auth Module",
+    title: "Authentication",
     description:
-      "Optional JWT authentication with session management. Add auth with one prompt or the --auth flag.",
+      "JWT with bcrypt and Zod validation for backends. Better Auth for full-stack apps.",
     color: "text-primary",
     badge: null,
     size: "normal",
@@ -132,13 +131,13 @@ export const ARCHITECTURE_FEATURES: Feature[] = [
 ];
 
 export const ARCHITECTURE_SECTION = {
-  badge: "Modular Architecture",
+  badge: "Modules",
   title: {
-    main: "Everything You Need.",
-    accent: "Nothing You Don't.",
+    main: "Pick what you need.",
+    accent: "Skip the rest.",
   },
   description:
-    "Pick the modules you need. Each one is designed to work perfectly alone or together.",
+    "Every module is optional. The CLI only adds the files and dependencies for what you select.",
 } as const;
 
 // ============================================================================
@@ -154,26 +153,26 @@ export interface StackItem {
 export const STACK_ITEMS: StackItem[] = [
   {
     icon: "Database",
-    label: "Data Layer",
-    sub: "MongoDB + Prisma + Mongoose",
+    label: "Database",
+    sub: "PostgreSQL (Prisma, Drizzle) or MongoDB (Mongoose)",
     color: "text-primary",
   },
   {
     icon: "Layers",
-    label: "Business Logic",
-    sub: "TypeScript + Zod + JWT Auth",
+    label: "Authentication",
+    sub: "JWT + bcrypt or Better Auth",
     color: "text-module-backend",
   },
   {
     icon: "Server",
-    label: "API Layer",
-    sub: "Express or NestJS + TypeScript",
+    label: "Server",
+    sub: "Express, NestJS, Next.js, or TanStack Start",
     color: "text-muted-foreground",
   },
   {
     icon: "UploadCloud",
     label: "Deployment",
-    sub: "Docker + CI/CD",
+    sub: "Dockerfile + Compose",
     color: "text-module-database",
   },
 ];
@@ -187,86 +186,47 @@ export interface FeatureCard {
 export const CORRECTNESS_FEATURE_CARDS: FeatureCard[] = [
   {
     icon: "Code2",
-    title: "Correctness First",
+    title: "Strict TypeScript",
     description:
-      "If it compiles, it works. Catch errors at build time, not in production.",
+      "Every template uses strict mode, with ESLint and Prettier already configured.",
   },
   {
     icon: "GitBranch",
-    title: "Modular Design",
+    title: "Only what you pick",
     description:
-      "Use only what you need. Each module is independent and composable.",
+      "No unused packages or files. Skip the database or auth and they are not there.",
   },
   {
     icon: "Zap",
-    title: "Zero Overhead",
+    title: "Tested combinations",
     description:
-      "No runtime type checking. All safety happens at compile time.",
+      "Every stack is installed, built, type-checked, and linted in CI on Linux and Windows.",
   },
 ];
 
 export const CORRECTNESS_SECTION = {
   badge: "How It Works",
-  title: "Built for Correctness",
+  title: "What you get",
   description:
-    "Every layer is type-safe. Every connection is validated. No more guessing—just shipping.",
-  typesPreserved: "Types preserved across all layers",
+    "A project you can read: plain TypeScript, with no generator runtime left behind.",
+  typesPreserved: "Strict TypeScript in every layer",
   comparison: {
     bad: {
-      label: "Manual Setup",
-      description: "Hours of config, auth headaches, type mismatches.",
+      label: "By hand",
+      description:
+        "Wire up TypeScript, linting, the ORM, auth, and Docker yourself.",
     },
     good: {
       label: "better-ts-stack",
-      description: "One command, full stack, ready to ship.",
+      description: "Answer a few prompts or pass flags, then start coding.",
     },
   },
   templates: {
-    title: "Ready-Made Templates. Zero Setup.",
+    title: "Templates that run",
     description:
-      "Pick your stack, choose your package manager (npm, pnpm, bun), and get a production-ready TypeScript project with an Express or NestJS backend, optional JWT authentication, and end-to-end type safety. No configuration needed.",
+      "Choose a framework, a database, and a package manager (npm, pnpm, or bun). The generated project installs, builds, and starts without extra configuration.",
   },
 } as const;
-
-// ============================================================================
-// TERMINAL PREVIEW CONSTANTS
-// ============================================================================
-export const TERMINAL_CONFIG = {
-  command: "npx better-ts-stack",
-  typingSpeed: 80, // milliseconds per character
-  output: [
-    {
-      icon: "✓",
-      text: "Scaffolding your type-safe project...",
-      color: "text-primary",
-    },
-    {
-      icon: "✓",
-      text: "Express + TypeScript configured",
-      color: "text-primary",
-    },
-    {
-      icon: "✓",
-      text: "Database (Prisma/Drizzle) ready",
-      color: "text-primary",
-    },
-    { icon: "✓", text: "Docker Compose configured", color: "text-primary" },
-    {
-      icon: "→",
-      text: "Done! Run `cd my-app && npm run dev`",
-      color: "text-primary",
-    },
-  ],
-} as const;
-
-// ============================================================================
-// STATS CONSTANTS
-// ============================================================================
-export const STATS = [
-  { label: "Type-Latencies", value: "0ms" },
-  { label: "Lighthouse Score", value: "100/100" },
-  { label: "Bundle Overhead", value: "2.4kb" },
-] as const;
 
 // ============================================================================
 // FOOTER CONSTANTS
@@ -293,104 +253,4 @@ export const FOOTER_CONFIG = {
     { href: "/docs/usage", label: "Usage" },
     { href: "/docs/structure", label: "Architecture" },
   ],
-} as const;
-
-// ============================================================================
-// MOBILE CTA CONSTANTS
-// ============================================================================
-export const MOBILE_CTA_CONFIG = {
-  buttonText: "Get Started",
-  scrollThreshold: 300, // pixels
-} as const;
-
-// ============================================================================
-// ANNOUNCEMENT BANNER CONSTANTS
-// ============================================================================
-export const ANNOUNCEMENT_BANNER_CONFIG = {
-  icon: "Zap",
-  text: "Start strong. Ship stronger.",
-  tagline: "Build fast. Refactor fearlessly. Deploy confidently.",
-} as const;
-
-// ============================================================================
-// CORE ARCHITECTURE CONSTANTS
-// ============================================================================
-export const CORE_ARCHITECTURE_CONFIG = {
-  badge: {
-    text: "Core Architecture",
-    indicator: true,
-  },
-  title: {
-    main: "Stop guessing.",
-    accent: "Start knowing.",
-  },
-  description:
-    "Built on the principles of correctness and performance. better-ts-stack isn't just a starter template; it's a philosophy.",
-  details:
-    "Traditional API layers break the type chain. better-ts-stack preserves it. If you change a column name in your database, your frontend build fails immediately. No more runtime surprises.",
-  stats: {
-    runtimeErrors: {
-      value: "0",
-      label: "Runtime Errors",
-    },
-    compileTimeSafety: {
-      value: "100%",
-      label: "Compile-time Safety",
-    },
-  },
-  simulation: {
-    modes: {
-      legacy: "Traditional",
-      modern: "better-ts-stack",
-    },
-    actions: {
-      renameColumn: "Rename Column (migrate)",
-      simulateRequest: "Simulate User Request",
-      running: "Running...",
-    },
-    status: {
-      buildFailed: "Build Failed",
-      typeSafe: "Type-Safe",
-      runtimeCrash: "Runtime Crash",
-      appRunning: "App Running",
-      waiting: "Waiting for request...",
-    },
-    labels: {
-      runtimeStatus: "Runtime Status",
-      buildStatus: "Build Status",
-      action: "Action",
-      result: "Result",
-    },
-  },
-} as const;
-
-// ============================================================================
-// CODE COMPARISON CONSTANTS
-// ============================================================================
-export const CODE_COMPARISON_CONFIG = {
-  title: "Type-Flow Visualization",
-  description:
-    "See the difference. better-ts-stack bridges the gap between your backend and frontend.",
-  files: {
-    traditional: {
-      name: "traditional-fetch.ts",
-      label: "Unsafe",
-      code: `const data = await fetch('/api/users').then(r => r.json())
-
-// ❌ No type inference
-console.log(data.user.nmae)`,
-    },
-    modern: {
-      name: "typed-client.ts",
-      label: "Type-Safe",
-      code: `const data = await api.users.get()
-
-// ✅ Full autocompletion
-console.log(data.user.name)`,
-      tooltip: {
-        method: "method getUsers(): Promise<User[]>",
-        hint: "Go to definition (Ctrl + Click)",
-      },
-    },
-  },
 } as const;

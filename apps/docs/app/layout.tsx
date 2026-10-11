@@ -17,9 +17,9 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const title = "better-ts-stack - Ship Type-Safety by Default";
+const title = "better-ts-stack - Scaffold TypeScript projects";
 const description =
-  "Scaffold end-to-end type-safe TypeScript projects with zero config. Build your backend, frontend, database, authentication, and Docker setup in one command.";
+  "A CLI that scaffolds Express, NestJS, Next.js, and TanStack Start projects with a database, authentication, and Docker already set up.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://better-ts-stack.abdullahtech.me"),
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     "React",
     "drizzle",
     "Prisma",
-    "tRPC",
+    "TanStack Start",
     "type safety",
     "CLI tool",
     "scaffolding",

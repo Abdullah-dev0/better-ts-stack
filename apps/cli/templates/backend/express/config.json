@@ -1,7 +1,7 @@
 {
   "id": "express",
   "name": "Express Base",
-  "description": "Base Express server with TypeScript, middleware, and best practices",
+  "description": "Base Express server with TypeScript, security headers, and a health check",
   "type": "base",
   "scripts": {
     "dev": "cross-env NODE_ENV=development {{#if (eq packageManager 'bun')}}bun --watch src/index.ts{{else}}tsx watch src/index.ts{{/if}}",

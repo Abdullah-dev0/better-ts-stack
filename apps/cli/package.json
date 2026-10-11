@@ -1,14 +1,19 @@
 {
   "name": "better-ts-stack",
   "version": "2.0.0",
-  "description": "A powerful CLI tool that generates fully configured TypeScript projects with backend, frontend, database integration, Docker support, and more--all through an interactive setup.",
+  "description": "A CLI that scaffolds Express, NestJS, Next.js, and TanStack Start projects with a database, authentication, and Docker already set up.",
   "keywords": [
     "cli",
     "builder",
     "backend",
     "typescript",
     "express",
+    "nestjs",
+    "nextjs",
+    "tanstack-start",
     "prisma",
+    "drizzle",
+    "mongoose",
     "template"
   ],
   "homepage": "https://better-ts-stack.abdullahtech.me",

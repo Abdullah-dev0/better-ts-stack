@@ -22,18 +22,19 @@ const APP_CONTAINER = "bts-test-app";
 const IMAGE = "bts-test-image";
 const POSTGRES_HOST_PORT = 54329;
 
-// Database containers, the URL the app container uses, and how to set up the schema
+// Database containers, the URL the app container uses, and how to set up the
+// schema. PostgreSQL runs without a password: it is a throwaway test container
 const DATABASES = {
   prisma: {
     runArgs: [
       "-e",
-      "POSTGRES_PASSWORD=postgres",
+      "POSTGRES_HOST_AUTH_METHOD=trust",
       "-p",
       `${POSTGRES_HOST_PORT}:5432`,
       "postgres:17-alpine",
     ],
     readyCommand: ["pg_isready", "-U", "postgres"],
-    env: `DATABASE_URL=postgresql://postgres:postgres@${DB_CONTAINER}:5432/postgres`,
+    env: `DATABASE_URL=postgresql://postgres@${DB_CONTAINER}:5432/postgres`,
     pushSchema: ["prisma", "db", "push"],
   },
   mongoose: {
@@ -95,7 +96,7 @@ async function startDatabase(log, c) {
         shell: process.platform === "win32",
         env: {
           ...process.env,
-          DATABASE_URL: `postgresql://postgres:postgres@localhost:${POSTGRES_HOST_PORT}/postgres`,
+          DATABASE_URL: `postgresql://postgres@localhost:${POSTGRES_HOST_PORT}/postgres`,
         },
       }
     );

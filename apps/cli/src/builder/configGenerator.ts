@@ -6,11 +6,21 @@ import path from "path";
 
 import {
   buildError,
+  Framework,
   MergedConfig,
   ModuleConfig,
   ProjectConfig,
   TemplateContext,
 } from "../types";
+
+// Frameworks whose generated project uses ES modules
+const ESM_FRAMEWORKS: Framework[] = ["tanstack", "nestjs"];
+
+// Compiled entry file of each backend framework
+const BACKEND_ENTRY_FILES: Partial<Record<Framework, string>> = {
+  express: "dist/index.js",
+  nestjs: "dist/main.js",
+};
 
 // Replaces Handlebars variables within script command strings
 export function processScriptVariables(
@@ -87,14 +97,14 @@ export async function generatePackageJson(
         node: config.framework === "tanstack" ? ">=24.20.0" : ">=24.0.0",
       },
       description: `Project created with better-ts-stack using ${config.database !== "none" ? config.database : "no database"}`,
-      ...(config.framework === "tanstack" ? { type: "module" } : {}),
-      ...(isFullstack ? {} : { main: "dist/index.js" }),
+      ...(ESM_FRAMEWORKS.includes(config.framework) ? { type: "module" } : {}),
+      ...(isFullstack ? {} : { main: BACKEND_ENTRY_FILES[config.framework] }),
       scripts: mergedConfig.scripts,
       keywords: isFullstack
         ? config.framework === "tanstack"
           ? ["tanstack-start", "react", "typescript"]
           : ["nextjs", "react", "typescript"]
-        : ["backend", "typescript", "express"],
+        : ["backend", "typescript", config.framework],
       author: "",
       license: "MIT",
       dependencies: mergedConfig.dependencies,

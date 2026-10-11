@@ -1,8 +1,8 @@
 # better-ts-stack
 
-> An interactive CLI that scaffolds TypeScript backend and full-stack projects.
+> A CLI that scaffolds TypeScript backend and full-stack projects.
 
-`better-ts-stack` creates an Express, Next.js, or TanStack Start project with TypeScript, ESLint, and Prettier set up. Database, authentication, Docker, and git are optional.
+`better-ts-stack` creates an Express, NestJS, Next.js, or TanStack Start project with TypeScript, ESLint, and Prettier set up. Database, authentication, Docker, and git are optional.
 
 ## Quick Start
 
@@ -17,26 +17,57 @@ better-ts-stack
 
 Run the command and answer the prompts. The CLI creates the project folder.
 
+## Flags
+
+Every prompt has a flag. Options you leave out are asked interactively, unless you pass `--yes`.
+
+```bash
+# No prompts at all
+npx better-ts-stack my-api --framework nestjs --database prisma --auth --yes
+
+# Create the project in the current (empty) directory
+npx better-ts-stack . --framework nextjs --database drizzle --pm pnpm
+```
+
+| Flag                         | Values                                       |
+| ---------------------------- | -------------------------------------------- |
+| `--framework <name>`         | `express`, `nestjs`, `nextjs`, `tanstack`    |
+| `--database <name>`          | `none`, `prisma`, `drizzle`, `mongoose`      |
+| `--pm <name>`                | `npm`, `pnpm`, `bun`                         |
+| `--auth` / `--no-auth`       | Add authentication                           |
+| `--docker` / `--no-docker`   | Add Docker files                             |
+| `--git` / `--no-git`         | Initialize a git repository                  |
+| `--install` / `--no-install` | Install dependencies                         |
+| `-y`, `--yes`                | Use defaults for missing options, no prompts |
+| `--dry-run`                  | Show the summary without writing files       |
+| `-h`, `--help`               | Show help                                    |
+| `-v`, `--version`            | Show the version                             |
+
+`--database` names the ORM, which also selects the database: `prisma` and `drizzle` use PostgreSQL, `mongoose` uses MongoDB.
+
+With `--yes`, the defaults are Express, no database, no auth, no Docker, npm, git initialized, and dependencies not installed.
+
+The project path can be a name (`my-app`), a nested path (`apps/api`), or `.` for the current directory.
+
 ## What It Can Scaffold
 
 | Project type   | Stack                                   | Optional setup                                                           |
 | -------------- | --------------------------------------- | ------------------------------------------------------------------------ |
-| Backend API    | Express 5 + TypeScript                  | PostgreSQL, MongoDB, Prisma, Drizzle, Mongoose, JWT auth, Docker, git    |
+| Backend API    | Express 5 or NestJS 12 + TypeScript     | PostgreSQL, MongoDB, Prisma, Drizzle, Mongoose, JWT auth, Docker, git    |
 | Full-stack app | Next.js 16 or TanStack Start + React 19 | PostgreSQL, MongoDB, Prisma, Drizzle, Mongoose, Better Auth, Docker, git |
 
 Notes:
 
-- Express is the only backend framework for now. NestJS is listed in the prompt as "coming soon".
 - Better Auth is only offered for full-stack projects that use a database.
 
 ## Interactive Prompt Flow
 
-The CLI has no subcommands or flags. It asks, in order:
+Without flags, the CLI asks, in order:
 
-1. Project name
+1. Project name or path
 2. Application type: `Backend API` or `Full-stack App`
 3. Framework
-   - Backend: `Express` (`NestJS` is coming soon)
+   - Backend: `Express` or `NestJS`
    - Full-stack: `Next.js` or `TanStack Start`
 4. Database: `none`, `PostgreSQL`, or `MongoDB`
 5. ORM/ODM when a database is selected
@@ -45,7 +76,7 @@ The CLI has no subcommands or flags. It asks, in order:
 6. Package manager: `npm`, `pnpm`, or `bun`
 7. Docker setup
 8. Authentication
-   - Express apps: JWT-based auth
+   - Express and NestJS apps: JWT-based auth
    - Next.js and TanStack Start apps: Better Auth, only when a database is selected
 9. Git initialization
 10. Dependency installation

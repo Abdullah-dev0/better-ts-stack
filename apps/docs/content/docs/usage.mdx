@@ -1,6 +1,6 @@
 ﻿---
-title: Interactive Usage
-description: Full walkthrough of the better-ts-stack CLI prompt flow
+title: Usage
+description: The better-ts-stack prompt flow and command-line flags
 ---
 
 import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
@@ -9,9 +9,52 @@ import { Step, Steps } from "fumadocs-ui/components/steps";
 
 ## How the CLI Works
 
-better-ts-stack is **interactive**. There are no subcommands or flags. Run the command, answer the prompts, and the CLI generates a project from your answers.
+Run the command, answer the prompts, and the CLI generates a project from your answers. Every prompt also has a flag, so scripts and CI can run it without prompts.
 
 <Callout type="info">Run `npx better-ts-stack` and follow the prompts.</Callout>
+
+---
+
+## Flags
+
+```bash
+better-ts-stack [project-path] [options]
+```
+
+Options you leave out are asked interactively, unless you pass `--yes`.
+
+```bash
+# No prompts at all
+npx better-ts-stack my-api --framework nestjs --database prisma --auth --yes
+
+# Create the project in the current (empty) directory
+npx better-ts-stack . --framework nextjs --database drizzle --pm pnpm
+
+# Check the result without writing anything
+npx better-ts-stack my-api --framework express --yes --dry-run
+```
+
+| Flag                         | Values                                       |
+| ---------------------------- | -------------------------------------------- |
+| `--framework <name>`         | `express`, `nestjs`, `nextjs`, `tanstack`    |
+| `--database <name>`          | `none`, `prisma`, `drizzle`, `mongoose`      |
+| `--pm <name>`                | `npm`, `pnpm`, `bun`                         |
+| `--auth` / `--no-auth`       | Add authentication                           |
+| `--docker` / `--no-docker`   | Add Docker files                             |
+| `--git` / `--no-git`         | Initialize a git repository                  |
+| `--install` / `--no-install` | Install dependencies                         |
+| `-y`, `--yes`                | Use defaults for missing options, no prompts |
+| `--dry-run`                  | Show the summary without writing files       |
+| `-h`, `--help`               | Show help                                    |
+| `-v`, `--version`            | Show the version                             |
+
+`--database` names the ORM, which also selects the database: `prisma` and `drizzle` use PostgreSQL, `mongoose` uses MongoDB.
+
+With `--yes`, the defaults are Express, no database, no auth, no Docker, npm, git initialized, and dependencies not installed.
+
+`--auth` with `nextjs` or `tanstack` needs a database, because Better Auth stores users and sessions. Without one the CLI stops with an error.
+
+`--yes` requires a project path.
 
 ---
 
@@ -20,9 +63,9 @@ better-ts-stack is **interactive**. There are no subcommands or flags. Run the c
 <Steps>
 
 <Step>
-### Welcome screen
+### Intro
 
-The CLI shows a banner with the product name and a short welcome message.
+The CLI prints its wordmark, version, and key hints, then starts the prompts. Each answered prompt collapses to one line, such as `✓ Project name  my-api`.
 
 </Step>
 
@@ -34,13 +77,14 @@ The CLI shows a banner with the product name and a short welcome message.
   my-awesome-project
 ```
 
-**Rules:**
+You can enter a name (`my-api`), a nested path (`apps/api`), or `.` to use the current directory. The target directory must be empty or not exist yet.
 
-- Must be a valid directory name
-- Cannot be empty, cannot contain spaces, cannot start with a dot
-- Use hyphens or underscores for multi-word names
+**Rules for the folder name**, which becomes the `package.json` name:
 
-**Valid examples:** `my-api`, `cool-app-v2`, `customer_portal`
+- Lowercase letters, numbers, and hyphens only
+- Cannot be empty and cannot start or end with a hyphen
+
+**Valid examples:** `my-api`, `cool-app-v2`, `apps/customer-portal`
 
 </Step>
 
@@ -53,10 +97,10 @@ The CLI shows a banner with the product name and a short welcome message.
   ( ) Full-stack
 ```
 
-| Option          | What it generates                                    |
-| --------------- | ---------------------------------------------------- |
-| **Backend API** | Express.js server (prompts for framework next)       |
-| **Full-stack**  | Next.js 16 or TanStack Start (prompts for framework) |
+| Option          | What it generates                                     |
+| --------------- | ----------------------------------------------------- |
+| **Backend API** | Express or NestJS server (prompts for framework next) |
+| **Full-stack**  | Next.js 16 or TanStack Start (prompts for framework)  |
 
 <Callout type="info">
   **Full-stack** generates a single project at the root of your chosen
@@ -70,12 +114,13 @@ The CLI shows a banner with the product name and a short welcome message.
 ```
 ? Select a backend framework:
   (*) Express
-  ( ) NestJS (coming soon)
+  ( ) NestJS
 ```
 
-**Available now:** Express.js
-
-**Coming soon:** NestJS - selecting it shows a warning and re-prompts.
+| Option      | What it generates                                   |
+| ----------- | --------------------------------------------------- |
+| **Express** | Express 5 server, `tsx watch` for development       |
+| **NestJS**  | NestJS 12 server (ES modules), `nest start --watch` |
 
 > This prompt does **not** appear for Full-stack projects.
 
@@ -216,22 +261,16 @@ If yes, the CLI runs your chosen package manager's install command after generat
 <Step>
 ### Confirmation summary
 
-Before generating, the CLI displays a summary box:
+Before generating, the CLI displays a summary:
 
 ```
-Project Name:    my-awesome-api
-Target Dir:      ./my-awesome-api
-App Type:        Backend API
-Framework:       express
-Database:        postgresql-prisma
-Auth:            Yes
-Docker:          No
-Package Mgr:     npm
-Git Init:        Yes
-Install Deps:    No
+  my-awesome-api
+  Stack  express · prisma · auth
+  Setup  npm · git
+  Path   my-awesome-api
 
-? Looks good? Ready to build?
-  (*) Yes  ( ) No
+$ Create this project?
+  › Yes     No
 ```
 
 Select **Yes** to start generation, or **No** to cancel without making changes.

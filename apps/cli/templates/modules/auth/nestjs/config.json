@@ -1,0 +1,24 @@
+{
+  "id": "auth",
+  "name": "JWT Auth",
+  "description": "JWT authentication for NestJS with bcrypt password hashing",
+  "type": "feature",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "jsonwebtoken": "^9.0.3",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/jsonwebtoken": "^9.0.10"
+  },
+  "scripts": {},
+  "envVars": {
+    "JWT_SECRET": "please-change-me",
+    "JWT_EXPIRES_IN": "1h"
+  },
+  "templateFiles": [
+    "src/auth/auth.module.ts.hbs",
+    "src/auth/users.service.ts.hbs"
+  ]
+}

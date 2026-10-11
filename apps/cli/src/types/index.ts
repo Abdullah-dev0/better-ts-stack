@@ -3,14 +3,8 @@
 // Supported package managers
 export type PackageManager = "npm" | "pnpm" | "bun";
 
-// Database type (what database system to use)
-export type DatabaseType = "mongodb" | "postgresql" | "none";
-
-// ORM/ODM options
-export type OrmOption = "prisma" | "mongoose" | "drizzle" | "none";
-
-// Legacy: kept for backward compatibility, will be derived from databaseType + orm
-export type DatabaseOption = "none" | "prisma" | "mongoose" | "drizzle";
+// Database layer; each ORM/ODM implies its database (Mongoose: MongoDB, others: PostgreSQL)
+export type Database = "none" | "prisma" | "drizzle" | "mongoose";
 
 export type ApplicationType = "backend" | "fullstack";
 
@@ -28,18 +22,16 @@ export type BackendFramework = "express" | "nestjs";
 // Supported frontend frameworks
 export type FrontendFramework = "nextjs" | "tanstack";
 
+export type Framework = BackendFramework | FrontendFramework;
+
 // Main configuration object for the build pipeline
 export interface ProjectConfig {
   // Project basics
   projectName: string;
   applicationType: ApplicationType;
-  framework: BackendFramework | FrontendFramework;
+  framework: Framework;
 
-  // Database configuration
-  databaseType: DatabaseType;
-  orm: OrmOption;
-  database: DatabaseOption; // Derived from databaseType + orm for backward compatibility
-
+  database: Database;
   useDocker: boolean;
   useAuth: boolean;
 
@@ -51,31 +43,25 @@ export interface ProjectConfig {
   installDeps: boolean;
 }
 
-/**
- * Shared type for prompt choices (used by both frontend and backend collectors).
- * This is essentially ProjectConfig without the derived/initial fields.
- */
-export type PromptChoices = Omit<
+// Stack options that can come from CLI flags or prompts
+export type StackChoices = Omit<
   ProjectConfig,
-  "projectName" | "applicationType" | "database"
+  "projectName" | "applicationType"
 >;
 
-/**
- * Derives the database option from database type and ORM selection.
- * Returns "none" if either is "none", otherwise returns the ORM which
- * must be a valid DatabaseOption (prisma, mongoose, or drizzle).
- */
-export function deriveDatabase(
-  databaseType: DatabaseType,
-  orm: OrmOption
-): DatabaseOption {
-  if (databaseType === "none" || orm === "none") {
-    return "none";
-  }
-  // At this point, orm must be one of: prisma, mongoose, drizzle
-  // which are all valid DatabaseOption values
-  return orm;
-}
+// Used for every choice not given as a flag when --yes is passed
+export const DEFAULT_CHOICES: StackChoices = {
+  framework: "express",
+  database: "none",
+  useDocker: false,
+  useAuth: false,
+  packageManager: "npm",
+  initGit: true,
+  installDeps: false,
+};
+
+// Port the generated server listens on
+export const DEFAULT_PORT = 3000;
 
 // Module configuration from config.json
 export interface ModuleConfig {
@@ -149,53 +135,55 @@ export interface TemplateContext {
     lowercase: (str: string) => string;
     uppercase: (str: string) => string;
     kebabCase: (str: string) => string;
+    eq: (a: string, b: string) => boolean;
+    runner: () => string;
   };
 }
 
 // Type-safe option definitions
 export const applicationTypeOptions = [
-  { value: "backend" as const, label: "Backend API (Express/NestJS)" },
-  { value: "fullstack" as const, label: "Full-stack App (Next.js/TanStack)" },
+  {
+    value: "backend" as const,
+    label: "Backend API",
+    hint: "Express or NestJS",
+  },
+  {
+    value: "fullstack" as const,
+    label: "Full-stack app",
+    hint: "Next.js or TanStack Start",
+  },
 ];
 
 export const backendFrameworkOptions = [
   { value: "express" as const, label: "Express" },
-  { value: "nestjs" as const, label: "NestJS", hint: "(Coming Soon)" },
+  { value: "nestjs" as const, label: "NestJS" },
 ];
 
 export const frontendFrameworkOptions = [
-  { value: "nextjs" as const, label: "Next.js 16 (App Router)" },
+  { value: "nextjs" as const, label: "Next.js 16", hint: "App Router" },
   {
     value: "tanstack" as const,
-    label: "TanStack Start (React)",
-    hint: "(Release Candidate)",
+    label: "TanStack Start",
+    hint: "React, release candidate",
   },
 ];
 
-// Database type options (what database system)
-export const databaseTypeOptions = [
-  { value: "none" as const, label: "None (Skip database setup)" },
+// Database system options; the ORM is chosen in a second step
+export const databaseSystemOptions = [
+  { value: "none" as const, label: "None", hint: "skip database setup" },
   { value: "mongodb" as const, label: "MongoDB" },
   { value: "postgresql" as const, label: "PostgreSQL" },
 ];
 
 // ORM options for MongoDB
 export const mongodbOrmOptions = [
-  { value: "mongoose" as const, label: "Mongoose (MongoDB ODM)" },
+  { value: "mongoose" as const, label: "Mongoose", hint: "MongoDB ODM" },
 ];
 
 // ORM options for PostgreSQL
 export const postgresqlOrmOptions = [
-  { value: "prisma" as const, label: "Prisma (Type-safe ORM)" },
-  { value: "drizzle" as const, label: "Drizzle (Lightweight ORM)" },
-];
-
-// Legacy database options (for backward compatibility)
-export const databaseOptions = [
-  { value: "none" as const, label: "None (Skip database setup)" },
-  { value: "prisma" as const, label: "Prisma (Type-safe ORM)" },
-  { value: "mongoose" as const, label: "Mongoose (Standard MongoDB ODM)" },
-  { value: "drizzle" as const, label: "Drizzle (Lightweight ORM)" },
+  { value: "prisma" as const, label: "Prisma", hint: "type-safe ORM" },
+  { value: "drizzle" as const, label: "Drizzle", hint: "lightweight ORM" },
 ];
 
 export const packageManagerOptions = [
@@ -204,7 +192,9 @@ export const packageManagerOptions = [
   { value: "bun" as const, label: "bun" },
 ];
 
-export const authOptions = [
-  { value: false as const, label: "No" },
-  { value: true as const, label: "Yes" },
-];
+// Backend frameworks produce an API server, the others a full-stack app
+export function getApplicationType(framework: Framework): ApplicationType {
+  return backendFrameworkOptions.some((option) => option.value === framework)
+    ? "backend"
+    : "fullstack";
+}

@@ -1,7 +1,7 @@
-import { execSync } from "child_process";
-import consola from "consola";
+import { execSync } from "node:child_process";
 
 import type { PackageManager } from "../types";
+import { info, success, warn } from "../ui";
 
 // Installs project dependencies in the target directory
 export function installDependencies(
@@ -10,8 +10,7 @@ export function installDependencies(
 ): boolean {
   const command = `${packageManager} install`;
 
-  consola.info(`Installing dependencies with ${packageManager}...`);
-  consola.debug(`Running: ${command}`);
+  info(`Installing dependencies with ${packageManager}`);
 
   try {
     execSync(command, {
@@ -19,17 +18,11 @@ export function installDependencies(
       stdio: "inherit", // Show installation progress in real-time
     });
 
-    consola.success("Dependencies installed successfully");
+    success("Dependencies installed");
     return true;
-  } catch (error) {
-    // Display helpful error message but don't throw - allow building to continue
-    consola.warn("Failed to install dependencies");
-    consola.debug(
-      `Error: ${error instanceof Error ? error.message : String(error)}`
-    );
-    consola.info(
-      `You can install dependencies manually later by running: ${command}`
-    );
+  } catch {
+    // Not fatal: the project is complete and the install can be run later
+    warn(`Could not install dependencies. Run "${command}" yourself.`);
     return false;
   }
 }

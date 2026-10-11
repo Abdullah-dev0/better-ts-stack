@@ -107,6 +107,7 @@ export const HeroSection = () => {
           {[
             "TypeScript",
             "Express",
+            "NestJS",
             "Prisma",
             "MongoDB",
             "Docker",

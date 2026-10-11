@@ -1,0 +1,144 @@
+{{#if (eq database 'drizzle')}}
+import { Inject, Injectable } from "@nestjs/common";
+import { eq } from "drizzle-orm";
+
+import { type Database, DRIZZLE } from "../database/database.module.js";
+import { users } from "../database/schema.js";
+{{/if}}
+{{#if (eq database 'prisma')}}
+import { Injectable } from "@nestjs/common";
+
+import { PrismaService } from "../prisma/prisma.service.js";
+{{/if}}
+{{#if (eq database 'mongoose')}}
+import { Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import type { Model } from "mongoose";
+
+import { User } from "../users/user.schema.js";
+{{/if}}
+{{#if (eq database 'none')}}
+import { Injectable } from "@nestjs/common";
+import { randomUUID } from "node:crypto";
+{{/if}}
+
+export interface AuthUser {
+  id: string;
+  email: string;
+  name?: string | null;
+  password: string;
+}
+
+export interface CreateUserInput {
+  email: string;
+  name?: string | null;
+  password: string;
+}
+
+@Injectable()
+export class UsersService {
+  {{#if (eq database 'drizzle')}}
+  constructor(@Inject(DRIZZLE) private readonly db: Database) {}
+
+  async findByEmail(email: string): Promise<AuthUser | null> {
+    const [user] = await this.db
+      .select()
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
+    return user ?? null;
+  }
+
+  async create(data: CreateUserInput): Promise<AuthUser> {
+    const [user] = await this.db.insert(users).values(data).returning();
+    return user;
+  }
+  {{/if}}
+  {{#if (eq database 'prisma')}}
+  constructor(private readonly prisma: PrismaService) {}
+
+  findByEmail(email: string): Promise<AuthUser | null> {
+    return this.prisma.user.findUnique({ where: { email } });
+  }
+
+  create(data: CreateUserInput): Promise<AuthUser> {
+    return this.prisma.user.create({ data });
+  }
+  {{/if}}
+  {{#if (eq database 'mongoose')}}
+  constructor(
+    @InjectModel(User.name) private readonly userModel: Model<User>
+  ) {}
+
+  async findByEmail(email: string): Promise<AuthUser | null> {
+    const user = await this.userModel.findOne({ email }).exec();
+    if (!user) return null;
+    return {
+      id: user._id.toString(),
+      email: user.email,
+      name: user.name,
+      password: user.password,
+    };
+  }
+
+  async create(data: CreateUserInput): Promise<AuthUser> {
+    const user = await this.userModel.create(data);
+    return {
+      id: user._id.toString(),
+      email: user.email,
+      name: user.name,
+      password: user.password,
+    };
+  }
+  {{/if}}
+  {{#if (eq database 'none')}}
+  // In-memory store for trying the API out: users are lost on restart, so add
+  // a database before going to production
+  private readonly users: AuthUser[] = [];
+
+  findByEmail(email: string): Promise<AuthUser | null> {
+    const user = this.users.find((candidate) => candidate.email === email);
+    return Promise.resolve(user ?? null);
+  }
+
+  create(data: CreateUserInput): Promise<AuthUser> {
+    // Enforce unique emails like a database constraint would, so a sign-up that
+    // raced past the findByEmail check is rejected instead of duplicated
+    if (this.users.some((candidate) => candidate.email === data.email)) {
+      return Promise.reject(
+        Object.assign(new Error("User already exists"), {
+          code: "DUPLICATE_EMAIL",
+        })
+      );
+    }
+
+    const user: AuthUser = { id: randomUUID(), ...data };
+    this.users.push(user);
+    return Promise.resolve(user);
+  }
+  {{/if}}
+}
+
+// Unique-constraint error codes: Prisma, PostgreSQL (Drizzle wraps it in `cause`),
+// MongoDB, and the in-memory store
+const DUPLICATE_KEY_CODES = new Set<unknown>([
+  "P2002",
+  "23505",
+  11000,
+  "DUPLICATE_EMAIL",
+]);
+
+// True when an insert failed because the email is already taken (e.g. concurrent sign-ups)
+export function isDuplicateEmailError(error: unknown): boolean {
+  let current = error;
+  for (
+    let depth = 0;
+    depth < 5 && current && typeof current === "object";
+    depth++
+  ) {
+    if (DUPLICATE_KEY_CODES.has((current as { code?: unknown }).code))
+      return true;
+    current = (current as { cause?: unknown }).cause;
+  }
+  return false;
+}

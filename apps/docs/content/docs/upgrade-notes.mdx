@@ -1,7 +1,46 @@
 ---
 title: Upgrade notes
-description: Dependency upgrades, runtime changes, and template fixes in 1.0.8
+description: What changed in each release and what to do when upgrading
 ---
+
+## 2.0.0
+
+Upgrading the CLI only changes projects you generate from now on. It does not change a project you already generated.
+
+### New
+
+- **NestJS backend.** NestJS 12 is a second backend framework, with the same Prisma, Drizzle, Mongoose, JWT auth, and Docker options as Express. See the [backend docs](/docs/modules/backend#nestjs).
+- **Flags.** Every prompt has a flag, and `--yes` runs the CLI without prompts. `--dry-run`, `--help`, and `--version` were added. See [flags](/docs/usage#flags).
+- **Project paths.** The project can be created in a nested path (`apps/api`) or in the current directory (`.`).
+- **Request validation.** Express JWT auth validates request bodies with Zod.
+- **New look.** The CLI has a new design: a wordmark banner, `$` prompts that collapse to one `✓` line when answered, a compact summary, and highlighted next steps. An interactive run starts on a cleared screen; runs with `--yes` do not clear it.
+
+### Changed behavior
+
+- **The email must be a valid address.** `POST /auth/register` and `POST /auth/login` in new Express projects return `400` for a malformed email. Before, any non-empty string was accepted.
+- **A failed build cleans up after itself.** If generation fails, the partial project folder is removed, so you can run the command again. A folder that already existed is emptied instead of deleted.
+- **The target directory is checked first.** A non-empty directory is reported right after you enter the project name, not after the last prompt.
+- **Generated Express projects no longer include `.eslintrc.js`.** ESLint 10 ignored that file; `eslint.config.mjs` is the config in use.
+- **Docker images for backend projects run as `appuser`** (was `expressuser`).
+
+### For contributors
+
+`ProjectConfig` no longer has `databaseType` and `orm`. The `database` field (`none`, `prisma`, `drizzle`, or `mongoose`) is the only database setting. This matters if you call the builder from your own scripts.
+
+CI runs lint, type-check, and the template matrix on Linux and Windows for every push and pull request.
+
+### Testing
+
+```bash
+npm run test:templates
+node scripts/check-matrix.cjs <matrix.json> <express|nestjs|nextjs|tanstack>
+node scripts/smoke-matrix.cjs <matrix.json> <express|nestjs|nextjs|tanstack>
+node scripts/docker-matrix.cjs <matrix.json> <express|nestjs|nextjs|tanstack>
+```
+
+`docker-matrix.cjs` needs a running Docker daemon. It builds the image of each Docker project, runs it next to a real PostgreSQL or MongoDB container, and repeats the HTTP checks.
+
+`test:templates` prints the path of the matrix file to use. Pass a directory to choose where it goes: `npm run test:templates -- <dir>`.
 
 ## 1.0.8
 

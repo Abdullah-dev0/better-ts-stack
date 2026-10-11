@@ -123,18 +123,18 @@ The final `package.json` will include:
 
 ## Module Availability Matrix
 
-| Module               | Backend (Express) | Full-stack (Next.js) | Full-stack (TanStack) |
-| -------------------- | ----------------- | -------------------- | --------------------- |
-| Express base         | Always            | -                    | -                     |
-| Next.js base         | -                 | Always               | -                     |
-| TanStack base        | -                 | -                    | Always                |
-| PostgreSQL + Prisma  | Yes               | Yes                  | Yes                   |
-| PostgreSQL + Drizzle | Yes               | Yes                  | Yes                   |
-| MongoDB + Mongoose   | Yes               | Yes                  | Yes                   |
-| JWT Auth             | Yes               | -                    | -                     |
-| Better Auth          | -                 | Yes (requires DB)    | Yes (requires DB)     |
-| Docker               | Yes               | Yes                  | Yes                   |
-| NestJS               | Coming soon       | -                    | -                     |
+| Module               | Backend (Express) | Backend (NestJS) | Full-stack (Next.js) | Full-stack (TanStack) |
+| -------------------- | ----------------- | ---------------- | -------------------- | --------------------- |
+| Express base         | Always            | -                | -                    | -                     |
+| NestJS base          | -                 | Always           | -                    | -                     |
+| Next.js base         | -                 | -                | Always               | -                     |
+| TanStack base        | -                 | -                | -                    | Always                |
+| PostgreSQL + Prisma  | Yes               | Yes              | Yes                  | Yes                   |
+| PostgreSQL + Drizzle | Yes               | Yes              | Yes                  | Yes                   |
+| MongoDB + Mongoose   | Yes               | Yes              | Yes                  | Yes                   |
+| JWT Auth             | Yes               | Yes              | -                    | -                     |
+| Better Auth          | -                 | -                | Yes (requires DB)    | Yes (requires DB)     |
+| Docker               | Yes               | Yes              | Yes                  | Yes                   |
 
 ---
 

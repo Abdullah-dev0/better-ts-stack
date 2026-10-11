@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
+import { z } from "zod";
 import { signToken } from "../lib/jwt";
 import { AuthenticatedRequest } from "../middleware/requireAuth";
 import {
@@ -14,54 +15,47 @@ const MIN_PASSWORD_LENGTH = 8;
 // bcrypt ignores bytes beyond 72, so longer passwords would be silently truncated
 const MAX_PASSWORD_BYTES = 72;
 
-// Request bodies are untrusted JSON, so fields may have any type
-interface RegisterBody {
-  email?: unknown;
-  password?: unknown;
-  name?: unknown;
-}
+// Emails are trimmed and lowercased so sign-in is case-insensitive
+const emailSchema = z
+  .string("Email and password are required")
+  .trim()
+  .toLowerCase()
+  .pipe(z.email("Email must be a valid email address"));
 
-interface LoginBody {
-  email?: unknown;
-  password?: unknown;
-}
+const registerSchema = z.object({
+  email: emailSchema,
+  password: z
+    .string("Email and password are required")
+    .min(
+      MIN_PASSWORD_LENGTH,
+      `Password must be at least ${MIN_PASSWORD_LENGTH} characters`,
+    )
+    .refine(
+      (password) => Buffer.byteLength(password, "utf8") <= MAX_PASSWORD_BYTES,
+      `Password must be at most ${MAX_PASSWORD_BYTES} bytes`,
+    ),
+  name: z.string("Name must be a string").nullish(),
+});
 
-// Returns a trimmed, lowercased email, or null when the value is not a usable string
-function normalizeEmail(email: unknown): string | null {
-  if (typeof email !== "string") return null;
-  const normalized = email.trim().toLowerCase();
-  return normalized || null;
-}
+const loginSchema = z.object({
+  email: emailSchema,
+  password: z.string("Email and password are required").min(1),
+});
 
-export async function register(
-  req: Request<object, unknown, RegisterBody | undefined>,
-  res: Response,
-): Promise<void> {
+// Sends a 400 with the first validation message and returns null when the body is invalid
+function parseBody<T>(schema: z.ZodType<T>, req: Request, res: Response): T | null {
   // Express 5 leaves req.body undefined when the request has no body
-  const body = req.body ?? {};
-  const email = normalizeEmail(body.email);
-  const password = body.password;
-  const name = body.name ?? null;
+  const result = schema.safeParse(req.body ?? {});
+  if (result.success) return result.data;
 
-  if (!email || typeof password !== "string" || !password) {
-    res.status(400).json({ error: "Email and password are required" });
-    return;
-  }
+  res.status(400).json({ error: result.error.issues[0].message });
+  return null;
+}
 
-  if (
-    password.length < MIN_PASSWORD_LENGTH ||
-    Buffer.byteLength(password, "utf8") > MAX_PASSWORD_BYTES
-  ) {
-    res.status(400).json({
-      error: `Password must be at least ${MIN_PASSWORD_LENGTH} characters and at most ${MAX_PASSWORD_BYTES} bytes`,
-    });
-    return;
-  }
-
-  if (name !== null && typeof name !== "string") {
-    res.status(400).json({ error: "Name must be a string" });
-    return;
-  }
+export async function register(req: Request, res: Response): Promise<void> {
+  const body = parseBody(registerSchema, req, res);
+  if (!body) return;
+  const { email, password, name = null } = body;
 
   const existingUser = await findUserByEmail(email);
   if (existingUser) {
@@ -88,18 +82,10 @@ export async function register(
   res.status(201).json({ user: toPublicUser(user), token });
 }
 
-export async function login(
-  req: Request<object, unknown, LoginBody | undefined>,
-  res: Response,
-): Promise<void> {
-  const body = req.body ?? {};
-  const email = normalizeEmail(body.email);
-  const password = body.password;
-
-  if (!email || typeof password !== "string" || !password) {
-    res.status(400).json({ error: "Email and password are required" });
-    return;
-  }
+export async function login(req: Request, res: Response): Promise<void> {
+  const body = parseBody(loginSchema, req, res);
+  if (!body) return;
+  const { email, password } = body;
 
   const user = await findUserByEmail(email);
 

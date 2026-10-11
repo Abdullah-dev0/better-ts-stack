@@ -2,30 +2,22 @@ import { ProjectConfig } from "../types";
 
 // Determines which base and feature modules to include based on user configuration
 export function selectModules(config: ProjectConfig) {
-  // Determine framework for module integration
-  const framework = config.framework;
+  const { framework } = config;
 
   // Select base template based on app type
   const base =
     config.applicationType === "backend"
-      ? `backend/${config.framework}`
-      : `frontend/${config.framework}`;
+      ? `backend/${framework}`
+      : `frontend/${framework}`;
 
-  const modules: Array<{ id: string; framework: string }> = [];
+  const modules: string[] = [];
 
-  // Add database module if selected (compound ids: prisma/express, drizzle/nextjs, mongoose/tanstack, ...)
-  if (config.database !== "none") {
-    modules.push({ id: `${config.database}/${framework}`, framework });
-  }
-
-  // Add feature modules based on configuration
-  if (config.useDocker) {
-    modules.push({ id: "docker", framework });
-  }
-
-  if (config.useAuth) {
-    modules.push({ id: `auth/${framework}`, framework });
-  }
+  // Database and auth modules have one variant per framework (prisma/express,
+  // auth/nextjs, ...); the Docker module is shared
+  if (config.database !== "none")
+    modules.push(`${config.database}/${framework}`);
+  if (config.useDocker) modules.push("docker");
+  if (config.useAuth) modules.push(`auth/${framework}`);
 
   return { base, modules };
 }

@@ -32,6 +32,8 @@ export const metadata: Metadata = {
   keywords: [
     "TypeScript",
     "Next.js",
+    "NestJS",
+    "Express",
     "React",
     "drizzle",
     "Prisma",

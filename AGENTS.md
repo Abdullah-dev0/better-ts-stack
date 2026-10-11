@@ -47,7 +47,7 @@ npm run type:check     # TypeScript check (no emit)
 
 ### Running Tests
 
-Template checks: `npm run test:templates`, then `node scripts/check-matrix.cjs <matrix.json> express`, `nextjs`, or `tanstack` (install, build, type-check, lint). After that, `node scripts/smoke-matrix.cjs <matrix.json> <framework>` starts the built projects without a database in production mode and checks HTTP responses. No test framework configured. When added: CLI: `npx vitest run <file>`, Client: `npx jest <file>`
+Template checks: `npm run test:templates` (optionally `-- <output-dir>`), then `node scripts/check-matrix.cjs <matrix.json> express`, `nestjs`, `nextjs`, or `tanstack` (install, build, type-check, lint). After that, `node scripts/smoke-matrix.cjs <matrix.json> <framework>` starts the built projects without a database in production mode and checks HTTP responses, and `node scripts/docker-matrix.cjs <matrix.json> <framework>` builds each Docker image and runs the same checks against real PostgreSQL and MongoDB containers (needs Docker). No test framework configured. When added: CLI: `npx vitest run <file>`, Client: `npx jest <file>`
 
 ## Code Style Guidelines
 
@@ -101,7 +101,7 @@ import { cn } from "@/lib/utils";
 
 ### Error Handling
 
-**CLI:** Use `buildError()` from `src/types/index.ts`, wrap async with try-catch, use consola for logging
+**CLI:** Use `buildError()` from `src/types/index.ts`, wrap async with try-catch, print through `src/ui` (`success`, `info`, `warn`, `error`)
 
 **Client:** Next.js error boundaries, try-catch async, proper HTTP status codes
 
@@ -125,16 +125,17 @@ export function Component({ children, ...props }: React.ComponentProps<typeof So
 ```
 src/
 ├── index.ts           # Entry point
-├── intro.ts           # Interactive intro
+├── args.ts            # Command-line flags (node:util parseArgs)
+├── ui/                # Theme, prompts (@clack/core), and printed messages
 ├── types/             # Types & buildError()
-├── prompts/           # User interaction (@clack/prompts)
+├── prompts/           # Questions asked for options not given as flags
 ├── builder/           # Project generation pipeline
 ├── validators/        # Input validation (Zod)
 ├── output/            # Output formatting
 └── modules/           # Module registry
 ```
 
-Patterns: Barrel exports via `index.ts`, feature folders, pure functions, async/await, Zod validation, consola logging
+Patterns: Barrel exports via `index.ts`, feature folders, pure functions, async/await, Zod validation, output through `src/ui`
 
 ### Docs (`apps/docs/`)
 
@@ -155,6 +156,7 @@ Patterns: Next.js App Router, Server Components default, Tailwind CSS v4, Radix 
 ### Templates (`apps/cli/templates/`)
 
 - `backend/express/` - Express.js template
+- `backend/nestjs/` - NestJS template (ES modules)
 - `frontend/nextjs/` - Next.js template
 - `modules/` - Modular feature additions (Handlebars `.hbs` files)
 
@@ -164,7 +166,7 @@ Modules in `apps/cli/templates/modules/` have `ModuleConfig` with: id, name, typ
 
 ## Dependencies
 
-**CLI:** @clack/prompts, consola, fs-extra, handlebars, zod
+**CLI:** @clack/core, fs-extra, handlebars, zod
 
 **Docs:** next, react 19, @radix-ui/react-slot, tailwindcss v4, motion, fumadocs-ui, lucide-react
 

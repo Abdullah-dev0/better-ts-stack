@@ -1,0 +1,16 @@
+{
+  "id": "mongoose",
+  "name": "Mongoose (MongoDB)",
+  "description": "MongoDB database integration for NestJS using Mongoose ODM",
+  "type": "database",
+  "dependencies": {
+    "@nestjs/mongoose": "^12.0.0",
+    "mongoose": "^9.9.5"
+  },
+  "devDependencies": {},
+  "scripts": {},
+  "envVars": {
+    "MONGODB_URI": "mongodb://localhost:27017/myapp"
+  },
+  "templateFiles": []
+}

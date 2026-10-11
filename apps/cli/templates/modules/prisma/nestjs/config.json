@@ -1,0 +1,28 @@
+{
+  "id": "prisma",
+  "name": "Prisma ORM",
+  "description": "Prisma ORM for NestJS with PostgreSQL",
+  "type": "database",
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.10.0",
+    "@prisma/client": "^7.10.0"
+  },
+  "devDependencies": {
+    "prisma": "^7.10.0"
+  },
+  "scripts": {
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio",
+    "pretype:check": "prisma generate",
+    "prebuild": "prisma generate"
+  },
+  "envVars": {
+    "DATABASE_URL": "postgresql://postgres:postgres@localhost:5432/postgres?schema=public"
+  },
+  "templateFiles": [],
+  "overrides": {
+    "deepmerge-ts": "^8.0.2",
+    "mysql2": "^3.24.3"
+  }
+}

@@ -1,0 +1,34 @@
+import { Module } from "@nestjs/common";
+{{#if (eq database 'mongoose')}}
+import { MongooseModule } from "@nestjs/mongoose";
+{{/if}}
+
+{{#if useAuth}}
+import { AuthModule } from "./auth/auth.module.js";
+{{/if}}
+{{#if (eq database 'drizzle')}}
+import { DatabaseModule } from "./database/database.module.js";
+{{/if}}
+import { HealthController } from "./health/health.controller.js";
+{{#if (eq database 'prisma')}}
+import { PrismaModule } from "./prisma/prisma.module.js";
+{{/if}}
+
+@Module({
+  imports: [
+    {{#if (eq database 'prisma')}}
+    PrismaModule,
+    {{/if}}
+    {{#if (eq database 'drizzle')}}
+    DatabaseModule,
+    {{/if}}
+    {{#if (eq database 'mongoose')}}
+    MongooseModule.forRoot(process.env.MONGODB_URI!),
+    {{/if}}
+    {{#if useAuth}}
+    AuthModule,
+    {{/if}}
+  ],
+  controllers: [HealthController],
+})
+export class AppModule {}

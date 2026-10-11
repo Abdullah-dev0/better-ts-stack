@@ -1,5 +1,5 @@
 // Context builder for Handlebars, providing variables and helpers for templates
-import { ProjectConfig } from "../types";
+import { DEFAULT_PORT, ProjectConfig, TemplateContext } from "../types";
 
 // Converts string to lowercase
 export function lowercase(str: string): string {
@@ -19,15 +19,14 @@ export function kebabCase(str: string): string {
     .toLowerCase();
 }
 
-export function buildTemplateContext(config: ProjectConfig) {
-  const framework = config.framework;
+export function buildTemplateContext(config: ProjectConfig): TemplateContext {
   return {
     projectName: config.projectName,
     packageManager: config.packageManager,
-    database: config.database ?? "none",
-    framework,
-    port: 3000, // Default port
-    useDocker: config.useDocker ?? false,
+    database: config.database,
+    framework: config.framework,
+    port: DEFAULT_PORT,
+    useDocker: config.useDocker,
     useAuth: config.useAuth,
     helpers: {
       lowercase,

@@ -1,9 +1,8 @@
-import consola from "consola";
 import fs from "fs-extra";
 
 import { getModule } from "../modules/registry";
 import { generateNextSteps } from "../output/nextSteps";
-import { buildError, BuildResult, ModuleConfig, ProjectConfig } from "../types";
+import { buildError, BuildResult, Module, ProjectConfig } from "../types";
 import { validateDirectoryEmpty } from "../validators";
 import {
   generateEnvFile,
@@ -22,20 +21,16 @@ export async function build(
   config: ProjectConfig,
   targetDir: string
 ): Promise<BuildResult> {
-  consola.start("Starting project building...");
+  // 1. Validate target directory
+  const validationResult = await validateDirectoryEmpty(targetDir);
+
+  if (validationResult)
+    throw buildError(validationResult, "DIRECTORY_NOT_EMPTY");
+
+  const didDirectoryExist = await fs.pathExists(targetDir);
 
   try {
-    // 1. Validate target directory
-    consola.info("Validating target directory...");
-
-    const validationResult = await validateDirectoryEmpty(targetDir);
-
-    if (validationResult)
-      throw buildError(validationResult, "DIRECTORY_NOT_EMPTY");
-
     // 2. Create target directory
-    consola.info("Creating project directory...");
-
     await fs.ensureDir(targetDir).catch((e) => {
       throw buildError(
         e,
@@ -44,72 +39,40 @@ export async function build(
       );
     });
 
-    // 3. Select modules
-    consola.info("Selecting modules...");
-
+    // 3. Select and load modules
     const selection = selectModules(config);
-
-    // 4. Load modules
-    consola.info("Loading module configurations...");
-    const modules: Array<{
-      config: ModuleConfig;
-      path: string;
-      framework: string;
-    }> = [];
+    const modules: Module[] = [];
     try {
-      const baseModule = await getModule(selection.base);
-      modules.push({ ...baseModule, framework: config.framework });
-
-      for (const moduleWithFramework of selection.modules) {
-        const module = await getModule(moduleWithFramework.id);
-        modules.push({ ...module, framework: moduleWithFramework.framework });
+      for (const id of [selection.base, ...selection.modules]) {
+        modules.push(await getModule(id));
       }
     } catch (e) {
       throw buildError(e, "MODULE_LOADING_ERROR", "Failed to load modules");
     }
-    consola.success(
-      `Selected ${modules.length} modules: ${modules.map((m) => m.config.id).join(", ")}`
-    );
 
-    // 5. Build template context
-    consola.info("Building template context...");
-
+    // 4. Build template context and merge module configurations
     const templateContext = buildTemplateContext(config);
-
-    // 6. Merge configurations
     const mergedConfig = mergeConfigurations(
       modules.map((m) => m.config),
       templateContext
     );
 
-    // 7. Copy module files
-    consola.info("Copying module files...");
+    // 5. Copy module files
     try {
       for (const module of modules) {
-        consola.debug(`  - Copying ${module.config.id}...`);
         await copyModuleFiles(module.path, targetDir);
       }
-      consola.success("Module files copied");
     } catch (e) {
       throw buildError(e, "FILE_COPY_ERROR", "Failed to copy module files");
     }
 
-    // 8. Process Handlebars templates
-    consola.info("Processing template files...");
+    // 6. Process Handlebars templates
     try {
-      const allTemplateFiles = modules.flatMap((m) => m.config.templateFiles);
-      if (allTemplateFiles.length > 0) {
-        await processTemplateFiles(
-          targetDir,
-          templateContext,
-          allTemplateFiles
-        );
-        consola.success(
-          `Processed ${allTemplateFiles.length} template file(s)`
-        );
-      } else {
-        consola.info("  No template files to process");
-      }
+      await processTemplateFiles(
+        targetDir,
+        templateContext,
+        modules.flatMap((m) => m.config.templateFiles)
+      );
     } catch (e) {
       throw buildError(
         e,
@@ -118,47 +81,34 @@ export async function build(
       );
     }
 
-    // 9. Generate package.json
-    consola.info("Generating package.json...");
+    // 7. Generate package.json
     await generatePackageJson(targetDir, mergedConfig, config);
     if (config.packageManager === "pnpm") {
       await generatePnpmWorkspace(targetDir, mergedConfig.overrides);
     }
-    consola.success("package.json generated");
 
-    // 10. Generate environment files
-    consola.info("Generating environment files...");
+    // 8. Generate environment files
     await generateEnvFile(targetDir, mergedConfig.envVars);
-    consola.success("Environment files generated");
 
-    // 11. Install dependencies (optional)
-    let depsInstalled = false;
-    if (config.installDeps) {
-      try {
-        depsInstalled = installDependencies(config.packageManager, targetDir);
-      } catch {
-        consola.warn("Continuing despite dependency installation issues");
-      }
-    }
+    // 9. Install dependencies and initialize git (both optional); a failure
+    // in either is reported as a warning and does not fail the build
+    const depsInstalled =
+      config.installDeps &&
+      installDependencies(config.packageManager, targetDir);
 
-    // 12. Initialize git (optional)
-    if (config.initGit) {
-      try {
-        initializeGitRepository(targetDir);
-      } catch {
-        consola.warn("Continuing despite git initialization issues");
-      }
-    }
-
-    // 13. Done!
-    consola.success("Project building completed successfully!");
+    if (config.initGit) initializeGitRepository(targetDir);
 
     return {
       success: true,
       projectPath: targetDir,
-      nextSteps: generateNextSteps(config, depsInstalled),
+      nextSteps: generateNextSteps(config, targetDir, depsInstalled),
     };
   } catch (error) {
+    // Remove the partial project so a retry is not blocked by a non-empty
+    // directory; a directory that already existed is emptied, not deleted
+    await (
+      didDirectoryExist ? fs.emptyDir(targetDir) : fs.remove(targetDir)
+    ).catch(() => undefined);
     throw buildError(error, "BUILDING_ERROR", "Building failed");
   }
 }

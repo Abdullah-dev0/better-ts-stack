@@ -1,9 +1,8 @@
-import { cancel, confirm, isCancel, select } from "@clack/prompts";
+import { isCancel } from "@clack/core";
 
 import {
   ApplicationType,
   applicationTypeOptions,
-  authOptions,
   backendFrameworkOptions,
   buildError,
   Database,
@@ -16,6 +15,7 @@ import {
   postgresqlOrmOptions,
   StackChoices,
 } from "../types";
+import { confirm, info, select } from "../ui";
 
 // Returns the preset value when there is one, otherwise asks the user
 export async function ask<T>(
@@ -26,7 +26,7 @@ export async function ask<T>(
 
   const answer = await prompt();
   if (isCancel(answer)) {
-    cancel("Operation cancelled.");
+    info("Cancelled. Nothing was created.");
     process.exit(0);
   }
   return answer;
@@ -34,7 +34,7 @@ export async function ask<T>(
 
 async function askFramework(): Promise<Framework | symbol> {
   const applicationType = await select<ApplicationType>({
-    message: "Application type:",
+    message: "Application type",
     options: applicationTypeOptions,
     initialValue: "backend",
   });
@@ -42,12 +42,12 @@ async function askFramework(): Promise<Framework | symbol> {
 
   return applicationType === "backend"
     ? select<Framework>({
-        message: "Select a backend framework:",
+        message: "Backend framework",
         options: backendFrameworkOptions,
         initialValue: "express",
       })
     : select<Framework>({
-        message: "Select a frontend framework:",
+        message: "Frontend framework",
         options: frontendFrameworkOptions,
         initialValue: "nextjs",
       });
@@ -55,7 +55,7 @@ async function askFramework(): Promise<Framework | symbol> {
 
 async function askDatabase(): Promise<Database | symbol> {
   const system = await select({
-    message: "Select a database:",
+    message: "Database",
     options: databaseSystemOptions,
     initialValue: "none",
   });
@@ -64,7 +64,7 @@ async function askDatabase(): Promise<Database | symbol> {
   const options =
     system === "mongodb" ? mongodbOrmOptions : postgresqlOrmOptions;
   return select<Database>({
-    message: `Select an ORM for ${system}:`,
+    message: "ORM",
     options,
     initialValue: options[0].value,
   });
@@ -78,13 +78,13 @@ export async function collectStackChoices(
   const database = await ask(preset.database, askDatabase);
   const packageManager = await ask(preset.packageManager, () =>
     select({
-      message: "Select a package manager:",
+      message: "Package manager",
       options: packageManagerOptions,
       initialValue: "npm",
     })
   );
   const useDocker = await ask(preset.useDocker, () =>
-    confirm({ message: "Use Docker?", initialValue: false })
+    confirm({ message: "Add Docker?", initialValue: false })
   );
 
   // Better Auth stores users and sessions, so full-stack auth needs a database
@@ -98,9 +98,8 @@ export async function collectStackChoices(
   }
   const useAuth = isAuthAvailable
     ? await ask(preset.useAuth, () =>
-        select({
-          message: isFullstack ? "Add Better Auth?" : "Add authentication?",
-          options: authOptions,
+        confirm({
+          message: isFullstack ? "Add Better Auth?" : "Add JWT authentication?",
           initialValue: false,
         })
       )

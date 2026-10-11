@@ -1,8 +1,7 @@
-import { note, outro } from "@clack/prompts";
 import path from "node:path";
 import { cwd } from "node:process";
 
-import { DEFAULT_PORT, ProjectConfig } from "../types";
+import { ProjectConfig } from "../types";
 
 const MONGODB_AUTH_SETUP_URL =
   "https://better-ts-stack.abdullahtech.me/docs/modules/database#mongoose-and-mongodb";
@@ -98,13 +97,4 @@ export function generateNextSteps(
   }
 
   return steps;
-}
-
-// Shows the numbered next steps and closes the session
-export function showNextSteps(steps: string[]) {
-  note(
-    steps.map((step, index) => `${index + 1}. ${step}`).join("\n"),
-    "Next steps"
-  );
-  outro(`Done. Your app will run at http://localhost:${DEFAULT_PORT}`);
 }

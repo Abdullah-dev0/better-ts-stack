@@ -142,8 +142,16 @@ export interface TemplateContext {
 
 // Type-safe option definitions
 export const applicationTypeOptions = [
-  { value: "backend" as const, label: "Backend API (Express/NestJS)" },
-  { value: "fullstack" as const, label: "Full-stack App (Next.js/TanStack)" },
+  {
+    value: "backend" as const,
+    label: "Backend API",
+    hint: "Express or NestJS",
+  },
+  {
+    value: "fullstack" as const,
+    label: "Full-stack app",
+    hint: "Next.js or TanStack Start",
+  },
 ];
 
 export const backendFrameworkOptions = [
@@ -152,41 +160,36 @@ export const backendFrameworkOptions = [
 ];
 
 export const frontendFrameworkOptions = [
-  { value: "nextjs" as const, label: "Next.js 16 (App Router)" },
+  { value: "nextjs" as const, label: "Next.js 16", hint: "App Router" },
   {
     value: "tanstack" as const,
-    label: "TanStack Start (React)",
-    hint: "(Release Candidate)",
+    label: "TanStack Start",
+    hint: "React, release candidate",
   },
 ];
 
 // Database system options; the ORM is chosen in a second step
 export const databaseSystemOptions = [
-  { value: "none" as const, label: "None (Skip database setup)" },
+  { value: "none" as const, label: "None", hint: "skip database setup" },
   { value: "mongodb" as const, label: "MongoDB" },
   { value: "postgresql" as const, label: "PostgreSQL" },
 ];
 
 // ORM options for MongoDB
 export const mongodbOrmOptions = [
-  { value: "mongoose" as const, label: "Mongoose (MongoDB ODM)" },
+  { value: "mongoose" as const, label: "Mongoose", hint: "MongoDB ODM" },
 ];
 
 // ORM options for PostgreSQL
 export const postgresqlOrmOptions = [
-  { value: "prisma" as const, label: "Prisma (Type-safe ORM)" },
-  { value: "drizzle" as const, label: "Drizzle (Lightweight ORM)" },
+  { value: "prisma" as const, label: "Prisma", hint: "type-safe ORM" },
+  { value: "drizzle" as const, label: "Drizzle", hint: "lightweight ORM" },
 ];
 
 export const packageManagerOptions = [
   { value: "npm" as const, label: "npm" },
   { value: "pnpm" as const, label: "pnpm" },
   { value: "bun" as const, label: "bun" },
-];
-
-export const authOptions = [
-  { value: false as const, label: "No" },
-  { value: true as const, label: "Yes" },
 ];
 
 // Backend frameworks produce an API server, the others a full-stack app

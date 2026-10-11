@@ -1,7 +1,7 @@
-import { log } from "@clack/prompts";
 import { execSync } from "node:child_process";
 
 import type { PackageManager } from "../types";
+import { info, success, warn } from "../ui";
 
 // Installs project dependencies in the target directory
 export function installDependencies(
@@ -10,7 +10,7 @@ export function installDependencies(
 ): boolean {
   const command = `${packageManager} install`;
 
-  log.step(`Installing dependencies with ${packageManager}`);
+  info(`Installing dependencies with ${packageManager}`);
 
   try {
     execSync(command, {
@@ -18,11 +18,11 @@ export function installDependencies(
       stdio: "inherit", // Show installation progress in real-time
     });
 
-    log.success("Dependencies installed");
+    success("Dependencies installed");
     return true;
   } catch {
     // Not fatal: the project is complete and the install can be run later
-    log.warn(`Could not install dependencies. Run "${command}" yourself.`);
+    warn(`Could not install dependencies. Run "${command}" yourself.`);
     return false;
   }
 }

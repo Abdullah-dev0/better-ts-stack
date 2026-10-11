@@ -1,17 +1,13 @@
-import { log, outro } from "@clack/prompts";
 import fs from "fs-extra";
 import path from "node:path";
 import { cwd } from "node:process";
 
 import { HELP_TEXT, parseCliArgs } from "./args";
 import { build } from "./builder";
-import { showIntro } from "./intro";
-import { showNextSteps } from "./output/nextSteps";
 import {
   collectProjectPath,
   collectStackChoices,
   confirmBuild,
-  showSummary,
 } from "./prompts";
 import {
   buildError,
@@ -19,6 +15,14 @@ import {
   getApplicationType,
   ProjectConfig,
 } from "./types";
+import {
+  error,
+  info,
+  showBanner,
+  showNextSteps,
+  showSummary,
+  success,
+} from "./ui";
 import { validateDirectoryEmpty } from "./validators";
 
 // Main entry point for the CLI tool
@@ -39,7 +43,7 @@ async function main(): Promise<void> {
     return;
   }
 
-  showIntro(version);
+  showBanner(version);
 
   const projectPath = await collectProjectPath(args.projectPath, args.yes);
   const targetDir = path.resolve(cwd(), projectPath);
@@ -61,7 +65,7 @@ async function main(): Promise<void> {
   showSummary(config, targetDir);
 
   if (args.dryRun) {
-    outro("Dry run: no files were written.");
+    info("Dry run: no files were written.");
     return;
   }
 
@@ -69,6 +73,7 @@ async function main(): Promise<void> {
 
   const result = await build(config, targetDir);
 
+  success("Project created");
   showNextSteps(result.nextSteps);
 }
 
@@ -76,8 +81,6 @@ main()
   .then(() => process.exit(0))
   .catch((err) => {
     // Errors raised by the CLI carry a code and a message meant for the user
-    log.error(
-      err instanceof Error && "code" in err ? err.message : String(err)
-    );
+    error(err instanceof Error && "code" in err ? err.message : String(err));
     process.exit(1);
   });

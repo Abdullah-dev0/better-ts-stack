@@ -65,7 +65,7 @@ With `--yes`, the defaults are Express, no database, no auth, no Docker, npm, gi
 <Step>
 ### Intro
 
-The CLI prints its name and version, then starts the prompts.
+The CLI prints its wordmark, version, and key hints, then starts the prompts. Each answered prompt collapses to one line, such as `✓ Project name  my-api`.
 
 </Step>
 
@@ -261,16 +261,16 @@ If yes, the CLI runs your chosen package manager's install command after generat
 <Step>
 ### Confirmation summary
 
-Before generating, the CLI displays a summary box:
+Before generating, the CLI displays a summary:
 
 ```
-Project    my-awesome-api
-Directory  my-awesome-api
-Stack      express · prisma · auth
-Setup      npm · git
+  my-awesome-api
+  Stack  express · prisma · auth
+  Setup  npm · git
+  Path   my-awesome-api
 
-? Create this project?
-  (*) Yes  ( ) No
+$ Create this project?
+  › Yes     No
 ```
 
 Select **Yes** to start generation, or **No** to cancel without making changes.

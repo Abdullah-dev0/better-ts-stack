@@ -101,7 +101,7 @@ import { cn } from "@/lib/utils";
 
 ### Error Handling
 
-**CLI:** Use `buildError()` from `src/types/index.ts`, wrap async with try-catch, use `log` from `@clack/prompts` for output
+**CLI:** Use `buildError()` from `src/types/index.ts`, wrap async with try-catch, print through `src/ui` (`success`, `info`, `warn`, `error`)
 
 **Client:** Next.js error boundaries, try-catch async, proper HTTP status codes
 
@@ -126,16 +126,16 @@ export function Component({ children, ...props }: React.ComponentProps<typeof So
 src/
 ├── index.ts           # Entry point
 ├── args.ts            # Command-line flags (node:util parseArgs)
-├── intro.ts           # Intro line (name and version)
+├── ui/                # Theme, prompts (@clack/core), and printed messages
 ├── types/             # Types & buildError()
-├── prompts/           # User interaction (@clack/prompts)
+├── prompts/           # Questions asked for options not given as flags
 ├── builder/           # Project generation pipeline
 ├── validators/        # Input validation (Zod)
 ├── output/            # Output formatting
 └── modules/           # Module registry
 ```
 
-Patterns: Barrel exports via `index.ts`, feature folders, pure functions, async/await, Zod validation, `@clack/prompts` output
+Patterns: Barrel exports via `index.ts`, feature folders, pure functions, async/await, Zod validation, output through `src/ui`
 
 ### Docs (`apps/docs/`)
 
@@ -166,7 +166,7 @@ Modules in `apps/cli/templates/modules/` have `ModuleConfig` with: id, name, typ
 
 ## Dependencies
 
-**CLI:** @clack/prompts, fs-extra, handlebars, zod
+**CLI:** @clack/core, fs-extra, handlebars, zod
 
 **Docs:** next, react 19, @radix-ui/react-slot, tailwindcss v4, motion, fumadocs-ui, lucide-react
 

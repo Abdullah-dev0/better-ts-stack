@@ -11,7 +11,7 @@
     "lint:fix": "eslint --fix",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,mdx,css}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,mdx,css}\"",
-    "type:check": "tsc --noEmit"
+    "type:check": "next typegen && tsc --noEmit"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.3.3",

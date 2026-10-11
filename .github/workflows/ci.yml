@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Lint, type-check, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run type:check
+      - run: npm run build
+
+  templates:
+    name: Templates (${{ matrix.framework }}, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        framework: [express, nestjs, nextjs, tanstack]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      # Generated outside the repository so the projects do not pick up its configs
+      - name: Generate every template combination
+        run: npm run test:templates -- "$RUNNER_TEMP/matrix"
+      - name: Install, build, type-check, and lint
+        run: node scripts/check-matrix.cjs "$RUNNER_TEMP/matrix/matrix.json" ${{ matrix.framework }}
+      - name: Start the built projects and check HTTP responses
+        run: node scripts/smoke-matrix.cjs "$RUNNER_TEMP/matrix/matrix.json" ${{ matrix.framework }}

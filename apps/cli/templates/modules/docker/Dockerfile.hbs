@@ -116,7 +116,7 @@ ENV NODE_ENV=production
 
 # Create non-root user for security
 RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 expressuser
+    adduser --system --uid 1001 appuser
 
 COPY package*.json ./
 # Clear the npm cache in the same layer so it does not ship in the image
@@ -124,11 +124,15 @@ RUN if [ -f package-lock.json ]; then npm ci --omit=dev; else npm install --omit
     && npm cache clean --force
 
 # Copy built files (if TypeScript) or source files (if JavaScript)
-COPY --from=builder --chown=expressuser:nodejs /app/dist ./dist
+COPY --from=builder --chown=appuser:nodejs /app/dist ./dist
 
-USER expressuser
+USER appuser
 EXPOSE {{port}}
 ENV PORT={{port}}
 
+{{#if (eq framework 'nestjs')}}
+CMD ["node", "dist/main.js"]
+{{else}}
 CMD ["node", "dist/index.js"]
+{{/if}}
 {{/if}}

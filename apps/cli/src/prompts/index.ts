@@ -1,76 +1,66 @@
-import { cancel, confirm, isCancel, select, text } from "@clack/prompts";
-import consola from "consola";
+import { cancel, confirm, isCancel, note, text } from "@clack/prompts";
+import path from "node:path";
+import { cwd } from "node:process";
 
-import {
-  ApplicationType,
-  applicationTypeOptions,
-  deriveDatabase,
-  ProjectConfig,
-} from "../types";
-import { validateProjectName } from "../validators";
-import { collectStackChoices } from "./stack";
+import { buildError, ProjectConfig } from "../types";
+import { validateProjectPath } from "../validators";
+import { ask } from "./stack";
 
-// Collects user input via interactive prompts
-export async function collectUserChoices() {
-  const projectName = await text({
-    message: "Project name:",
-    placeholder: "my-awesome-project",
-    validate: (value) => validateProjectName(value ?? ""),
-  });
+export { collectStackChoices } from "./stack";
 
-  if (isCancel(projectName)) {
-    cancel("Operation cancelled.");
-    process.exit(0);
+// Returns the project path from the command line, or asks for it
+export async function collectProjectPath(
+  preset: string | undefined,
+  isNonInteractive: boolean
+): Promise<string> {
+  if (preset !== undefined) {
+    const error = validateProjectPath(preset);
+    if (error) throw buildError(error, "INVALID_ARGUMENT");
+  } else if (isNonInteractive) {
+    throw buildError(
+      "A project path is required with --yes, for example: better-ts-stack my-app --yes",
+      "INVALID_ARGUMENT"
+    );
   }
 
-  const applicationType = await select<ApplicationType>({
-    message: "Application type:",
-    options: applicationTypeOptions,
-    initialValue: "backend",
-  });
-
-  if (isCancel(applicationType)) {
-    cancel("Operation cancelled.");
-    process.exit(0);
-  }
-
-  const userChoices = await collectStackChoices(applicationType);
-
-  // Derive database field from databaseType + orm for backward compatibility
-  const database = deriveDatabase(userChoices.databaseType, userChoices.orm);
-
-  const choices: ProjectConfig = {
-    projectName,
-    applicationType,
-    ...userChoices,
-    database,
-  };
-
-  return choices;
+  return ask(preset, () =>
+    text({
+      message: "Project name:",
+      placeholder: "my-awesome-project",
+      validate: (value) => validateProjectPath(value ?? ""),
+    })
+  );
 }
 
-// Displays a summary and asks for final confirmation before building
-export async function confirmBuild(config: ProjectConfig, targetDir: string) {
-  consola.info("Project Summary:");
+// Displays a summary of what will be built
+export function showSummary(config: ProjectConfig, targetDir: string) {
+  const stack = [
+    config.framework,
+    config.database !== "none" && config.database,
+    config.useAuth && "auth",
+    config.useDocker && "docker",
+  ];
+  const setup = [
+    config.packageManager,
+    config.initGit && "git",
+    config.installDeps && "install dependencies",
+  ];
 
-  const appTypeLabel =
-    config.applicationType === "backend" ? "Backend API" : "Full-stack App";
-
-  consola.box(
-    `Project Name:    ${config.projectName}\n` +
-      `Target Dir:      ${targetDir}\n` +
-      `App Type:        ${appTypeLabel}\n` +
-      `Framework:       ${config.framework}\n` +
-      `Database:        ${config.database}\n` +
-      `Auth:            ${config.useAuth ? "Yes" : "No"}\n` +
-      `Docker:          ${config.useDocker ? "Yes" : "No"}\n` +
-      `Package Mgr:     ${config.packageManager}\n` +
-      `Git Init:        ${config.initGit ? "Yes" : "No"}\n` +
-      `Install Deps:    ${config.installDeps ? "Yes" : "No"}`
+  note(
+    [
+      `Project    ${config.projectName}`,
+      `Directory  ${path.relative(cwd(), targetDir) || "."}`,
+      `Stack      ${stack.filter(Boolean).join(" · ")}`,
+      `Setup      ${setup.filter(Boolean).join(" · ")}`,
+    ].join("\n"),
+    "Summary"
   );
+}
 
+// Asks for final confirmation before building
+export async function confirmBuild() {
   const shouldContinue = await confirm({
-    message: "Looks good? Ready to build?",
+    message: "Create this project?",
     initialValue: true,
   });
 
@@ -80,7 +70,7 @@ export async function confirmBuild(config: ProjectConfig, targetDir: string) {
   }
 
   if (!shouldContinue) {
-    cancel("Building cancelled by user.");
+    cancel("Operation cancelled.");
     process.exit(0);
   }
 }

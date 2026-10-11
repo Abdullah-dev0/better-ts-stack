@@ -1,11 +1,11 @@
 ﻿---
 title: Backend Module
-description: Express.js backend with TypeScript, routing, and middleware
+description: Express and NestJS backends with TypeScript, routing, and middleware
 ---
 
 ## Overview
 
-The Backend module generates an Express 5 server with TypeScript. Every **Backend API** project starts from it.
+The Backend module generates an Express 5 or a [NestJS 12](#nestjs) server with TypeScript. Every **Backend API** project starts from one of them. The sections below describe Express first.
 
 ## What You Get
 
@@ -185,6 +185,57 @@ router.get("/profile", requireAuth, (req, res) => {
 export default router;
 ```
 
-### NestJS (coming soon)
+---
 
-NestJS is listed in the framework prompt, but it is not available yet. If you select it, the CLI shows a warning and asks again.
+## NestJS
+
+Select **NestJS** in the framework prompt, or pass `--framework nestjs`. The project uses NestJS 12 with ES modules, so relative imports end in `.js`.
+
+```
+src/
+|-- main.ts                 # Entry point - loads .env, enables helmet and CORS, starts the server
+|-- app.module.ts           # Root module - imports the database and auth modules you selected
+\-- health/
+    \-- health.controller.ts   # GET /health endpoint
+```
+
+### Scripts
+
+| Script       | Command                                          |
+| ------------ | ------------------------------------------------ |
+| `dev`        | `nest start --watch` with `NODE_ENV=development` |
+| `build`      | `nest build` (output in `dist/`)                 |
+| `start`      | `node dist/main.js` with `NODE_ENV=production`   |
+| `lint`       | `eslint src`                                     |
+| `type:check` | `tsc --noEmit`                                   |
+
+### Database modules
+
+| Database | Files                                                         | How to use it                                                  |
+| -------- | ------------------------------------------------------------- | -------------------------------------------------------------- |
+| Prisma   | `src/prisma/prisma.service.ts`, `src/prisma/prisma.module.ts` | Inject `PrismaService`                                         |
+| Drizzle  | `src/database/database.module.ts`, `src/database/schema.ts`   | `@Inject(DRIZZLE) private readonly db: Database`               |
+| Mongoose | `src/users/user.schema.ts`, connection in `src/app.module.ts` | `MongooseModule.forFeature(...)` and `@InjectModel(User.name)` |
+
+The Prisma and Drizzle modules are global, so any module can inject them without importing them.
+
+### Auth module
+
+JWT auth adds `src/auth/` with the same endpoints as Express: `POST /auth/register`, `POST /auth/login`, and `GET /auth/me`. Request bodies are validated with Zod.
+
+Protect a route with the guard:
+
+```typescript
+import { Controller, Get, Req, UseGuards } from "@nestjs/common";
+
+import { type AuthenticatedRequest, AuthGuard } from "../auth/auth.guard.js";
+
+@Controller("profile")
+export class ProfileController {
+  @Get()
+  @UseGuards(AuthGuard)
+  getProfile(@Req() request: AuthenticatedRequest) {
+    return { user: request.user };
+  }
+}
+```

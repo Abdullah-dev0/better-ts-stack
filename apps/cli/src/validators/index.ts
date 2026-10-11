@@ -32,6 +32,12 @@ export function validateProjectName(name: string): string | undefined {
   return firstError.message;
 }
 
+// Checks a project path such as "my-app", "apps/api", or "."; the last folder
+// name becomes the package name
+export function validateProjectPath(projectPath: string): string | undefined {
+  return validateProjectName(path.basename(path.resolve(projectPath)));
+}
+
 // Ensures a directory is empty or does not exist before starting build
 export async function validateDirectoryEmpty(dirPath: string) {
   const exists = await fs.pathExists(dirPath);

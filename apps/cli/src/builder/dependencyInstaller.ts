@@ -1,5 +1,5 @@
-import { execSync } from "child_process";
-import consola from "consola";
+import { log } from "@clack/prompts";
+import { execSync } from "node:child_process";
 
 import type { PackageManager } from "../types";
 
@@ -10,8 +10,7 @@ export function installDependencies(
 ): boolean {
   const command = `${packageManager} install`;
 
-  consola.info(`Installing dependencies with ${packageManager}...`);
-  consola.debug(`Running: ${command}`);
+  log.step(`Installing dependencies with ${packageManager}`);
 
   try {
     execSync(command, {
@@ -19,17 +18,11 @@ export function installDependencies(
       stdio: "inherit", // Show installation progress in real-time
     });
 
-    consola.success("Dependencies installed successfully");
+    log.success("Dependencies installed");
     return true;
-  } catch (error) {
-    // Display helpful error message but don't throw - allow building to continue
-    consola.warn("Failed to install dependencies");
-    consola.debug(
-      `Error: ${error instanceof Error ? error.message : String(error)}`
-    );
-    consola.info(
-      `You can install dependencies manually later by running: ${command}`
-    );
+  } catch {
+    // Not fatal: the project is complete and the install can be run later
+    log.warn(`Could not install dependencies. Run "${command}" yourself.`);
     return false;
   }
 }

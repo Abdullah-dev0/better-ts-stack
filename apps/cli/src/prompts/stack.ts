@@ -1,100 +1,125 @@
-import { cancel, confirm, group, isCancel, select } from "@clack/prompts";
-import consola from "consola";
+import { cancel, confirm, isCancel, select } from "@clack/prompts";
 
 import {
   ApplicationType,
+  applicationTypeOptions,
   authOptions,
-  BackendFramework,
   backendFrameworkOptions,
-  DatabaseType,
-  databaseTypeOptions,
-  FrontendFramework,
+  buildError,
+  Database,
+  databaseSystemOptions,
+  Framework,
   frontendFrameworkOptions,
+  getApplicationType,
   mongodbOrmOptions,
-  OrmOption,
-  PackageManager,
   packageManagerOptions,
   postgresqlOrmOptions,
-  PromptChoices,
+  StackChoices,
 } from "../types";
 
-export async function collectStackChoices(
-  applicationType: ApplicationType
-): Promise<PromptChoices> {
-  return group<{ [K in keyof PromptChoices]: PromptChoices[K] | symbol }>(
-    {
-      framework: async () => {
-        if (applicationType === "backend") {
-          while (true) {
-            const selection = await select<BackendFramework>({
-              message: "Select a backend framework:",
-              options: backendFrameworkOptions,
-              initialValue: "express",
-            });
-            if (isCancel(selection) || selection !== "nestjs")
-              return selection;
-            consola.warn(
-              "This framework is coming soon! Please select another option."
-            );
-          }
-        }
+// Returns the preset value when there is one, otherwise asks the user
+export async function ask<T>(
+  preset: T | undefined,
+  prompt: () => Promise<T | symbol>
+): Promise<T> {
+  if (preset !== undefined) return preset;
 
-        return select<FrontendFramework>({
-          message: "Select a frontend framework:",
-          options: frontendFrameworkOptions,
-          initialValue: "nextjs",
-        });
-      },
-      databaseType: () =>
-        select<DatabaseType>({
-          message: "Select a database:",
-          options: databaseTypeOptions,
-          initialValue: "none",
-        }),
-      orm: async ({ results }): Promise<OrmOption | symbol> => {
-        if (results.databaseType === "none") return "none" as const;
-        const options =
-          results.databaseType === "mongodb"
-            ? mongodbOrmOptions
-            : postgresqlOrmOptions;
-        return select<OrmOption>({
-          message: `Select an ORM for ${results.databaseType}:`,
-          options,
-          initialValue: options[0].value,
-        });
-      },
-      packageManager: () =>
-        select<PackageManager>({
-          message: "Select a package manager:",
-          options: packageManagerOptions,
-          initialValue: "npm",
-        }),
-      useDocker: () => confirm({ message: "Use Docker?", initialValue: false }),
-      useAuth: async ({ results }): Promise<boolean | symbol> => {
-        if (applicationType === "fullstack" && results.databaseType === "none")
-          return false;
-        return select({
-          message:
-            applicationType === "fullstack"
-              ? "Add Better Auth?"
-              : "Add authentication?",
+  const answer = await prompt();
+  if (isCancel(answer)) {
+    cancel("Operation cancelled.");
+    process.exit(0);
+  }
+  return answer;
+}
+
+async function askFramework(): Promise<Framework | symbol> {
+  const applicationType = await select<ApplicationType>({
+    message: "Application type:",
+    options: applicationTypeOptions,
+    initialValue: "backend",
+  });
+  if (isCancel(applicationType)) return applicationType;
+
+  return applicationType === "backend"
+    ? select<Framework>({
+        message: "Select a backend framework:",
+        options: backendFrameworkOptions,
+        initialValue: "express",
+      })
+    : select<Framework>({
+        message: "Select a frontend framework:",
+        options: frontendFrameworkOptions,
+        initialValue: "nextjs",
+      });
+}
+
+async function askDatabase(): Promise<Database | symbol> {
+  const system = await select({
+    message: "Select a database:",
+    options: databaseSystemOptions,
+    initialValue: "none",
+  });
+  if (isCancel(system) || system === "none") return system;
+
+  const options =
+    system === "mongodb" ? mongodbOrmOptions : postgresqlOrmOptions;
+  return select<Database>({
+    message: `Select an ORM for ${system}:`,
+    options,
+    initialValue: options[0].value,
+  });
+}
+
+// Collects the stack choices, prompting only for those missing from the preset
+export async function collectStackChoices(
+  preset: Partial<StackChoices>
+): Promise<StackChoices> {
+  const framework = await ask(preset.framework, askFramework);
+  const database = await ask(preset.database, askDatabase);
+  const packageManager = await ask(preset.packageManager, () =>
+    select({
+      message: "Select a package manager:",
+      options: packageManagerOptions,
+      initialValue: "npm",
+    })
+  );
+  const useDocker = await ask(preset.useDocker, () =>
+    confirm({ message: "Use Docker?", initialValue: false })
+  );
+
+  // Better Auth stores users and sessions, so full-stack auth needs a database
+  const isFullstack = getApplicationType(framework) === "fullstack";
+  const isAuthAvailable = !isFullstack || database !== "none";
+  if (preset.useAuth && !isAuthAvailable) {
+    throw buildError(
+      `Auth for ${framework} needs a database. Add --database prisma, drizzle, or mongoose`,
+      "INVALID_ARGUMENT"
+    );
+  }
+  const useAuth = isAuthAvailable
+    ? await ask(preset.useAuth, () =>
+        select({
+          message: isFullstack ? "Add Better Auth?" : "Add authentication?",
           options: authOptions,
           initialValue: false,
-        });
-      },
-      initGit: () =>
-        confirm({
-          message: "Initialize a git repository?",
-          initialValue: true,
-        }),
-      installDeps: () =>
-        confirm({ message: "Install dependencies now?", initialValue: false }),
-    },
-    {
-      onCancel: () => {
-        cancel("Operation cancelled.");
-        process.exit(0);
-      },
-    }
+        })
+      )
+    : false;
+
+  const initGit = await ask(preset.initGit, () =>
+    confirm({ message: "Initialize a git repository?", initialValue: true })
   );
+  const installDeps = await ask(preset.installDeps, () =>
+    confirm({ message: "Install dependencies now?", initialValue: false })
+  );
+
+  return {
+    framework,
+    database,
+    packageManager,
+    useDocker,
+    useAuth,
+    initGit,
+    installDeps,
+  };
 }

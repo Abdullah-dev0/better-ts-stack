@@ -1,0 +1,44 @@
+{
+  "id": "nestjs",
+  "name": "NestJS Base",
+  "description": "Base NestJS server with TypeScript, security headers, and a health check",
+  "type": "base",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development nest start --watch",
+    "build": "nest build",
+    "start": "cross-env NODE_ENV=production {{runner}} dist/main.js",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "type:check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@nestjs/common": "^12.1.2",
+    "@nestjs/core": "^12.1.2",
+    "@nestjs/platform-express": "^12.1.2",
+    "cross-env": "^10.1.0",
+    "dotenv": "^17.4.2",
+    "helmet": "^8.3.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@nestjs/cli": "^12.0.8",
+    "@nestjs/schematics": "^12.0.6",
+    "@trivago/prettier-plugin-sort-imports": "^6.0.2",
+    "@types/express": "^5.0.6",
+    "@types/node": "^24.13.3",
+    "eslint": "^10.10.0",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.9.6",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.69.0"
+  },
+  "envVars": {
+    "PORT": "3000"
+  },
+  "templateFiles": [
+    "src/app.module.ts.hbs"
+  ]
+}

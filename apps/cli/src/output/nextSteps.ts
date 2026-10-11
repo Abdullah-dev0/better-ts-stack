@@ -1,4 +1,8 @@
-import { ProjectConfig } from "../types";
+import { note, outro } from "@clack/prompts";
+import path from "node:path";
+import { cwd } from "node:process";
+
+import { DEFAULT_PORT, ProjectConfig } from "../types";
 
 const MONGODB_AUTH_SETUP_URL =
   "https://better-ts-stack.abdullahtech.me/docs/modules/database#mongoose-and-mongodb";
@@ -19,13 +23,15 @@ function isNodeBelow([major, minor]: number[]): boolean {
 // Generates a list of instructions for the user to follow after project creation
 export function generateNextSteps(
   config: ProjectConfig,
+  targetDir: string,
   depsInstalled: boolean
 ): string[] {
   const steps: string[] = [];
   const isFullstack = config.applicationType === "fullstack";
 
-  // Step 1: cd into project directory
-  steps.push(`cd ${config.projectName}`);
+  // Step 1: cd into project directory, unless it was created in place
+  const relativeDir = path.relative(cwd(), targetDir);
+  if (relativeDir) steps.push(`cd ${relativeDir}`);
 
   // Step 2: Set environment variables
   if (config.database !== "none") {
@@ -94,23 +100,11 @@ export function generateNextSteps(
   return steps;
 }
 
-// Formats the next steps into a success message string
-export function displayNextSteps(
-  _projectName: string,
-  steps: string[]
-): string {
-  const formattedSteps = steps
-    .map((step, index) => `  ${index + 1}. ${step}`)
-    .join("\n");
-
-  const message = `
-✨ Project created successfully!
-
-Next steps:
-${formattedSteps}
-
-Your server will be running at http://localhost:3000
-`;
-
-  return message;
+// Shows the numbered next steps and closes the session
+export function showNextSteps(steps: string[]) {
+  note(
+    steps.map((step, index) => `${index + 1}. ${step}`).join("\n"),
+    "Next steps"
+  );
+  outro(`Done. Your app will run at http://localhost:${DEFAULT_PORT}`);
 }

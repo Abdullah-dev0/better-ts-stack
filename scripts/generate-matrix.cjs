@@ -1,14 +1,21 @@
-/** Generate every supported combination; optionally install and check one case. */
+/** Generate every supported combination into [output-dir] (default: a new temp dir). */
 const assert = require("node:assert/strict");
 const fs = require("node:fs/promises");
 const os = require("node:os");
 const path = require("node:path");
 const { build } = require("../apps/cli/dist/builder");
 
+const BACKEND_ENTRY_FILES = {
+  express: "dist/index.js",
+  nestjs: "dist/main.js",
+};
+
 async function main() {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), "better-ts-stack-"));
+  const root = process.argv[2]
+    ? path.resolve(process.argv[2])
+    : await fs.mkdtemp(path.join(os.tmpdir(), "better-ts-stack-"));
   const cases = [];
-  for (const framework of ["express", "nextjs", "tanstack"]) {
+  for (const framework of ["express", "nestjs", "nextjs", "tanstack"]) {
     for (const database of ["none", "prisma", "drizzle", "mongoose"]) {
       for (const useAuth of [false, true]) {
         if (
@@ -24,16 +31,10 @@ async function main() {
             const config = {
               projectName: name,
               framework,
-              applicationType:
-                framework === "express" ? "backend" : "fullstack",
+              applicationType: BACKEND_ENTRY_FILES[framework]
+                ? "backend"
+                : "fullstack",
               database,
-              orm: database,
-              databaseType:
-                database === "none"
-                  ? "none"
-                  : database === "mongoose"
-                    ? "mongodb"
-                    : "postgresql",
               useAuth,
               useDocker,
               packageManager,
@@ -54,10 +55,10 @@ async function main() {
               assert(/^\^?\d+\.\d+\.\d+$/.test(version), `${name}: ${version}`);
             }
             assert(!JSON.stringify(manifest.scripts).includes("{{"), name);
-            if (framework === "express")
+            if (BACKEND_ENTRY_FILES[framework])
               assert.equal(
                 manifest.scripts.start,
-                `cross-env NODE_ENV=production ${packageManager === "bun" ? "bun" : "node"} dist/index.js`
+                `cross-env NODE_ENV=production ${packageManager === "bun" ? "bun" : "node"} ${BACKEND_ENTRY_FILES[framework]}`
               );
             // pnpm 11+ ignores package.json "pnpm" and needs build approvals
             assert(!manifest.pnpm, `${name}: package.json pnpm field`);

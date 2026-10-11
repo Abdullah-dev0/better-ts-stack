@@ -3,6 +3,35 @@ title: Upgrade notes
 description: What changed in each release and what to do when upgrading
 ---
 
+## 2.0.1
+
+A more useful `--dry-run`, bug fixes, and cleanup. Projects you already generated are not changed.
+
+### New
+
+- **`--dry-run` lists what a build would produce.** After the summary it prints every file, the dependencies and dev dependencies with their versions, dependency overrides, `package.json` scripts, environment variables, and the commands run afterwards (`install`, `git init`). Before, it only repeated the summary. Nothing is written, installed, or initialized. See [dry run](/docs/usage#dry-run).
+
+### Fixed
+
+- **No terminal, no silent exit.** Run without an interactive terminal and without `--yes`, the CLI used to print a prompt, exit with code 0, and create nothing. It now stops with an error and a non-zero exit code.
+- **No nested git repository.** Creating a project inside an existing repository, such as `apps/api` in a monorepo, no longer runs `git init`.
+- **Express with Mongoose prints the server address** when it starts, like every other project.
+- **TanStack Start with Drizzle pins `esbuild` to 0.28.2**, like the other Drizzle projects. Without it, `drizzle-kit` installed an old `esbuild` that `npm audit` reports.
+- **Project name rules in the troubleshooting page** now match the CLI: lowercase letters, numbers, and hyphens.
+
+### Changed in generated projects
+
+- **Drizzle's default `DATABASE_URL`** is `postgresql://postgres:postgres@localhost:5432/postgres`, the same as Prisma's. Before it was `postgresql://user:password@localhost:5432/mydb?schema=public`.
+- **Express Prettier config** no longer loads `prettier-plugin-tailwindcss` or sorts React and Next.js imports first, and the package is no longer installed.
+- **Next.js and TanStack Start auth** no longer list `mongodb` as a dependency unless you chose Mongoose.
+- **`zod`** is `^4.6.5` in every auth module.
+
+### For contributors
+
+- Every template file ending in `.hbs` is rendered automatically. The `templateFiles` list in `config.json` is gone.
+- The published package no longer ships type declarations or source maps, and it includes a `LICENSE` file.
+- `BuildResult.success`, `BuildError.exitCode`, and the `lowercase`, `uppercase`, and `kebabCase` template helpers were removed. None were used.
+
 ## 2.0.0
 
 Upgrading the CLI only changes projects you generate from now on. It does not change a project you already generated.

@@ -1,5 +1,5 @@
-import * as fs from "fs-extra";
-import * as path from "path";
+import fs from "fs-extra";
+import path from "node:path";
 import { z } from "zod";
 
 // Validates project name: lowercase letters, numbers, and hyphens

@@ -1,20 +1,19 @@
 import fs from "fs-extra";
 
-import { getModule } from "../modules/registry";
 import { generateNextSteps } from "../output/nextSteps";
-import { buildError, BuildResult, Module, ProjectConfig } from "../types";
+import { buildError, BuildResult, isBuildError, ProjectConfig } from "../types";
 import { validateDirectoryEmpty } from "../validators";
+import { loadBuildInputs } from "./buildPlanner";
 import {
   generateEnvFile,
   generatePackageJson,
   generatePnpmWorkspace,
-  mergeConfigurations,
 } from "./configGenerator";
 import { installDependencies } from "./dependencyInstaller";
 import { copyModuleFiles, processTemplateFiles } from "./fileProcessor";
 import { initializeGitRepository } from "./gitInitializer";
-import { selectModules } from "./moduleSelector";
-import { buildTemplateContext } from "./templateContext";
+
+export { planBuild } from "./buildPlanner";
 
 // Main function to orchestrate the project construction process
 export async function build(
@@ -39,58 +38,29 @@ export async function build(
       );
     });
 
-    // 3. Select and load modules
-    const selection = selectModules(config);
-    const modules: Module[] = [];
-    try {
-      for (const id of [selection.base, ...selection.modules]) {
-        modules.push(await getModule(id));
-      }
-    } catch (e) {
-      throw buildError(e, "MODULE_LOADING_ERROR", "Failed to load modules");
+    // 3. Load the selected modules, build the template context, and merge
+    // the module configurations
+    const { modules, templateContext, mergedConfig } =
+      await loadBuildInputs(config);
+
+    // 4. Copy module files
+    for (const module of modules) {
+      await copyModuleFiles(module.path, targetDir);
     }
 
-    // 4. Build template context and merge module configurations
-    const templateContext = buildTemplateContext(config);
-    const mergedConfig = mergeConfigurations(
-      modules.map((m) => m.config),
-      templateContext
-    );
+    // 5. Process Handlebars templates
+    await processTemplateFiles(targetDir, templateContext);
 
-    // 5. Copy module files
-    try {
-      for (const module of modules) {
-        await copyModuleFiles(module.path, targetDir);
-      }
-    } catch (e) {
-      throw buildError(e, "FILE_COPY_ERROR", "Failed to copy module files");
-    }
-
-    // 6. Process Handlebars templates
-    try {
-      await processTemplateFiles(
-        targetDir,
-        templateContext,
-        modules.flatMap((m) => m.config.templateFiles)
-      );
-    } catch (e) {
-      throw buildError(
-        e,
-        "TEMPLATE_PROCESSING_ERROR",
-        "Failed to process template files"
-      );
-    }
-
-    // 7. Generate package.json
+    // 6. Generate package.json
     await generatePackageJson(targetDir, mergedConfig, config);
     if (config.packageManager === "pnpm") {
       await generatePnpmWorkspace(targetDir, mergedConfig.overrides);
     }
 
-    // 8. Generate environment files
+    // 7. Generate environment files
     await generateEnvFile(targetDir, mergedConfig.envVars);
 
-    // 9. Install dependencies and initialize git (both optional); a failure
+    // 8. Install dependencies and initialize git (both optional); a failure
     // in either is reported as a warning and does not fail the build
     const depsInstalled =
       config.installDeps &&
@@ -99,7 +69,6 @@ export async function build(
     if (config.initGit) initializeGitRepository(targetDir);
 
     return {
-      success: true,
       projectPath: targetDir,
       nextSteps: generateNextSteps(config, targetDir, depsInstalled),
     };
@@ -109,6 +78,9 @@ export async function build(
     await (
       didDirectoryExist ? fs.emptyDir(targetDir) : fs.remove(targetDir)
     ).catch(() => undefined);
-    throw buildError(error, "BUILDING_ERROR", "Building failed");
+    // Errors raised by the build steps already say what failed
+    throw isBuildError(error)
+      ? error
+      : buildError(error, "BUILDING_ERROR", "Building failed");
   }
 }

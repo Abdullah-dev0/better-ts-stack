@@ -30,15 +30,11 @@
     "eslint": "^10.10.0",
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.9.6",
-    "prettier-plugin-tailwindcss": "^0.8.1",
     "tsx": "^4.23.13",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.69.0"
   },
   "envVars": {
     "PORT": "3000"
-  },
-  "templateFiles": [
-    "src/index.ts"
-  ]
+  }
 }

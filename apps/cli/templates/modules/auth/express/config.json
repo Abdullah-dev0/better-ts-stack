@@ -16,12 +16,5 @@
   "envVars": {
     "JWT_SECRET": "please-change-me",
     "JWT_EXPIRES_IN": "1h"
-  },
-  "templateFiles": [
-    "src/lib/jwt.ts.hbs",
-    "src/middleware/requireAuth.ts.hbs",
-    "src/services/userStore.ts.hbs",
-    "src/routes/auth.ts.hbs",
-    "src/controllers/authController.ts.hbs"
-  ]
+  }
 }

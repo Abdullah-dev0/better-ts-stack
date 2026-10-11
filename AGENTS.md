@@ -162,7 +162,7 @@ Patterns: Next.js App Router, Server Components default, Tailwind CSS v4, Radix 
 
 ## Module System
 
-Modules in `apps/cli/templates/modules/` have `ModuleConfig` with: id, name, type ("base" | "database" | "feature"), dependencies, devDependencies, scripts, envVars, templateFiles.
+Modules in `apps/cli/templates/modules/` have `ModuleConfig` with: id, name, type ("base" | "database" | "feature"), dependencies, devDependencies, overrides, scripts, envVars. Every file ending in `.hbs` is rendered with Handlebars and written without the extension; other files are copied as they are.
 
 ## Dependencies
 

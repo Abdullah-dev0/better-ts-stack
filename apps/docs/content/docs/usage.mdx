@@ -30,7 +30,7 @@ npx better-ts-stack my-api --framework nestjs --database prisma --auth --yes
 # Create the project in the current (empty) directory
 npx better-ts-stack . --framework nextjs --database drizzle --pm pnpm
 
-# Check the result without writing anything
+# List what would be created without writing anything
 npx better-ts-stack my-api --framework express --yes --dry-run
 ```
 
@@ -44,7 +44,7 @@ npx better-ts-stack my-api --framework express --yes --dry-run
 | `--git` / `--no-git`         | Initialize a git repository                  |
 | `--install` / `--no-install` | Install dependencies                         |
 | `-y`, `--yes`                | Use defaults for missing options, no prompts |
-| `--dry-run`                  | Show the summary without writing files       |
+| `--dry-run`                  | List what would be created, write nothing    |
 | `-h`, `--help`               | Show help                                    |
 | `-v`, `--version`            | Show the version                             |
 
@@ -55,6 +55,20 @@ With `--yes`, the defaults are Express, no database, no auth, no Docker, npm, gi
 `--auth` with `nextjs` or `tanstack` needs a database, because Better Auth stores users and sessions. Without one the CLI stops with an error.
 
 `--yes` requires a project path.
+
+### Dry run
+
+`--dry-run` goes through the prompts and checks as usual, then prints what the build would produce instead of building it:
+
+- every file, with its path inside the project
+- dependencies and dev dependencies with their versions, and any dependency overrides
+- `package.json` scripts
+- environment variables written to `.env` and `.env.example` (generated secrets are shown as `<random secret>`)
+- commands run after the files are written: the install, when `--install` is set, and `git init`, unless the project is inside an existing repository
+
+No files are written, nothing is installed, and no repository is initialized.
+
+Without an interactive terminal (in CI or when input is piped) the CLI cannot ask questions. Pass `--yes`, or give every option as a flag. Otherwise it stops with an error and a non-zero exit code.
 
 ---
 
@@ -243,6 +257,8 @@ If yes, three files are added: `Dockerfile`, `docker-compose.yml`, and `.dockeri
 ```
 
 If yes, the CLI runs `git init` after generating the project files. It does not create a commit, so commit the files yourself when you are ready.
+
+If the project folder is already inside a git repository, for example `apps/api` in a monorepo, the CLI skips `git init` so you do not get a nested repository.
 
 </Step>
 

@@ -1,6 +1,6 @@
 {
   "name": "better-ts-stack",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "A CLI that scaffolds Express, NestJS, Next.js, and TanStack Start projects with a database, authentication, and Docker already set up.",
   "keywords": [
     "cli",
@@ -37,6 +37,7 @@
   ],
   "scripts": {
     "dev": "tsx  src/index.ts",
+    "prebuild": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
     "build": "tsc",
     "postbuild": "node -e \"const fs=require('fs');const p='dist/index.js';fs.writeFileSync(p,'#!/usr/bin/env node\\n'+fs.readFileSync(p,'utf8'))\"",
     "prepack": "npm run build",

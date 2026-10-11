@@ -52,7 +52,7 @@ npx better-ts-stack . --framework nextjs --database drizzle --pm pnpm
 | `--git` / `--no-git`         | Initialize a git repository                  |
 | `--install` / `--no-install` | Install dependencies                         |
 | `-y`, `--yes`                | Use defaults for missing options, no prompts |
-| `--dry-run`                  | Show the summary without writing files       |
+| `--dry-run`                  | List what would be created, write nothing    |
 | `-h`, `--help`               | Show help                                    |
 | `-v`, `--version`            | Show the version                             |
 

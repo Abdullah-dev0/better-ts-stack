@@ -37,8 +37,5 @@
   },
   "envVars": {
     "PORT": "3000"
-  },
-  "templateFiles": [
-    "src/app.module.ts.hbs"
-  ]
+  }
 }

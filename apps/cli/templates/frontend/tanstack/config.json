@@ -41,8 +41,5 @@
   },
   "envVars": {
     "PORT": "3000"
-  },
-  "templateFiles": [
-    "src/routes/index.tsx.hbs"
-  ]
+  }
 }

@@ -33,7 +33,8 @@ Options left out are asked interactively, unless --yes is given.
   --git, --no-git         Initialize a git repository
   --install, --no-install Install dependencies
   -y, --yes               Use defaults for missing options and skip confirmation
-  --dry-run               Show what would be created without writing files
+  --dry-run               List the files, dependencies, scripts, environment
+                          variables, and commands without writing anything
   -h, --help              Show this help
   -v, --version           Show the version
 

@@ -74,7 +74,6 @@ export interface ModuleConfig {
   overrides: Dependencies;
   scripts: Record<string, string>;
   envVars: Record<string, string>;
-  templateFiles: string[];
 }
 
 // Represents a module with its config and file path
@@ -92,9 +91,16 @@ export interface MergedConfig {
   envVars: Record<string, string>;
 }
 
+// What a build would produce, as shown by --dry-run
+export interface BuildPlan extends MergedConfig {
+  // Paths relative to the project directory
+  files: string[];
+  // Commands run after the files are written
+  commands: string[];
+}
+
 // Result of the build operation
 export interface BuildResult {
-  success: boolean;
   projectPath: string;
   nextSteps: string[];
 }
@@ -102,15 +108,13 @@ export interface BuildResult {
 // Custom error for build failures
 export interface BuildError extends Error {
   code: string;
-  exitCode: number;
 }
 
 // Unified error creation function
 export function buildError(
   errorOrMessage: unknown,
   code: string,
-  context?: string,
-  exitCode: number = 1
+  context?: string
 ): BuildError {
   const message =
     errorOrMessage instanceof Error
@@ -118,7 +122,12 @@ export function buildError(
       : String(errorOrMessage);
   const fullMessage = context ? `${context}: ${message}` : message;
   const error = new Error(fullMessage);
-  return Object.assign(error, { code, exitCode });
+  return Object.assign(error, { code });
+}
+
+// True for errors created by buildError(), whose message is meant for the user
+export function isBuildError(error: unknown): error is BuildError {
+  return error instanceof Error && "code" in error;
 }
 
 // Variables and helpers available in Handlebars templates
@@ -132,9 +141,6 @@ export interface TemplateContext {
   useDocker: boolean;
   useAuth: boolean;
   helpers: {
-    lowercase: (str: string) => string;
-    uppercase: (str: string) => string;
-    kebabCase: (str: string) => string;
     eq: (a: string, b: string) => boolean;
     runner: () => string;
   };

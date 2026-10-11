@@ -53,7 +53,6 @@ RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
 COPY . .
 
-# Only build if package.json has a build script
 {{#if (eq database 'prisma')}}
 RUN DATABASE_URL="postgresql://postgres:postgres@localhost:5432/postgres" npm run build
 {{else if (eq database 'mongoose')}}
@@ -100,7 +99,6 @@ RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
 COPY . .
 
-# Only build if package.json has a build script
 {{#if (eq database 'prisma')}}
 RUN DATABASE_URL="postgresql://postgres:postgres@localhost:5432/postgres" npm run build
 {{else if (eq database 'mongoose')}}
@@ -123,7 +121,7 @@ COPY package*.json ./
 RUN if [ -f package-lock.json ]; then npm ci --omit=dev; else npm install --omit=dev; fi \
     && npm cache clean --force
 
-# Copy built files (if TypeScript) or source files (if JavaScript)
+# Copy the compiled output
 COPY --from=builder --chown=appuser:nodejs /app/dist ./dist
 
 USER appuser

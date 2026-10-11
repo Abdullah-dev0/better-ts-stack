@@ -1,6 +1,6 @@
 // Module registry for accessing base templates and feature modules
 import fs from "fs-extra";
-import path from "path";
+import path from "node:path";
 import { z } from "zod";
 
 import { buildError, ModuleConfig } from "../types";
@@ -15,7 +15,6 @@ const moduleConfigSchema = z.object({
   overrides: z.record(z.string(), z.string()).default({}),
   scripts: z.record(z.string(), z.string()).default({}),
   envVars: z.record(z.string(), z.string()).default({}),
-  templateFiles: z.array(z.string()).default([]),
 });
 
 // Determines the absolute filesystem path for a given module ID

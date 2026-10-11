@@ -24,6 +24,14 @@ export async function ask<T>(
 ): Promise<T> {
   if (preset !== undefined) return preset;
 
+  // Without a terminal a prompt reads end-of-input and looks like a cancel
+  if (!process.stdin.isTTY) {
+    throw buildError(
+      "Cannot ask questions without an interactive terminal. Pass --yes, or give every option as a flag (see --help)",
+      "NOT_INTERACTIVE"
+    );
+  }
+
   const answer = await prompt();
   if (isCancel(answer)) {
     info("Cancelled. Nothing was created.");

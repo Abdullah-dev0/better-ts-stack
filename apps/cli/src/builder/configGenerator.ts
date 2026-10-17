@@ -91,11 +91,7 @@ export async function generatePackageJson(
       name: config.projectName,
       version: "1.0.0",
       private: true,
-      // TanStack's srvx static serving needs Node 24.20+ on Windows (earlier
-      // 24.x reports mismatched file stats there, so every asset 404s)
-      engines: {
-        node: config.framework === "tanstack" ? ">=24.20.0" : ">=24.0.0",
-      },
+      engines: { node: ">=24.0.0" },
       description: `Project created with better-ts-stack using ${config.database !== "none" ? config.database : "no database"}`,
       ...(ESM_FRAMEWORKS.includes(config.framework) ? { type: "module" } : {}),
       ...(isFullstack ? {} : { main: BACKEND_ENTRY_FILES[config.framework] }),

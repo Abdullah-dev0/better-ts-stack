@@ -17,6 +17,7 @@ const featureList = [
   {{#if useAuth}}"Better Auth-ready session flow",{{/if}}
   {{#if (eq database "prisma")}}"Prisma database tooling",{{/if}}
   {{#if (eq database "drizzle")}}"Drizzle database tooling",{{/if}}
+  {{#if (eq database "mongoose")}}"Mongoose database tooling",{{/if}}
 ];
 
 function Home() {
@@ -55,7 +56,7 @@ function Home() {
               </Link>
               {{else}}
               <a
-                href="https://github.com/Abdullah-dev0/better-ts-stack"
+                href="https://better-ts-stack.abdullahtech.me/docs"
                 target="_blank"
                 rel="noreferrer"
                 className={cn(buttonVariants({ size: "lg" }), "gap-2")}

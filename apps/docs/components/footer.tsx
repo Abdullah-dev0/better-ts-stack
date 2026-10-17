@@ -5,74 +5,52 @@ import { FOOTER_CONFIG } from "@/lib/constants";
 
 export function Footer() {
   return (
-    <footer className="bg-background relative overflow-hidden py-16 text-center">
-      {/* Giant Background Text - behind content */}
-      <div className="pointer-events-none z-0 flex items-start justify-center overflow-hidden select-none">
-        <h1 className="text-foreground/[0.07] text-4xl font-black tracking-tight whitespace-nowrap md:text-[10rem]">
-          BETTER TS STACK
-        </h1>
-      </div>
-
-      <div className="container mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 items-center justify-center gap-10 md:grid-cols-3">
-          {/* Brand Column */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-center gap-2">
-              <Image
-                src="/icon.png"
-                alt=""
-                width={32}
-                height={32}
-                className="rounded-lg"
-              />
-              <span className="text-foreground text-lg font-bold tracking-tight">
-                {FOOTER_CONFIG.brand.name}
-              </span>
-            </div>
-            <p className="text-muted-foreground text-sm">
-              © {FOOTER_CONFIG.copyright.year} {FOOTER_CONFIG.brand.name}.
-              <br />
-              {FOOTER_CONFIG.copyright.text}
-            </p>
+    <footer className="border-border relative overflow-hidden border-t">
+      <div className="container mx-auto flex max-w-6xl flex-col gap-8 px-4 py-12 sm:px-6 md:flex-row md:items-start md:justify-between">
+        <div className="space-y-3">
+          <div className="flex items-center gap-2.5">
+            <Image
+              src="/icon.png"
+              alt=""
+              width={24}
+              height={24}
+              className="rounded-md"
+            />
+            <span className="text-foreground font-semibold tracking-tight">
+              {FOOTER_CONFIG.brand.name}
+            </span>
           </div>
-
-          {/* Pages Column */}
-          <div className="text-center">
-            <h4 className="text-foreground mb-4 font-semibold">Pages</h4>
-            <ul className="text-muted-foreground space-y-3 text-sm">
-              {FOOTER_CONFIG.pages.map((page, i) => (
-                <li key={i}>
-                  <Link
-                    href={page.href}
-                    className="hover:text-primary transition-colors"
-                  >
-                    {page.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Socials Column */}
-          <div className="text-center">
-            <h4 className="text-foreground mb-4 font-semibold">Socials</h4>
-            <ul className="text-muted-foreground space-y-3 text-sm">
-              {FOOTER_CONFIG.social.map((social, i) => (
-                <li key={i}>
-                  <Link
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-primary transition-colors"
-                  >
-                    {social.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <p className="text-muted-foreground text-sm">
+            © {FOOTER_CONFIG.copyright.year} {FOOTER_CONFIG.brand.name}.{" "}
+            {FOOTER_CONFIG.copyright.text}
+          </p>
         </div>
+
+        <ul className="flex flex-wrap gap-x-6 gap-y-3 text-sm">
+          {FOOTER_CONFIG.links.map((link) => (
+            <li key={link.href}>
+              <Link
+                href={link.href}
+                {...(link.external && {
+                  target: "_blank",
+                  rel: "noopener noreferrer",
+                })}
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {link.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
       </div>
+
+      {/* Sized to the viewport so the wordmark always fits on one line */}
+      <p
+        aria-hidden
+        className="text-foreground/[0.06] -mb-[0.22em] text-center text-[12.5vw] leading-none font-semibold tracking-[-0.05em] whitespace-nowrap select-none xl:text-[10.5rem]"
+      >
+        {FOOTER_CONFIG.brand.name}
+      </p>
     </footer>
   );
 }

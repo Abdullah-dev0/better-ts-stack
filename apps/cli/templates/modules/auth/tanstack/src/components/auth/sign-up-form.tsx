@@ -1,5 +1,3 @@
-"use client";
-
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useState, useTransition } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";

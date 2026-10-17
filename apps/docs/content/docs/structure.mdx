@@ -21,24 +21,25 @@ The layout of a generated project depends on the options you select. This page s
   <Folder name="my-api" defaultOpen>
     <Folder name="src" defaultOpen>
       <File name="index.ts" />
+      <File name="env.ts" />
       <Folder name="routes">
         <File name="health.ts" />
       </Folder>
     </Folder>
     <File name="package.json" />
+    <File name="README.md" />
     <File name="tsconfig.json" />
     <File name=".env" />
     <File name=".env.example" />
-    <File name=".eslintrc.js" />
     <File name="eslint.config.mjs" />
     <File name=".prettierrc" />
     <File name=".gitignore" />
   </Folder>
 </Files>
 
-The base template has two source files: `src/index.ts` and
-`src/routes/health.ts`. `.eslintrc.js` is left over from older ESLint versions;
-ESLint 10 only reads `eslint.config.mjs`.
+The base template has three source files: `src/index.ts`, `src/env.ts`, and
+`src/routes/health.ts`. Every project also gets a `README.md` that lists its
+stack, setup steps, scripts, and environment variables.
 
 ### With PostgreSQL + Prisma + JWT Auth + Docker
 
@@ -49,6 +50,7 @@ ESLint 10 only reads `eslint.config.mjs`.
     </Folder>
     <Folder name="src" defaultOpen>
       <File name="index.ts" />
+      <File name="env.ts" />
       <Folder name="lib">
         <File name="prisma.ts" />
         <File name="jwt.ts" />
@@ -71,6 +73,7 @@ ESLint 10 only reads `eslint.config.mjs`.
     <File name="docker-compose.yml" />
     <File name=".dockerignore" />
     <File name="package.json" />
+    <File name="README.md" />
     <File name="tsconfig.json" />
     <File name=".env" />
     <File name=".env.example" />
@@ -84,6 +87,7 @@ ESLint 10 only reads `eslint.config.mjs`.
   <Folder name="my-api" defaultOpen>
     <Folder name="src" defaultOpen>
       <File name="index.ts" />
+      <File name="env.ts" />
       <Folder name="lib">
         <File name="db.ts" />
         <File name="jwt.ts" />
@@ -106,6 +110,7 @@ ESLint 10 only reads `eslint.config.mjs`.
       </Folder>
     </Folder>
     <File name="package.json" />
+    <File name="README.md" />
     <File name="tsconfig.json" />
     <File name=".env" />
     <File name=".env.example" />
@@ -150,6 +155,7 @@ A full-stack project is a **single Next.js application** at the project root. Th
     <File name="eslint.config.mjs" />
     <File name="next-env.d.ts" />
     <File name="package.json" />
+    <File name="README.md" />
     <File name=".env" />
     <File name=".env.example" />
     <File name=".gitignore" />
@@ -217,6 +223,7 @@ A full-stack project is a **single Next.js application** at the project root. Th
     <File name="docker-compose.yml" />
     <File name=".dockerignore" />
     <File name="package.json" />
+    <File name="README.md" />
     <File name=".env" />
     <File name=".env.example" />
     <File name=".gitignore" />
@@ -276,6 +283,7 @@ A full-stack project is a **single Next.js application** at the project root. Th
     <File name="drizzle.config.ts" />
     <File name="next.config.ts" />
     <File name="package.json" />
+    <File name="README.md" />
     <File name=".env" />
     <File name=".env.example" />
     <File name=".gitignore" />
@@ -322,6 +330,7 @@ A TanStack Start project is a **single Vite-based application** at the project r
     <File name="tsconfig.json" />
     <File name="eslint.config.mjs" />
     <File name="package.json" />
+    <File name="README.md" />
     <File name=".env" />
     <File name=".env.example" />
     <File name=".gitignore" />
@@ -387,6 +396,7 @@ A TanStack Start project is a **single Vite-based application** at the project r
     <File name="docker-compose.yml" />
     <File name=".dockerignore" />
     <File name="package.json" />
+    <File name="README.md" />
     <File name=".env" />
     <File name=".env.example" />
     <File name=".gitignore" />
@@ -402,6 +412,8 @@ A TanStack Start project is a **single Vite-based application** at the project r
 | File                                | Purpose                                                            |
 | ----------------------------------- | ------------------------------------------------------------------ |
 | `src/index.ts`                      | Entry point - configures Express, mounts routes, starts the server |
+| `src/env.ts`                        | Validates environment variables with Zod at startup                |
+| `src/middleware/rateLimit.ts`       | Request limits, with `--rate-limit`                                |
 | `src/routes/health.ts`              | `GET /health` endpoint                                             |
 | `src/lib/prisma.ts`                 | Prisma client singleton                                            |
 | `src/lib/db.ts`                     | Mongoose connection helper                                         |
@@ -468,6 +480,7 @@ Variables are written to `.env.example` (and `.env`) based on selected modules.
 
 ```bash
 PORT=3000
+CORS_ORIGIN=*
 ```
 
 ### + PostgreSQL (Prisma or Drizzle)

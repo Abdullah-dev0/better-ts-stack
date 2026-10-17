@@ -12,12 +12,13 @@ export function selectModules(config: ProjectConfig) {
 
   const modules: string[] = [];
 
-  // Database and auth modules have one variant per framework (prisma/express,
-  // auth/nextjs, ...); the Docker module is shared
+  // Database, auth, and rate-limit modules have one variant per framework
+  // (prisma/express, auth/nextjs, ...); the Docker module is shared
   if (config.database !== "none")
     modules.push(`${config.database}/${framework}`);
   if (config.useDocker) modules.push("docker");
   if (config.useAuth) modules.push(`auth/${framework}`);
+  if (config.useRateLimit) modules.push(`rate-limit/${framework}`);
 
   return { base, modules };
 }

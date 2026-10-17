@@ -64,6 +64,7 @@ export function showSummary(config: ProjectConfig, targetDir: string) {
     config.framework,
     config.database !== "none" && config.database,
     config.useAuth && "auth",
+    config.useRateLimit && "rate limit",
     config.useDocker && "docker",
   ];
   const setup = [
@@ -115,7 +116,7 @@ export function showNextSteps(steps: string[]) {
   write();
   write(`  ${amber(bold("Next steps"))}`);
   steps.forEach((step, index) => {
-    const isCommand = /^(cd|npm|pnpm|bun) /.test(step);
+    const isCommand = /^(cd|npm|pnpm|bun|docker) /.test(step);
     write(`  ${dim(`${index + 1}.`)} ${isCommand ? lime(step) : step}`);
   });
   write();

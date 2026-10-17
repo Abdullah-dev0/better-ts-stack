@@ -1,6 +1,12 @@
 import { Module } from "@nestjs/common";
+{{#if useRateLimit}}
+import { APP_GUARD } from "@nestjs/core";
+{{/if}}
 {{#if (eq database 'mongoose')}}
 import { MongooseModule } from "@nestjs/mongoose";
+{{/if}}
+{{#if useRateLimit}}
+import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 {{/if}}
 
 {{#if useAuth}}
@@ -28,7 +34,14 @@ import { PrismaModule } from "./prisma/prisma.module.js";
     {{#if useAuth}}
     AuthModule,
     {{/if}}
+    {{#if useRateLimit}}
+    // Every route: 100 requests per client IP in 15 minutes
+    ThrottlerModule.forRoot([{ ttl: 15 * 60 * 1000, limit: 100 }]),
+    {{/if}}
   ],
   controllers: [HealthController],
+  {{#if useRateLimit}}
+  providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
+  {{/if}}
 })
 export class AppModule {}

@@ -7,4 +7,99 @@ services:
       - .env
     environment:
       - NODE_ENV=production
+{{#if (eq database 'prisma')}}
+      # Inside Docker the database is the "db" service, not localhost
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
+{{/if}}
+{{#if (eq database 'drizzle')}}
+      # Inside Docker the database is the "db" service, not localhost
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
+{{/if}}
+{{#if (eq database 'mongoose')}}
+      # Inside Docker the database is the "db" service, not localhost
+      - MONGODB_URI=mongodb://db:27017/myapp?directConnection=true
+{{/if}}
+{{#unless (eq database 'none')}}
+    depends_on:
+      db:
+        condition: service_healthy
+{{/unless}}
     restart: unless-stopped
+{{#if (eq database 'prisma')}}
+
+  # PostgreSQL for local development. The port is published so migrations and
+  # the app can also reach it from your machine at localhost:5432
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  db-data:
+{{/if}}
+{{#if (eq database 'drizzle')}}
+
+  # PostgreSQL for local development. The port is published so migrations and
+  # the app can also reach it from your machine at localhost:5432
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  db-data:
+{{/if}}
+{{#if (eq database 'mongoose')}}
+
+  # MongoDB for local development, run as a one-node replica set because
+  # transactions need one. The health check starts the replica set on first
+  # run. The port is published so the app can also reach it from your machine
+  # at localhost:27017
+  db:
+    image: mongo:8
+    command: ["--replSet", "rs0", "--bind_ip_all"]
+    ports:
+      - "27017:27017"
+    volumes:
+      - db-data:/data/db
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mongosh",
+          "--quiet",
+          "--eval",
+          "try { rs.status().ok } catch (e) { rs.initiate({ _id: 'rs0', members: [{ _id: 0, host: 'localhost:27017' }] }).ok }",
+        ]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+    restart: unless-stopped
+
+volumes:
+  db-data:
+{{/if}}

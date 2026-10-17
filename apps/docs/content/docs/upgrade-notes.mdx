@@ -3,6 +3,37 @@ title: Upgrade notes
 description: What changed in each release and what to do when upgrading
 ---
 
+## 2.1.0
+
+Projects you already generated are not changed.
+
+### New
+
+- **Rate limiting.** Express and NestJS projects can add per-IP request limits with `--rate-limit` or the new "Add rate limiting?" prompt: 100 requests per 15 minutes on every route, and 10 sign-up or login attempts with auth. It is off unless you choose it. See [rate limiting](/docs/modules/backend#-rate-limiting).
+- **A README in every project**, with the chosen stack, setup steps, scripts, and environment variables.
+- **Docker uses your package manager.** The image installs with npm, pnpm, or bun to match the project, and uses the committed lockfile when there is one.
+- **A database in Docker Compose.** With Prisma or Drizzle, Compose runs PostgreSQL; with Mongoose, MongoDB as a replica set. The app waits for it to be healthy. See [Docker](/docs/modules/docker#environment-and-databases).
+- **Docker health checks.** Images check `/health` (Express and NestJS) or `/` (Next.js and TanStack Start).
+- **Environment validation.** Express and NestJS projects check their environment variables with Zod in `src/env.ts` at startup and stop with a clear message when one is missing or malformed.
+- **`CORS_ORIGIN`.** Express and NestJS read the allowed origins from `.env`. The default `*` allows every origin, as before.
+- **TanStack Start runs on Nitro in production**, as TanStack's [hosting guide](https://tanstack.com/start/latest/docs/framework/react/guide/hosting) recommends for Vite. `vite build` writes a self-contained server to `.output/`, and `npm start` runs `node --env-file-if-exists=.env .output/server/index.mjs`. `srvx` is gone, and so is the Windows problem where Node.js 24 before 24.20 returned 404 for CSS and JS. The Docker image runs `.output/` without a `node_modules` install. `vite dev` is unchanged.
+- **Graceful shutdown in Express.** On `SIGTERM` or Ctrl+C the server finishes open requests and closes the database connection before exiting.
+
+### Changed
+
+- **The package manager defaults to the one that ran the CLI**: `pnpm dlx better-ts-stack` selects pnpm, and `bunx` selects bun. With `--yes` this is the default too; `npx` still selects npm.
+- **A folder that only holds `.git` can be used**, for example a clone of an empty repository. A failed build leaves `.git` in place.
+- **Cancelling a prompt exits with code `130`** instead of `0`.
+- **Next steps** mention `docker compose up -d db` and `docker:up` when Docker is selected.
+- **Home page:** the docs button on the Next.js and TanStack Start home page links to the docs site, and Mongoose is listed with the other databases.
+- **TanStack Start projects require Node.js 24** like the others (`engines` was `>=24.20.0`).
+- **Express and NestJS `JWT_SECRET` must be at least 32 characters.** The generated value already is; a short value now stops the server at startup.
+
+### For contributors
+
+- `ProjectConfig` has a `useRateLimit` field, and the new `rate-limit/express` and `rate-limit/nestjs` modules hold the rate-limit code.
+- The template matrix covers rate limiting for Express and NestJS, and the smoke checks verify the rate-limit headers and the `429` after 10 login attempts.
+
 ## 2.0.2
 
 Projects you already generated are not changed. To patch an existing TanStack Start project, update `@tanstack/react-start` to 1.168.60 or later, then rebuild and redeploy.

@@ -142,9 +142,7 @@ PORT=3001 npm run dev
 
 ### TanStack Start: CSS and JS return 404 after `npm start` (Windows)
 
-On Windows, Node.js 24 releases before 24.20 report different device IDs for the same file depending on how it is read. `srvx`, the TanStack production server, treats that as unsafe and refuses every static file, so pages load without styles or client JavaScript.
-
-Upgrade Node.js to 24.20 or later (`node --version`), then run `npm start` again. The generated `package.json` lists this in `engines`.
+Projects generated before 2.1.0 serve production builds with `srvx`. On Windows, Node.js 24 releases before 24.20 report different device IDs for the same file depending on how it is read, and `srvx` refuses every static file, so pages load without styles or client JavaScript. Upgrade Node.js to 24.20 or later, or move the project to Nitro as 2.1.0 does (see the [upgrade notes](/docs/upgrade-notes#210)). Projects generated with 2.1.0 or later are not affected.
 
 ### "Cannot find module"
 
@@ -278,7 +276,7 @@ During development, `npm run dev` uses `tsx watch`, which skips type checking an
 
 If you're still stuck:
 
-1. **Check versions.** You need Node.js 24 or later (`node --version`). TanStack Start projects on Windows need Node.js 24.20 or later.
+1. **Check versions.** You need Node.js 24 or later (`node --version`).
 2. **Search [GitHub Issues](https://github.com/abdullah-dev0/better-ts-stack/issues)** for the same error.
 3. **Make a minimal reproduction.** Generate a fresh project with the fewest options that still show the problem.
 

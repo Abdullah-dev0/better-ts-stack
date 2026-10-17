@@ -43,3 +43,23 @@ export async function getWeeklyDownloads(): Promise<WeeklyDownloads | null> {
     return null;
   }
 }
+
+const NPM_LATEST_URL = "https://registry.npmjs.org/better-ts-stack/latest";
+
+// The version npm installs by default, or null when the registry is unreachable
+export async function getLatestVersion(): Promise<string | null> {
+  try {
+    const response = await fetch(NPM_LATEST_URL, {
+      next: { revalidate: 60 * 60 },
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = (await response.json()) as { version?: unknown };
+    return typeof data.version === "string" ? data.version : null;
+  } catch {
+    return null;
+  }
+}

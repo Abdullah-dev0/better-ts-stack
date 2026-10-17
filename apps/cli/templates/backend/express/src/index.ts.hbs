@@ -3,8 +3,18 @@ import express, { Express, Request, Response, NextFunction } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
+import { env } from "./env";
+{{#if (eq database 'prisma')}}
+import { disconnectPrisma } from "./lib/prisma";
+{{/if}}
+{{#if (eq database 'drizzle')}}
+import { db } from "./lib/db";
+{{/if}}
 {{#if (eq database 'mongoose')}}
-import { connectDB } from "./lib/db";
+import { connectDB, disconnectDB } from "./lib/db";
+{{/if}}
+{{#if useRateLimit}}
+import { apiLimiter } from "./middleware/rateLimit";
 {{/if}}
 import healthRouter from "./routes/health";
 {{#if useAuth}}
@@ -12,11 +22,14 @@ import authRouter from "./routes/auth";
 {{/if}}
 
 const app: Express = express();
-const port = process.env.PORT || 3000;
+const port = env.PORT;
 
 // Middleware
 app.use(helmet());
-app.use(cors());
+app.use(cors({ origin: env.CORS_ORIGIN }));
+{{#if useRateLimit}}
+app.use(apiLimiter);
+{{/if}}
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -53,12 +66,35 @@ app.use(
   },
 );
 
+// Closes the database connection once the server has stopped
+function closeDatabase(): Promise<void> {
+{{#if (eq database 'prisma')}}
+  return disconnectPrisma();
+{{else if (eq database 'drizzle')}}
+  return db.$client.end();
+{{else if (eq database 'mongoose')}}
+  return disconnectDB();
+{{else}}
+  return Promise.resolve();
+{{/if}}
+}
+
 function listen(): void {
-  app.listen(port, () => {
+  const server = app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}
     Health: http://localhost:${port}/health
     `);
   });
+
+  // Docker and most hosts stop the process with SIGTERM, and Ctrl+C sends
+  // SIGINT: finish open requests, close the database, then exit
+  const shutdown = () => {
+    server.close(() => {
+      void closeDatabase().finally(() => process.exit(0));
+    });
+  };
+  process.once("SIGTERM", shutdown);
+  process.once("SIGINT", shutdown);
 }
 
 {{#if (eq database 'mongoose')}}

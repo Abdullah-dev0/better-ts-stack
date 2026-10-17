@@ -4,13 +4,14 @@ import "dotenv/config";
 import helmet from "helmet";
 
 import { AppModule } from "./app.module.js";
+import { env } from "./env.js";
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
-  const port = process.env.PORT ?? 3000;
+  const port = env.PORT;
 
   app.use(helmet());
-  app.enableCors();
+  app.enableCors({ origin: env.CORS_ORIGIN });
   // Lets modules close database connections when the process is stopped
   app.enableShutdownHooks();
 

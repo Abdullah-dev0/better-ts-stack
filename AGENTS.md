@@ -47,7 +47,7 @@ npm run type:check     # TypeScript check (no emit)
 
 ### Running Tests
 
-Template checks: `npm run test:templates` (optionally `-- <output-dir>`), then `node scripts/check-matrix.cjs <matrix.json> express`, `nestjs`, `nextjs`, or `tanstack` (install, build, type-check, lint). After that, `node scripts/smoke-matrix.cjs <matrix.json> <framework>` starts the built projects without a database in production mode and checks HTTP responses, and `node scripts/docker-matrix.cjs <matrix.json> <framework>` builds each Docker image and runs the same checks against real PostgreSQL and MongoDB containers (needs Docker). No test framework configured. When added: CLI: `npx vitest run <file>`, Client: `npx jest <file>`
+Template checks: `npm run test:templates` (optionally `-- <output-dir>`), then `node scripts/check-matrix.cjs <matrix.json> express`, `nestjs`, `nextjs`, or `tanstack` (install, build, type-check, lint). After that, `node scripts/smoke-matrix.cjs <matrix.json> <framework>` starts the built projects without a database in production mode and checks HTTP responses, and `node scripts/docker-matrix.cjs <matrix.json> <framework>` builds each Docker image (npm, pnpm, and bun) and runs the same checks against real PostgreSQL and MongoDB containers (needs Docker). No test framework configured. When added: CLI: `npx vitest run <file>`, Client: `npx jest <file>`
 
 ## Code Style Guidelines
 

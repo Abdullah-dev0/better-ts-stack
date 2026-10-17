@@ -1,256 +1,174 @@
-// Icons are now referenced by name strings for server/client component compatibility
-// Icon components are imported and mapped in client components
+import type { Framework } from "@/lib/stack";
 
-// ============================================================================
-// NAVBAR CONSTANTS
-// ============================================================================
-export interface NavbarLink {
+export const GITHUB_URL = "https://github.com/Abdullah-dev0/better-ts-stack";
+export const NPM_URL = "https://www.npmjs.com/package/better-ts-stack";
+
+// "better-ts-stack" in the figlet Big font, as the CLI prints it
+// (apps/cli/src/ui/messages.ts)
+export const WORDMARK = [
+  "  _          _   _                   _                  _             _",
+  " | |        | | | |                 | |                | |           | |",
+  " | |__   ___| |_| |_ ___ _ __ ______| |_ ___ ______ ___| |_ __ _  ___| | __",
+  " | '_ \\ / _ \\ __| __/ _ \\ '__|______| __/ __|______/ __| __/ _` |/ __| |/ /",
+  " | |_) |  __/ |_| ||  __/ |         | |_\\__ \\      \\__ \\ || (_| | (__|   <",
+  " |_.__/ \\___|\\__|\\__\\___|_|          \\__|___/      |___/\\__\\__,_|\\___|_|\\_\\",
+].join("\n");
+
+// The page's sections, in order; the status bar and the number keys use them
+export const SECTIONS = [
+  { id: "init", label: "init" },
+  { id: "builder", label: "builder" },
+  { id: "modules", label: "modules" },
+  { id: "ci", label: "ci" },
+] as const;
+
+export interface NavLink {
   href: string;
   label: string;
   external: boolean;
 }
 
-export const NAVBAR_CONFIG = {
-  brand: {
-    name: "better-ts-stack",
-    logo: "TS",
+export const NAV_LINKS = [
+  { href: "/docs", label: "Docs", external: false },
+  { href: "/#builder", label: "Builder", external: false },
+  { href: "/#modules", label: "Modules", external: false },
+  { href: "/docs/upgrade-notes", label: "Changelog", external: false },
+] as const satisfies readonly NavLink[];
+
+// ============================================================================
+// INIT PANE
+// ============================================================================
+export const INIT_PANE = {
+  tagline: "TypeScript projects, ready to run.",
+  description:
+    "A CLI that scaffolds Express, NestJS, Next.js, and TanStack Start projects with a database, authentication, and Docker already set up.",
+  hint: "Run it with no flags and it asks for each option.",
+  builder: {
+    text: "Pick every option here and copy the generated command.",
+    link: "open builder",
   },
-  banner: {
-    icon: "Zap",
-    text: "Version 2.0: NestJS, a flag for every prompt, and a new CLI.",
-    tagline: "npx better-ts-stack",
-  },
-  links: [
-    { href: "/docs", label: "Docs", external: false },
-    {
-      href: "https://github.com/Abdullah-dev0/better-ts-stack",
-      label: "GitHub",
-      external: true,
-    },
-  ] as const satisfies readonly NavbarLink[],
-  cta: {
-    text: "Get Started",
-    href: "/docs",
+  docs: {
+    text: "Flags, prompts, and the generated structure.",
+    link: "read the docs",
   },
 } as const;
 
 // ============================================================================
-// HERO SECTION CONSTANTS
+// MODULES PANE
 // ============================================================================
-export const HERO_CONFIG = {
-  badge: {
-    icon: "Sparkles",
-    text: "Version 2.0",
-  },
-  headline: {
-    main: "Scaffold a TypeScript project.",
-    second: "One command.",
-    accent: "Ready to run.",
-  },
-  subheadline:
-    "Pick a framework, a database, authentication, and Docker. The CLI writes a project that installs, builds, and lints without extra setup.",
-  cta: {
-    primary: {
-      text: "Get Started",
-      icon: "ArrowRight",
-      href: "/docs/installation",
-    },
-    secondary: {
-      text: "View Documentation",
-      href: "/docs",
-    },
-  },
-} as const;
-
-// ============================================================================
-// ARCHITECTURE GRID CONSTANTS
-// ============================================================================
-export interface Feature {
-  icon: string; // Icon name as string for server/client component compatibility
+export interface ModuleEntry {
+  flag: string;
   title: string;
   description: string;
-  color: string;
-  badge: string | null;
-  size: "normal" | "large";
+  frameworks: readonly Framework[];
 }
 
-export const ARCHITECTURE_FEATURES: Feature[] = [
+export const MODULE_ENTRIES: ModuleEntry[] = [
   {
-    icon: "Server",
-    title: "Backend",
+    flag: "--framework express",
+    title: "Express",
     description:
-      "Express 5 or NestJS 12 with TypeScript, security headers, CORS, and a health check route.",
-    color: "text-module-backend",
-    badge: null,
-    size: "large",
+      "Express 5 with security headers, CORS, a health check route, and tsx watch.",
+    frameworks: ["express"],
   },
   {
-    icon: "Database",
-    title: "PostgreSQL",
+    flag: "--framework nestjs",
+    title: "NestJS",
     description:
-      "Prisma or Drizzle with a starter schema, a database client, and migration scripts.",
-    color: "text-module-database",
-    badge: null,
-    size: "normal",
+      "NestJS 12 as ES modules, with security headers and a health controller.",
+    frameworks: ["nestjs"],
   },
   {
-    icon: "Box",
-    title: "MongoDB",
-    description: "A Mongoose connection and a typed User model.",
-    color: "text-primary",
-    badge: null,
-    size: "normal",
-  },
-  {
-    icon: "Container",
-    title: "Docker",
+    flag: "--framework nextjs",
+    title: "Next.js",
     description:
-      "A multi-stage Dockerfile, a Compose file, and scripts to build and run the image.",
-    color: "text-muted-foreground",
-    badge: null,
-    size: "normal",
+      "Next.js 16 App Router, React 19, Tailwind CSS v4, and shadcn-style components.",
+    frameworks: ["nextjs"],
   },
   {
-    icon: "Layout",
-    title: "Full-stack",
+    flag: "--framework tanstack",
+    title: "TanStack Start",
     description:
-      "Next.js 16 or TanStack Start with React 19, Tailwind CSS v4, and shadcn-style components.",
-    color: "text-module-frontend",
-    badge: null,
-    size: "large",
+      "File-based routing, Vite in development, and a Nitro production server.",
+    frameworks: ["tanstack"],
   },
   {
-    icon: "Shield",
+    flag: "--database prisma",
+    title: "Prisma",
+    description:
+      "PostgreSQL with a starter schema, a client, and migration scripts.",
+    frameworks: ["express", "nestjs", "nextjs", "tanstack"],
+  },
+  {
+    flag: "--database drizzle",
+    title: "Drizzle",
+    description:
+      "PostgreSQL with a typed schema, a client, and drizzle-kit scripts.",
+    frameworks: ["express", "nestjs", "nextjs", "tanstack"],
+  },
+  {
+    flag: "--database mongoose",
+    title: "Mongoose",
+    description: "MongoDB with a connection helper and a typed User model.",
+    frameworks: ["express", "nestjs", "nextjs", "tanstack"],
+  },
+  {
+    flag: "--auth",
     title: "Authentication",
     description:
-      "JWT with bcrypt and Zod validation for backends. Better Auth for full-stack apps.",
-    color: "text-primary",
-    badge: null,
-    size: "normal",
+      "JWT, bcrypt, and Zod for backends. Better Auth with sign-in and sign-up pages for full-stack apps.",
+    frameworks: ["express", "nestjs", "nextjs", "tanstack"],
+  },
+  {
+    flag: "--rate-limit",
+    title: "Rate limiting",
+    description: "Per-IP limits with express-rate-limit or @nestjs/throttler.",
+    frameworks: ["express", "nestjs"],
+  },
+  {
+    flag: "--docker",
+    title: "Docker",
+    description:
+      "A multi-stage Dockerfile, a Compose file, and scripts to run them.",
+    frameworks: ["express", "nestjs", "nextjs", "tanstack"],
   },
 ];
 
-export const ARCHITECTURE_SECTION = {
-  badge: "Modules",
-  title: {
-    main: "Pick what you need.",
-    accent: "Skip the rest.",
-  },
+// ============================================================================
+// CI PANE
+// ============================================================================
+export const CI_PANE = {
   description:
-    "Every module is optional. The CLI only adds the files and dependencies for what you select.",
-} as const;
-
-// ============================================================================
-// CORRECTNESS SECTION CONSTANTS
-// ============================================================================
-export interface StackItem {
-  icon: string; // Icon name as string for server/client component compatibility
-  label: string;
-  sub: string;
-  color: string;
-}
-
-export const STACK_ITEMS: StackItem[] = [
-  {
-    icon: "Database",
-    label: "Database",
-    sub: "PostgreSQL (Prisma, Drizzle) or MongoDB (Mongoose)",
-    color: "text-primary",
-  },
-  {
-    icon: "Layers",
-    label: "Authentication",
-    sub: "JWT + bcrypt or Better Auth",
-    color: "text-module-backend",
-  },
-  {
-    icon: "Server",
-    label: "Server",
-    sub: "Express, NestJS, Next.js, or TanStack Start",
-    color: "text-muted-foreground",
-  },
-  {
-    icon: "UploadCloud",
-    label: "Deployment",
-    sub: "Dockerfile + Compose",
-    color: "text-module-database",
-  },
-];
-
-export interface FeatureCard {
-  icon: string; // Icon name as string for server/client component compatibility
-  title: string;
-  description: string;
-}
-
-export const CORRECTNESS_FEATURE_CARDS: FeatureCard[] = [
-  {
-    icon: "Code2",
-    title: "Strict TypeScript",
-    description:
-      "Every template uses strict mode, with ESLint and Prettier already configured.",
-  },
-  {
-    icon: "GitBranch",
-    title: "Only what you pick",
-    description:
-      "No unused packages or files. Skip the database or auth and they are not there.",
-  },
-  {
-    icon: "Zap",
-    title: "Tested combinations",
-    description:
-      "Every stack is installed, built, type-checked, and linted in CI on Linux and Windows.",
-  },
-];
-
-export const CORRECTNESS_SECTION = {
-  badge: "How It Works",
-  title: "What you get",
-  description:
-    "A project you can read: plain TypeScript, with no generator runtime left behind.",
-  typesPreserved: "Strict TypeScript in every layer",
-  comparison: {
-    bad: {
-      label: "By hand",
-      description:
-        "Wire up TypeScript, linting, the ORM, auth, and Docker yourself.",
-    },
-    good: {
-      label: "better-ts-stack",
-      description: "Answer a few prompts or pass flags, then start coding.",
-    },
-  },
-  templates: {
-    title: "Templates that run",
-    description:
-      "Choose a framework, a database, and a package manager (npm, pnpm, or bun). The generated project installs, builds, and starts without extra configuration.",
-  },
-} as const;
-
-// ============================================================================
-// FOOTER CONSTANTS
-// ============================================================================
-export const FOOTER_CONFIG = {
-  brand: {
-    name: "better-ts-stack",
-    logo: "TS",
-  },
-  copyright: {
-    year: new Date().getFullYear(),
-    text: "Open source under MIT.",
-  },
-  social: [
+    "Every pull request generates each combination the CLI can produce, then installs, builds, type-checks, lints, and starts it.",
+  steps: ["generate", "install", "build", "type-check", "lint", "start"],
+  runners: ["ubuntu-latest", "windows-latest"],
+  principles: [
     {
-      href: "https://github.com/Abdullah-dev0/better-ts-stack",
-      icon: "Github",
-      label: "GitHub",
+      title: "strict by default",
+      description:
+        "Strict TypeScript in every template, with ESLint and Prettier configured.",
+    },
+    {
+      title: "only what you pick",
+      description:
+        "Skip the database or auth and their packages and files are not there.",
+    },
+    {
+      title: "nothing left behind",
+      description:
+        "A plain project you own. No generator runtime, no lock-in.",
     },
   ],
-  pages: [
-    { href: "/", label: "Home" },
-    { href: "/docs", label: "Docs" },
-    { href: "/docs/usage", label: "Usage" },
-    { href: "/docs/structure", label: "Architecture" },
-  ],
 } as const;
+
+// ============================================================================
+// FOOTER
+// ============================================================================
+export const FOOTER_LINKS = [
+  { href: "/docs", label: "docs", external: false },
+  { href: "/docs/usage", label: "usage", external: false },
+  { href: "/docs/structure", label: "structure", external: false },
+  { href: "/docs/troubleshooting", label: "troubleshooting", external: false },
+  { href: GITHUB_URL, label: "github", external: true },
+  { href: NPM_URL, label: "npm", external: true },
+] as const satisfies readonly NavLink[];

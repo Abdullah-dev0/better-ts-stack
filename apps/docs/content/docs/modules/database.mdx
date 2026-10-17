@@ -73,7 +73,7 @@ In Next.js and TanStack Start, Better Auth uses the native MongoDB adapter and i
 
 ### Transactions and first sign-up (Next.js and TanStack Start)
 
-Better Auth in Next.js and TanStack Start uses MongoDB transactions, which need a replica set or MongoDB Atlas. Create the auth collections before you start the server. Otherwise, the first sign-up can fail because MongoDB tries to create indexes inside the transaction:
+Better Auth in Next.js and TanStack Start uses MongoDB transactions, which need a replica set or MongoDB Atlas. With Docker selected, the Compose `db` service already runs MongoDB as a replica set (see [Docker](/docs/modules/docker#environment-and-databases)). Create the auth collections before you start the server. Otherwise, the first sign-up can fail because MongoDB tries to create indexes inside the transaction:
 
 ```javascript
 // Run once in mongosh, in your application's database.

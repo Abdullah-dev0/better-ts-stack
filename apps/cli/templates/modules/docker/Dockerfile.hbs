@@ -3,11 +3,14 @@
 FROM node:24-alpine AS base
 WORKDIR /app
 RUN apk add --no-cache libc6-compat
+{{#if docker.setup}}
+{{docker.setup}}
+{{/if}}
 
 # Dependencies stage
 FROM base AS deps
-COPY package*.json ./
-RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
+COPY {{docker.manifests}} ./
+RUN {{docker.install}}
 
 # Build stage
 FROM base AS builder
@@ -18,11 +21,11 @@ COPY . .
 # a placeholder secret for this command only; the real one is supplied at runtime.
 {{/if}}
 {{#if (eq database 'prisma')}}
-RUN {{#if useAuth}}BETTER_AUTH_SECRET="build-only-placeholder-secret-not-used-at-runtime" {{/if}}DATABASE_URL="postgresql://postgres:postgres@localhost:5432/postgres" npm run build
+RUN {{#if useAuth}}BETTER_AUTH_SECRET="build-only-placeholder-secret-not-used-at-runtime" {{/if}}DATABASE_URL="postgresql://postgres:postgres@localhost:5432/postgres" {{docker.run}} build
 {{else if (eq database 'mongoose')}}
-RUN {{#if useAuth}}BETTER_AUTH_SECRET="build-only-placeholder-secret-not-used-at-runtime" {{/if}}MONGODB_URI="mongodb://localhost:27017/build" npm run build
+RUN {{#if useAuth}}BETTER_AUTH_SECRET="build-only-placeholder-secret-not-used-at-runtime" {{/if}}MONGODB_URI="mongodb://localhost:27017/build" {{docker.run}} build
 {{else}}
-RUN {{#if useAuth}}BETTER_AUTH_SECRET="build-only-placeholder-secret-not-used-at-runtime" {{/if}}npm run build
+RUN {{#if useAuth}}BETTER_AUTH_SECRET="build-only-placeholder-secret-not-used-at-runtime" {{/if}}{{docker.run}} build
 {{/if}}
 
 # Production stage
@@ -41,27 +44,34 @@ USER nextjs
 EXPOSE {{port}}
 ENV PORT={{port}} HOSTNAME=0.0.0.0
 
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+    CMD wget -q -O /dev/null http://127.0.0.1:{{port}}/ || exit 1
+
 CMD ["node", "server.js"]
 
 {{else if (eq framework 'tanstack')}}
 # Build stage
 FROM node:24-alpine AS builder
 WORKDIR /app
+{{#if docker.setup}}
+{{docker.setup}}
+{{/if}}
 
-COPY package*.json ./
-RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
+COPY {{docker.manifests}} ./
+RUN {{docker.install}}
 
 COPY . .
 
 {{#if (eq database 'prisma')}}
-RUN DATABASE_URL="postgresql://postgres:postgres@localhost:5432/postgres" npm run build
+RUN DATABASE_URL="postgresql://postgres:postgres@localhost:5432/postgres" {{docker.run}} build
 {{else if (eq database 'mongoose')}}
-RUN MONGODB_URI="mongodb://localhost:27017/build" npm run build
+RUN MONGODB_URI="mongodb://localhost:27017/build" {{docker.run}} build
 {{else}}
-RUN npm run build
+RUN {{docker.run}} build
 {{/if}}
 
-# Production stage
+# Production stage. Nitro bundles the server and the dependencies it needs
+# into .output, so no install is needed here
 FROM node:24-alpine
 WORKDIR /app
 ENV NODE_ENV=production
@@ -70,56 +80,54 @@ ENV NODE_ENV=production
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 tanstackuser
 
-COPY package*.json ./
-# Clear the npm cache in the same layer so it does not ship in the image
-RUN if [ -f package-lock.json ]; then npm ci --omit=dev; else npm install --omit=dev; fi \
-    && npm cache clean --force
-
-# Copy built output (dist/server/server.js + dist/client)
-COPY --from=builder --chown=tanstackuser:nodejs /app/dist ./dist
-
-# Include the Prisma client generated during the build stage
-{{#if (eq database 'prisma')}}
-COPY --from=builder --chown=tanstackuser:nodejs /app/generated ./generated
-{{/if}}
+COPY --from=builder --chown=tanstackuser:nodejs /app/.output ./.output
 
 USER tanstackuser
 EXPOSE {{port}}
 ENV PORT={{port}}
 
-CMD ["node_modules/.bin/srvx", "--prod", "-s", "../client", "dist/server/server.js"]
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+    CMD wget -q -O /dev/null http://127.0.0.1:{{port}}/ || exit 1
+
+CMD ["node", ".output/server/index.mjs"]
 
 {{else}}
 # Build stage
 FROM node:24-alpine AS builder
 WORKDIR /app
+{{#if docker.setup}}
+{{docker.setup}}
+{{/if}}
 
-COPY package*.json ./
-RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
+COPY {{docker.manifests}} ./
+RUN {{docker.install}}
 
 COPY . .
 
 {{#if (eq database 'prisma')}}
-RUN DATABASE_URL="postgresql://postgres:postgres@localhost:5432/postgres" npm run build
+RUN DATABASE_URL="postgresql://postgres:postgres@localhost:5432/postgres" {{docker.run}} build
 {{else if (eq database 'mongoose')}}
-RUN MONGODB_URI="mongodb://localhost:27017/build" npm run build
+RUN MONGODB_URI="mongodb://localhost:27017/build" {{docker.run}} build
 {{else}}
-RUN npm run build
+RUN {{docker.run}} build
 {{/if}}
 
 # Production stage
 FROM node:24-alpine
 WORKDIR /app
 ENV NODE_ENV=production
+{{#if docker.setup}}
+{{docker.setup}}
+{{/if}}
 
 # Create non-root user for security
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 appuser
 
-COPY package*.json ./
-# Clear the npm cache in the same layer so it does not ship in the image
-RUN if [ -f package-lock.json ]; then npm ci --omit=dev; else npm install --omit=dev; fi \
-    && npm cache clean --force
+COPY {{docker.manifests}} ./
+# Clear the download cache in the same layer so it does not ship in the image
+RUN {{docker.installProduction}} \
+    && {{docker.cleanCache}}
 
 # Copy the compiled output
 COPY --from=builder --chown=appuser:nodejs /app/dist ./dist
@@ -127,6 +135,9 @@ COPY --from=builder --chown=appuser:nodejs /app/dist ./dist
 USER appuser
 EXPOSE {{port}}
 ENV PORT={{port}}
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+    CMD wget -q -O /dev/null http://127.0.0.1:{{port}}/health || exit 1
 
 {{#if (eq framework 'nestjs')}}
 CMD ["node", "dist/main.js"]

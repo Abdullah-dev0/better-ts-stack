@@ -263,11 +263,11 @@ components.json       # shadcn CLI-compatible component config
 - **`~/*` path alias** mapped to `./src/*` (TanStack-native, resolved by `tsconfigPaths: true` in the Vite config). Use `~/components/...` and `~/lib/...` in imports.
 - **File-based routing** lives in `src/routes/`. TanStack Router regenerates
   `src/routeTree.gen.ts` during Vite development and builds.
-- **No Nitro**: the build produces `dist/server/server.js` (a fetch-compatible handler) plus `dist/client`. The `start` script serves it with `srvx`:
+- **Nitro for production**: as in TanStack's [hosting guide](https://tanstack.com/start/latest/docs/framework/react/guide/hosting), `vite build` runs the [Nitro](https://nitro.build) Vite plugin, which writes a self-contained Node.js server to `.output/`. The `start` script runs it with `node` and loads `.env` first. `vite dev` uses TanStack Start's own dev server, without Nitro:
 
 ```bash
-npm run build   # vite build
-npm run start   # srvx --prod -s ../client dist/server/server.js
+npm run build   # vite build (writes .output/)
+npm run start   # node --env-file-if-exists=.env .output/server/index.mjs
 npm run dev     # vite dev
 npm run type:check  # tsc --noEmit
 npm run lint    # eslint src
@@ -281,7 +281,7 @@ npm run lint    # eslint src
 ```bash
 bun run dev       # vite dev
 bun run build     # vite build
-bun run start     # srvx --prod -s ../client dist/server/server.js
+bun run start     # node --env-file-if-exists=.env .output/server/index.mjs
 bun run type:check
 bun run lint
 ```

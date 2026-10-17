@@ -29,23 +29,24 @@ npx better-ts-stack my-api --framework nestjs --database prisma --auth --yes
 npx better-ts-stack . --framework nextjs --database drizzle --pm pnpm
 ```
 
-| Flag                         | Values                                       |
-| ---------------------------- | -------------------------------------------- |
-| `--framework <name>`         | `express`, `nestjs`, `nextjs`, `tanstack`    |
-| `--database <name>`          | `none`, `prisma`, `drizzle`, `mongoose`      |
-| `--pm <name>`                | `npm`, `pnpm`, `bun`                         |
-| `--auth` / `--no-auth`       | Add authentication                           |
-| `--docker` / `--no-docker`   | Add Docker files                             |
-| `--git` / `--no-git`         | Initialize a git repository                  |
-| `--install` / `--no-install` | Install dependencies                         |
-| `-y`, `--yes`                | Use defaults for missing options, no prompts |
-| `--dry-run`                  | List what would be created, write nothing    |
-| `-h`, `--help`               | Show help                                    |
-| `-v`, `--version`            | Show the version                             |
+| Flag                               | Values                                       |
+| ---------------------------------- | -------------------------------------------- |
+| `--framework <name>`               | `express`, `nestjs`, `nextjs`, `tanstack`    |
+| `--database <name>`                | `none`, `prisma`, `drizzle`, `mongoose`      |
+| `--pm <name>`                      | `npm`, `pnpm`, `bun`                         |
+| `--auth` / `--no-auth`             | Add authentication                           |
+| `--docker` / `--no-docker`         | Add Docker files                             |
+| `--rate-limit` / `--no-rate-limit` | Add rate limiting (Express and NestJS)       |
+| `--git` / `--no-git`               | Initialize a git repository                  |
+| `--install` / `--no-install`       | Install dependencies                         |
+| `-y`, `--yes`                      | Use defaults for missing options, no prompts |
+| `--dry-run`                        | List what would be created, write nothing    |
+| `-h`, `--help`                     | Show help                                    |
+| `-v`, `--version`                  | Show the version                             |
 
 `--database` names the ORM, which also selects the database: `prisma` and `drizzle` use PostgreSQL, `mongoose` uses MongoDB.
 
-With `--yes`, the defaults are Express, no database, no auth, no Docker, npm, git initialized, and dependencies not installed.
+With `--yes`, the defaults are Express, no database, no auth, no rate limiting, no Docker, git initialized, and dependencies not installed. The package manager defaults to the one that ran the CLI: `pnpm` for `pnpm dlx`, `bun` for `bunx`, and `npm` otherwise.
 
 The project path can be a name (`my-app`), a nested path (`apps/api`), or `.` for the current directory.
 

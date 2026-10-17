@@ -1,5 +1,8 @@
 import { Request, Response, NextFunction, Router } from 'express';
 import { login, me, register } from '../controllers/authController';
+{{#if useRateLimit}}
+import { authLimiter } from '../middleware/rateLimit';
+{{/if}}
 import { requireAuth } from '../middleware/requireAuth';
 
 const router: Router = Router();
@@ -12,8 +15,13 @@ function asyncHandler(
   };
 }
 
+{{#if useRateLimit}}
+router.post('/register', authLimiter, asyncHandler(register));
+router.post('/login', authLimiter, asyncHandler(login));
+{{else}}
 router.post('/register', asyncHandler(register));
 router.post('/login', asyncHandler(login));
+{{/if}}
 router.get('/me', requireAuth, me);
 
 export default router;

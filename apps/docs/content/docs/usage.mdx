@@ -41,6 +41,7 @@ npx better-ts-stack my-api --framework express --yes --dry-run
 | `--pm <name>`                | `npm`, `pnpm`, `bun`                         |
 | `--auth` / `--no-auth`       | Add authentication                           |
 | `--docker` / `--no-docker`   | Add Docker files                             |
+| `--rate-limit` / `--no-rate-limit` | Add rate limiting (Express and NestJS) |
 | `--git` / `--no-git`         | Initialize a git repository                  |
 | `--install` / `--no-install` | Install dependencies                         |
 | `-y`, `--yes`                | Use defaults for missing options, no prompts |
@@ -50,11 +51,15 @@ npx better-ts-stack my-api --framework express --yes --dry-run
 
 `--database` names the ORM, which also selects the database: `prisma` and `drizzle` use PostgreSQL, `mongoose` uses MongoDB.
 
-With `--yes`, the defaults are Express, no database, no auth, no Docker, npm, git initialized, and dependencies not installed.
+With `--yes`, the defaults are Express, no database, no auth, no rate limiting, no Docker, git initialized, and dependencies not installed. The package manager defaults to the one that ran the CLI: `pnpm` for `pnpm dlx`, `bun` for `bunx`, and `npm` otherwise.
 
 `--auth` with `nextjs` or `tanstack` needs a database, because Better Auth stores users and sessions. Without one the CLI stops with an error.
 
 `--yes` requires a project path.
+
+`--rate-limit` with `nextjs` or `tanstack` stops with an error: Better Auth already limits its own endpoints.
+
+Cancelling a prompt (Ctrl+C or Esc) exits with code `130` and writes nothing.
 
 ### Dry run
 
@@ -91,7 +96,7 @@ $ Project name
   my-awesome-project
 ```
 
-You can enter a name (`my-api`), a nested path (`apps/api`), or `.` to use the current directory. The target directory must be empty or not exist yet.
+You can enter a name (`my-api`), a nested path (`apps/api`), or `.` to use the current directory. The target directory must be empty or not exist yet. A folder that only holds `.git`, such as a clone of an empty repository, also works.
 
 **Rules for the folder name**, which becomes the `package.json` name:
 
@@ -152,7 +157,7 @@ $ Frontend framework
 | Option             | What it generates                                      |
 | ------------------ | ------------------------------------------------------ |
 | **Next.js 16**     | App Router, `next dev`/`next build`, standalone server |
-| **TanStack Start** | File-based routing, `vite dev`, served by `srvx`       |
+| **TanStack Start** | File-based routing, `vite dev`, Nitro production server |
 
 </Step>
 
@@ -215,7 +220,7 @@ $ Package manager
     bun
 ```
 
-The generated `dev` script and install commands are tailored to your choice. With `bun`, the `dev` script uses `bun --watch` instead of `tsx watch`.
+The package manager that ran the CLI is selected first: `pnpm` for `pnpm dlx`, `bun` for `bunx`, and `npm` otherwise. The generated `dev` script, install commands, and Docker image are tailored to your choice. With `bun`, the `dev` script uses `bun --watch` instead of `tsx watch`.
 
 With `pnpm`, the CLI also writes `pnpm-workspace.yaml`. It holds the dependency overrides and approves the install scripts of `bcrypt`, `esbuild`, `prisma`, `@prisma/engines`, and `unrs-resolver`. Without that approval, pnpm 11 and later stop `pnpm install` with an "Ignored build scripts" error.
 
@@ -229,7 +234,7 @@ $ Add Docker?
     Yes   › No
 ```
 
-If yes, three files are added: `Dockerfile`, `docker-compose.yml`, and `.dockerignore`.
+If yes, three files are added: `Dockerfile`, `docker-compose.yml`, and `.dockerignore`. With a database, Compose also runs PostgreSQL or MongoDB. See [Docker](/docs/modules/docker).
 
 </Step>
 
@@ -245,6 +250,18 @@ $ Add Better Auth?            # Next.js and TanStack Start
 **Express and NestJS** - JWT-based auth with `jsonwebtoken` and `bcrypt`. Always prompted regardless of database selection.
 
 **Next.js / TanStack full-stack** - Better Auth with a database adapter. **This prompt only appears if you selected a database.** If you chose `none` for database, auth is skipped automatically.
+
+</Step>
+
+<Step>
+### Rate limiting *(Express and NestJS only)*
+
+```
+$ Add rate limiting?
+    Yes   › No
+```
+
+If yes, every route allows 100 requests per client IP in 15 minutes, and with auth, sign-up and login allow 10. Express uses `express-rate-limit`; NestJS uses `@nestjs/throttler`. Full-stack projects are not asked: Better Auth already limits its own endpoints. See [rate limiting](/docs/modules/backend#-rate-limiting).
 
 </Step>
 
@@ -357,8 +374,8 @@ npm run lint   # eslint
 
 ```bash
 npm run dev         # vite dev
-npm run build       # vite build (dist/server/server.js + dist/client)
-npm run start       # srvx --prod -s ../client dist/server/server.js
+npm run build       # vite build (writes .output/)
+npm run start       # node --env-file-if-exists=.env .output/server/index.mjs
 npm run type:check  # tsc --noEmit
 npm run lint        # eslint src
 ```

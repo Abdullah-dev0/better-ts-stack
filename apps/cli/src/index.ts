@@ -8,6 +8,7 @@ import {
   collectProjectPath,
   collectStackChoices,
   confirmBuild,
+  detectPackageManager,
 } from "./prompts";
 import {
   buildError,
@@ -55,7 +56,13 @@ async function main(): Promise<void> {
   if (directoryError) throw buildError(directoryError, "DIRECTORY_NOT_EMPTY");
 
   const choices = await collectStackChoices(
-    args.yes ? { ...DEFAULT_CHOICES, ...args.choices } : args.choices
+    args.yes
+      ? {
+          ...DEFAULT_CHOICES,
+          packageManager: detectPackageManager(),
+          ...args.choices,
+        }
+      : args.choices
   );
 
   const config: ProjectConfig = {

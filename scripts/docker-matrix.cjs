@@ -92,7 +92,8 @@ async function startDatabase(log, c) {
       process.platform === "win32" ? "npx.cmd" : "npx",
       database.pushSchema,
       {
-        cwd: c.target.replace(/-docker$/, "-local"),
+        // The npm project without Docker, which check-matrix.cjs installed
+        cwd: c.target.replace(/-(npm|pnpm|bun)-docker$/, "-npm-local"),
         shell: process.platform === "win32",
         env: {
           ...process.env,
@@ -130,7 +131,7 @@ async function checkCase(c, log) {
 
   await waitForServer(`http://localhost:${PORT}/`);
   return framework === "express" || framework === "nestjs"
-    ? backendChecks(c.config.useAuth)
+    ? backendChecks(c.config.useAuth, c.config.useRateLimit)
     : fullstackChecks();
 }
 
@@ -142,7 +143,6 @@ async function main() {
   for (const c of matrix.cases.filter(
     (c) =>
       c.config.framework === framework &&
-      c.config.packageManager === "npm" &&
       c.config.useDocker &&
       (!filter || c.name === filter)
   )) {

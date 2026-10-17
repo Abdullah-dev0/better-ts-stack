@@ -12,6 +12,7 @@ The Backend module generates an Express 5 or a [NestJS 12](#nestjs) server with 
 ```
 src/
 |-- index.ts          # Entry point - configures middleware, mounts routes, starts server
+|-- env.ts            # Validates environment variables at startup
 \-- routes/
     \-- health.ts     # GET /health endpoint
 ```
@@ -33,13 +34,14 @@ import express, { Express, NextFunction, Request, Response } from "express";
 import helmet from "helmet";
 import morgan from "morgan";
 
+import { env } from "./env";
 import healthRouter from "./routes/health";
 
 const app: Express = express();
-const port = process.env.PORT || 3000;
+const port = env.PORT;
 
 app.use(helmet());
-app.use(cors());
+app.use(cors({ origin: env.CORS_ORIGIN }));
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -57,15 +59,33 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   res.status(500).json({ error: "Internal Server Error" });
 });
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
-  console.log(`Health: http://localhost:${port}/health`);
 });
+
+// Finish open requests and close the database before exiting
+const shutdown = () => server.close(() => process.exit(0));
+process.once("SIGTERM", shutdown);
+process.once("SIGINT", shutdown);
 
 export default app;
 ```
 
 With the **auth** module, `src/index.ts` also mounts the auth router at `/auth`. With **Mongoose**, the server connects to MongoDB before it starts listening.
+
+On `SIGTERM` (what Docker and most hosts send to stop a container) or `SIGINT` (Ctrl+C), the server stops accepting connections, lets open requests finish, closes the database connection, and exits.
+
+### src/env.ts
+
+Reads `.env` and checks every variable the project uses with Zod before the server starts. A missing or malformed value stops the server with a message that names the variable, instead of failing on the first request that needs it. Import `env` instead of reading `process.env`:
+
+```typescript
+import { env } from "./env";
+
+console.log(env.PORT); // a number, 3000 unless PORT is set
+```
+
+Add a line to the schema in `src/env.ts` when you add a variable to `.env`.
 
 ### src/routes/health.ts
 
@@ -113,6 +133,7 @@ npm run type:check # tsc --noEmit
 | `helmet`    | Security headers                                 |
 | `morgan`    | HTTP request logger                              |
 | `dotenv`    | Loads `.env` into `process.env`                  |
+| `zod`       | Validates environment variables in `src/env.ts`  |
 | `cross-env` | Sets `NODE_ENV` in the `dev` and `start` scripts |
 
 ---
@@ -121,7 +142,10 @@ npm run type:check # tsc --noEmit
 
 ```bash
 PORT=3000
+CORS_ORIGIN=*
 ```
+
+`CORS_ORIGIN` sets which sites may call the API from a browser. `*` allows every origin. For production, list the origins of your frontends, separated by commas: `CORS_ORIGIN=https://app.example.com,https://admin.example.com`.
 
 `NODE_ENV` is not written to `.env`. The `dev` script sets it to `development` and `start` sets it to `production` (through `cross-env`, so it works on Windows too).
 
@@ -148,6 +172,15 @@ If auth is selected, the build adds:
 - `src/controllers/authController.ts` - Register/login handlers
 - `src/routes/auth.ts` - Router mounted at `/auth`
 - `JWT_SECRET` and `JWT_EXPIRES_IN` environment variables
+
+### + Rate limiting
+
+If rate limiting is selected (`--rate-limit`), the build adds `src/middleware/rateLimit.ts` with [`express-rate-limit`](https://github.com/express-rate-limit/express-rate-limit):
+
+- Every route allows **100 requests per client IP in 15 minutes**.
+- With auth, `POST /auth/register` and `POST /auth/login` allow **10 attempts per IP in 15 minutes**, which slows down password guessing.
+
+A client over the limit gets `429 Too Many Requests`, and every response carries `RateLimit` headers. The limits are counted in memory, so each server instance counts separately. Behind a reverse proxy or load balancer, add `app.set("trust proxy", 1)` so the limit uses the real client IP.
 
 ### + Docker module
 
@@ -194,6 +227,7 @@ Select **NestJS** in the framework prompt, or pass `--framework nestjs`. The pro
 ```
 src/
 |-- main.ts                 # Entry point - loads .env, enables helmet and CORS, starts the server
+|-- env.ts                  # Validates environment variables at startup
 |-- app.module.ts           # Root module - imports the database and auth modules you selected
 \-- health/
     \-- health.controller.ts   # GET /health endpoint
@@ -222,6 +256,10 @@ The Prisma and Drizzle modules are global, so any module can inject them without
 ### Auth module
 
 JWT auth adds `src/auth/` with the same endpoints as Express: `POST /auth/register`, `POST /auth/login`, and `GET /auth/me`. Request bodies are validated with Zod.
+
+With rate limiting (`--rate-limit`), the build adds [`@nestjs/throttler`](https://docs.nestjs.com/security/rate-limiting): a global guard allows 100 requests per client IP in 15 minutes, and `register` and `login` allow 10. Change the limits in `src/app.module.ts` and `src/auth/auth.controller.ts`.
+
+`src/env.ts` and `CORS_ORIGIN` work as they do for Express.
 
 Protect a route with the guard:
 

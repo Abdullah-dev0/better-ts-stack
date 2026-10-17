@@ -1,8 +1,9 @@
 import fs from "fs-extra";
+import path from "node:path";
 
 import { generateNextSteps } from "../output/nextSteps";
 import { buildError, BuildResult, isBuildError, ProjectConfig } from "../types";
-import { validateDirectoryEmpty } from "../validators";
+import { PRESERVED_ENTRIES, validateDirectoryEmpty } from "../validators";
 import { loadBuildInputs } from "./buildPlanner";
 import {
   generateEnvFile,
@@ -12,8 +13,18 @@ import {
 import { installDependencies } from "./dependencyInstaller";
 import { copyModuleFiles, processTemplateFiles } from "./fileProcessor";
 import { initializeGitRepository } from "./gitInitializer";
+import { generateReadme } from "./readmeGenerator";
 
 export { planBuild } from "./buildPlanner";
+
+// Empties a directory except for the entries it may have had before the build
+async function removeCreatedEntries(dir: string): Promise<void> {
+  for (const entry of await fs.readdir(dir)) {
+    if (!PRESERVED_ENTRIES.includes(entry)) {
+      await fs.remove(path.join(dir, entry));
+    }
+  }
+}
 
 // Main function to orchestrate the project construction process
 export async function build(
@@ -57,8 +68,9 @@ export async function build(
       await generatePnpmWorkspace(targetDir, mergedConfig.overrides);
     }
 
-    // 7. Generate environment files
+    // 7. Generate environment files and the README
     await generateEnvFile(targetDir, mergedConfig.envVars);
+    await generateReadme(targetDir, config, mergedConfig);
 
     // 8. Install dependencies and initialize git (both optional); a failure
     // in either is reported as a warning and does not fail the build
@@ -74,9 +86,10 @@ export async function build(
     };
   } catch (error) {
     // Remove the partial project so a retry is not blocked by a non-empty
-    // directory; a directory that already existed is emptied, not deleted
+    // directory. A directory that already existed is emptied, not deleted,
+    // and keeps what it had before, such as .git
     await (
-      didDirectoryExist ? fs.emptyDir(targetDir) : fs.remove(targetDir)
+      didDirectoryExist ? removeCreatedEntries(targetDir) : fs.remove(targetDir)
     ).catch(() => undefined);
     // Errors raised by the build steps already say what failed
     throw isBuildError(error)

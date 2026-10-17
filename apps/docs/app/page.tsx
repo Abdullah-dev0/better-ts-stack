@@ -1,17 +1,21 @@
-import { ArchitectureGrid } from "@/components/architecture-grid";
-import { CorrectnessSection } from "@/components/correctness-section";
 import { Footer } from "@/components/footer";
-import { HeroSection } from "@/components/hero";
+import { ClosingCta } from "@/components/home/closing-cta";
+import { Hero } from "@/components/home/hero";
+import { ModuleList } from "@/components/home/module-list";
+import { TestMatrix } from "@/components/home/test-matrix";
 import { Navbar } from "@/components/navbar";
 
 export default function Home() {
   return (
-    <main className="bg-background selection:bg-primary/30 min-h-screen">
+    <div className="home-page bg-background selection:bg-primary/30 min-h-screen">
       <Navbar />
-      <HeroSection />
-      <ArchitectureGrid />
-      <CorrectnessSection />
+      <main>
+        <Hero />
+        <ModuleList />
+        <TestMatrix />
+        <ClosingCta />
+      </main>
       <Footer />
-    </main>
+    </div>
   );
 }

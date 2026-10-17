@@ -12,3 +12,4 @@ coverage
 *.log
 
 .next
+.output

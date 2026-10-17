@@ -55,7 +55,7 @@ async function main() {
       await waitForServer(`http://localhost:${PORT}/`);
       checks =
         framework === "express" || framework === "nestjs"
-          ? await backendChecks(c.config.useAuth)
+          ? await backendChecks(c.config.useAuth, c.config.useRateLimit)
           : await fullstackChecks();
     } catch (error) {
       checks = [["server", "running", error.message]];

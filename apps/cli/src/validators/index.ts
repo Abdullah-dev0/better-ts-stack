@@ -38,6 +38,10 @@ export function validateProjectPath(projectPath: string): string | undefined {
   return validateProjectName(path.basename(path.resolve(projectPath)));
 }
 
+// Entries a project folder may already have: a repository cloned from an
+// empty remote, and files the operating system creates
+export const PRESERVED_ENTRIES = [".git", ".DS_Store", "Thumbs.db"];
+
 // Ensures a directory is empty or does not exist before starting build
 export async function validateDirectoryEmpty(dirPath: string) {
   const exists = await fs.pathExists(dirPath);
@@ -52,7 +56,7 @@ export async function validateDirectoryEmpty(dirPath: string) {
 
   const files = await fs.readdir(dirPath);
 
-  if (files.length === 0) return null;
+  if (files.every((file) => PRESERVED_ENTRIES.includes(file))) return null;
 
   return `Directory "${path.basename(dirPath)}" already exists and is not empty`;
 }

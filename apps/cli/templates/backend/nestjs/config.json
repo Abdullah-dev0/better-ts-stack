@@ -20,7 +20,8 @@
     "dotenv": "^17.4.2",
     "helmet": "^8.3.0",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.2"
+    "rxjs": "^7.8.2",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -36,6 +37,7 @@
     "typescript-eslint": "^8.69.0"
   },
   "envVars": {
-    "PORT": "3000"
+    "PORT": "3000",
+    "CORS_ORIGIN": "*"
   }
 }

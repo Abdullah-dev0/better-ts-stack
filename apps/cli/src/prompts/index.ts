@@ -3,7 +3,7 @@ import { confirm, text } from "../ui";
 import { validateProjectPath } from "../validators";
 import { ask } from "./stack";
 
-export { collectStackChoices } from "./stack";
+export { collectStackChoices, detectPackageManager } from "./stack";
 
 // Returns the project path from the command line, or asks for it
 export async function collectProjectPath(

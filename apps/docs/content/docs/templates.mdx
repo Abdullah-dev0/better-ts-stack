@@ -19,22 +19,23 @@ Selecting **Backend API** with Express generates:
   <Folder name="my-api" defaultOpen>
     <Folder name="src" defaultOpen>
       <File name="index.ts" />
+      <File name="env.ts" />
       <Folder name="routes">
         <File name="health.ts" />
       </Folder>
     </Folder>
     <File name="package.json" />
+    <File name="README.md" />
     <File name="tsconfig.json" />
     <File name=".env" />
     <File name=".env.example" />
-    <File name=".eslintrc.js" />
     <File name="eslint.config.mjs" />
     <File name=".prettierrc" />
     <File name=".gitignore" />
   </Folder>
 </Files>
 
-The base template has two source files: `src/index.ts` and
+The base template has three source files: `src/index.ts`, `src/env.ts`, and
 `src/routes/health.ts`.
 
 ### src/index.ts
@@ -136,9 +137,9 @@ components.json       # shadcn CLI-compatible component config
 package.json          # "type": "module"
 ```
 
-The template uses the `~/*` path alias mapped to `src/*`. The build produces a
-fetch-compatible SSR handler via Vite (no Nitro), and the `start` script serves
-it with `srvx`. The CLI includes the initial route tree, and TanStack Router
+The template uses the `~/*` path alias mapped to `src/*`. `vite build` runs the
+Nitro plugin, which writes a self-contained Node.js server to `.output/`, and the
+`start` script runs it with `node`, as TanStack's hosting guide recommends. The CLI includes the initial route tree, and TanStack Router
 regenerates it during Vite development and builds.
 
 #### Generated package.json scripts
@@ -148,7 +149,7 @@ regenerates it during Vite development and builds.
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
-    "start": "srvx --prod -s ../client dist/server/server.js",
+    "start": "node --env-file-if-exists=.env .output/server/index.mjs",
     "preview": "vite preview",
     "type:check": "tsc --noEmit",
     "lint": "eslint src"
@@ -415,7 +416,7 @@ Environment variable added: `MONGODB_URI`
   </Folder>
 </Files>
 
-The `Dockerfile` is framework-aware: it uses a Next.js standalone output stage for Next.js projects, an `srvx`-based production stage for TanStack Start, and a Node.js multi-stage build for Express backends. Both full-stack images run `npm run build` (and Prisma generate for the database variant) and copy the build output to a non-root Alpine production image.
+The `Dockerfile` is framework-aware: it uses a Next.js standalone output stage for Next.js projects, a production stage that runs the Nitro `.output/` server for TanStack Start, and a Node.js multi-stage build for Express backends. Both full-stack images run `npm run build` (and Prisma generate for the database variant) and copy the build output to a non-root Alpine production image.
 
 Scripts added to `package.json`:
 

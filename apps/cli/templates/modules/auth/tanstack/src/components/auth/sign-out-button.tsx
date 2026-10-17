@@ -1,5 +1,3 @@
-"use client";
-
 import { useNavigate } from "@tanstack/react-router";
 import { useState, useTransition } from "react";
 import { LoaderCircle, LogOut } from "lucide-react";

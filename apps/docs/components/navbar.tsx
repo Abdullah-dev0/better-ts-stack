@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 
+import Image from "next/image";
 import Link from "next/link";
 
-import { Menu, X, Zap } from "lucide-react";
+import { Menu, X } from "lucide-react";
 
 import { Github } from "@/components/icons/github";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -14,90 +15,75 @@ import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./theme-toggle";
 
 export const Navbar = () => {
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll);
+    const handleScroll = () => setIsScrolled(window.scrollY > 12);
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
-    <div
-      className={`fixed top-0 right-0 left-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? "bg-background/80 border-border/50 border-b backdrop-blur-xl"
-          : "bg-transparent"
-      }`}
+    <header
+      className={cn(
+        "fixed inset-x-0 top-0 z-50 border-b transition-colors duration-300",
+        isScrolled || isMobileOpen
+          ? "bg-background/85 border-border backdrop-blur-xl"
+          : "border-transparent bg-transparent"
+      )}
     >
-      {/* Announcement banner */}
-      <div className="bg-primary/10 border-primary/20 border-b py-2">
-        <div className="container mx-auto flex items-center justify-center gap-2 px-6 text-xs">
-          <Zap className="text-primary h-3 w-3" />
-          <span className="text-foreground/80">
-            {NAVBAR_CONFIG.banner.text}
-          </span>
-          <span className="text-primary ml-2 hidden font-mono md:inline">
-            {NAVBAR_CONFIG.banner.tagline}
-          </span>
-        </div>
-      </div>
-
-      <nav className="container mx-auto flex h-16 items-center justify-between px-6">
-        {/* Logo */}
-        <Link href="/" className="group flex items-center gap-3">
-          <div className="rom-primary to-accent pulse-glow flex h-10 w-10 items-center justify-center rounded-xl">
-            <span className="text-primary-foreground font-mono text-lg font-bold">
-              {NAVBAR_CONFIG.brand.logo}
-            </span>
-          </div>
-          <span className="text-foreground group-hover:text-primary text-lg font-bold transition-colors">
+      <nav className="container mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
+        <Link href="/" className="flex items-center gap-2.5">
+          <Image
+            src="/icon.png"
+            alt=""
+            width={28}
+            height={28}
+            className="rounded-md"
+            priority
+          />
+          <span className="text-foreground font-semibold tracking-tight">
             {NAVBAR_CONFIG.brand.name}
           </span>
         </Link>
 
-        {/* Desktop Nav */}
-        <div className="hidden items-center gap-8 md:flex">
-          {NAVBAR_CONFIG.links.map((link, i) => (
+        <div className="hidden items-center gap-7 md:flex">
+          {NAVBAR_CONFIG.links.map((link) => (
             <Link
-              key={i}
+              key={link.href}
               href={link.href}
               {...(link.external && {
                 target: "_blank",
                 rel: "noopener noreferrer",
               })}
-              className="text-muted-foreground hover:text-primary group relative text-sm transition-colors"
+              className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-sm transition-colors"
             >
-              {link.label === "GitHub" && (
-                <Github className="mr-1 inline h-4 w-4" />
-              )}
+              {link.label === "GitHub" && <Github className="h-4 w-4" />}
               {link.label}
-              <span className="bg-primary absolute -bottom-1 left-0 h-0.5 w-0 transition-all duration-300 group-hover:w-full" />
             </Link>
           ))}
         </div>
 
-        {/* Actions */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <ThemeToggle />
           <Link
             href={NAVBAR_CONFIG.cta.href}
-            className={cn(
-              buttonVariants({ size: "sm" }),
-              "btn-cyber text-primary-foreground hidden font-medium md:flex"
-            )}
+            className={cn(buttonVariants({ size: "sm" }), "hidden md:flex")}
           >
             {NAVBAR_CONFIG.cta.text}
           </Link>
-
           <Button
             variant="ghost"
             size="icon"
-            className="glass-card rounded-lg md:hidden"
-            onClick={() => setMobileOpen(!mobileOpen)}
+            className="md:hidden"
+            aria-label={isMobileOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isMobileOpen}
+            aria-controls="mobile-menu"
+            onClick={() => setIsMobileOpen(!isMobileOpen)}
           >
-            {mobileOpen ? (
+            {isMobileOpen ? (
               <X className="h-5 w-5" />
             ) : (
               <Menu className="h-5 w-5" />
@@ -106,38 +92,33 @@ export const Navbar = () => {
         </div>
       </nav>
 
-      {/* Mobile Menu */}
-      {mobileOpen && (
-        <div className="bg-background/95 border-border border-b backdrop-blur-xl md:hidden">
-          <div className="container flex flex-col gap-4 px-6 py-4">
-            {NAVBAR_CONFIG.links.map((link, i) => (
+      {isMobileOpen && (
+        <div id="mobile-menu" className="border-border border-t md:hidden">
+          <div className="flex flex-col gap-1 px-4 py-3">
+            {NAVBAR_CONFIG.links.map((link) => (
               <Link
-                key={i}
+                key={link.href}
                 href={link.href}
+                onClick={() => setIsMobileOpen(false)}
                 {...(link.external && {
                   target: "_blank",
                   rel: "noopener noreferrer",
                 })}
-                className="text-muted-foreground hover:text-primary py-2 text-sm"
+                className="text-muted-foreground hover:text-foreground flex items-center gap-2 rounded-md py-2.5 text-sm"
               >
-                {link.label === "GitHub" && (
-                  <Github className="mr-1 inline h-4 w-4" />
-                )}
+                {link.label === "GitHub" && <Github className="h-4 w-4" />}
                 {link.label}
               </Link>
             ))}
             <Link
               href={NAVBAR_CONFIG.cta.href}
-              className={cn(
-                buttonVariants({ size: "sm" }),
-                "btn-cyber text-primary-foreground w-full"
-              )}
+              className={cn(buttonVariants(), "mt-2 w-full")}
             >
               {NAVBAR_CONFIG.cta.text}
             </Link>
           </div>
         </div>
       )}
-    </div>
+    </header>
   );
 };

@@ -11,11 +11,22 @@ import {
   frontendFrameworkOptions,
   getApplicationType,
   mongodbOrmOptions,
+  PackageManager,
   packageManagerOptions,
   postgresqlOrmOptions,
   StackChoices,
 } from "../types";
 import { confirm, info, select } from "../ui";
+
+// The package manager that started the CLI (pnpm dlx, bunx, npx), from the
+// user agent it passes to the process; npm when it cannot be told
+export function detectPackageManager(): PackageManager {
+  const userAgent = process.env.npm_config_user_agent ?? "";
+  const name = userAgent.split("/")[0];
+  return packageManagerOptions.some((option) => option.value === name)
+    ? (name as PackageManager)
+    : "npm";
+}
 
 // Returns the preset value when there is one, otherwise asks the user
 export async function ask<T>(
@@ -35,7 +46,8 @@ export async function ask<T>(
   const answer = await prompt();
   if (isCancel(answer)) {
     info("Cancelled. Nothing was created.");
-    process.exit(0);
+    // 130 is the usual exit code for a run stopped with Ctrl+C
+    process.exit(130);
   }
   return answer;
 }
@@ -88,7 +100,7 @@ export async function collectStackChoices(
     select({
       message: "Package manager",
       options: packageManagerOptions,
-      initialValue: "npm",
+      initialValue: detectPackageManager(),
     })
   );
   const useDocker = await ask(preset.useDocker, () =>
@@ -113,6 +125,19 @@ export async function collectStackChoices(
       )
     : false;
 
+  // Better Auth limits its own endpoints, so only the backends offer this
+  if (preset.useRateLimit && isFullstack) {
+    throw buildError(
+      `Rate limiting is available for Express and NestJS. Better Auth in ${framework} already limits its own endpoints`,
+      "INVALID_ARGUMENT"
+    );
+  }
+  const useRateLimit = isFullstack
+    ? false
+    : await ask(preset.useRateLimit, () =>
+        confirm({ message: "Add rate limiting?", initialValue: false })
+      );
+
   const initGit = await ask(preset.initGit, () =>
     confirm({ message: "Initialize a git repository?", initialValue: true })
   );
@@ -126,6 +151,7 @@ export async function collectStackChoices(
     packageManager,
     useDocker,
     useAuth,
+    useRateLimit,
     initGit,
     installDeps,
   };

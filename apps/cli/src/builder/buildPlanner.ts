@@ -17,7 +17,7 @@ import { selectModules } from "./moduleSelector";
 import { buildTemplateContext } from "./templateContext";
 
 // Files the builder writes itself instead of copying them from a module
-const GENERATED_FILES = ["package.json", ".env", ".env.example"];
+const GENERATED_FILES = ["package.json", ".env", ".env.example", "README.md"];
 
 interface BuildInputs {
   modules: Module[];

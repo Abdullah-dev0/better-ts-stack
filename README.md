@@ -42,23 +42,24 @@ npx better-ts-stack my-api --framework nestjs --database prisma --auth --yes
 npx better-ts-stack . --framework nextjs --database drizzle --pm pnpm
 ```
 
-| Flag                         | Values                                       |
-| ---------------------------- | -------------------------------------------- |
-| `--framework <name>`         | `express`, `nestjs`, `nextjs`, `tanstack`    |
-| `--database <name>`          | `none`, `prisma`, `drizzle`, `mongoose`      |
-| `--pm <name>`                | `npm`, `pnpm`, `bun`                         |
-| `--auth` / `--no-auth`       | Add authentication                           |
-| `--docker` / `--no-docker`   | Add Docker files                             |
-| `--git` / `--no-git`         | Initialize a git repository                  |
-| `--install` / `--no-install` | Install dependencies                         |
-| `-y`, `--yes`                | Use defaults for missing options, no prompts |
-| `--dry-run`                  | List what would be created, write nothing    |
-| `-h`, `--help`               | Show help                                    |
-| `-v`, `--version`            | Show the version                             |
+| Flag                               | Values                                       |
+| ---------------------------------- | -------------------------------------------- |
+| `--framework <name>`               | `express`, `nestjs`, `nextjs`, `tanstack`    |
+| `--database <name>`                | `none`, `prisma`, `drizzle`, `mongoose`      |
+| `--pm <name>`                      | `npm`, `pnpm`, `bun`                         |
+| `--auth` / `--no-auth`             | Add authentication                           |
+| `--docker` / `--no-docker`         | Add Docker files                             |
+| `--rate-limit` / `--no-rate-limit` | Add rate limiting (Express and NestJS)       |
+| `--git` / `--no-git`               | Initialize a git repository                  |
+| `--install` / `--no-install`       | Install dependencies                         |
+| `-y`, `--yes`                      | Use defaults for missing options, no prompts |
+| `--dry-run`                        | List what would be created, write nothing    |
+| `-h`, `--help`                     | Show help                                    |
+| `-v`, `--version`                  | Show the version                             |
 
 `--database` names the ORM, which also selects the database: `prisma` and `drizzle` use PostgreSQL, `mongoose` uses MongoDB.
 
-With `--yes`, the defaults are Express, no database, no auth, no Docker, npm, git initialized, and dependencies not installed.
+With `--yes`, the defaults are Express, no database, no auth, no rate limiting, no Docker, git initialized, and dependencies not installed. The package manager defaults to the one that ran the CLI: `pnpm` for `pnpm dlx`, `bun` for `bunx`, and `npm` otherwise.
 
 The project path can be a name (`my-app`), a nested path (`apps/api`), or `.` for the current directory. The last folder name becomes the `package.json` name.
 
@@ -79,8 +80,9 @@ The CLI guides you through these questions in order:
 7. **Authentication** — add auth?
    - Express / NestJS: JWT-based auth (always available)
    - Next.js / TanStack Start: Better Auth (only prompted when a database is selected)
-8. **Git** — initialize a git repository? (yes/no)
-9. **Install dependencies** — run the install command now? (yes/no)
+8. **Rate limiting** — Express / NestJS only: limit requests per IP? (yes/no)
+9. **Git** — initialize a git repository? (yes/no)
+10. **Install dependencies** — run the install command now? (yes/no)
 
 > **Note**: The CLI does not ask for a port. The server port defaults to `3000` via the `PORT` environment variable.
 
@@ -125,7 +127,7 @@ A generated project includes:
 - TanStack Start (React) with TanStack Router, React Query, and SSR
 - Tailwind CSS v4
 - Vite-based build (no Nitro) producing `dist/server/server.js` + `dist/client`
-- Production serving via `srvx` (`start` script, also used in Docker)
+- Production server built by Nitro (`node .output/server/index.mjs`), also used in Docker
 - `~/*` path alias and `components.json` (shadcn-style) configured for UI components
 - `dev`, `build`, `start`, `preview`, `type:check`, `lint` scripts
 - Auth routes use server functions (`createServerFn`) with cookie-based sessions

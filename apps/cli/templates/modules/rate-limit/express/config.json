@@ -1,0 +1,12 @@
+{
+  "id": "rate-limit",
+  "name": "Rate limiting",
+  "description": "Per-IP request limits for Express with express-rate-limit",
+  "type": "feature",
+  "dependencies": {
+    "express-rate-limit": "^8.7.1"
+  },
+  "devDependencies": {},
+  "scripts": {},
+  "envVars": {}
+}

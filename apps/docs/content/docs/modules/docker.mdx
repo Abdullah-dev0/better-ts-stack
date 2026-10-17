@@ -20,11 +20,25 @@ Every image uses Node.js 24 Alpine, a separate build stage, and a non-root user 
 
 - **Express** runs `dist/index.js`.
 - **Next.js** runs the standalone `server.js` output.
-- **TanStack Start** runs `srvx` against the Vite output in `dist/server/server.js`. The image installs production dependencies with `npm ci --omit=dev`, because `srvx` is needed at runtime.
+- **TanStack Start** runs the Nitro server in `.output/server/index.mjs`. Nitro bundles the dependencies it needs into `.output/`, so the image has no `node_modules`.
 
 If the build fails, the image build stops with an error.
 
-The image always installs dependencies with npm, even if you picked pnpm or bun for local development. If a `package-lock.json` is committed, the image uses `npm ci`. Otherwise it uses `npm install`.
+### Package manager
+
+The image installs dependencies with the package manager you picked:
+
+| Package manager | Installed in the image with              | With a committed lockfile           |
+| --------------- | ---------------------------------------- | ----------------------------------- |
+| npm             | Node.js itself                           | `npm ci` (`package-lock.json`)      |
+| pnpm            | `npm install -g pnpm@11`                 | `pnpm install --frozen-lockfile`    |
+| bun             | the `bun` binary from `oven/bun:1-alpine` | `bun install --frozen-lockfile`     |
+
+Without a lockfile the image runs a plain install, so commit your lockfile to get the same versions in every build. The app itself always runs on Node.js.
+
+### Health check
+
+The image has a `HEALTHCHECK` that requests `/health` (Express and NestJS) or `/` (Next.js and TanStack Start) every 30 seconds. `docker ps` shows the container as `healthy` once the app answers.
 
 ### Prisma
 
@@ -34,9 +48,22 @@ The Prisma client is generated during the image build and copied into the final 
 
 Compose loads your `.env` file through `env_file` and sets `NODE_ENV=production`.
 
-Inside a container, `localhost` means the container itself, not your machine. Change database URLs to an address the container can reach: a database service name on the same Docker network, or your host's address.
+With a database, Compose also runs it as a `db` service, and the app waits until the database reports healthy:
 
-The generated Compose file only defines the app service. Add a database service yourself, or point the app at an external database.
+- **PostgreSQL** (Prisma and Drizzle): `postgres:17-alpine` with user, password, and database `postgres`
+- **MongoDB** (Mongoose): `mongo:8`, run as a one-node replica set because Better Auth needs transactions
+
+Data is kept in the `db-data` volume. The database port (`5432` or `27017`) is published, so migrations and `npm run dev` on your machine use the same database through the `localhost` URL in `.env`. Stop a local PostgreSQL or MongoDB first if it already uses that port.
+
+Inside a container, `localhost` means the container itself, so Compose sets `DATABASE_URL` or `MONGODB_URI` for the app to the `db` service. To use an external database instead, remove the `db` service and the override, and set the URL in `.env`.
+
+Typical first run:
+
+```bash
+docker compose up -d db      # start the database
+npm run prisma:migrate       # or db:migrate for Drizzle, from your machine
+npm run docker:up            # build and start the app
+```
 
 Each project gets its own random auth secret in `.env`. For production, set your own secrets and set `BETTER_AUTH_URL` to the deployed address.
 

@@ -15,7 +15,7 @@ async function waitForServer(url) {
 
 async function request(pathname, options = {}) {
   const res = await fetch(`http://localhost:${PORT}${pathname}`, options);
-  return { status: res.status, text: await res.text() };
+  return { status: res.status, headers: res.headers, text: await res.text() };
 }
 
 function postJson(pathname, body) {
@@ -27,10 +27,17 @@ function postJson(pathname, body) {
 }
 
 // Each check returns [label, expected, actual]
-async function backendChecks(useAuth) {
+async function backendChecks(useAuth, useRateLimit) {
+  const health = await request("/health");
   const checks = [
-    ["GET /health", 200, (await request("/health")).status],
+    ["GET /health", 200, health.status],
     ["malformed JSON", 400, (await postJson("/health", "{bad")).status],
+    // express-rate-limit sends RateLimit-*, @nestjs/throttler X-RateLimit-*
+    [
+      "rate limit headers",
+      Boolean(useRateLimit),
+      [...health.headers.keys()].some((name) => name.includes("ratelimit")),
+    ],
   ];
   if (!useAuth) return checks;
 
@@ -78,6 +85,18 @@ async function backendChecks(useAuth) {
     "201,409,409",
     statuses.sort().join(","),
   ]);
+
+  // Sign-up and login allow 10 attempts per IP in 15 minutes
+  if (useRateLimit) {
+    const wrong = JSON.stringify({
+      email: "smoke@test.dev",
+      password: "wrong",
+    });
+    let lastStatus;
+    for (let attempt = 0; attempt < 10; attempt++)
+      lastStatus = (await postJson("/auth/login", wrong)).status;
+    checks.push(["login after the auth limit", 429, lastStatus]);
+  }
   return checks;
 }
 

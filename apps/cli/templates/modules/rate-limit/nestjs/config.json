@@ -1,0 +1,12 @@
+{
+  "id": "rate-limit",
+  "name": "Rate limiting",
+  "description": "Per-IP request limits for NestJS with @nestjs/throttler",
+  "type": "feature",
+  "dependencies": {
+    "@nestjs/throttler": "^6.7.1"
+  },
+  "devDependencies": {},
+  "scripts": {},
+  "envVars": {}
+}

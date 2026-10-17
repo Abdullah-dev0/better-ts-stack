@@ -6,24 +6,14 @@ import { ProjectConfig } from "../types";
 const MONGODB_AUTH_SETUP_URL =
   "https://better-ts-stack.abdullahtech.me/docs/modules/database#mongoose-and-mongodb";
 
-// Node 24 releases before 24.20 report mismatched file stats on Windows, which
-// makes srvx (TanStack's production server) reject every static asset
-const MIN_TANSTACK_WINDOWS_NODE = [24, 20];
-
-function isNodeBelow([major, minor]: number[]): boolean {
-  const [currentMajor, currentMinor] = process.versions.node
-    .split(".")
-    .map(Number);
-  return (
-    currentMajor < major || (currentMajor === major && currentMinor < minor)
-  );
-}
-
-// Generates a list of instructions for the user to follow after project creation
+// Generates a list of instructions for the user to follow after project
+// creation. The README version leaves out the cd step, which only makes
+// sense in the terminal
 export function generateNextSteps(
   config: ProjectConfig,
   targetDir: string,
-  depsInstalled: boolean
+  depsInstalled: boolean,
+  isForReadme = false
 ): string[] {
   const steps: string[] = [];
   const isFullstack = config.applicationType === "fullstack";
@@ -31,7 +21,7 @@ export function generateNextSteps(
   // Step 1: cd into project directory, unless it was created in place
   // Quoted when it has spaces, so the command can be pasted as it is
   const relativeDir = path.relative(cwd(), targetDir);
-  if (relativeDir) {
+  if (relativeDir && !isForReadme) {
     steps.push(
       /\s/.test(relativeDir) ? `cd "${relativeDir}"` : `cd ${relativeDir}`
     );
@@ -52,23 +42,17 @@ export function generateNextSteps(
     );
   }
 
-  if (
-    config.framework === "tanstack" &&
-    process.platform === "win32" &&
-    isNodeBelow(MIN_TANSTACK_WINDOWS_NODE)
-  ) {
-    steps.push(
-      `Upgrade Node.js to ${MIN_TANSTACK_WINDOWS_NODE.join(".")} or newer: on Windows, ` +
-        `Node ${process.versions.node} makes "npm start" return 404 for CSS, JS, and other static files`
-    );
-  }
-
   // Step 3: Install dependencies if not already done
   if (!depsInstalled) {
     steps.push(`${config.packageManager} install`);
   }
 
-  // Step 4: Database-specific steps
+  // Step 4: Database-specific steps. With Docker, Compose runs the database
+  const hasDockerDatabase = config.useDocker && config.database !== "none";
+  if (hasDockerDatabase) {
+    steps.push("docker compose up -d db");
+  }
+
   if (config.database === "prisma") {
     steps.push(`${config.packageManager} run prisma:generate`);
     steps.push(`${config.packageManager} run prisma:migrate`);
@@ -76,12 +60,15 @@ export function generateNextSteps(
     steps.push(`${config.packageManager} run db:generate`);
     steps.push(`${config.packageManager} run db:migrate`);
   } else if (config.database === "mongoose") {
-    steps.push(
-      "Ensure MongoDB is running locally or update MONGODB_URI in .env"
-    );
+    if (!hasDockerDatabase) {
+      steps.push(
+        "Ensure MongoDB is running locally or update MONGODB_URI in .env"
+      );
+    }
 
-    // Better Auth's MongoDB adapter uses transactions, which need a replica set
-    if (config.useAuth && isFullstack) {
+    // Better Auth's MongoDB adapter uses transactions, which need a replica
+    // set; the Compose database already runs as one
+    if (config.useAuth && isFullstack && !hasDockerDatabase) {
       steps.push(
         "Better Auth uses MongoDB transactions: run MongoDB as a replica set (or use Atlas) " +
           'and create the "user", "session", "account", and "verification" collections before signing up. ' +
@@ -98,6 +85,12 @@ export function generateNextSteps(
       isFullstack
         ? "Visit /sign-up to create your first account"
         : "Create a user via POST /auth/register then login with /auth/login"
+    );
+  }
+
+  if (config.useDocker) {
+    steps.push(
+      `To run the app in Docker instead: ${config.packageManager} run docker:up`
     );
   }
 

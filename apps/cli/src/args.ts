@@ -30,6 +30,8 @@ Options left out are asked interactively, unless --yes is given.
   --pm <name>             ${PACKAGE_MANAGERS.join(" | ")}
   --auth, --no-auth       Add authentication
   --docker, --no-docker   Add Docker files
+  --rate-limit, --no-rate-limit
+                          Add rate limiting (Express and NestJS)
   --git, --no-git         Initialize a git repository
   --install, --no-install Install dependencies
   -y, --yes               Use defaults for missing options and skip confirmation
@@ -80,6 +82,7 @@ export function parseCliArgs(argv: string[]): CliArgs {
         pm: { type: "string" },
         auth: { type: "boolean" },
         docker: { type: "boolean" },
+        "rate-limit": { type: "boolean" },
         git: { type: "boolean" },
         install: { type: "boolean" },
         yes: { type: "boolean", short: "y" },
@@ -106,6 +109,7 @@ export function parseCliArgs(argv: string[]): CliArgs {
     packageManager: parseChoice("pm", values.pm, PACKAGE_MANAGERS),
     useAuth: values.auth,
     useDocker: values.docker,
+    useRateLimit: values["rate-limit"],
     initGit: values.git,
     installDeps: values.install,
   };

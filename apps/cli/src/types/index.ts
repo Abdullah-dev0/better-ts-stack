@@ -34,6 +34,8 @@ export interface ProjectConfig {
   database: Database;
   useDocker: boolean;
   useAuth: boolean;
+  // Express and NestJS only; Better Auth limits its own endpoints
+  useRateLimit: boolean;
 
   // Tooling
   packageManager: PackageManager;
@@ -55,6 +57,7 @@ export const DEFAULT_CHOICES: StackChoices = {
   database: "none",
   useDocker: false,
   useAuth: false,
+  useRateLimit: false,
   packageManager: "npm",
   initGit: true,
   installDeps: false,
@@ -132,6 +135,21 @@ export function isBuildError(error: unknown): error is BuildError {
 
 // Variables and helpers available in Handlebars templates
 
+// Package manager commands the Dockerfile runs
+export interface DockerCommands {
+  // Dockerfile lines that make the package manager available, or ""
+  setup: string;
+  // Files copied before the install: package.json, lockfile, workspace file
+  manifests: string;
+  install: string;
+  // Installs production dependencies only
+  installProduction: string;
+  // Removes the download cache so it does not ship in the image
+  cleanCache: string;
+  // Prefix for package.json scripts: "npm run", "pnpm run", "bun run"
+  run: string;
+}
+
 export interface TemplateContext {
   projectName: string;
   packageManager: string;
@@ -140,6 +158,8 @@ export interface TemplateContext {
   port: number;
   useDocker: boolean;
   useAuth: boolean;
+  useRateLimit: boolean;
+  docker: DockerCommands;
   helpers: {
     eq: (a: string, b: string) => boolean;
     runner: () => string;

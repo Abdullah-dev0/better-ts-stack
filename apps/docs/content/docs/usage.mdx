@@ -87,7 +87,7 @@ The CLI prints its wordmark, version, and key hints, then starts the prompts. Ea
 ### Project name
 
 ```
-? Project name:
+$ Project name
   my-awesome-project
 ```
 
@@ -106,9 +106,9 @@ You can enter a name (`my-api`), a nested path (`apps/api`), or `.` to use the c
 ### Application type
 
 ```
-? Application type:
-  (*) Backend API
-  ( ) Full-stack
+$ Application type
+  › Backend API  Express or NestJS
+    Full-stack app
 ```
 
 | Option          | What it generates                                     |
@@ -126,9 +126,9 @@ You can enter a name (`my-api`), a nested path (`apps/api`), or `.` to use the c
 ### Backend framework *(Backend API only)*
 
 ```
-? Select a backend framework:
-  (*) Express
-  ( ) NestJS
+$ Backend framework
+  › Express
+    NestJS
 ```
 
 | Option      | What it generates                                   |
@@ -144,9 +144,9 @@ You can enter a name (`my-api`), a nested path (`apps/api`), or `.` to use the c
 ### Frontend framework *(Full-stack only)*
 
 ```
-? Select a frontend framework:
-  (*) Next.js 16 (App Router)
-  ( ) TanStack Start (React)      (Release Candidate)
+$ Frontend framework
+  › Next.js 16  App Router
+    TanStack Start
 ```
 
 | Option             | What it generates                                      |
@@ -160,10 +160,10 @@ You can enter a name (`my-api`), a nested path (`apps/api`), or `.` to use the c
 ### Database type
 
 ```
-? Select a database:
-  (*) none
-  ( ) postgresql
-  ( ) mongodb
+$ Database
+  › None  skip database setup
+    MongoDB
+    PostgreSQL
 ```
 
 | Choice         | Availability                      |
@@ -180,26 +180,26 @@ You can enter a name (`my-api`), a nested path (`apps/api`), or `.` to use the c
 For **PostgreSQL**:
 
 ```
-? Select an ORM for postgresql:
-  (*) prisma
-  ( ) drizzle
+$ ORM
+  › Prisma  type-safe ORM
+    Drizzle
 ```
 
 | ORM     | Available in                                                  |
 | ------- | ------------------------------------------------------------- |
-| Prisma  | Backend (Express) and Full-stack (Next.js and TanStack Start) |
-| Drizzle | Backend (Express) and Full-stack (Next.js and TanStack Start) |
+| Prisma  | Every framework: Express, NestJS, Next.js, and TanStack Start |
+| Drizzle | Every framework: Express, NestJS, Next.js, and TanStack Start |
 
 For **MongoDB**:
 
 ```
-? Select an ORM for mongodb:
-  (*) Mongoose (MongoDB ODM)
+$ ORM
+  › Mongoose  MongoDB ODM
 ```
 
 | ODM      | Notes                          |
 | -------- | ------------------------------ |
-| Mongoose | Express, Next.js, and TanStack |
+| Mongoose | Express, NestJS, Next.js, and TanStack Start |
 
 > If you select **none** for database type, this prompt is skipped entirely.
 
@@ -209,10 +209,10 @@ For **MongoDB**:
 ### Package manager
 
 ```
-? Select a package manager:
-  (*) npm
-  ( ) pnpm
-  ( ) bun
+$ Package manager
+  › npm
+    pnpm
+    bun
 ```
 
 The generated `dev` script and install commands are tailored to your choice. With `bun`, the `dev` script uses `bun --watch` instead of `tsx watch`.
@@ -225,8 +225,8 @@ With `pnpm`, the CLI also writes `pnpm-workspace.yaml`. It holds the dependency 
 ### Docker
 
 ```
-? Use Docker?
-  ( ) yes  (*) no
+$ Add Docker?
+    Yes   › No
 ```
 
 If yes, three files are added: `Dockerfile`, `docker-compose.yml`, and `.dockerignore`.
@@ -237,12 +237,12 @@ If yes, three files are added: `Dockerfile`, `docker-compose.yml`, and `.dockeri
 ### Authentication
 
 ```
-? Add authentication?      # Express
-? Add Better Auth?         # Next.js / TanStack Start
-  ( ) Yes  (*) No
+$ Add JWT authentication?     # Express and NestJS
+$ Add Better Auth?            # Next.js and TanStack Start
+    Yes   › No
 ```
 
-**Express backend** - JWT-based auth with `jsonwebtoken` and `bcrypt`. Always prompted regardless of database selection.
+**Express and NestJS** - JWT-based auth with `jsonwebtoken` and `bcrypt`. Always prompted regardless of database selection.
 
 **Next.js / TanStack full-stack** - Better Auth with a database adapter. **This prompt only appears if you selected a database.** If you chose `none` for database, auth is skipped automatically.
 
@@ -252,8 +252,8 @@ If yes, three files are added: `Dockerfile`, `docker-compose.yml`, and `.dockeri
 ### Git initialization
 
 ```
-? Initialize a git repository?
-  (*) yes  ( ) no
+$ Initialize a git repository?
+  › Yes     No
 ```
 
 If yes, the CLI runs `git init` after generating the project files. It does not create a commit, so commit the files yourself when you are ready.
@@ -266,8 +266,8 @@ If the project folder is already inside a git repository, for example `apps/api`
 ### Install dependencies
 
 ```
-? Install dependencies now?
-  ( ) yes  (*) no
+$ Install dependencies now?
+    Yes   › No
 ```
 
 If yes, the CLI runs your chosen package manager's install command after generating the project.

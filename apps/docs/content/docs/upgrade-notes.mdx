@@ -3,6 +3,28 @@ title: Upgrade notes
 description: What changed in each release and what to do when upgrading
 ---
 
+## 2.0.2
+
+Projects you already generated are not changed. To patch an existing TanStack Start project, update `@tanstack/react-start` to 1.168.60 or later, then rebuild and redeploy.
+
+### TanStack Start 1.0
+
+- **TanStack Start is stable.** The CLI no longer labels it a release candidate.
+- **New TanStack Start projects require `@tanstack/react-start` 1.169.3 or later.** This is past the fix for [CVE-2026-102989](https://tanstack.com/blog/tanstack-start-security-update-cve-2026-102989), a cross-site scripting bug in server-function responses fixed in 1.168.60. `@tanstack/react-router`, the router devtools and SSR query packages, TanStack Query, `srvx`, Vite, and `@vitejs/plugin-react` move to their current releases.
+
+### Fixed
+
+- **The `cd` step is quoted when the project path has spaces**, so it can be pasted as it is.
+- **Drizzle `updatedAt` columns update on every write.** Before, they kept the creation time.
+
+### Changed in generated projects
+
+- The Better Auth forms in Next.js and TanStack Start use `z.email()` instead of the deprecated `z.string().email()`.
+
+### Docs
+
+- The prompt examples in [usage](/docs/usage) show the prompts as the CLI prints them since 2.0.0, and NestJS is listed wherever Express is.
+
 ## 2.0.1
 
 A more useful `--dry-run`, bug fixes, and cleanup. Projects you already generated are not changed.

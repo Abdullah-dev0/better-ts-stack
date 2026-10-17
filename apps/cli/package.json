@@ -1,6 +1,6 @@
 {
   "name": "better-ts-stack",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "A CLI that scaffolds Express, NestJS, Next.js, and TanStack Start projects with a database, authentication, and Docker already set up.",
   "keywords": [
     "cli",

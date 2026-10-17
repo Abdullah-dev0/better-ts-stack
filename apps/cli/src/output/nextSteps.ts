@@ -29,8 +29,13 @@ export function generateNextSteps(
   const isFullstack = config.applicationType === "fullstack";
 
   // Step 1: cd into project directory, unless it was created in place
+  // Quoted when it has spaces, so the command can be pasted as it is
   const relativeDir = path.relative(cwd(), targetDir);
-  if (relativeDir) steps.push(`cd ${relativeDir}`);
+  if (relativeDir) {
+    steps.push(
+      /\s/.test(relativeDir) ? `cd "${relativeDir}"` : `cd ${relativeDir}`
+    );
+  }
 
   // Step 2: Set environment variables
   if (config.database !== "none") {

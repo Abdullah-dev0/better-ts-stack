@@ -170,7 +170,7 @@ export const frontendFrameworkOptions = [
   {
     value: "tanstack" as const,
     label: "TanStack Start",
-    hint: "React, release candidate",
+    hint: "Vite and React",
   },
 ];
 

@@ -12,7 +12,8 @@ export const user = pgTable("user", {
     .defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull()
-    .defaultNow(),
+    .defaultNow()
+    .$onUpdate(() => new Date()),
 });
 
 export const session = pgTable("session", {
@@ -24,7 +25,8 @@ export const session = pgTable("session", {
     .defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull()
-    .defaultNow(),
+    .defaultNow()
+    .$onUpdate(() => new Date()),
   ipAddress: text("ip_address"),
   userAgent: text("user_agent"),
   userId: text("user_id")
@@ -55,7 +57,8 @@ export const account = pgTable("account", {
     .defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull()
-    .defaultNow(),
+    .defaultNow()
+    .$onUpdate(() => new Date()),
 }, (table) => [uniqueIndex("account_provider_account_id_unique").on(table.providerId, table.accountId)]);
 
 export const verification = pgTable("verification", {
@@ -68,7 +71,8 @@ export const verification = pgTable("verification", {
     .defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull()
-    .defaultNow(),
+    .defaultNow()
+    .$onUpdate(() => new Date()),
 });
 {{else}}
 import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
@@ -79,6 +83,8 @@ export const users = pgTable("users", {
   name: text("name"),
   password: text("password").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .defaultNow()
+    .$onUpdate(() => new Date()),
 });
 {{/if}}

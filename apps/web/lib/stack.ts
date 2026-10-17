@@ -39,25 +39,25 @@ export const FRAMEWORK_OPTIONS: (StackOption<Framework> & {
     value: "express",
     label: "Express",
     kind: "backend",
-    description: "Express 5 API with tsx watch",
+    description: "Express 5 API server",
   },
   {
     value: "nestjs",
     label: "NestJS",
     kind: "backend",
-    description: "NestJS 12 API as ES modules",
+    description: "NestJS 12 API server",
   },
   {
     value: "nextjs",
     label: "Next.js",
     kind: "full-stack",
-    description: "Next.js 16 App Router and React 19",
+    description: "App Router, React 19",
   },
   {
     value: "tanstack",
     label: "TanStack Start",
     kind: "full-stack",
-    description: "File-based routing on Vite and Nitro",
+    description: "Vite, Nitro, React 19",
   },
 ];
 

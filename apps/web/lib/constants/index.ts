@@ -3,17 +3,6 @@ import type { Framework } from "@/lib/stack";
 export const GITHUB_URL = "https://github.com/Abdullah-dev0/better-ts-stack";
 export const NPM_URL = "https://www.npmjs.com/package/better-ts-stack";
 
-// "better-ts-stack" in the figlet Big font, as the CLI prints it
-// (apps/cli/src/ui/messages.ts)
-export const WORDMARK = [
-  "  _          _   _                   _                  _             _",
-  " | |        | | | |                 | |                | |           | |",
-  " | |__   ___| |_| |_ ___ _ __ ______| |_ ___ ______ ___| |_ __ _  ___| | __",
-  " | '_ \\ / _ \\ __| __/ _ \\ '__|______| __/ __|______/ __| __/ _` |/ __| |/ /",
-  " | |_) |  __/ |_| ||  __/ |         | |_\\__ \\      \\__ \\ || (_| | (__|   <",
-  " |_.__/ \\___|\\__|\\__\\___|_|          \\__|___/      |___/\\__\\__,_|\\___|_|\\_\\",
-].join("\n");
-
 // The page's sections, in order; the status bar and the number keys use them
 export const SECTIONS = [
   { id: "init", label: "init" },
@@ -28,12 +17,19 @@ export interface NavLink {
   external: boolean;
 }
 
+// Links to sections of the home page only show in the mobile menu; wider
+// screens reach them from the status bar
 export const NAV_LINKS = [
-  { href: "/docs", label: "Docs", external: false },
-  { href: "/#builder", label: "Builder", external: false },
-  { href: "/#modules", label: "Modules", external: false },
-  { href: "/docs/upgrade-notes", label: "Changelog", external: false },
-] as const satisfies readonly NavLink[];
+  { href: "/docs", label: "Docs", external: false, isSection: false },
+  { href: "/#builder", label: "Builder", external: false, isSection: true },
+  { href: "/#modules", label: "Modules", external: false, isSection: true },
+  {
+    href: "/docs/upgrade-notes",
+    label: "Changelog",
+    external: false,
+    isSection: false,
+  },
+] as const satisfies readonly (NavLink & { isSection: boolean })[];
 
 // ============================================================================
 // INIT PANE
@@ -155,8 +151,7 @@ export const CI_PANE = {
     },
     {
       title: "nothing left behind",
-      description:
-        "A plain project you own. No generator runtime, no lock-in.",
+      description: "A plain project you own. No generator runtime, no lock-in.",
     },
   ],
 } as const;

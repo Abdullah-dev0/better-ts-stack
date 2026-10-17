@@ -4,7 +4,7 @@
 
 TypeScript CLI monorepo that generates fully configured TypeScript projects with backend, frontend, database, Docker support via interactive setup.
 
-**Structure:** Turborepo monorepo with `apps/cli` (Node.js CLI generator), `apps/docs` (Next.js 16 + React 19 docs site), and `packages/eslint-config` and `packages/prettier-config` (shared configs).
+**Structure:** Turborepo monorepo with `apps/cli` (Node.js CLI generator), `apps/web` (Next.js 16 + React 19 website and docs), and `packages/eslint-config` and `packages/prettier-config` (shared configs).
 
 > Run commands from the repo root using Turbo, or from individual package directories.
 
@@ -33,10 +33,10 @@ npm run format:check   # Check formatting
 npm run type:check     # TypeScript check (no emit)
 ```
 
-### Docs (apps/docs/)
+### Web (apps/web/)
 
 ```bash
-cd apps/docs
+cd apps/web
 npm run dev            # Next.js dev server
 npm run build          # Production build
 npm run start          # Run production server
@@ -66,7 +66,7 @@ Semi-colons required, double quotes, ES5 trailing commas, print width 80, tab wi
 ### ESLint Rules
 
 - CLI: uses `@better-ts-stack/eslint-config/node`, no-unused-vars (error), no-floating-promises (error), no-explicit-any (warn), no-console (off)
-- Docs: eslint-config-next with core-web-vitals
+- Web: eslint-config-next with core-web-vitals
 
 ### Naming Conventions
 
@@ -91,7 +91,7 @@ import { cwd } from "node:process";
 import { buildError } from "./types";
 ```
 
-**Docs:** Use `@/` path alias, prefer server components
+**Web:** Use `@/` path alias, prefer server components
 
 ```typescript
 import * as React from "react";
@@ -137,7 +137,7 @@ src/
 
 Patterns: Barrel exports via `index.ts`, feature folders, pure functions, async/await, Zod validation, output through `src/ui`
 
-### Docs (`apps/docs/`)
+### Web (`apps/web/`)
 
 ```
 app/
@@ -168,7 +168,7 @@ Modules in `apps/cli/templates/modules/` have `ModuleConfig` with: id, name, typ
 
 **CLI:** @clack/core, fs-extra, handlebars, zod
 
-**Docs:** next, react 19, @radix-ui/react-slot, tailwindcss v4, motion, fumadocs-ui, lucide-react
+**Web:** next, react 19, @radix-ui/react-slot, tailwindcss v4, motion, fumadocs-ui, lucide-react
 
 **Shared packages:** `@better-ts-stack/eslint-config`, `@better-ts-stack/prettier-config`
 

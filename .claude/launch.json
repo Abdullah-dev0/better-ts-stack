@@ -2,9 +2,9 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "docs",
+      "name": "web",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--workspace", "apps/docs", "--", "--port", "3100"],
+      "runtimeArgs": ["run", "dev", "--workspace", "apps/web", "--", "--port", "3100"],
       "port": 3100
     }
   ]

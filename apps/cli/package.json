@@ -1,6 +1,6 @@
 {
   "name": "better-ts-stack",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "A CLI that scaffolds Express, NestJS, Next.js, and TanStack Start projects with a database, authentication, and Docker already set up.",
   "keywords": [
     "cli",
@@ -51,8 +51,8 @@
   "dependencies": {
     "@clack/core": "^1.4.3",
     "fs-extra": "^11.4.0",
-    "handlebars": "^4.7.9",
-    "zod": "^4.5.4"
+    "handlebars": "^4.7.10",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@better-ts-stack/eslint-config": "*",

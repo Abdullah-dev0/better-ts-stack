@@ -34,3 +34,6 @@ coverage/
 
 # Misc
 *.tsbuildinfo
+
+# Prisma client, created by prisma generate
+src/generated/

@@ -26,7 +26,6 @@ components/ui/       # shadcn-compatible base UI primitives
 lib/utils.ts         # cn() helper for class merging
 components.json      # shadcn CLI-compatible component config
 public/              # Static assets (Next.js defaults)
-proxy.ts             # Dev proxy configuration
 next.config.ts       # Next.js configuration
 postcss.config.mjs   # PostCSS setup for Tailwind
 tsconfig.json        # TypeScript configuration
@@ -215,6 +214,7 @@ export const authClient = createAuthClient();
 
 The generated sign-in and sign-up forms use React Hook Form + Zod on the client
 and call `authClient.signIn.email(...)` / `authClient.signUp.email(...)`.
+`proxy.ts` redirects visitors without a session from `/dashboard` to `/sign-in`.
 
 <Callout type="info">
   `BETTER_AUTH_SECRET` and `BETTER_AUTH_URL` are server-side variables. Do not
@@ -225,9 +225,7 @@ and call `authClient.signIn.email(...)` / `authClient.signUp.email(...)`.
 
 ## Environment Variables
 
-```bash
-PORT=3000
-```
+The base Next.js project needs no variables. Next.js picks its port before it loads `.env`, so set it in the shell instead, as in `PORT=3001 npm run dev`.
 
 `NODE_ENV` is not written to `.env`. The dev, build, and start commands set it, so `npm start` runs in production mode.
 
@@ -263,7 +261,7 @@ components.json       # shadcn CLI-compatible component config
 - **`~/*` path alias** mapped to `./src/*` (TanStack-native, resolved by `tsconfigPaths: true` in the Vite config). Use `~/components/...` and `~/lib/...` in imports.
 - **File-based routing** lives in `src/routes/`. TanStack Router regenerates
   `src/routeTree.gen.ts` during Vite development and builds.
-- **Nitro for production**: as in TanStack's [hosting guide](https://tanstack.com/start/latest/docs/framework/react/guide/hosting), `vite build` runs the [Nitro](https://nitro.build) Vite plugin, which writes a self-contained Node.js server to `.output/`. The `start` script runs it with `node` and loads `.env` first. `vite dev` uses TanStack Start's own dev server, without Nitro:
+- **Nitro for production**: as in TanStack's [hosting guide](https://tanstack.com/start/latest/docs/framework/react/guide/hosting), `vite build` runs the [Nitro](https://nitro.build) Vite plugin, which writes a self-contained Node.js server to `.output/`. The `start` script runs it with `node` and loads `.env` first. `vite preview` serves that build. `vite dev` uses TanStack Start's own dev server, without Nitro:
 
 ```bash
 npm run build   # vite build (writes .output/)
@@ -273,7 +271,7 @@ npm run type:check  # tsc --noEmit
 npm run lint    # eslint src
 ```
 
-- `PORT` controls the server port (default 3000).
+- `PORT` in `.env` sets the production server port (default 3000). `vite dev` uses the port in `vite.config.ts`.
 - The generated `package.json` sets `"type": "module"` so the ESM-only TanStack Vite plugin loads correctly.
 
 ### Commands

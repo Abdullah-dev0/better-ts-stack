@@ -64,7 +64,17 @@ export function renderReadme(
         : "- **Auth:** JWT with `/auth/register`, `/auth/login`, and `/auth/me`"
     );
   }
+  if (config.useRateLimit) {
+    lines.push(
+      `- **Rate limiting:** 100 requests per client IP in 15 minutes${config.useAuth ? ", and 10 sign-up or login attempts" : ""}`
+    );
+  }
   if (config.useDocker) lines.push("- **Docker:** Dockerfile and Compose file");
+  if (config.useCi) {
+    lines.push(
+      "- **CI:** GitHub Actions builds, type-checks, and lints every push to `main` and every pull request"
+    );
+  }
   lines.push(`- **Package manager:** ${config.packageManager}`, "");
 
   const steps = generateNextSteps(config, targetDir, false, true);

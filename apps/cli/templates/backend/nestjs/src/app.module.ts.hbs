@@ -35,7 +35,7 @@ import { PrismaModule } from "./prisma/prisma.module.js";
     AuthModule,
     {{/if}}
     {{#if useRateLimit}}
-    // Every route: 100 requests per client IP in 15 minutes
+    // Every route except /health: 100 requests per client IP in 15 minutes
     ThrottlerModule.forRoot([{ ttl: 15 * 60 * 1000, limit: 100 }]),
     {{/if}}
   ],

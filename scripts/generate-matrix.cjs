@@ -43,6 +43,7 @@ async function main() {
                 useAuth,
                 useRateLimit,
                 useDocker,
+                useCi: !useDocker,
                 packageManager,
                 initGit: false,
                 installDeps: false,
@@ -52,8 +53,13 @@ async function main() {
               assert(!files.some((file) => file.endsWith(".hbs")), name);
               assert(files.includes(".gitignore"), name);
               assert(files.includes("README.md"), name);
+              assert.equal(
+                files.some((file) => file.endsWith("ci.yml")),
+                config.useCi,
+                `${name}: ci.yml`,
+              );
               const manifest = JSON.parse(
-                await fs.readFile(path.join(target, "package.json"))
+                await fs.readFile(path.join(target, "package.json")),
               );
               for (const version of Object.values({
                 ...manifest.dependencies,
@@ -63,21 +69,21 @@ async function main() {
                 // Nitro's 3.0.x-beta are allowed
                 assert(
                   /^\^?\d+\.\d+\.\d+(-[0-9A-Za-z.]+)?$/.test(version),
-                  `${name}: ${version}`
+                  `${name}: ${version}`,
                 );
               }
               assert(!JSON.stringify(manifest.scripts).includes("{{"), name);
               if (BACKEND_ENTRY_FILES[framework])
                 assert.equal(
                   manifest.scripts.start,
-                  `cross-env NODE_ENV=production ${packageManager === "bun" ? "bun" : "node"} ${BACKEND_ENTRY_FILES[framework]}`
+                  `cross-env NODE_ENV=production ${packageManager === "bun" ? "bun" : "node"} ${BACKEND_ENTRY_FILES[framework]}`,
                 );
               // pnpm 11+ ignores package.json "pnpm" and needs build approvals
               assert(!manifest.pnpm, `${name}: package.json pnpm field`);
               assert.equal(
                 files.includes("pnpm-workspace.yaml"),
                 packageManager === "pnpm",
-                `${name}: pnpm-workspace.yaml`
+                `${name}: pnpm-workspace.yaml`,
               );
               // NODE_ENV comes from the scripts, so .env must not pin it
               const env = await fs.readFile(path.join(target, ".env"), "utf8");
@@ -91,10 +97,10 @@ async function main() {
   const report = { root, cases };
   await fs.writeFile(
     path.join(root, "matrix.json"),
-    JSON.stringify(report, null, 2)
+    JSON.stringify(report, null, 2),
   );
   console.log(
-    `Generated and checked ${cases.length} combinations. Matrix: ${path.join(root, "matrix.json")}`
+    `Generated and checked ${cases.length} combinations. Matrix: ${path.join(root, "matrix.json")}`,
   );
 }
 main().catch((error) => {

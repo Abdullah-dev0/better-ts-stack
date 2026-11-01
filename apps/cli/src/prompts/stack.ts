@@ -138,6 +138,10 @@ export async function collectStackChoices(
         confirm({ message: "Add rate limiting?", initialValue: false })
       );
 
+  const useCi = await ask(preset.useCi, () =>
+    confirm({ message: "Add GitHub Actions CI?", initialValue: false })
+  );
+
   const initGit = await ask(preset.initGit, () =>
     confirm({ message: "Initialize a git repository?", initialValue: true })
   );
@@ -152,6 +156,7 @@ export async function collectStackChoices(
     useDocker,
     useAuth,
     useRateLimit,
+    useCi,
     initGit,
     installDeps,
   };

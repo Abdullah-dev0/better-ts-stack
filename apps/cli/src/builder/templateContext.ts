@@ -42,6 +42,29 @@ const DOCKER_COMMANDS: Record<PackageManager, DockerCommands> = {
   },
 };
 
+// Placeholders for the CI build, the same ones the Dockerfile uses: a build
+// needs these to be set, but never connects to a database
+function getCiBuildEnv(config: ProjectConfig): TemplateContext["ciBuildEnv"] {
+  const env: TemplateContext["ciBuildEnv"] = [];
+  if (config.database === "prisma" || config.database === "drizzle") {
+    env.push({
+      name: "DATABASE_URL",
+      value: "postgresql://postgres:postgres@localhost:5432/postgres",
+    });
+  }
+  if (config.database === "mongoose") {
+    env.push({ name: "MONGODB_URI", value: "mongodb://localhost:27017/build" });
+  }
+  // next build loads the auth route, which initializes Better Auth
+  if (config.framework === "nextjs" && config.useAuth) {
+    env.push({
+      name: "BETTER_AUTH_SECRET",
+      value: "build-only-placeholder-secret-not-used-at-runtime",
+    });
+  }
+  return env;
+}
+
 export function buildTemplateContext(config: ProjectConfig): TemplateContext {
   return {
     projectName: config.projectName,
@@ -53,6 +76,7 @@ export function buildTemplateContext(config: ProjectConfig): TemplateContext {
     useAuth: config.useAuth,
     useRateLimit: config.useRateLimit,
     docker: DOCKER_COMMANDS[config.packageManager],
+    ciBuildEnv: getCiBuildEnv(config),
     helpers: {
       eq: (a: string, b: string) => a === b,
       runner: () => {

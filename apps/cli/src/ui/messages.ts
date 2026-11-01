@@ -66,6 +66,7 @@ export function showSummary(config: ProjectConfig, targetDir: string) {
     config.useAuth && "auth",
     config.useRateLimit && "rate limit",
     config.useDocker && "docker",
+    config.useCi && "ci",
   ];
   const setup = [
     config.packageManager,

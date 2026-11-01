@@ -40,7 +40,6 @@ export const MODULE_FILES: Record<string, readonly string[]> = {
     "lib/utils.ts",
     "next.config.ts",
     "postcss.config.mjs",
-    "proxy.ts",
     "public/file.svg",
     "public/globe.svg",
     "public/next.svg",
@@ -125,6 +124,7 @@ export const MODULE_FILES: Record<string, readonly string[]> = {
     "src/auth/zod-validation.pipe.ts",
   ],
   "auth/nextjs": [
+    "proxy.ts",
     "app/api/auth/[...all]/route.ts",
     "app/dashboard/page.tsx",
     "app/sign-in/page.tsx",
@@ -153,4 +153,5 @@ export const MODULE_FILES: Record<string, readonly string[]> = {
   "rate-limit/express": ["src/middleware/rateLimit.ts"],
   "rate-limit/nestjs": [],
   docker: [".dockerignore", "Dockerfile", "docker-compose.yml"],
+  ci: [".github/workflows/ci.yml"],
 };

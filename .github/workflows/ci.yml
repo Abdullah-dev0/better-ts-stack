@@ -2,6 +2,9 @@ name: CI
 
 on:
   pull_request:
+  # Releases are pushed straight to main
+  push:
+    branches: [main]
 
 concurrency:
   group: ci-${{ github.ref }}

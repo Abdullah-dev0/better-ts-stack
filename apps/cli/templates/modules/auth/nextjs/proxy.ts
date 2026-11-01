@@ -1,8 +1,6 @@
-import { NextResponse } from "next/server";
-
-{{#if useAuth}}
-import type { NextRequest } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
 export function proxy(request: NextRequest) {
   const sessionCookie = getSessionCookie(request);
@@ -17,8 +15,3 @@ export function proxy(request: NextRequest) {
 export const config = {
   matcher: ["/dashboard/:path*"],
 };
-{{else}}
-export function proxy() {
-  return NextResponse.next();
-}
-{{/if}}

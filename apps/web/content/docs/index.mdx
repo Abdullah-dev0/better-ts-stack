@@ -79,8 +79,10 @@ The CLI asks, in order (every prompt can also be answered with a [flag](/docs/us
 7. **Authentication** - add auth?
    - Express / NestJS: JWT-based auth (always available when asked)
    - Next.js / TanStack: Better Auth (only prompted if a database was selected)
-8. **Git** - initialize a repository?
-9. **Install dependencies** - run the install command now?
+8. **Rate limiting** - Express / NestJS only: limit requests per IP?
+9. **CI** - add a GitHub Actions workflow?
+10. **Git** - initialize a repository?
+11. **Install dependencies** - run the install command now?
 
 <Callout type="info">
   The CLI does not ask for a port number. The server port defaults to `3000`

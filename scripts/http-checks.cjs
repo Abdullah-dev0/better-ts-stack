@@ -26,18 +26,21 @@ function postJson(pathname, body) {
   });
 }
 
+// express-rate-limit sends RateLimit-*, @nestjs/throttler X-RateLimit-*
+function hasRateLimitHeaders(response) {
+  return [...response.headers.keys()].some((name) =>
+    name.includes("ratelimit"),
+  );
+}
+
 // Each check returns [label, expected, actual]
 async function backendChecks(useAuth, useRateLimit) {
   const health = await request("/health");
   const checks = [
     ["GET /health", 200, health.status],
     ["malformed JSON", 400, (await postJson("/health", "{bad")).status],
-    // express-rate-limit sends RateLimit-*, @nestjs/throttler X-RateLimit-*
-    [
-      "rate limit headers",
-      Boolean(useRateLimit),
-      [...health.headers.keys()].some((name) => name.includes("ratelimit")),
-    ],
+    // Docker and load balancers call it on a schedule, so it is never limited
+    ["GET /health not rate limited", false, hasRateLimitHeaders(health)],
   ];
   if (!useAuth) return checks;
 
@@ -46,6 +49,11 @@ async function backendChecks(useAuth, useRateLimit) {
     password: "pw123456",
   });
   checks.push(
+    [
+      "rate limit headers",
+      Boolean(useRateLimit),
+      hasRateLimitHeaders(await request("/auth/me")),
+    ],
     ["register", 201, (await postJson("/auth/register", user)).status],
     [
       "register same email, other case",
@@ -69,16 +77,16 @@ async function backendChecks(useAuth, useRateLimit) {
       (
         await postJson(
           "/auth/register",
-          JSON.stringify({ email: "a".repeat(200000) })
+          JSON.stringify({ email: "a".repeat(200000) }),
         )
       ).status,
     ],
-    ["login", 200, (await postJson("/auth/login", user)).status]
+    ["login", 200, (await postJson("/auth/login", user)).status],
   );
 
   const race = JSON.stringify({ email: "race@test.dev", password: "pw123456" });
   const statuses = await Promise.all(
-    [1, 2, 3].map(async () => (await postJson("/auth/register", race)).status)
+    [1, 2, 3].map(async () => (await postJson("/auth/register", race)).status),
   );
   checks.push([
     "3 concurrent duplicate registers",

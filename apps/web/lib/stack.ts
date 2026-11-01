@@ -13,6 +13,7 @@ export interface StackChoices {
   useAuth: boolean;
   useDocker: boolean;
   useRateLimit: boolean;
+  useCi: boolean;
 }
 
 export const PROJECT_NAME = "my-app";
@@ -24,6 +25,7 @@ export const DEFAULT_CHOICES: StackChoices = {
   useAuth: true,
   useDocker: true,
   useRateLimit: false,
+  useCi: false,
 };
 
 export interface StackOption<T extends string> {
@@ -118,11 +120,13 @@ export function buildCommand(choices: StackChoices): string[] {
   if (choices.useAuth) parts.push("--auth");
   if (choices.useRateLimit) parts.push("--rate-limit");
   if (choices.useDocker) parts.push("--docker");
+  if (choices.useCi) parts.push("--ci");
   parts.push("--yes");
   return parts;
 }
 
-export type FileSource = "base" | "database" | "auth" | "docker" | "rate-limit";
+export type FileSource =
+  "base" | "database" | "auth" | "docker" | "rate-limit" | "ci";
 
 export interface ProjectFile {
   path: string;
@@ -142,6 +146,7 @@ export function listProjectFiles(choices: StackChoices): ProjectFile[] {
   if (choices.useAuth) modules.push([`auth/${framework}`, "auth"]);
   if (choices.useRateLimit)
     modules.push([`rate-limit/${framework}`, "rate-limit"]);
+  if (choices.useCi) modules.push(["ci", "ci"]);
 
   // Later modules overwrite files of earlier ones, so each path is listed once
   const files = new Map<string, FileSource>();

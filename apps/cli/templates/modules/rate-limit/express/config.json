@@ -4,7 +4,7 @@
   "description": "Per-IP request limits for Express with express-rate-limit",
   "type": "feature",
   "dependencies": {
-    "express-rate-limit": "^8.7.1"
+    "express-rate-limit": "^8.7.2"
   },
   "devDependencies": {},
   "scripts": {},

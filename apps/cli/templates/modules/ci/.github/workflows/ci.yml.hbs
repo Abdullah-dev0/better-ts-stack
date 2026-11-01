@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Build, type-check, lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+{{#if (eq packageManager 'pnpm')}}
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 11
+{{/if}}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+{{#if (eq packageManager 'bun')}}
+      - uses: oven-sh/setup-bun@v2
+{{/if}}
+      - name: Install
+        run: {{docker.install}}
+      - name: Build
+{{#if ciBuildEnv.length}}
+        # Placeholders: the build never connects to a database. Add real values
+        # as repository secrets if your build needs them
+        env:
+{{#each ciBuildEnv}}
+          {{name}}: "{{value}}"
+{{/each}}
+{{/if}}
+        run: {{docker.run}} build
+      - name: Type-check
+        run: {{docker.run}} type:check
+      - name: Lint
+        run: {{docker.run}} lint

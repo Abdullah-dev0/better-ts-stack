@@ -1,5 +1,5 @@
 import { buildError } from "../types";
-import { confirm, text } from "../ui";
+import { confirm, info, text } from "../ui";
 import { validateProjectPath } from "../validators";
 import { ask } from "./stack";
 
@@ -24,7 +24,9 @@ export async function collectProjectPath(
     text({
       message: "Project name",
       placeholder: "my-awesome-project",
-      validate: (value) => validateProjectPath(value ?? ""),
+      // An empty path would resolve to the current directory and pass
+      validate: (value) =>
+        value ? validateProjectPath(value) : "Project name is required",
     })
   );
 }
@@ -36,6 +38,7 @@ export async function confirmBuild() {
   );
 
   if (!shouldBuild) {
+    info("Nothing was created.");
     process.exit(0);
   }
 }

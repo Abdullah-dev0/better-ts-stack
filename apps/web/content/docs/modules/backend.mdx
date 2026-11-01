@@ -177,10 +177,10 @@ If auth is selected, the build adds:
 
 If rate limiting is selected (`--rate-limit`), the build adds `src/middleware/rateLimit.ts` with [`express-rate-limit`](https://github.com/express-rate-limit/express-rate-limit):
 
-- Every route allows **100 requests per client IP in 15 minutes**.
+- Every route except `/health` allows **100 requests per client IP in 15 minutes**.
 - With auth, `POST /auth/register` and `POST /auth/login` allow **10 attempts per IP in 15 minutes**, which slows down password guessing.
 
-A client over the limit gets `429 Too Many Requests`, and every response carries `RateLimit` headers. The limits are counted in memory, so each server instance counts separately. Behind a reverse proxy or load balancer, add `app.set("trust proxy", 1)` so the limit uses the real client IP.
+A client over the limit gets `429 Too Many Requests`, and limited responses carry `RateLimit` headers. The limits are counted in memory, so each server instance counts separately. Behind a reverse proxy or load balancer, add `app.set("trust proxy", 1)` so the limit uses the real client IP.
 
 ### + Docker module
 

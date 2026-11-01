@@ -33,6 +33,7 @@ const SOURCE_STYLES: Record<
   auth: { label: "auth", text: "text-tui-amber" },
   docker: { label: "docker", text: "text-tui-lavender" },
   "rate-limit": { label: "rate-limit", text: "text-tui-pink" },
+  ci: { label: "ci", text: "text-tui-lime" },
 };
 
 function pickRandom<T>(values: readonly T[]): T {
@@ -47,6 +48,7 @@ function randomChoices(): StackChoices {
     useAuth: Math.random() < 0.5,
     useDocker: Math.random() < 0.5,
     useRateLimit: Math.random() < 0.5,
+    useCi: Math.random() < 0.5,
   };
 }
 
@@ -195,6 +197,14 @@ export function StackBuilder() {
               isChecked={choices.useRateLimit}
               isDisabled={!isRateLimitAvailable}
               onChange={(isChecked) => update({ useRateLimit: isChecked })}
+            />
+            <OptionTile
+              type="checkbox"
+              name="ci"
+              label="ci"
+              description="GitHub Actions"
+              isChecked={choices.useCi}
+              onChange={(isChecked) => update({ useCi: isChecked })}
             />
           </OptionGrid>
         </PaneBlock>

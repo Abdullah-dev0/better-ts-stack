@@ -1,0 +1,10 @@
+{
+  "id": "ci",
+  "name": "GitHub Actions CI",
+  "description": "A GitHub Actions workflow that builds, type-checks, and lints every push and pull request",
+  "type": "feature",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {},
+  "envVars": {}
+}

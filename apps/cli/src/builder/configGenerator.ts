@@ -188,7 +188,9 @@ export async function generateEnvFile(
     envContent +=
       "# Copy this file to .env and update with your actual values\n\n";
 
-    let localEnvContent = envContent;
+    let localEnvContent = "# Environment Variables\n";
+    localEnvContent +=
+      "# Local values for this project. Do not commit them\n\n";
 
     // Add each environment variable
     for (const [key, value] of Object.entries(envVars)) {

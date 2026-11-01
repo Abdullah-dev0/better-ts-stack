@@ -4,12 +4,12 @@
   "description": "Drizzle ORM for Express with PostgreSQL",
   "type": "database",
   "dependencies": {
-    "drizzle-orm": "^0.45.2",
-    "pg": "^8.23.0",
+    "drizzle-orm": "^0.45.4",
+    "pg": "^8.23.1",
     "dotenv": "^17.4.2"
   },
   "devDependencies": {
-    "drizzle-kit": "^0.31.10",
+    "drizzle-kit": "^0.31.11",
     "@types/pg": "^8.23.1"
   },
   "scripts": {

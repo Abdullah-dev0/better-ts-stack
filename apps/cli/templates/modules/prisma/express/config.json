@@ -4,11 +4,11 @@
   "description": "Prisma ORM with PostgreSQL database support",
   "type": "database",
   "dependencies": {
-    "@prisma/adapter-pg": "^7.10.0",
-    "@prisma/client": "^7.10.0"
+    "@prisma/adapter-pg": "^7.10.1",
+    "@prisma/client": "^7.10.1"
   },
   "devDependencies": {
-    "prisma": "^7.10.0"
+    "prisma": "^7.10.1"
   },
   "scripts": {
     "prisma:generate": "prisma generate",
@@ -22,6 +22,6 @@
   },
   "overrides": {
     "deepmerge-ts": "^8.0.2",
-    "mysql2": "^3.24.3"
+    "mysql2": "^3.24.6"
   }
 }

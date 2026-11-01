@@ -1,5 +1,13 @@
 import { Controller, Get } from "@nestjs/common";
+{{#if useRateLimit}}
+import { SkipThrottle } from "@nestjs/throttler";
+{{/if}}
 
+{{#if useRateLimit}}
+// Docker and load balancers call the health check on a schedule, so it is not
+// counted
+@SkipThrottle()
+{{/if}}
 @Controller("health")
 export class HealthController {
   @Get()

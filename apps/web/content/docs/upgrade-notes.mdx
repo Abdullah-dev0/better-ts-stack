@@ -3,6 +3,50 @@ title: Upgrade notes
 description: What changed in each release and what to do when upgrading
 ---
 
+## 2.1.1
+
+Adds a GitHub Actions workflow, and fixes security issues and bugs. Projects you already generated are not changed.
+
+### New
+
+- **GitHub Actions CI.** Add a workflow with `--ci` or the new "Add GitHub Actions CI?" prompt. On every push to `main` and every pull request it installs dependencies with your package manager, then builds, type-checks, and lints on Node.js 24. It needs no secrets. It is off unless you choose it. See [GitHub Actions CI](/docs/usage#github-actions-ci).
+
+### Security
+
+- **New projects require patched dependencies**, including Next.js 16.4.3, past the [October 14 security update](https://nextjs.org/blog/nextjs-security-update-october-14-2026) with its critical remote code execution fixes, and Better Auth 1.7.14. New projects already resolved these through their version ranges; the minimum versions are now raised.
+- **Update existing Next.js projects now:** run `npm install next@latest`, then rebuild and redeploy. Next.js plans [another security release](https://nextjs.org/blog/upcoming-nextjs-security-release-november-2026) on November 3, 2026, so update again after that.
+- **Update existing Better Auth projects** with `npm install better-auth@latest`.
+- **The CLI itself** moves to Handlebars 4.7.10 and Zod 4.6.7, which fix reported vulnerabilities.
+
+### Fixed
+
+- **`npm run preview` works in TanStack Start projects.** It returned a 500 since the move to Nitro in 2.1.0.
+- **Rate limiting no longer counts `/health`.** Frequent health checks could use up the limit and get `429`, which can make a host restart the app. To fix an existing project, skip `/health` in `apiLimiter` (Express) or add `@SkipThrottle()` to `HealthController` (NestJS).
+- **Prisma projects build without a `.env` file**, for example in CI or on a host. `prisma generate` failed because `DATABASE_URL` was missing. In an existing project, change `url: env("DATABASE_URL")` to `url: process.env.DATABASE_URL ?? ""` in `prisma.config.ts`.
+- **The generated Prisma client is not committed.** It is now in `.gitignore`. In an existing project, add `src/generated/` (Express, NestJS) or `/generated/` (Next.js, TanStack Start), then run `git rm -r --cached` on that folder.
+- **A project named `db` gets a valid Compose file.** Its app service had the same name as the database service. The app service is now always called `app`.
+- **An empty project name is rejected** at the prompt with a clear message.
+- **`.env` no longer says to copy itself to `.env`.** That line stays in `.env.example`.
+- **The README of a generated project lists rate limiting.**
+- **Next steps remind you to start PostgreSQL** when Compose does not run it.
+- **Declining "Create this project?" says that nothing was created.**
+
+### Changed in generated projects
+
+- **Next.js projects no longer get `PORT` in `.env`.** Next.js ignored it there. Use `PORT=3001 npm run dev` instead.
+- **`proxy.ts` is only added to Next.js projects with auth.** Without auth it did nothing on every request.
+- **Express no longer logs an error for each invalid JWT**, which any client could trigger. It still answers `401`.
+- **All dependencies move to their current releases within the same major version.** TypeScript stays on 6 because `typescript-eslint` does not support 7 yet, and Prisma stays on 7 because version 8 is still a release candidate and Better Auth does not support it yet.
+
+### Docs
+
+- Corrected the Compose section of the configuration page, the TanStack Start build description in the README, and the description of `proxy.ts`.
+
+### For contributors
+
+- CI also runs on pushes to `main`, because releases go straight there.
+- The smoke checks verify that `/health` is never rate limited.
+
 ## 2.1.0
 
 Projects you already generated are not changed.

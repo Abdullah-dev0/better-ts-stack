@@ -50,6 +50,7 @@ npx better-ts-stack . --framework nextjs --database drizzle --pm pnpm
 | `--auth` / `--no-auth`             | Add authentication                           |
 | `--docker` / `--no-docker`         | Add Docker files                             |
 | `--rate-limit` / `--no-rate-limit` | Add rate limiting (Express and NestJS)       |
+| `--ci` / `--no-ci`                 | Add a GitHub Actions workflow                |
 | `--git` / `--no-git`               | Initialize a git repository                  |
 | `--install` / `--no-install`       | Install dependencies                         |
 | `-y`, `--yes`                      | Use defaults for missing options, no prompts |
@@ -81,8 +82,9 @@ The CLI guides you through these questions in order:
    - Express / NestJS: JWT-based auth (always available)
    - Next.js / TanStack Start: Better Auth (only prompted when a database is selected)
 8. **Rate limiting** — Express / NestJS only: limit requests per IP? (yes/no)
-9. **Git** — initialize a git repository? (yes/no)
-10. **Install dependencies** — run the install command now? (yes/no)
+9. **CI** — add a GitHub Actions workflow? (yes/no)
+10. **Git** — initialize a git repository? (yes/no)
+11. **Install dependencies** — run the install command now? (yes/no)
 
 > **Note**: The CLI does not ask for a port. The server port defaults to `3000` via the `PORT` environment variable.
 
@@ -97,6 +99,7 @@ A generated project includes:
 - Database connection and ORM setup (if selected)
 - Authentication scaffolding (if selected)
 - Docker files (if selected)
+- A GitHub Actions workflow (if selected)
 - Optional git repository initialization
 
 ## Available Modules
@@ -120,13 +123,12 @@ A generated project includes:
 - Next.js 16 with React 19 and App Router
 - Tailwind CSS v4
 - `dev`, `build`, `start`, `lint` scripts
-- A proxy configuration file (`proxy.ts`) rendered from a Handlebars template
+- With Better Auth, `proxy.ts` redirects signed-out visitors away from `/dashboard`
 
 ### Frontend — TanStack Start
 
 - TanStack Start (React) with TanStack Router, React Query, and SSR
 - Tailwind CSS v4
-- Vite-based build (no Nitro) producing `dist/server/server.js` + `dist/client`
 - Production server built by Nitro (`node .output/server/index.mjs`), also used in Docker
 - `~/*` path alias and `components.json` (shadcn-style) configured for UI components
 - `dev`, `build`, `start`, `preview`, `type:check`, `lint` scripts

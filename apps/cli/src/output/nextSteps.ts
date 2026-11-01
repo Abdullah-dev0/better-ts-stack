@@ -53,6 +53,15 @@ export function generateNextSteps(
     steps.push("docker compose up -d db");
   }
 
+  if (
+    (config.database === "prisma" || config.database === "drizzle") &&
+    !hasDockerDatabase
+  ) {
+    steps.push(
+      "Ensure PostgreSQL is running locally or update DATABASE_URL in .env"
+    );
+  }
+
   if (config.database === "prisma") {
     steps.push(`${config.packageManager} run prisma:generate`);
     steps.push(`${config.packageManager} run prisma:migrate`);

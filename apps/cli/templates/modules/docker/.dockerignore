@@ -2,6 +2,7 @@ node_modules
 npm-debug.log
 .env*
 .git
+.github
 .gitignore
 README.md
 .vscode

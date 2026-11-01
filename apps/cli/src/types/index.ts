@@ -36,6 +36,7 @@ export interface ProjectConfig {
   useAuth: boolean;
   // Express and NestJS only; Better Auth limits its own endpoints
   useRateLimit: boolean;
+  useCi: boolean;
 
   // Tooling
   packageManager: PackageManager;
@@ -58,6 +59,7 @@ export const DEFAULT_CHOICES: StackChoices = {
   useDocker: false,
   useAuth: false,
   useRateLimit: false,
+  useCi: false,
   packageManager: "npm",
   initGit: true,
   installDeps: false,
@@ -160,6 +162,8 @@ export interface TemplateContext {
   useAuth: boolean;
   useRateLimit: boolean;
   docker: DockerCommands;
+  // Variables the CI build step sets
+  ciBuildEnv: { name: string; value: string }[];
   helpers: {
     eq: (a: string, b: string) => boolean;
     runner: () => string;

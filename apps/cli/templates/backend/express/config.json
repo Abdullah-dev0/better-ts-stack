@@ -13,13 +13,13 @@
     "type:check": "tsc --noEmit"
   },
   "dependencies": {
-    "express": "^5.2.1",
+    "express": "^5.3.0",
     "dotenv": "^17.4.2",
     "cors": "^2.8.6",
     "cross-env": "^10.1.0",
     "helmet": "^8.3.0",
-    "morgan": "^1.12.0",
-    "zod": "^4.6.5"
+    "morgan": "^1.12.1",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -27,13 +27,13 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/morgan": "^1.9.10",
-    "@types/node": "^24.13.3",
-    "eslint": "^10.10.0",
+    "@types/node": "^24.19.2",
+    "eslint": "^10.14.0",
     "eslint-config-prettier": "^10.1.8",
-    "prettier": "^3.9.6",
-    "tsx": "^4.23.13",
+    "prettier": "^3.9.10",
+    "tsx": "^4.23.15",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.69.0"
+    "typescript-eslint": "^8.72.1"
   },
   "envVars": {
     "PORT": "3000",

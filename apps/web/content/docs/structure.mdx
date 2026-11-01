@@ -148,7 +148,6 @@ A full-stack project is a **single Next.js application** at the project root. Th
       <File name="(static assets)" />
     </Folder>
     <File name="components.json" />
-    <File name="proxy.ts" />
     <File name="next.config.ts" />
     <File name="postcss.config.mjs" />
     <File name="tsconfig.json" />
@@ -426,24 +425,24 @@ A TanStack Start project is a **single Vite-based application** at the project r
 
 ### Full-stack (Next.js)
 
-| File                 | Purpose                                          |
-| -------------------- | ------------------------------------------------ |
-| `app/layout.tsx`     | Root layout with font and metadata               |
-| `app/page.tsx`       | Home page                                        |
-| `app/globals.css`    | Tailwind CSS v4 import + design tokens           |
-| `proxy.ts`           | Dev proxy configuration (rendered from template) |
-| `next.config.ts`     | Next.js configuration                            |
-| `postcss.config.mjs` | PostCSS setup for Tailwind                       |
-| `components.json`    | shadcn CLI-compatible component metadata         |
-| `lib/utils.ts`       | Shared `cn()` helper for UI components           |
-| `lib/auth.ts`        | Better Auth server configuration                 |
-| `lib/auth-client.ts` | `createAuthClient()` for client components       |
-| `lib/auth-schema.ts` | Shared auth form validation and error parsing    |
-| `lib/prisma.ts`      | Prisma client with `@prisma/adapter-pg`          |
-| `lib/db.ts`          | Drizzle database connection                      |
-| `lib/schema.ts`      | Drizzle table definitions                        |
-| `prisma.config.ts`   | Prisma datasource URL configuration              |
-| `drizzle.config.ts`  | Drizzle Kit configuration                        |
+| File                 | Purpose                                       |
+| -------------------- | --------------------------------------------- |
+| `app/layout.tsx`     | Root layout with font and metadata            |
+| `app/page.tsx`       | Home page                                     |
+| `app/globals.css`    | Tailwind CSS v4 import + design tokens        |
+| `proxy.ts`           | Better Auth redirect for signed-out visitors  |
+| `next.config.ts`     | Next.js configuration                         |
+| `postcss.config.mjs` | PostCSS setup for Tailwind                    |
+| `components.json`    | shadcn CLI-compatible component metadata      |
+| `lib/utils.ts`       | Shared `cn()` helper for UI components        |
+| `lib/auth.ts`        | Better Auth server configuration              |
+| `lib/auth-client.ts` | `createAuthClient()` for client components    |
+| `lib/auth-schema.ts` | Shared auth form validation and error parsing |
+| `lib/prisma.ts`      | Prisma client with `@prisma/adapter-pg`       |
+| `lib/db.ts`          | Drizzle database connection                   |
+| `lib/schema.ts`      | Drizzle table definitions                     |
+| `prisma.config.ts`   | Prisma datasource URL configuration           |
+| `drizzle.config.ts`  | Drizzle Kit configuration                     |
 
 ### Full-stack (TanStack Start)
 

@@ -34,20 +34,21 @@ npx better-ts-stack . --framework nextjs --database drizzle --pm pnpm
 npx better-ts-stack my-api --framework express --yes --dry-run
 ```
 
-| Flag                         | Values                                       |
-| ---------------------------- | -------------------------------------------- |
-| `--framework <name>`         | `express`, `nestjs`, `nextjs`, `tanstack`    |
-| `--database <name>`          | `none`, `prisma`, `drizzle`, `mongoose`      |
-| `--pm <name>`                | `npm`, `pnpm`, `bun`                         |
-| `--auth` / `--no-auth`       | Add authentication                           |
-| `--docker` / `--no-docker`   | Add Docker files                             |
-| `--rate-limit` / `--no-rate-limit` | Add rate limiting (Express and NestJS) |
-| `--git` / `--no-git`         | Initialize a git repository                  |
-| `--install` / `--no-install` | Install dependencies                         |
-| `-y`, `--yes`                | Use defaults for missing options, no prompts |
-| `--dry-run`                  | List what would be created, write nothing    |
-| `-h`, `--help`               | Show help                                    |
-| `-v`, `--version`            | Show the version                             |
+| Flag                               | Values                                       |
+| ---------------------------------- | -------------------------------------------- |
+| `--framework <name>`               | `express`, `nestjs`, `nextjs`, `tanstack`    |
+| `--database <name>`                | `none`, `prisma`, `drizzle`, `mongoose`      |
+| `--pm <name>`                      | `npm`, `pnpm`, `bun`                         |
+| `--auth` / `--no-auth`             | Add authentication                           |
+| `--docker` / `--no-docker`         | Add Docker files                             |
+| `--rate-limit` / `--no-rate-limit` | Add rate limiting (Express and NestJS)       |
+| `--ci` / `--no-ci`                 | Add a GitHub Actions workflow                |
+| `--git` / `--no-git`               | Initialize a git repository                  |
+| `--install` / `--no-install`       | Install dependencies                         |
+| `-y`, `--yes`                      | Use defaults for missing options, no prompts |
+| `--dry-run`                        | List what would be created, write nothing    |
+| `-h`, `--help`                     | Show help                                    |
+| `-v`, `--version`                  | Show the version                             |
 
 `--database` names the ORM, which also selects the database: `prisma` and `drizzle` use PostgreSQL, `mongoose` uses MongoDB.
 
@@ -154,9 +155,9 @@ $ Frontend framework
     TanStack Start
 ```
 
-| Option             | What it generates                                      |
-| ------------------ | ------------------------------------------------------ |
-| **Next.js 16**     | App Router, `next dev`/`next build`, standalone server |
+| Option             | What it generates                                       |
+| ------------------ | ------------------------------------------------------- |
+| **Next.js 16**     | App Router, `next dev`/`next build`, standalone server  |
 | **TanStack Start** | File-based routing, `vite dev`, Nitro production server |
 
 </Step>
@@ -202,8 +203,8 @@ $ ORM
   › Mongoose  MongoDB ODM
 ```
 
-| ODM      | Notes                          |
-| -------- | ------------------------------ |
+| ODM      | Notes                                        |
+| -------- | -------------------------------------------- |
 | Mongoose | Express, NestJS, Next.js, and TanStack Start |
 
 > If you select **none** for database type, this prompt is skipped entirely.
@@ -262,6 +263,18 @@ $ Add rate limiting?
 ```
 
 If yes, every route allows 100 requests per client IP in 15 minutes, and with auth, sign-up and login allow 10. Express uses `express-rate-limit`; NestJS uses `@nestjs/throttler`. Full-stack projects are not asked: Better Auth already limits its own endpoints. See [rate limiting](/docs/modules/backend#-rate-limiting).
+
+</Step>
+
+<Step>
+### GitHub Actions CI
+
+```
+$ Add GitHub Actions CI?
+    Yes   › No
+```
+
+If yes, the project gets `.github/workflows/ci.yml`. On every push to `main` and every pull request it installs dependencies with your package manager, then runs `build`, `type:check`, and `lint` on Node.js 24. The build step sets placeholders for the variables a build needs, such as `DATABASE_URL`, so the workflow needs no secrets and never connects to a database. Commit your lockfile to get the same versions in CI.
 
 </Step>
 

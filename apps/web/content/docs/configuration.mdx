@@ -36,7 +36,8 @@ JWT_EXPIRES_IN=1h
 ### Full-stack / Next.js (.env)
 
 ```bash
-# Base (always generated). NODE_ENV is set by next, vite, and the Nitro server.
+# TanStack Start only. Next.js picks its port before it loads .env.
+# NODE_ENV is set by next, vite, and the Nitro server.
 PORT=3000
 
 # + Better Auth (requires database)
@@ -245,11 +246,11 @@ See full Dockerfile in [Docker Module](/docs/modules/docker).
 
 ### docker-compose.yml
 
-The generated file defines only the app service:
+The generated file defines an `app` service, and a `db` service when you choose a database:
 
 ```yaml
 services:
-  your-project:
+  app:
     build: .
     ports:
       - "3000:3000"
@@ -260,7 +261,7 @@ services:
     restart: unless-stopped
 ```
 
-Database services are **not** generated automatically. Add them manually if needed. See the [Docker module docs](/docs/modules/docker) for an example.
+With a database, Compose also runs PostgreSQL or MongoDB and the app waits until it is healthy. See the [Docker module docs](/docs/modules/docker#environment-and-databases).
 
 ---
 

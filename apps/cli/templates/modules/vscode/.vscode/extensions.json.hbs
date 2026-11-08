@@ -1,0 +1,29 @@
+{
+  "recommendations": [
+{{#if (eq framework 'express')}}
+    "esbenp.prettier-vscode",
+{{/if}}
+{{#if (eq framework 'nestjs')}}
+    "esbenp.prettier-vscode",
+{{/if}}
+{{#if (eq framework 'nextjs')}}
+    "bradlc.vscode-tailwindcss",
+{{/if}}
+{{#if (eq framework 'tanstack')}}
+    "bradlc.vscode-tailwindcss",
+{{/if}}
+{{#if (eq database 'prisma')}}
+    "Prisma.prisma",
+{{/if}}
+{{#if (eq database 'mongoose')}}
+    "mongodb.mongodb-vscode",
+{{/if}}
+{{#if useDocker}}
+    "ms-azuretools.vscode-containers",
+{{/if}}
+{{#if useCi}}
+    "github.vscode-github-actions",
+{{/if}}
+    "dbaeumer.vscode-eslint"
+  ]
+}

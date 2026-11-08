@@ -1,0 +1,22 @@
+{
+{{#if (eq framework 'express')}}
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+{{/if}}
+{{#if (eq framework 'nestjs')}}
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+{{/if}}
+{{#if (eq framework 'nextjs')}}
+  "files.associations": { "*.css": "tailwindcss" },
+{{/if}}
+{{#if (eq framework 'tanstack')}}
+  "files.associations": { "*.css": "tailwindcss" },
+  "files.readonlyInclude": { "**/routeTree.gen.ts": true },
+  "files.watcherExclude": { "**/routeTree.gen.ts": true },
+  "search.exclude": { "**/routeTree.gen.ts": true },
+{{/if}}
+  "editor.codeActionsOnSave": { "source.fixAll.eslint": "explicit" },
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true
+}

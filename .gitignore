@@ -32,6 +32,8 @@ next-env.d.ts
 
 # IDE
 .vscode/
+# The VS Code files that the vscode module copies into generated projects
+!apps/cli/templates/modules/vscode/.vscode/
 .idea/
 *.swp
 *.swo

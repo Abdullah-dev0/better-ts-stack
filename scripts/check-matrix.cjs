@@ -12,7 +12,7 @@ for (const c of matrix.cases.filter(
     c.config.framework === framework &&
     c.config.packageManager === "npm" &&
     !c.config.useDocker &&
-    (!filter || c.name === filter)
+    (!filter || c.name === filter),
 )) {
   const log = path.join(matrix.root, c.name + ".log");
   const fd = fs.openSync(log, "a");
@@ -23,17 +23,14 @@ for (const c of matrix.cases.filter(
     ["run", "type:check"],
     ["run", "lint"],
   ]) {
-    const r = spawnSync(
-      process.platform === "win32" ? "npm.cmd" : "npm",
-      args,
-      {
-        cwd: c.target,
-        stdio: ["ignore", fd, fd],
-        shell: process.platform === "win32",
-        timeout: 600000,
-        env: { ...process.env, NEXT_TELEMETRY_DISABLED: "1" },
-      }
-    );
+    // One command string: Node.js deprecates arguments passed with shell
+    const r = spawnSync(`npm ${args.join(" ")}`, {
+      cwd: c.target,
+      stdio: ["ignore", fd, fd],
+      shell: true,
+      timeout: 600000,
+      env: { ...process.env, NEXT_TELEMETRY_DISABLED: "1" },
+    });
     checks.push({
       command: "npm " + args.join(" "),
       status: r.status,
@@ -45,7 +42,7 @@ for (const c of matrix.cases.filter(
   results.push({ name: c.name, target: c.target, log, checks });
   fs.writeFileSync(
     path.join(matrix.root, (filter || framework) + "-results.json"),
-    JSON.stringify(results, null, 2)
+    JSON.stringify(results, null, 2),
   );
   console.log(c.name, JSON.stringify(checks));
 }

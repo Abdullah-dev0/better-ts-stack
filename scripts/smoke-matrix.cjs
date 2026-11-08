@@ -18,17 +18,14 @@ const filter = process.argv[4];
 
 function startServer(cwd, log) {
   const fd = fs.openSync(log, "a");
-  const child = spawn(
-    process.platform === "win32" ? "npm.cmd" : "npm",
-    ["run", "start"],
-    {
-      cwd,
-      stdio: ["ignore", fd, fd],
-      shell: process.platform === "win32",
-      detached: process.platform !== "win32",
-      env: { ...process.env, PORT: String(PORT), NEXT_TELEMETRY_DISABLED: "1" },
-    }
-  );
+  // One command string: Node.js deprecates arguments passed with shell
+  const child = spawn("npm run start", {
+    cwd,
+    stdio: ["ignore", fd, fd],
+    shell: true,
+    detached: process.platform !== "win32",
+    env: { ...process.env, PORT: String(PORT), NEXT_TELEMETRY_DISABLED: "1" },
+  });
   return () => {
     // npm starts the server as a grandchild, so stop the whole process tree
     if (process.platform === "win32")
@@ -46,7 +43,7 @@ async function main() {
       c.config.packageManager === "npm" &&
       !c.config.useDocker &&
       c.config.database === "none" &&
-      (!filter || c.name === filter)
+      (!filter || c.name === filter),
   )) {
     const log = path.join(matrix.root, c.name + ".smoke.log");
     const stop = startServer(c.target, log);
@@ -71,7 +68,7 @@ async function main() {
 
   fs.writeFileSync(
     path.join(matrix.root, (filter || framework) + "-smoke-results.json"),
-    JSON.stringify(results, null, 2)
+    JSON.stringify(results, null, 2),
   );
   if (results.length === 0) throw new Error("No matching matrix cases");
   if (results.some((result) => result.failed)) process.exitCode = 1;

@@ -1,0 +1,35 @@
+name: Publish
+
+# Publishes the CLI to npm when a GitHub release is published. npm trusted
+# publishing authenticates this workflow through OIDC, so no npm token is stored
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      # Trusted publishing needs npm 11.5.1 or later
+      - run: npm install -g npm@latest
+      - run: npm ci
+      # The release tag must match the version being published
+      - name: Check the tag matches the version
+        run: |
+          version="v$(node -p "require('./apps/cli/package.json').version")"
+          if [ "$version" != "$GITHUB_REF_NAME" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match package version $version"
+            exit 1
+          fi
+      # prepack builds the CLI before it is packed
+      - run: npm publish --workspace better-ts-stack

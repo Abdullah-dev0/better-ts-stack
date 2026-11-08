@@ -75,6 +75,7 @@ export function buildTemplateContext(config: ProjectConfig): TemplateContext {
     useDocker: config.useDocker,
     useAuth: config.useAuth,
     useRateLimit: config.useRateLimit,
+    useCi: config.useCi,
     docker: DOCKER_COMMANDS[config.packageManager],
     ciBuildEnv: getCiBuildEnv(config),
     helpers: {

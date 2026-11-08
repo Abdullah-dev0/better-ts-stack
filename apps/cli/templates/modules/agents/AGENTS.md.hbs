@@ -1,0 +1,237 @@
+# AGENTS.md
+
+Instructions for AI coding agents working in {{projectName}}. Read this before making changes.
+
+## Stack
+
+{{#if (eq framework 'express')}}
+- Express 5 REST API in TypeScript, compiled to CommonJS with `tsc`
+{{/if}}
+{{#if (eq framework 'nestjs')}}
+- NestJS 12 REST API in TypeScript, using ES modules
+{{/if}}
+{{#if (eq framework 'nextjs')}}
+- Next.js 16 with the App Router, React 19, Tailwind CSS 4, and shadcn/ui
+{{/if}}
+{{#if (eq framework 'tanstack')}}
+- TanStack Start with Vite, Nitro, React 19, Tailwind CSS 4, and shadcn/ui
+{{/if}}
+{{#if (eq database 'prisma')}}
+- PostgreSQL through Prisma 7
+{{/if}}
+{{#if (eq database 'drizzle')}}
+- PostgreSQL through Drizzle ORM
+{{/if}}
+{{#if (eq database 'mongoose')}}
+- MongoDB through Mongoose
+{{/if}}
+{{#if useAuth}}
+{{#if (eq framework 'express')}}
+- JWT auth: `POST /auth/register`, `POST /auth/login`, and `GET /auth/me`
+{{/if}}
+{{#if (eq framework 'nestjs')}}
+- JWT auth: `POST /auth/register`, `POST /auth/login`, and `GET /auth/me`
+{{/if}}
+{{#if (eq framework 'nextjs')}}
+- Better Auth with email and password
+{{/if}}
+{{#if (eq framework 'tanstack')}}
+- Better Auth with email and password
+{{/if}}
+{{/if}}
+{{#if useRateLimit}}
+- Rate limiting on every route except `/health`
+{{/if}}
+{{#if useDocker}}
+- Docker: `Dockerfile` and `docker-compose.yml`
+{{/if}}
+{{#if useCi}}
+- GitHub Actions CI in `.github/workflows/ci.yml`
+{{/if}}
+- Package manager: {{packageManager}}. Do not use another one or add its lockfile
+- Node.js 24 or later
+
+## Commands
+
+- Install: `{{packageManager}} install`
+- Dev server: `{{docker.run}} dev`
+- Build: `{{docker.run}} build`
+- Type-check: `{{docker.run}} type:check`
+- Lint: `{{docker.run}} lint`
+{{#if (eq database 'prisma')}}
+- After changing `prisma/schema.prisma`: `{{docker.run}} prisma:migrate` creates and applies a migration and regenerates the client
+{{/if}}
+{{#if (eq database 'drizzle')}}
+- After changing the schema: `{{docker.run}} db:generate` writes a migration, then `{{docker.run}} db:migrate` applies it
+{{/if}}
+
+## Before you finish
+
+Run type-check and lint, and fix every error they report. Run the build too when you changed config, dependencies, or anything the build reads. Do not report a task as done while any of them fails.
+
+## Layout
+
+{{#if (eq framework 'express')}}
+- `src/index.ts`: creates the app, adds middleware, and mounts the routers
+- `src/env.ts`: checks the environment variables with Zod at startup, so a missing one stops the server with a clear message
+- `src/routes/`: one router per resource, mounted in `src/index.ts`
+{{#if useAuth}}
+- `src/controllers/`, `src/services/`: request handlers and data access for auth
+- `src/middleware/requireAuth.ts`: add it to a route to require a valid JWT
+{{/if}}
+{{#if useRateLimit}}
+- `src/middleware/rateLimit.ts`: the rate limiters
+{{/if}}
+{{#if (eq database 'prisma')}}
+- `src/lib/prisma.ts`: the shared Prisma client. Do not create another one
+{{/if}}
+{{#if (eq database 'drizzle')}}
+- `src/lib/db.ts`, `src/lib/schema.ts`: the database client and the tables
+{{/if}}
+{{#if (eq database 'mongoose')}}
+- `src/lib/db.ts`, `src/models/`: the connection and the Mongoose models
+{{/if}}
+{{/if}}
+{{#if (eq framework 'nestjs')}}
+- `src/main.ts`: starts the app
+- `src/app.module.ts`: the root module. Register new modules and controllers here
+- `src/env.ts`: checks the environment variables with Zod at startup, so a missing one stops the server with a clear message
+- `src/health/`: `GET /health`
+{{#if useAuth}}
+- `src/auth/`: the auth module. Put `@UseGuards(AuthGuard)` on a route to require a valid JWT
+{{/if}}
+{{#if (eq database 'prisma')}}
+- `src/prisma/`: `PrismaService`, injected wherever the database is needed
+{{/if}}
+{{#if (eq database 'drizzle')}}
+- `src/database/`: the database module and the tables in `schema.ts`
+{{/if}}
+{{#if (eq database 'mongoose')}}
+- `src/users/user.schema.ts`: the Mongoose schema for users
+{{/if}}
+{{/if}}
+{{#if (eq framework 'nextjs')}}
+- `app/`: routes, layouts, and route handlers. Pages are Server Components unless they need state, effects, or event handlers
+- `components/ui/`: shadcn/ui components. Add new ones with the shadcn CLI instead of writing them by hand
+- `lib/utils.ts`: the `cn()` class name helper
+{{#if useAuth}}
+- `lib/auth.ts`: the Better Auth server. `lib/auth-client.ts`: the client for components
+- `app/api/auth/[...all]/route.ts`: the Better Auth endpoints. Do not rename it
+- `proxy.ts`: sends signed-out visitors from `/dashboard` to `/sign-in`. Add other protected paths to its `matcher`
+{{/if}}
+{{#if (eq database 'prisma')}}
+- `lib/prisma.ts`: the shared Prisma client. Do not create another one
+{{/if}}
+{{#if (eq database 'drizzle')}}
+- `lib/db.ts`, `lib/schema.ts`: the database client and the tables
+{{/if}}
+{{#if (eq database 'mongoose')}}
+- `lib/db.ts`, `models/`: the connection and the Mongoose models
+{{/if}}
+{{/if}}
+{{#if (eq framework 'tanstack')}}
+- `src/routes/`: file-based routes. A new file becomes a route
+- `src/routeTree.gen.ts`: generated by the dev server and the build. Never edit it
+- `src/router.tsx`, `src/routes/__root.tsx`: the router and the root layout
+- `src/components/ui/`: shadcn/ui components. Add new ones with the shadcn CLI instead of writing them by hand
+- `src/lib/utils.ts`: the `cn()` class name helper
+{{#if useAuth}}
+- `src/lib/auth.ts`: the Better Auth server. `src/lib/auth-client.ts`: the client for components
+- `src/routes/api/auth/$.ts`: the Better Auth endpoints. Do not rename it
+- `src/routes/dashboard.tsx`: an example of a protected route that redirects in `beforeLoad`
+{{/if}}
+{{#if (eq database 'prisma')}}
+- `src/lib/prisma.ts`: the shared Prisma client. Do not create another one
+{{/if}}
+{{#if (eq database 'drizzle')}}
+- `src/lib/db.ts`, `src/lib/schema.ts`: the database client and the tables
+{{/if}}
+{{#if (eq database 'mongoose')}}
+- `src/lib/db.ts`, `src/models/`: the connection and the Mongoose models
+{{/if}}
+{{/if}}
+
+## Rules
+
+- TypeScript is strict. Do not use `any` or `@ts-ignore` to silence an error; fix the type
+{{#if (eq framework 'nestjs')}}
+- Relative imports end in `.js`, as ES modules require: `import { AuthModule } from "./auth/auth.module.js"`
+{{/if}}
+- Keep `.env` out of git. When you add an environment variable, add it to `.env.example` too{{#if (eq framework 'express')}}, and to `src/env.ts`{{/if}}{{#if (eq framework 'nestjs')}}, and to `src/env.ts`{{/if}}
+{{#if (eq database 'prisma')}}
+- The Prisma client is generated into {{#if (eq framework 'express')}}`src/generated/`{{/if}}{{#if (eq framework 'nestjs')}}`src/generated/`{{/if}}{{#if (eq framework 'nextjs')}}`generated/`{{/if}}{{#if (eq framework 'tanstack')}}`generated/`{{/if}}. Never edit or commit it
+{{/if}}
+- Match the existing code style. ESLint settings are in `eslint.config.mjs`{{#if (eq framework 'express')}} and Prettier settings in `.prettierrc`{{/if}}{{#if (eq framework 'nestjs')}} and Prettier settings in `.prettierrc`{{/if}}
+- Add a dependency only when the task needs it, and install it with {{packageManager}}
+
+## Production rules
+
+- Validate every input from outside the app (request bodies, query strings, form data) with Zod before you use it{{#unless useAuth}}{{#if (eq framework 'nextjs')}} (add `zod` with {{packageManager}} first){{/if}}{{#if (eq framework 'tanstack')}} (add `zod` with {{packageManager}} first){{/if}}{{/unless}}
+- Never log or return secrets, tokens, or passwords. Error responses get a short message and the right status code, never a stack trace
+{{#unless (eq database 'none')}}
+- Query the database through {{#if (eq database 'prisma')}}Prisma{{/if}}{{#if (eq database 'drizzle')}}Drizzle{{/if}}{{#if (eq database 'mongoose')}}Mongoose{{/if}}, never with SQL or queries built from strings
+{{/unless}}
+{{#if (eq framework 'express')}}
+- Keep the security middleware in `src/index.ts` (`helmet`, `cors`{{#if useRateLimit}}, the rate limiter{{/if}}) in place. Set `CORS_ORIGIN` to your real origins in production
+{{/if}}
+{{#if (eq framework 'nestjs')}}
+- Keep the security setup in `src/main.ts` and `src/app.module.ts` in place. Set `CORS_ORIGIN` to your real origins in production
+{{/if}}
+{{#if (eq framework 'nextjs')}}
+- Code that reads secrets or the database stays on the server. Only variables prefixed with `NEXT_PUBLIC_` reach the browser, so never put a secret in one
+{{/if}}
+{{#if (eq framework 'tanstack')}}
+- Code that reads secrets or the database runs in server functions or server routes. Only variables prefixed with `VITE_` reach the browser, so never put a secret in one
+{{/if}}
+{{#if useAuth}}
+{{#if (eq framework 'nextjs')}}
+- Check the session on the server in every protected page, route handler, and server action. Hiding a button in the UI does not protect anything
+{{/if}}
+{{#if (eq framework 'tanstack')}}
+- Check the session on the server in every protected route and server function. Hiding a button in the UI does not protect anything
+{{/if}}
+{{/if}}
+{{#if (eq framework 'express')}}
+- Keep `GET /health` fast and free of auth{{#if useRateLimit}} and rate limiting{{/if}}, so hosts can check that the app is up
+{{/if}}
+{{#if (eq framework 'nestjs')}}
+- Keep `GET /health` fast and free of auth{{#if useRateLimit}} and rate limiting{{/if}}, so hosts can check that the app is up
+{{/if}}
+- Keep changes small and focused on the task. Do not add layers, abstractions, or files the task does not need
+
+## When you are unsure
+
+The libraries here may be newer than what you know. When you are not sure how an API works, read the official docs for the version in `package.json` instead of guessing:
+
+{{#if (eq framework 'express')}}
+- Express 5: https://expressjs.com/en/5x/api.html
+{{/if}}
+{{#if (eq framework 'nestjs')}}
+- NestJS: https://docs.nestjs.com
+{{/if}}
+{{#if (eq framework 'nextjs')}}
+- Next.js: https://nextjs.org/docs
+{{/if}}
+{{#if (eq framework 'tanstack')}}
+- TanStack Start: https://tanstack.com/start/latest/docs
+{{/if}}
+{{#if (eq database 'prisma')}}
+- Prisma: https://www.prisma.io/docs
+{{/if}}
+{{#if (eq database 'drizzle')}}
+- Drizzle: https://orm.drizzle.team/docs/overview
+{{/if}}
+{{#if (eq database 'mongoose')}}
+- Mongoose: https://mongoosejs.com/docs
+{{/if}}
+{{#if useAuth}}
+{{#if (eq framework 'nextjs')}}
+- Better Auth: https://www.better-auth.com/docs
+{{/if}}
+{{#if (eq framework 'tanstack')}}
+- Better Auth: https://www.better-auth.com/docs
+{{/if}}
+{{/if}}
+- Zod: https://zod.dev
+
+If the docs and this file disagree, follow the docs and say so.

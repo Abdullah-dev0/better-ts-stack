@@ -37,6 +37,10 @@ export interface ProjectConfig {
   // Express and NestJS only; Better Auth limits its own endpoints
   useRateLimit: boolean;
   useCi: boolean;
+  // AGENTS.md and CLAUDE.md for AI coding agents
+  useAgents: boolean;
+  // .vscode/settings.json and extensions.json
+  useVscode: boolean;
 
   // Tooling
   packageManager: PackageManager;
@@ -60,6 +64,8 @@ export const DEFAULT_CHOICES: StackChoices = {
   useAuth: false,
   useRateLimit: false,
   useCi: false,
+  useAgents: false,
+  useVscode: false,
   packageManager: "npm",
   initGit: true,
   installDeps: false,
@@ -161,6 +167,7 @@ export interface TemplateContext {
   useDocker: boolean;
   useAuth: boolean;
   useRateLimit: boolean;
+  useCi: boolean;
   docker: DockerCommands;
   // Variables the CI build step sets
   ciBuildEnv: { name: string; value: string }[];

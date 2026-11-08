@@ -142,6 +142,17 @@ export async function collectStackChoices(
     confirm({ message: "Add GitHub Actions CI?", initialValue: false })
   );
 
+  const useAgents = await ask(preset.useAgents, () =>
+    confirm({
+      message: "Add AGENTS.md for AI coding agents?",
+      initialValue: false,
+    })
+  );
+
+  const useVscode = await ask(preset.useVscode, () =>
+    confirm({ message: "Add VS Code settings?", initialValue: false })
+  );
+
   const initGit = await ask(preset.initGit, () =>
     confirm({ message: "Initialize a git repository?", initialValue: true })
   );
@@ -157,6 +168,8 @@ export async function collectStackChoices(
     useAuth,
     useRateLimit,
     useCi,
+    useAgents,
+    useVscode,
     initGit,
     installDeps,
   };

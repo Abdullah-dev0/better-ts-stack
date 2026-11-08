@@ -154,4 +154,6 @@ export const MODULE_FILES: Record<string, readonly string[]> = {
   "rate-limit/nestjs": [],
   docker: [".dockerignore", "Dockerfile", "docker-compose.yml"],
   ci: [".github/workflows/ci.yml"],
+  agents: ["AGENTS.md", "CLAUDE.md"],
+  vscode: [".vscode/extensions.json", ".vscode/settings.json"],
 };

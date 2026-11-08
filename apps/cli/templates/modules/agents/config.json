@@ -1,0 +1,10 @@
+{
+  "id": "agents",
+  "name": "AI agent instructions",
+  "description": "An AGENTS.md that tells AI coding agents how this project is built, run, and checked, and a CLAUDE.md that points Claude Code to it",
+  "type": "feature",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {},
+  "envVars": {}
+}

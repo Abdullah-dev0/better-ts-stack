@@ -67,6 +67,8 @@ export function showSummary(config: ProjectConfig, targetDir: string) {
     config.useRateLimit && "rate limit",
     config.useDocker && "docker",
     config.useCi && "ci",
+    config.useAgents && "agents",
+    config.useVscode && "vscode",
   ];
   const setup = [
     config.packageManager,

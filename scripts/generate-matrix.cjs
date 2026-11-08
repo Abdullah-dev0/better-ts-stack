@@ -44,6 +44,8 @@ async function main() {
                 useRateLimit,
                 useDocker,
                 useCi: !useDocker,
+                useAgents: useDocker,
+                useVscode: useDocker,
                 packageManager,
                 initGit: false,
                 installDeps: false,
@@ -58,6 +60,22 @@ async function main() {
                 config.useCi,
                 `${name}: ci.yml`,
               );
+              assert.equal(
+                files.includes("AGENTS.md"),
+                config.useAgents,
+                `${name}: AGENTS.md`,
+              );
+              if (config.useAgents) {
+                const agents = await fs.readFile(
+                  path.join(target, "AGENTS.md"),
+                  "utf8",
+                );
+                // Every condition rendered, and none left a run of blank lines
+                assert(
+                  !agents.includes("{{") && !agents.includes("\n\n\n"),
+                  `${name}: AGENTS.md`,
+                );
+              }
               const manifest = JSON.parse(
                 await fs.readFile(path.join(target, "package.json")),
               );

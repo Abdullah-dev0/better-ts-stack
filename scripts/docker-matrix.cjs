@@ -20,7 +20,9 @@ const NETWORK = "bts-test";
 const DB_CONTAINER = "bts-test-db";
 const APP_CONTAINER = "bts-test-app";
 const IMAGE = "bts-test-image";
-const POSTGRES_HOST_PORT = 54329;
+// Below 49152: Windows reserves blocks of the dynamic port range for Hyper-V
+// and WSL, and a port in a reserved block cannot be published
+const POSTGRES_HOST_PORT = 45432;
 
 // Database containers, the URL the app container uses, and how to set up the
 // schema. PostgreSQL runs without a password: it is a throwaway test container
@@ -89,17 +91,18 @@ async function startDatabase(log, c) {
   if (database.pushSchema) {
     const pushed = run(
       log,
-      process.platform === "win32" ? "npx.cmd" : "npx",
-      database.pushSchema,
+      // One command string: Node.js deprecates arguments passed with shell
+      `npx ${database.pushSchema.join(" ")}`,
+      [],
       {
         // The npm project without Docker, which check-matrix.cjs installed
         cwd: c.target.replace(/-(npm|pnpm|bun)-docker$/, "-npm-local"),
-        shell: process.platform === "win32",
+        shell: true,
         env: {
           ...process.env,
           DATABASE_URL: `postgresql://postgres@localhost:${POSTGRES_HOST_PORT}/postgres`,
         },
-      }
+      },
     );
     if (!pushed) throw new Error("Database schema push failed");
   }
@@ -144,7 +147,7 @@ async function main() {
     (c) =>
       c.config.framework === framework &&
       c.config.useDocker &&
-      (!filter || c.name === filter)
+      (!filter || c.name === filter),
   )) {
     const log = path.join(matrix.root, c.name + ".docker.log");
     removeContainers(log);
@@ -169,7 +172,7 @@ async function main() {
 
   fs.writeFileSync(
     path.join(matrix.root, (filter || framework) + "-docker-results.json"),
-    JSON.stringify(results, null, 2)
+    JSON.stringify(results, null, 2),
   );
   if (results.length === 0) throw new Error("No matching matrix cases");
   if (results.some((result) => result.failed)) process.exitCode = 1;

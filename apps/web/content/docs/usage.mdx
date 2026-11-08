@@ -34,21 +34,23 @@ npx better-ts-stack . --framework nextjs --database drizzle --pm pnpm
 npx better-ts-stack my-api --framework express --yes --dry-run
 ```
 
-| Flag                               | Values                                       |
-| ---------------------------------- | -------------------------------------------- |
-| `--framework <name>`               | `express`, `nestjs`, `nextjs`, `tanstack`    |
-| `--database <name>`                | `none`, `prisma`, `drizzle`, `mongoose`      |
-| `--pm <name>`                      | `npm`, `pnpm`, `bun`                         |
-| `--auth` / `--no-auth`             | Add authentication                           |
-| `--docker` / `--no-docker`         | Add Docker files                             |
-| `--rate-limit` / `--no-rate-limit` | Add rate limiting (Express and NestJS)       |
-| `--ci` / `--no-ci`                 | Add a GitHub Actions workflow                |
-| `--git` / `--no-git`               | Initialize a git repository                  |
-| `--install` / `--no-install`       | Install dependencies                         |
-| `-y`, `--yes`                      | Use defaults for missing options, no prompts |
-| `--dry-run`                        | List what would be created, write nothing    |
-| `-h`, `--help`                     | Show help                                    |
-| `-v`, `--version`                  | Show the version                             |
+| Flag                               | Values                                          |
+| ---------------------------------- | ----------------------------------------------- |
+| `--framework <name>`               | `express`, `nestjs`, `nextjs`, `tanstack`       |
+| `--database <name>`                | `none`, `prisma`, `drizzle`, `mongoose`         |
+| `--pm <name>`                      | `npm`, `pnpm`, `bun`                            |
+| `--auth` / `--no-auth`             | Add authentication                              |
+| `--docker` / `--no-docker`         | Add Docker files                                |
+| `--rate-limit` / `--no-rate-limit` | Add rate limiting (Express and NestJS)          |
+| `--ci` / `--no-ci`                 | Add a GitHub Actions workflow                   |
+| `--agents` / `--no-agents`         | Add AGENTS.md for AI coding agents              |
+| `--vscode` / `--no-vscode`         | Add VS Code settings and recommended extensions |
+| `--git` / `--no-git`               | Initialize a git repository                     |
+| `--install` / `--no-install`       | Install dependencies                            |
+| `-y`, `--yes`                      | Use defaults for missing options, no prompts    |
+| `--dry-run`                        | List what would be created, write nothing       |
+| `-h`, `--help`                     | Show help                                       |
+| `-v`, `--version`                  | Show the version                                |
 
 `--database` names the ORM, which also selects the database: `prisma` and `drizzle` use PostgreSQL, `mongoose` uses MongoDB.
 
@@ -275,6 +277,30 @@ $ Add GitHub Actions CI?
 ```
 
 If yes, the project gets `.github/workflows/ci.yml`. On every push to `main` and every pull request it installs dependencies with your package manager, then runs `build`, `type:check`, and `lint` on Node.js 24. The build step sets placeholders for the variables a build needs, such as `DATABASE_URL`, so the workflow needs no secrets and never connects to a database. Commit your lockfile to get the same versions in CI.
+
+</Step>
+
+<Step>
+### AI agent instructions
+
+```
+$ Add AGENTS.md for AI coding agents?
+    Yes   › No
+```
+
+If yes, the project gets an `AGENTS.md`, the instructions file that coding agents such as Codex, Cursor, Copilot, and Gemini CLI read, and a `CLAUDE.md` that imports it for Claude Code. It is written for the stack you chose: the install, dev, build, type-check, and lint commands for your package manager, the database workflow, where the code lives, and rules for the project, such as validating input, keeping secrets on the server, and running type-check and lint before a task is done. It also links the official docs for each library so an agent checks them instead of guessing. Edit it as the project grows.
+
+</Step>
+
+<Step>
+### VS Code settings
+
+```
+$ Add VS Code settings?
+    Yes   › No
+```
+
+If yes, the project gets `.vscode/settings.json`, which fixes ESLint problems on save, formats with Prettier on save in Express and NestJS, and uses the project's TypeScript version. TanStack Start projects also mark the generated `src/routeTree.gen.ts` as read-only. `.vscode/extensions.json` recommends the extensions for your stack, such as ESLint, Prettier or Tailwind CSS, Prisma, MongoDB, Container Tools, and GitHub Actions, and VS Code offers to install them when you open the folder. Other editors ignore both files.
 
 </Step>
 

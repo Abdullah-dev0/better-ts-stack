@@ -33,6 +33,8 @@ Options left out are asked interactively, unless --yes is given.
   --rate-limit, --no-rate-limit
                           Add rate limiting (Express and NestJS)
   --ci, --no-ci           Add a GitHub Actions workflow
+  --agents, --no-agents   Add AGENTS.md for AI coding agents
+  --vscode, --no-vscode   Add VS Code settings and recommended extensions
   --git, --no-git         Initialize a git repository
   --install, --no-install Install dependencies
   -y, --yes               Use defaults for missing options and skip confirmation
@@ -85,6 +87,8 @@ export function parseCliArgs(argv: string[]): CliArgs {
         docker: { type: "boolean" },
         "rate-limit": { type: "boolean" },
         ci: { type: "boolean" },
+        agents: { type: "boolean" },
+        vscode: { type: "boolean" },
         git: { type: "boolean" },
         install: { type: "boolean" },
         yes: { type: "boolean", short: "y" },
@@ -113,6 +117,8 @@ export function parseCliArgs(argv: string[]): CliArgs {
     useDocker: values.docker,
     useRateLimit: values["rate-limit"],
     useCi: values.ci,
+    useAgents: values.agents,
+    useVscode: values.vscode,
     initGit: values.git,
     installDeps: values.install,
   };

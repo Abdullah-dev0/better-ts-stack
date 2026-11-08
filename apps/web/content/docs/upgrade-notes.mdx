@@ -3,6 +3,32 @@ title: Upgrade notes
 description: What changed in each release and what to do when upgrading
 ---
 
+## 2.1.2
+
+Adds instructions for AI coding agents and VS Code settings, and moves Next.js projects to the November security release. Projects you already generated are not changed.
+
+### New
+
+- **VS Code settings.** Add them with `--vscode`. `.vscode/settings.json` fixes ESLint problems on save and uses the project's TypeScript, and `.vscode/extensions.json` recommends the extensions for your stack. See [VS Code settings](/docs/usage#vs-code-settings).
+- **AGENTS.md for AI coding agents.** Add it with `--agents` or the new "Add AGENTS.md for AI coding agents?" prompt. It tells agents such as Codex, Cursor, Copilot, and Gemini CLI how your project works: the commands for your package manager, the database workflow, where the code lives, and rules to follow, such as validating input, keeping secrets on the server, and passing type-check and lint before a task is done. It links the official docs for each library in your stack, so an agent checks them instead of guessing. A `CLAUDE.md` imports it for Claude Code. It is off unless you choose it. See [AI agent instructions](/docs/usage#ai-agent-instructions).
+
+### Security
+
+- **New Next.js projects require Next.js 16.4.5**, which fixes the vulnerabilities in the [November 3 security release](https://nextjs.org/blog/november-2026-security-release), including a high-severity cache disclosure. New projects already resolved it through their version range; the minimum is now raised.
+- **Update existing Next.js projects:** run `npm install next@latest`, then rebuild and redeploy. On Netlify, a project with `proxy.ts` also needs the adapter update described in [Netlify's notice](https://www.netlify.com/changelog/2026-11-03-nextjs-security-vulnerabilities/).
+
+### Changed in generated projects
+
+- **Express and NestJS keep `.vscode/settings.json` and `.vscode/extensions.json` in git.** `.gitignore` now ignores the rest of `.vscode/` instead of the whole folder.
+- **`.dockerignore` leaves out `AGENTS.md` and `CLAUDE.md`**, which the image does not need.
+
+### For contributors
+
+- Publishing a GitHub release publishes the CLI to npm from GitHub Actions (`.github/workflows/publish.yml`), through npm trusted publishing with provenance and no stored token.
+- `docker-matrix.cjs` publishes PostgreSQL on port 45432. Windows reserves blocks of ports above 49152 for Hyper-V and WSL, and the old port 54329 was in one, so the database container could not start.
+- The matrix scripts pass each command as one string, which removes the Node.js deprecation warning about arguments passed with `shell`.
+- `generate-matrix.cjs` checks that `AGENTS.md` is written only when chosen and renders without leftover template tags.
+
 ## 2.1.1
 
 Adds a GitHub Actions workflow, and fixes security issues and bugs. Projects you already generated are not changed.

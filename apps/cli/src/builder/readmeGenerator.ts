@@ -75,6 +75,16 @@ export function renderReadme(
       "- **CI:** GitHub Actions builds, type-checks, and lints every push to `main` and every pull request"
     );
   }
+  if (config.useVscode) {
+    lines.push(
+      "- **VS Code:** workspace settings and recommended extensions in `.vscode/`"
+    );
+  }
+  if (config.useAgents) {
+    lines.push(
+      "- **AI agents:** `AGENTS.md` describes the stack, commands, and rules for coding agents"
+    );
+  }
   lines.push(`- **Package manager:** ${config.packageManager}`, "");
 
   const steps = generateNextSteps(config, targetDir, false, true);

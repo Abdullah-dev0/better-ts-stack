@@ -14,6 +14,8 @@ export interface StackChoices {
   useDocker: boolean;
   useRateLimit: boolean;
   useCi: boolean;
+  useAgents: boolean;
+  useVscode: boolean;
 }
 
 export const PROJECT_NAME = "my-app";
@@ -26,6 +28,8 @@ export const DEFAULT_CHOICES: StackChoices = {
   useDocker: true,
   useRateLimit: false,
   useCi: false,
+  useAgents: false,
+  useVscode: false,
 };
 
 export interface StackOption<T extends string> {
@@ -121,12 +125,21 @@ export function buildCommand(choices: StackChoices): string[] {
   if (choices.useRateLimit) parts.push("--rate-limit");
   if (choices.useDocker) parts.push("--docker");
   if (choices.useCi) parts.push("--ci");
+  if (choices.useAgents) parts.push("--agents");
+  if (choices.useVscode) parts.push("--vscode");
   parts.push("--yes");
   return parts;
 }
 
 export type FileSource =
-  "base" | "database" | "auth" | "docker" | "rate-limit" | "ci";
+  | "base"
+  | "database"
+  | "auth"
+  | "docker"
+  | "rate-limit"
+  | "ci"
+  | "agents"
+  | "vscode";
 
 export interface ProjectFile {
   path: string;
@@ -147,6 +160,8 @@ export function listProjectFiles(choices: StackChoices): ProjectFile[] {
   if (choices.useRateLimit)
     modules.push([`rate-limit/${framework}`, "rate-limit"]);
   if (choices.useCi) modules.push(["ci", "ci"]);
+  if (choices.useAgents) modules.push(["agents", "agents"]);
+  if (choices.useVscode) modules.push(["vscode", "vscode"]);
 
   // Later modules overwrite files of earlier ones, so each path is listed once
   const files = new Map<string, FileSource>();

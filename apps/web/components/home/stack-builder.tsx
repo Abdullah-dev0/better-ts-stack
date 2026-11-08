@@ -34,6 +34,8 @@ const SOURCE_STYLES: Record<
   docker: { label: "docker", text: "text-tui-lavender" },
   "rate-limit": { label: "rate-limit", text: "text-tui-pink" },
   ci: { label: "ci", text: "text-tui-lime" },
+  agents: { label: "agents", text: "text-tui-amber" },
+  vscode: { label: "vscode", text: "text-tui-lavender" },
 };
 
 function pickRandom<T>(values: readonly T[]): T {
@@ -49,6 +51,8 @@ function randomChoices(): StackChoices {
     useDocker: Math.random() < 0.5,
     useRateLimit: Math.random() < 0.5,
     useCi: Math.random() < 0.5,
+    useAgents: Math.random() < 0.5,
+    useVscode: Math.random() < 0.5,
   };
 }
 
@@ -205,6 +209,22 @@ export function StackBuilder() {
               description="GitHub Actions"
               isChecked={choices.useCi}
               onChange={(isChecked) => update({ useCi: isChecked })}
+            />
+            <OptionTile
+              type="checkbox"
+              name="agents"
+              label="agents"
+              description="AGENTS.md"
+              isChecked={choices.useAgents}
+              onChange={(isChecked) => update({ useAgents: isChecked })}
+            />
+            <OptionTile
+              type="checkbox"
+              name="vscode"
+              label="vscode"
+              description="settings + extensions"
+              isChecked={choices.useVscode}
+              onChange={(isChecked) => update({ useVscode: isChecked })}
             />
           </OptionGrid>
         </PaneBlock>

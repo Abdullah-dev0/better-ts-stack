@@ -1,0 +1,10 @@
+{
+  "id": "vscode",
+  "name": "VS Code settings",
+  "description": "Workspace settings that fix lint problems on save, and the recommended extensions for the stack",
+  "type": "feature",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {},
+  "envVars": {}
+}

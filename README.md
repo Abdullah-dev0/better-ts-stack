@@ -42,21 +42,23 @@ npx better-ts-stack my-api --framework nestjs --database prisma --auth --yes
 npx better-ts-stack . --framework nextjs --database drizzle --pm pnpm
 ```
 
-| Flag                               | Values                                       |
-| ---------------------------------- | -------------------------------------------- |
-| `--framework <name>`               | `express`, `nestjs`, `nextjs`, `tanstack`    |
-| `--database <name>`                | `none`, `prisma`, `drizzle`, `mongoose`      |
-| `--pm <name>`                      | `npm`, `pnpm`, `bun`                         |
-| `--auth` / `--no-auth`             | Add authentication                           |
-| `--docker` / `--no-docker`         | Add Docker files                             |
-| `--rate-limit` / `--no-rate-limit` | Add rate limiting (Express and NestJS)       |
-| `--ci` / `--no-ci`                 | Add a GitHub Actions workflow                |
-| `--git` / `--no-git`               | Initialize a git repository                  |
-| `--install` / `--no-install`       | Install dependencies                         |
-| `-y`, `--yes`                      | Use defaults for missing options, no prompts |
-| `--dry-run`                        | List what would be created, write nothing    |
-| `-h`, `--help`                     | Show help                                    |
-| `-v`, `--version`                  | Show the version                             |
+| Flag                               | Values                                          |
+| ---------------------------------- | ----------------------------------------------- |
+| `--framework <name>`               | `express`, `nestjs`, `nextjs`, `tanstack`       |
+| `--database <name>`                | `none`, `prisma`, `drizzle`, `mongoose`         |
+| `--pm <name>`                      | `npm`, `pnpm`, `bun`                            |
+| `--auth` / `--no-auth`             | Add authentication                              |
+| `--docker` / `--no-docker`         | Add Docker files                                |
+| `--rate-limit` / `--no-rate-limit` | Add rate limiting (Express and NestJS)          |
+| `--ci` / `--no-ci`                 | Add a GitHub Actions workflow                   |
+| `--agents` / `--no-agents`         | Add AGENTS.md for AI coding agents              |
+| `--vscode` / `--no-vscode`         | Add VS Code settings and recommended extensions |
+| `--git` / `--no-git`               | Initialize a git repository                     |
+| `--install` / `--no-install`       | Install dependencies                            |
+| `-y`, `--yes`                      | Use defaults for missing options, no prompts    |
+| `--dry-run`                        | List what would be created, write nothing       |
+| `-h`, `--help`                     | Show help                                       |
+| `-v`, `--version`                  | Show the version                                |
 
 `--database` names the ORM, which also selects the database: `prisma` and `drizzle` use PostgreSQL, `mongoose` uses MongoDB.
 
@@ -83,8 +85,10 @@ The CLI guides you through these questions in order:
    - Next.js / TanStack Start: Better Auth (only prompted when a database is selected)
 8. **Rate limiting** — Express / NestJS only: limit requests per IP? (yes/no)
 9. **CI** — add a GitHub Actions workflow? (yes/no)
-10. **Git** — initialize a git repository? (yes/no)
-11. **Install dependencies** — run the install command now? (yes/no)
+10. **AI agents** — add an AGENTS.md for coding agents? (yes/no)
+11. **VS Code** — add workspace settings and recommended extensions? (yes/no)
+12. **Git** — initialize a git repository? (yes/no)
+13. **Install dependencies** — run the install command now? (yes/no)
 
 > **Note**: The CLI does not ask for a port. The server port defaults to `3000` via the `PORT` environment variable.
 
@@ -100,6 +104,8 @@ A generated project includes:
 - Authentication scaffolding (if selected)
 - Docker files (if selected)
 - A GitHub Actions workflow (if selected)
+- An `AGENTS.md` with the stack, commands, and rules for AI coding agents, plus a `CLAUDE.md` that points Claude Code to it (if selected)
+- VS Code settings that fix lint problems on save, and recommended extensions for the stack (if selected)
 - Optional git repository initialization
 
 ## Available Modules

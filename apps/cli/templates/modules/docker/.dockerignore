@@ -5,6 +5,8 @@ npm-debug.log
 .github
 .gitignore
 README.md
+AGENTS.md
+CLAUDE.md
 .vscode
 .idea
 dist

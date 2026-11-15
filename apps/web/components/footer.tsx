@@ -8,7 +8,7 @@ const COMMAND = "npx better-ts-stack";
 
 export function Footer() {
   return (
-    <Pane label="exit" index="07" className="border-border border-b">
+    <Pane label="exit" index="05" className="border-border border-b">
       <div className="grid gap-8 px-5 py-8 sm:px-8 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
         <div>
           <p className="text-foreground mb-4 text-2xl font-medium sm:text-3xl">

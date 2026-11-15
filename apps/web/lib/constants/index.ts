@@ -6,9 +6,8 @@ export const NPM_URL = "https://www.npmjs.com/package/better-ts-stack";
 // The page's sections, in order; the status bar and the number keys use them
 export const SECTIONS = [
   { id: "init", label: "init" },
-  { id: "builder", label: "builder" },
+  { id: "recipes", label: "recipes" },
   { id: "modules", label: "modules" },
-  { id: "ci", label: "ci" },
 ] as const;
 
 export interface NavLink {
@@ -21,7 +20,7 @@ export interface NavLink {
 // screens reach them from the status bar
 export const NAV_LINKS = [
   { href: "/docs", label: "Docs", external: false, isSection: false },
-  { href: "/#builder", label: "Builder", external: false, isSection: true },
+  { href: "/builder", label: "Builder", external: false, isSection: false },
   { href: "/#modules", label: "Modules", external: false, isSection: true },
   {
     href: "/docs/upgrade-notes",
@@ -131,30 +130,24 @@ export const MODULE_ENTRIES: ModuleEntry[] = [
 ];
 
 // ============================================================================
-// CI PANE
+// PRINCIPLES PANE
 // ============================================================================
-export const CI_PANE = {
-  description:
-    "Every pull request generates each combination the CLI can produce, then installs, builds, type-checks, lints, and starts it.",
-  steps: ["generate", "install", "build", "type-check", "lint", "start"],
-  runners: ["ubuntu-latest", "windows-latest"],
-  principles: [
-    {
-      title: "strict by default",
-      description:
-        "Strict TypeScript in every template, with ESLint and Prettier configured.",
-    },
-    {
-      title: "only what you pick",
-      description:
-        "Skip the database or auth and their packages and files are not there.",
-    },
-    {
-      title: "nothing left behind",
-      description: "A plain project you own. No generator runtime, no lock-in.",
-    },
-  ],
-} as const;
+export const PRINCIPLES = [
+  {
+    title: "strict by default",
+    description:
+      "Strict TypeScript in every template, with ESLint and Prettier configured.",
+  },
+  {
+    title: "only what you pick",
+    description:
+      "Skip the database or auth and their packages and files are not there.",
+  },
+  {
+    title: "nothing left behind",
+    description: "A plain project you own. No generator runtime, no lock-in.",
+  },
+] as const;
 
 // ============================================================================
 // FOOTER

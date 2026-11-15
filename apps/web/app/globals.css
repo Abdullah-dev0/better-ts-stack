@@ -72,6 +72,18 @@
   --module-frontend: oklch(0.6658 0.1574 58.3183);
   --module-backend: oklch(0.5553 0.1455 48.9975);
   --module-database: oklch(0.4732 0.1247 46.2007);
+
+  /* The app's own look, shared by the home page, the builder, and the docs:
+     warm neutral surfaces and the CLI's colors (xterm 214, 148, 183, 211) */
+  --app-background: oklch(0.985 0.004 90);
+  --app-card: oklch(0.97 0.005 90);
+  --app-muted: oklch(0.955 0.005 90);
+  --app-border: oklch(0.885 0.006 90);
+  --app-muted-foreground: oklch(0.551 0.0234 264.3637);
+  --tui-amber: oklch(0.57 0.14 62);
+  --tui-lime: oklch(0.52 0.13 128);
+  --tui-lavender: oklch(0.5 0.17 300);
+  --tui-pink: oklch(0.55 0.18 5);
 }
 
 .dark {
@@ -139,6 +151,59 @@
   --module-frontend: oklch(0.8369 0.1644 84.4286);
   --module-backend: oklch(0.6658 0.1574 58.3183);
   --module-database: oklch(0.5553 0.1455 48.9975);
+
+  --app-background: oklch(0.155 0 0);
+  --app-card: oklch(0.185 0 0);
+  --app-muted: oklch(0.2 0 0);
+  --app-border: oklch(0.285 0 0);
+  --app-muted-foreground: oklch(0.68 0 0);
+  --tui-amber: oklch(0.81 0.17 75);
+  --tui-lime: oklch(0.83 0.19 122);
+  --tui-lavender: oklch(0.82 0.1 305);
+  --tui-pink: oklch(0.76 0.13 0);
+}
+
+/* The docs (fumadocs) in the app's colors, fonts, and square corners */
+:root,
+.dark {
+  --color-fd-background: var(--app-background);
+  --color-fd-foreground: var(--foreground);
+  --color-fd-card: var(--app-card);
+  --color-fd-card-foreground: var(--foreground);
+  --color-fd-popover: var(--app-card);
+  --color-fd-popover-foreground: var(--foreground);
+  --color-fd-muted: var(--app-muted);
+  --color-fd-muted-foreground: var(--app-muted-foreground);
+  --color-fd-secondary: var(--app-muted);
+  --color-fd-secondary-foreground: var(--foreground);
+  --color-fd-accent: var(--app-muted);
+  --color-fd-accent-foreground: var(--foreground);
+  --color-fd-border: var(--app-border);
+  --color-fd-primary: var(--tui-amber);
+  --color-fd-primary-foreground: var(--app-background);
+  --color-fd-ring: var(--tui-amber);
+}
+
+#nd-sidebar,
+.dark #nd-sidebar {
+  --color-fd-muted-foreground: var(--app-muted-foreground);
+  background-color: var(--app-card);
+  border-color: var(--app-border);
+}
+
+body:has(#nd-docs-layout) {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --radius: 0px;
+}
+
+#nd-docs-layout :is(h1, h2, h3, h4, #nd-sidebar, #nd-subnav, #nd-toc) {
+  font-family: var(--font-mono);
+}
+
+#nd-docs-layout :is(h1, h2, h3, h4) {
+  font-weight: 500;
+  letter-spacing: 0;
 }
 
 @theme inline {
@@ -260,32 +325,17 @@
 }
 
 @layer components {
-  /* The home page is a terminal-style workspace in the CLI's own colors
-     (xterm 214, 148, 183, 211), with the Geist fonts from app/layout.tsx */
+  /* The home page and the builder are terminal-style workspaces in the
+     --app-* colors, with the Geist fonts from app/layout.tsx */
   .home-page {
     --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
     --font-mono: var(--font-geist-mono), ui-monospace, monospace;
-    --background: oklch(0.985 0.004 90);
-    --card: oklch(0.97 0.005 90);
-    --muted: oklch(0.955 0.005 90);
-    --border: oklch(0.885 0.006 90);
-    --tui-amber: oklch(0.57 0.14 62);
-    --tui-lime: oklch(0.52 0.13 128);
-    --tui-lavender: oklch(0.5 0.17 300);
-    --tui-pink: oklch(0.55 0.18 5);
+    --background: var(--app-background);
+    --card: var(--app-card);
+    --muted: var(--app-muted);
+    --border: var(--app-border);
+    --muted-foreground: var(--app-muted-foreground);
     font-family: var(--font-mono);
-  }
-
-  .dark .home-page {
-    --background: oklch(0.155 0 0);
-    --card: oklch(0.185 0 0);
-    --muted: oklch(0.2 0 0);
-    --border: oklch(0.285 0 0);
-    --muted-foreground: oklch(0.68 0 0);
-    --tui-amber: oklch(0.81 0.17 75);
-    --tui-lime: oklch(0.83 0.19 122);
-    --tui-lavender: oklch(0.82 0.1 305);
-    --tui-pink: oklch(0.76 0.13 0);
   }
 }
 

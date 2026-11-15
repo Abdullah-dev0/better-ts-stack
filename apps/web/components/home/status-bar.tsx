@@ -121,7 +121,9 @@ export function StatusBar({
         )}
         {version && <span className="text-tui-lavender">v{version}</span>}
         <span>
-          <kbd className="border-border text-foreground border px-1">1-4</kbd>{" "}
+          <kbd className="border-border text-foreground border px-1">
+            1-{SECTIONS.length}
+          </kbd>{" "}
           jump
         </span>
       </p>

@@ -28,6 +28,7 @@
     "postcss": "^8.5.28",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
+    "simple-icons": "^16.37.0",
     "tailwind-merge": "^3.6.0",
     "tailwindcss-animate": "^1.0.7"
   },

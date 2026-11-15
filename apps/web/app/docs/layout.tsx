@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+import Link from "next/link";
+
 import { DocsLayout } from "fumadocs-ui/layouts/docs";
 
 import { baseOptions } from "@/lib/layout.shared";
@@ -12,12 +14,17 @@ export default function Layout({ children }: { children: ReactNode }) {
       {...baseOptions()}
       sidebar={{
         banner: (
-          <div className="mb-4 rounded-lg border bg-linear-to-br from-blue-50 to-cyan-50 p-4 dark:from-blue-950 dark:to-cyan-950">
-            <p className="mb-1 text-sm font-medium">🚀 Quick Start</p>
-            <p className="text-muted-foreground text-xs">
-              Generate your TypeScript stack in minutes
-            </p>
-          </div>
+          <Link
+            href="/builder"
+            className="border-fd-border bg-fd-background hover:border-fd-primary mb-4 block border p-3 font-mono transition-colors"
+          >
+            <span className="text-fd-primary mb-1 block text-xs">
+              &gt;_ stack builder
+            </span>
+            <span className="text-fd-muted-foreground block text-xs leading-relaxed">
+              Pick your stack and copy the command
+            </span>
+          </Link>
         ),
         defaultOpenLevel: 1,
       }}

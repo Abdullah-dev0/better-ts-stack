@@ -59,7 +59,7 @@ export function InitPane({
             <p className="text-muted-foreground mt-4 text-[13px]">
               {INIT_PANE.hint}{" "}
               <Link
-                href="#builder"
+                href="/builder"
                 className="text-tui-lavender underline-offset-4 hover:underline"
               >
                 {INIT_PANE.builder.link} -&gt;

@@ -1,5 +1,5 @@
-// The stack picker on the home page: the choices it offers, the command they
-// map to, and the files the CLI would write for them
+// The stack builder at /builder: the choices it offers, the command they map
+// to, the link that shares them, and the files the CLI would write for them
 import { MODULE_FILES } from "./stack-files";
 
 export type Framework = "express" | "nestjs" | "nextjs" | "tanstack";
@@ -112,12 +112,15 @@ export function normalizeChoices(choices: StackChoices): StackChoices {
 
 // The command for these choices; the package manager comes from the runner,
 // so it needs no --pm flag
-export function buildCommand(choices: StackChoices): string[] {
+export function buildCommand(
+  choices: StackChoices,
+  projectName: string = PROJECT_NAME
+): string[] {
   const runner =
     PACKAGE_MANAGER_OPTIONS.find((o) => o.value === choices.packageManager)
       ?.runner ?? "npx";
   const parts = [
-    `${runner} better-ts-stack ${PROJECT_NAME}`,
+    `${runner} better-ts-stack ${projectName}`,
     `--framework ${choices.framework}`,
   ];
   if (choices.database !== "none") parts.push(`--database ${choices.database}`);
@@ -221,34 +224,190 @@ export function buildTree(files: ProjectFile[]): TreeNode[] {
   return sort(root.children);
 }
 
-export interface MatrixCase {
-  name: string;
-  framework: Framework;
-  database: Database;
+// Same rules as projectNameSchema in apps/cli/src/validators/index.ts
+export function isValidProjectName(name: string): boolean {
+  return (
+    /^[a-z0-9-]+$/.test(name) &&
+    !name.startsWith("-") &&
+    !name.endsWith("-") &&
+    name.length <= 214
+  );
 }
 
-// Every combination scripts/generate-matrix.cjs builds and CI checks
-export function listMatrixCases(): MatrixCase[] {
-  const cases: MatrixCase[] = [];
+type Extra = Exclude<FileSource, "base" | "database">;
+
+const EXTRA_KEYS = {
+  auth: "useAuth",
+  docker: "useDocker",
+  "rate-limit": "useRateLimit",
+  ci: "useCi",
+  agents: "useAgents",
+  vscode: "useVscode",
+} as const satisfies Record<Extra, keyof StackChoices>;
+
+const EXTRAS = Object.keys(EXTRA_KEYS) as Extra[];
+
+// The query string that reopens the builder with these choices
+export function toSearchParams(
+  choices: StackChoices,
+  projectName: string = PROJECT_NAME
+): string {
+  const params = new URLSearchParams({
+    framework: choices.framework,
+    database: choices.database,
+    pm: choices.packageManager,
+    with: EXTRAS.filter((extra) => choices[EXTRA_KEYS[extra]]).join(","),
+  });
+  if (projectName !== PROJECT_NAME && isValidProjectName(projectName))
+    params.set("name", projectName);
+  // Commas are safe in a query string and read better unescaped
+  return params.toString().replaceAll("%2C", ",");
+}
+
+export type SearchParams = Record<string, string | string[] | undefined>;
+
+function pickOption<T extends string>(
+  options: readonly StackOption<T>[],
+  value: string | string[] | undefined,
+  fallback: T
+): T {
+  return options.find((option) => option.value === value)?.value ?? fallback;
+}
+
+// Reads a shared link; anything missing or unknown falls back to the default
+export function fromSearchParams(params: SearchParams): {
+  choices: StackChoices;
+  projectName: string;
+} {
+  const choices: StackChoices = {
+    ...DEFAULT_CHOICES,
+    framework: pickOption(
+      FRAMEWORK_OPTIONS,
+      params.framework,
+      DEFAULT_CHOICES.framework
+    ),
+    database: pickOption(
+      DATABASE_OPTIONS,
+      params.database,
+      DEFAULT_CHOICES.database
+    ),
+    packageManager: pickOption(
+      PACKAGE_MANAGER_OPTIONS,
+      params.pm,
+      DEFAULT_CHOICES.packageManager
+    ),
+  };
+  if (typeof params.with === "string") {
+    const picked = params.with.split(",");
+    for (const extra of EXTRAS)
+      choices[EXTRA_KEYS[extra]] = picked.includes(extra);
+  }
+  const name = params.name;
+  return {
+    choices: normalizeChoices(choices),
+    projectName:
+      typeof name === "string" && isValidProjectName(name)
+        ? name
+        : PROJECT_NAME,
+  };
+}
+
+// Ready-made stacks: buttons in the builder and the recipes on the home page.
+// A preset leaves the package manager alone.
+export interface StackPreset {
+  id: string;
+  label: string;
+  description: string;
+  choices: Omit<StackChoices, "packageManager">;
+}
+
+export const STACK_PRESETS: StackPreset[] = [
+  {
+    id: "minimal",
+    label: "minimal api",
+    description: "Express with strict TypeScript and nothing else to delete.",
+    choices: {
+      framework: "express",
+      database: "none",
+      useAuth: false,
+      useDocker: false,
+      useRateLimit: false,
+      useCi: false,
+      useAgents: true,
+      useVscode: false,
+    },
+  },
+  {
+    id: "api",
+    label: "production api",
+    description:
+      "NestJS on PostgreSQL with sign-in, rate limits, Docker, and CI.",
+    choices: {
+      framework: "nestjs",
+      database: "drizzle",
+      useAuth: true,
+      useDocker: true,
+      useRateLimit: true,
+      useCi: true,
+      useAgents: true,
+      useVscode: false,
+    },
+  },
+  {
+    id: "saas",
+    label: "saas starter",
+    description:
+      "Next.js with Prisma and sign-in, sign-up, and password reset pages.",
+    choices: {
+      framework: "nextjs",
+      database: "prisma",
+      useAuth: true,
+      useDocker: true,
+      useRateLimit: false,
+      useCi: true,
+      useAgents: true,
+      useVscode: false,
+    },
+  },
+  {
+    id: "vite",
+    label: "full-stack on vite",
+    description:
+      "TanStack Start with Drizzle and Better Auth, served by Nitro.",
+    choices: {
+      framework: "tanstack",
+      database: "drizzle",
+      useAuth: true,
+      useDocker: false,
+      useRateLimit: false,
+      useCi: false,
+      useAgents: true,
+      useVscode: true,
+    },
+  },
+];
+
+export function matchesPreset(
+  choices: StackChoices,
+  preset: StackPreset
+): boolean {
+  return (
+    Object.keys(preset.choices) as (keyof StackPreset["choices"])[]
+  ).every((key) => choices[key] === preset.choices[key]);
+}
+
+// How many combinations scripts/generate-matrix.cjs builds and CI checks
+export function countMatrixCases(): number {
+  let count = 0;
   for (const { value: framework } of FRAMEWORK_OPTIONS) {
     for (const { value: database } of DATABASE_OPTIONS) {
       for (const useAuth of [false, true]) {
         if (!isBackend(framework) && database === "none" && useAuth) continue;
-        for (const useRateLimit of isBackend(framework)
-          ? [false, true]
-          : [false]) {
-          for (const { value: pm } of PACKAGE_MANAGER_OPTIONS) {
-            for (const useDocker of [false, true]) {
-              cases.push({
-                framework,
-                database,
-                name: `${framework}-${database}-${useAuth ? "auth" : "plain"}${useRateLimit ? "-ratelimit" : ""}-${pm}-${useDocker ? "docker" : "local"}`,
-              });
-            }
-          }
-        }
+        const rateLimitVariants = isBackend(framework) ? 2 : 1;
+        // Each one with and without Docker, on every package manager
+        count += rateLimitVariants * PACKAGE_MANAGER_OPTIONS.length * 2;
       }
     }
   }
-  return cases;
+  return count;
 }

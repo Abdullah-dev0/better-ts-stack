@@ -1,14 +1,15 @@
+import Link from "next/link";
+
 import { Footer } from "@/components/footer";
-import { CiMatrix } from "@/components/home/ci-matrix";
 import { InitPane } from "@/components/home/init-pane";
 import { ModuleTable } from "@/components/home/module-table";
 import { Pane } from "@/components/home/pane";
-import { StackBuilder } from "@/components/home/stack-builder";
+import { Recipes } from "@/components/home/recipes";
 import { StatusBar } from "@/components/home/status-bar";
 import { Navbar } from "@/components/navbar";
-import { CI_PANE, MODULE_ENTRIES } from "@/lib/constants";
+import { MODULE_ENTRIES, PRINCIPLES } from "@/lib/constants";
 import { getLatestVersion, getWeeklyDownloads } from "@/lib/npm-downloads";
-import { listMatrixCases } from "@/lib/stack";
+import { countMatrixCases, STACK_PRESETS } from "@/lib/stack";
 
 export default async function Home() {
   const [downloads, version] = await Promise.all([
@@ -16,7 +17,7 @@ export default async function Home() {
     getLatestVersion(),
   ]);
   const weeklyDownloads = downloads?.downloads ?? null;
-  const cases = listMatrixCases();
+  const stackCount = countMatrixCases();
 
   return (
     <div className="home-page bg-background text-foreground selection:bg-tui-amber/30 min-h-screen md:pb-8">
@@ -25,37 +26,42 @@ export default async function Home() {
         <InitPane
           weeklyDownloads={weeklyDownloads}
           version={version}
-          stackCount={cases.length}
+          stackCount={stackCount}
         />
 
-        {/* On wide screens the builder fills the screen and each pane scrolls */}
-        <div className="border-border grid border-b xl:h-[calc(100svh-5rem)] xl:min-h-160 xl:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] xl:*:min-h-0 xl:*:overflow-hidden">
-          <StackBuilder />
-        </div>
+        <Pane
+          id="recipes"
+          label="recipes"
+          index="02"
+          aside={
+            <>
+              <span>{STACK_PRESETS.length} stacks</span>
+              <Link
+                href="/builder"
+                className="text-tui-lavender focus-visible:ring-tui-amber underline-offset-4 hover:underline focus-visible:ring-1 focus-visible:outline-none"
+              >
+                build your own -&gt;
+              </Link>
+            </>
+          }
+          className="border-border border-b"
+        >
+          <Recipes />
+        </Pane>
 
         <Pane
           id="modules"
           label="modules"
-          index="04"
+          index="03"
           aside={<span>{MODULE_ENTRIES.length} modules</span>}
           className="border-border border-b"
         >
           <ModuleTable />
         </Pane>
 
-        <Pane
-          id="ci"
-          label="ci.matrix"
-          index="05"
-          aside={<span>ubuntu · windows</span>}
-          className="border-border border-b"
-        >
-          <CiMatrix cases={cases} />
-        </Pane>
-
-        <Pane label="principles" index="06" className="border-border border-b">
+        <Pane label="principles" index="04" className="border-border border-b">
           <ul className="divide-border grid divide-y md:grid-cols-3 md:divide-x md:divide-y-0">
-            {CI_PANE.principles.map((principle) => (
+            {PRINCIPLES.map((principle) => (
               <li key={principle.title} className="px-5 py-6 sm:px-8">
                 <h3 className="text-tui-amber mb-2 text-[13px] font-medium">
                   {principle.title}
@@ -73,7 +79,7 @@ export default async function Home() {
       <StatusBar
         version={version}
         weeklyDownloads={weeklyDownloads}
-        stackCount={cases.length}
+        stackCount={stackCount}
       />
     </div>
   );

@@ -233,16 +233,26 @@ Compose reads `.env`, so make sure it exists and that its database URLs work fro
 
 ## Auth Issues
 
-### "Invalid token" errors
+### `401` on protected routes (Express and NestJS)
 
-**Problem:** Requests with a JWT are rejected.
+**Problem:** `GET /api/me` or another protected route answers `401`.
 
 **Solution:**
 
-- Check that `JWT_SECRET` is set in `.env`. The CLI writes a random value there.
-- Tokens expire after `JWT_EXPIRES_IN` (default `1h`). Log in again to get a new one.
-- Send the token as `Authorization: Bearer <token>`.
+- Send the token from the `set-auth-token` header of sign-up or sign-in as `Authorization: Bearer <token>`.
+- A sign-out or a password reset ends the session; sign in again for a new token.
+- Without a database, sessions live in memory and end when the server restarts.
 - Restart the server after you change `.env`.
+
+### `403` "Missing or null Origin" or "Invalid origin"
+
+**Problem:** Sign-up or sign-in from a browser or from `fetch` is rejected with `403`.
+
+**Solution:** Better Auth accepts requests that carry an `Origin` header only from trusted origins: `BETTER_AUTH_URL` and, on Express and NestJS, the origins in `CORS_ORIGIN`. Set `CORS_ORIGIN` to your front end's URL instead of `*`. `curl` sends no `Origin` and is not affected.
+
+### No verification or reset email arrives
+
+**Solution:** Without `RESEND_API_KEY`, emails are printed to the server log instead of sent, so copy the link from there. With Resend, the default sender `onboarding@resend.dev` only delivers to your own address: verify a domain and set `EMAIL_FROM`.
 
 ---
 

@@ -38,8 +38,8 @@ No seed script is included. If you need seed data, add a seed file and configure
 
 The generated models depend on the auth option:
 
-- Express includes a `User` model used by JWT auth.
-- Next.js and TanStack Start with Better Auth include `User`, `Session`, `Account`, and `Verification` models. Run the migration before you sign up.
+- Without auth, every framework gets a sample `User` model.
+- With auth, every framework gets Better Auth's `User`, `Session`, `Account`, and `Verification` models instead. Run the migration before you sign up.
 
 `prisma:migrate` runs `prisma migrate dev`, which is meant for development. In production, run `prisma migrate deploy` as part of your deployment.
 
@@ -61,13 +61,15 @@ npm run db:studio
 
 Set `DATABASE_URL` before running migrations.
 
-With Express JWT auth, users are stored through Drizzle. With Better Auth in Next.js or TanStack Start, the schema contains the four Better Auth tables, and the schema is passed to the Drizzle client so the adapter can find them.
+With auth, the schema contains the four Better Auth tables instead of the sample `users` table, and the schema is passed to the Drizzle client so the adapter can find them.
 
 ## Mongoose and MongoDB
 
 Set `MONGODB_URI` in `.env`. The module adds a connection helper and a sample `User` model: `src/lib/db.ts` and `src/models/User.ts` in Express and TanStack Start, or `lib/db.ts` and `models/User.ts` in Next.js.
 
-In Express, the server connects to MongoDB before it starts listening, and JWT auth uses the Mongoose `User` model. The model is registered in a way that survives development reloads.
+In Express, the server connects to MongoDB before it starts listening. The `User` model is registered in a way that survives development reloads.
+
+In Express and NestJS, Better Auth uses the MongoDB driver directly, next to Mongoose, and creates its own `user`, `session`, `account`, and `verification` collections. It runs without transactions, so a standalone MongoDB server works.
 
 In Next.js and TanStack Start, Better Auth uses the native MongoDB adapter and its own collections, configured in `lib/auth.ts` (Next.js) or `src/lib/auth.ts` (TanStack Start). The Mongoose helper is still there for your own models. Call `connectDB()` in server code before you query them. It reuses one connection and throws an error if it can't connect, instead of exiting the process.
 

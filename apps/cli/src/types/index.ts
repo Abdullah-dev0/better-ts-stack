@@ -64,7 +64,7 @@ export const DEFAULT_CHOICES: StackChoices = {
   useAuth: false,
   useRateLimit: false,
   useCi: false,
-  useAgents: false,
+  useAgents: true,
   useVscode: false,
   packageManager: "npm",
   initGit: true,

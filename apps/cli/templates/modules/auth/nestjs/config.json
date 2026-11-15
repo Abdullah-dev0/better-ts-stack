@@ -1,20 +1,22 @@
 {
   "id": "auth",
-  "name": "JWT Auth",
-  "description": "JWT authentication for NestJS with bcrypt password hashing",
+  "name": "Better Auth",
+  "description": "Better Auth for NestJS: email and password, email verification, password reset, GitHub and Google sign-in, and bearer tokens",
   "type": "feature",
   "dependencies": {
-    "bcrypt": "^6.0.0",
-    "jsonwebtoken": "^9.0.3",
-    "zod": "^4.6.7"
+    "@thallesp/nestjs-better-auth": "^2.8.0",
+    "better-auth": "^1.7.18"
   },
-  "devDependencies": {
-    "@types/bcrypt": "^6.0.0",
-    "@types/jsonwebtoken": "^9.0.10"
-  },
+  "devDependencies": {},
   "scripts": {},
   "envVars": {
-    "JWT_SECRET": "please-change-me",
-    "JWT_EXPIRES_IN": "1h"
+    "BETTER_AUTH_SECRET": "please-change-me-to-a-random-string",
+    "BETTER_AUTH_URL": "http://localhost:3000",
+    "GITHUB_CLIENT_ID": "",
+    "GITHUB_CLIENT_SECRET": "",
+    "GOOGLE_CLIENT_ID": "",
+    "GOOGLE_CLIENT_SECRET": "",
+    "RESEND_API_KEY": "",
+    "EMAIL_FROM": "onboarding@resend.dev"
   }
 }

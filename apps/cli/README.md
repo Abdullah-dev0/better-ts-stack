@@ -37,6 +37,9 @@ npx better-ts-stack . --framework nextjs --database drizzle --pm pnpm
 | `--auth` / `--no-auth`             | Add authentication                           |
 | `--docker` / `--no-docker`         | Add Docker files                             |
 | `--rate-limit` / `--no-rate-limit` | Add rate limiting (Express and NestJS)       |
+| `--ci` / `--no-ci`                 | Add a GitHub Actions workflow                |
+| `--no-agents`                      | Leave out AGENTS.md (added by default)       |
+| `--vscode` / `--no-vscode`         | Add VS Code settings and extensions          |
 | `--git` / `--no-git`               | Initialize a git repository                  |
 | `--install` / `--no-install`       | Install dependencies                         |
 | `-y`, `--yes`                      | Use defaults for missing options, no prompts |
@@ -46,7 +49,7 @@ npx better-ts-stack . --framework nextjs --database drizzle --pm pnpm
 
 `--database` names the ORM, which also selects the database: `prisma` and `drizzle` use PostgreSQL, `mongoose` uses MongoDB.
 
-With `--yes`, the defaults are Express, no database, no auth, no rate limiting, no Docker, git initialized, and dependencies not installed. The package manager defaults to the one that ran the CLI: `pnpm` for `pnpm dlx`, `bun` for `bunx`, and `npm` otherwise.
+With `--yes`, the defaults are Express, no database, no auth, no rate limiting, no Docker, no CI, no VS Code settings, an `AGENTS.md`, git initialized, and dependencies not installed. The package manager defaults to the one that ran the CLI: `pnpm` for `pnpm dlx`, `bun` for `bunx`, and `npm` otherwise.
 
 The project path can be a name (`my-app`), a nested path (`apps/api`), or `.` for the current directory.
 
@@ -54,12 +57,12 @@ The project path can be a name (`my-app`), a nested path (`apps/api`), or `.` fo
 
 | Project type   | Stack                                   | Optional setup                                                           |
 | -------------- | --------------------------------------- | ------------------------------------------------------------------------ |
-| Backend API    | Express 5 or NestJS 12 + TypeScript     | PostgreSQL, MongoDB, Prisma, Drizzle, Mongoose, JWT auth, Docker, git    |
+| Backend API    | Express 5 or NestJS 12 + TypeScript     | PostgreSQL, MongoDB, Prisma, Drizzle, Mongoose, Better Auth, Docker, git |
 | Full-stack app | Next.js 16 or TanStack Start + React 19 | PostgreSQL, MongoDB, Prisma, Drizzle, Mongoose, Better Auth, Docker, git |
 
 Notes:
 
-- Better Auth is only offered for full-stack projects that use a database.
+- Better Auth is offered for every framework; full-stack projects need a database for it.
 
 ## Interactive Prompt Flow
 
@@ -77,10 +80,15 @@ Without flags, the CLI asks, in order:
 6. Package manager: `npm`, `pnpm`, or `bun`
 7. Docker setup
 8. Authentication
-   - Express and NestJS apps: JWT-based auth
-   - Next.js and TanStack Start apps: Better Auth, only when a database is selected
-9. Git initialization
-10. Dependency installation
+   - Better Auth for every framework
+   - Next.js and TanStack Start apps: only when a database is selected
+9. Rate limiting (Express and NestJS)
+10. GitHub Actions CI
+11. VS Code settings
+12. Git initialization
+13. Dependency installation
+
+`AGENTS.md` and `CLAUDE.md` are added without a question; pass `--no-agents` to leave them out.
 
 The CLI does not ask for a port. Backend projects default to `PORT=3000`.
 
@@ -93,7 +101,7 @@ Every generated project includes:
 - `.env.example` and `.env` setup
 - Ready-to-run project scripts
 - Health check endpoint at `/health` for backend projects
-- shadcn-compatible UI components for Next.js and TanStack Start projects
+- shadcn/ui components built on Base UI for Next.js and TanStack Start projects
 - Database wiring and schema setup when selected
 - Authentication scaffolding when selected
 - Docker files when selected

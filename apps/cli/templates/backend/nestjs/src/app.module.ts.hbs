@@ -16,6 +16,9 @@ import { AuthModule } from "./auth/auth.module.js";
 import { DatabaseModule } from "./database/database.module.js";
 {{/if}}
 import { HealthController } from "./health/health.controller.js";
+{{#if useAuth}}
+import { MeController } from "./me/me.controller.js";
+{{/if}}
 {{#if (eq database 'prisma')}}
 import { PrismaModule } from "./prisma/prisma.module.js";
 {{/if}}
@@ -39,7 +42,7 @@ import { PrismaModule } from "./prisma/prisma.module.js";
     ThrottlerModule.forRoot([{ ttl: 15 * 60 * 1000, limit: 100 }]),
     {{/if}}
   ],
-  controllers: [HealthController],
+  controllers: [HealthController{{#if useAuth}}, MeController{{/if}}],
   {{#if useRateLimit}}
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
   {{/if}}

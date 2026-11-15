@@ -129,11 +129,11 @@ src/
 |-- routes/           # File-based routes (__root.tsx, index.tsx)
 |-- routeTree.gen.ts  # Generated route tree
 |-- router.tsx        # createRouter() + QueryClient + SSR query integration
-|-- lib/utils.ts      # cn() helper
-|-- components/ui/    # shadcn-compatible base UI primitives
+|-- lib/utils.ts      # cn() class name helper
+|-- components/ui/    # shadcn/ui components built on Base UI
 |-- styles/app.css    # Tailwind CSS v4 import + base styles
 vite.config.ts        # tanstackStart() + tailwind + react plugins
-components.json       # shadcn CLI-compatible component config
+components.json       # shadcn CLI config (base-vega style)
 package.json          # "type": "module"
 ```
 
@@ -295,31 +295,45 @@ Environment variable added: `MONGODB_URI`
 
 ## With Auth Module
 
-<Tabs items={['Express - JWT', 'Next.js - Better Auth', 'TanStack - Better Auth']}>
-  <Tab value="Express - JWT">
+<Tabs items={['Express - Better Auth', 'NestJS - Better Auth', 'Next.js - Better Auth', 'TanStack - Better Auth']}>
+  <Tab value="Express - Better Auth">
     <Files>
       <Folder name="src" defaultOpen>
         <Folder name="lib">
-          <File name="jwt.ts" />
+          <File name="auth.ts" />
+          <File name="email.ts" />
         </Folder>
         <Folder name="middleware">
           <File name="requireAuth.ts" />
         </Folder>
-        <Folder name="services">
-          <File name="userStore.ts" />
-        </Folder>
-        <Folder name="controllers">
-          <File name="authController.ts" />
-        </Folder>
         <Folder name="routes">
-          <File name="auth.ts" />
+          <File name="me.ts" />
         </Folder>
       </Folder>
     </Files>
 
-    Environment variables added: `JWT_SECRET`, `JWT_EXPIRES_IN`
+    Environment variables added: `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, and the optional `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `RESEND_API_KEY`, and `EMAIL_FROM`
 
-    The auth router is mounted at `/auth` in `src/index.ts`.
+    Better Auth is mounted on `/api/auth` in `src/index.ts`, and `GET /api/me` is an example of a protected route. It works without a database too, with an in-memory store.
+
+  </Tab>
+  <Tab value="NestJS - Better Auth">
+    <Files>
+      <Folder name="src" defaultOpen>
+        <Folder name="auth">
+          <File name="auth.ts" />
+          <File name="auth.module.ts" />
+          <File name="email.ts" />
+        </Folder>
+        <Folder name="me">
+          <File name="me.controller.ts" />
+        </Folder>
+      </Folder>
+    </Files>
+
+    Environment variables added: `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, and the optional `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `RESEND_API_KEY`, and `EMAIL_FROM`
+
+    `@thallesp/nestjs-better-auth` mounts Better Auth on `/api/auth`, and its guard protects every route not marked `@AllowAnonymous()`.
 
   </Tab>
   <Tab value="Next.js - Better Auth">
@@ -328,6 +342,11 @@ Environment variable added: `MONGODB_URI`
         <Folder name="auth">
           <File name="sign-in-form.tsx" />
           <File name="sign-up-form.tsx" />
+          <File name="social-buttons.tsx" />
+          <File name="forgot-password-form.tsx" />
+          <File name="reset-password-form.tsx" />
+          <File name="email-verification-card.tsx" />
+          <File name="change-password-form.tsx" />
           <File name="sign-out-button.tsx" />
         </Folder>
       </Folder>
@@ -335,12 +354,20 @@ Environment variable added: `MONGODB_URI`
         <File name="auth.ts" />
         <File name="auth-client.ts" />
         <File name="auth-schema.ts" />
+        <File name="email.ts" />
+        <File name="session.ts" />
       </Folder>
       <Folder name="app" defaultOpen>
         <Folder name="sign-in">
           <File name="page.tsx" />
         </Folder>
         <Folder name="sign-up">
+          <File name="page.tsx" />
+        </Folder>
+        <Folder name="forgot-password">
+          <File name="page.tsx" />
+        </Folder>
+        <Folder name="reset-password">
           <File name="page.tsx" />
         </Folder>
         <Folder name="dashboard">
@@ -356,7 +383,7 @@ Environment variable added: `MONGODB_URI`
       </Folder>
     </Files>
 
-    Environment variables added: `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`
+    Environment variables added: `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, and the optional `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `RESEND_API_KEY`, and `EMAIL_FROM`
 
     <Callout type="info">
       Better Auth in Next.js is only generated when a database is selected.
@@ -372,6 +399,11 @@ Environment variable added: `MONGODB_URI`
           <Folder name="auth">
             <File name="sign-in-form.tsx" />
             <File name="sign-up-form.tsx" />
+            <File name="social-buttons.tsx" />
+            <File name="forgot-password-form.tsx" />
+            <File name="reset-password-form.tsx" />
+            <File name="email-verification-card.tsx" />
+            <File name="change-password-form.tsx" />
             <File name="sign-out-button.tsx" />
           </Folder>
         </Folder>
@@ -380,6 +412,7 @@ Environment variable added: `MONGODB_URI`
           <File name="auth-client.ts" />
           <File name="auth-functions.ts" />
           <File name="auth-schema.ts" />
+          <File name="email.ts" />
         </Folder>
         <Folder name="routes">
           <Folder name="api/auth">
@@ -387,12 +420,14 @@ Environment variable added: `MONGODB_URI`
           </Folder>
           <File name="sign-in.tsx" />
           <File name="sign-up.tsx" />
+          <File name="forgot-password.tsx" />
+          <File name="reset-password.tsx" />
           <File name="dashboard.tsx" />
         </Folder>
       </Folder>
     </Files>
 
-    Environment variables added: `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`
+    Environment variables added: `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, and the optional `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `RESEND_API_KEY`, and `EMAIL_FROM`
 
     <Callout type="info">
       TanStack Better Auth uses `tanstackStartCookies()` from
@@ -433,10 +468,10 @@ npm run docker:logs   # docker compose logs -f
 
 | Framework | App type   | Database   | ORM/ODM  | Auth        | Status |
 | --------- | ---------- | ---------- | -------- | ----------- | ------ |
-| Express   | Backend    | none       | -        | JWT         | Yes    |
-| Express   | Backend    | PostgreSQL | Prisma   | JWT         | Yes    |
-| Express   | Backend    | PostgreSQL | Drizzle  | JWT         | Yes    |
-| Express   | Backend    | MongoDB    | Mongoose | JWT         | Yes    |
+| Express   | Backend    | none       | -        | Better Auth | Yes    |
+| Express   | Backend    | PostgreSQL | Prisma   | Better Auth | Yes    |
+| Express   | Backend    | PostgreSQL | Drizzle  | Better Auth | Yes    |
+| Express   | Backend    | MongoDB    | Mongoose | Better Auth | Yes    |
 | Next.js   | Full-stack | none       | -        | -           | Yes    |
 | Next.js   | Full-stack | PostgreSQL | Prisma   | Better Auth | Yes    |
 | Next.js   | Full-stack | PostgreSQL | Drizzle  | Better Auth | Yes    |
@@ -445,7 +480,7 @@ npm run docker:logs   # docker compose logs -f
 | TanStack  | Full-stack | PostgreSQL | Prisma   | Better Auth | Yes    |
 | TanStack  | Full-stack | PostgreSQL | Drizzle  | Better Auth | Yes    |
 | TanStack  | Full-stack | MongoDB    | Mongoose | Better Auth | Yes    |
-| NestJS    | Backend    | none       | -        | JWT         | Yes    |
-| NestJS    | Backend    | PostgreSQL | Prisma   | JWT         | Yes    |
-| NestJS    | Backend    | PostgreSQL | Drizzle  | JWT         | Yes    |
-| NestJS    | Backend    | MongoDB    | Mongoose | JWT         | Yes    |
+| NestJS    | Backend    | none       | -        | Better Auth | Yes    |
+| NestJS    | Backend    | PostgreSQL | Prisma   | Better Auth | Yes    |
+| NestJS    | Backend    | PostgreSQL | Drizzle  | Better Auth | Yes    |
+| NestJS    | Backend    | MongoDB    | Mongoose | Better Auth | Yes    |

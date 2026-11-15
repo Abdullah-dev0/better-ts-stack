@@ -11,7 +11,6 @@ import {
   DEFAULT_CHOICES,
   type FileSource,
   FRAMEWORK_OPTIONS,
-  isBackend,
   listProjectFiles,
   normalizeChoices,
   PACKAGE_MANAGER_OPTIONS,
@@ -173,11 +172,7 @@ export function StackBuilder() {
               name="auth"
               label="auth"
               description={
-                !isAuthAvailable
-                  ? "needs a database"
-                  : isBackend(choices.framework)
-                    ? "JWT, bcrypt, Zod"
-                    : "Better Auth"
+                !isAuthAvailable ? "needs a database" : "Better Auth"
               }
               isChecked={choices.useAuth}
               isDisabled={!isAuthAvailable}
@@ -233,7 +228,7 @@ export function StackBuilder() {
       <Pane
         label={`${PROJECT_NAME}/`}
         index="03"
-        className="min-h-[28rem]"
+        className="min-h-112"
         bodyClassName="flex flex-col xl:overflow-hidden"
         aside={<span aria-live="polite">{files.length} files</span>}
       >
@@ -241,7 +236,7 @@ export function StackBuilder() {
           label="cli command"
           aside={<CopyButton text={command.join(" ")} />}
         >
-          <p className="text-[13px] leading-6 break-words">
+          <p className="text-[13px] leading-6 wrap-break-word">
             <span className="text-tui-lime mr-2 select-none" aria-hidden>
               $
             </span>
@@ -267,7 +262,7 @@ export function StackBuilder() {
           </div>
           <ul
             aria-label={`Files in ${PROJECT_NAME}`}
-            className="max-h-96 min-h-56 flex-1 [scrollbar-width:thin] overflow-y-auto pr-1 text-[13px] leading-6 xl:max-h-none"
+            className="max-h-96 min-h-56 flex-1 scrollbar-thin overflow-y-auto pr-1 text-[13px] leading-6 xl:max-h-none"
           >
             {tree.map((node) => (
               <TreeItem

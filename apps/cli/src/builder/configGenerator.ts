@@ -127,7 +127,6 @@ export async function generatePackageJson(
 // these are not approved; entries for packages a project lacks are ignored.
 const PNPM_BUILD_DEPENDENCIES = [
   "@prisma/engines",
-  "bcrypt",
   "esbuild",
   "prisma",
   "unrs-resolver",
@@ -175,7 +174,46 @@ export async function generatePnpmWorkspace(
 }
 
 // Variables that get a random value in .env instead of the module's default
-export const GENERATED_SECRETS = ["JWT_SECRET", "BETTER_AUTH_SECRET"];
+export const GENERATED_SECRETS = ["BETTER_AUTH_SECRET"];
+
+// Name of the file that records how a project was generated
+export const STACK_FILE = "better-ts-stack.json";
+
+// Records the stack choices, so later commands (such as adding a module to the
+// project) know what the project was generated with
+export async function generateStackFile(
+  targetDir: string,
+  config: ProjectConfig
+): Promise<void> {
+  try {
+    const { version } = (await fs.readJson(
+      path.join(__dirname, "../../package.json")
+    )) as { version: string };
+    const stack = {
+      cliVersion: version,
+      framework: config.framework,
+      database: config.database,
+      packageManager: config.packageManager,
+      auth: config.useAuth,
+      docker: config.useDocker,
+      rateLimit: config.useRateLimit,
+      ci: config.useCi,
+      agents: config.useAgents,
+      vscode: config.useVscode,
+    };
+    await fs.writeFile(
+      path.join(targetDir, STACK_FILE),
+      JSON.stringify(stack, null, 2) + "\n",
+      "utf-8"
+    );
+  } catch (error) {
+    throw buildError(
+      error,
+      "STACK_FILE_ERROR",
+      `Failed to write ${STACK_FILE}`
+    );
+  }
+}
 
 // Generates .env and .env.example files from merged environment variables
 export async function generateEnvFile(

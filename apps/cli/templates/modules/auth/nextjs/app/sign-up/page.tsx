@@ -1,35 +1,41 @@
-import { headers } from "next/headers";
+import { Suspense } from "react";
+
 import { redirect } from "next/navigation";
 
 import { SignUpForm } from "@/components/auth/sign-up-form";
-import { auth } from "@/lib/auth";
+import { Badge } from "@/components/ui/badge";
+import { socialProviders } from "@/lib/auth";
+import { getSession } from "@/lib/session";
 
-export default async function SignUpPage() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (session) {
+// Sends a signed-in visitor to the dashboard. It runs in its own <Suspense>
+// boundary, so the form is sent without waiting for the session lookup
+async function RedirectIfSignedIn() {
+  if (await getSession()) {
     redirect("/dashboard");
   }
 
+  return null;
+}
+
+export default function SignUpPage() {
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.18),_transparent_28%),linear-gradient(180deg,_#f8fafc_0%,_#ecfeff_100%)] px-6 py-16 sm:px-10">
-      <div className="mx-auto flex min-h-[calc(100vh-8rem)] max-w-5xl items-center gap-12 lg:grid lg:grid-cols-[0.9fr_1.1fr]">
-        <section className="hidden space-y-5 lg:block">
-          <span className="inline-flex rounded-full border border-sky-200 bg-white/80 px-3 py-1 text-xs font-medium uppercase tracking-[0.24em] text-sky-700">
-            Better Auth
-          </span>
-          <h1 className="text-4xl font-semibold tracking-tight text-slate-950">
+    <main className="flex min-h-svh items-center justify-center bg-muted p-6 md:p-10">
+      <div className="grid w-full max-w-5xl items-center gap-12 lg:grid-cols-[0.9fr_1.1fr]">
+        <section className="hidden flex-col gap-5 lg:flex">
+          <Badge variant="outline">Better Auth</Badge>
+          <h1 className="text-4xl font-semibold tracking-tight">
             Create your account.
           </h1>
-          <p className="max-w-md text-base leading-7 text-slate-600">
-            Start with email and password today, then layer in profile data,
-            onboarding, and provider-based auth when your product needs it.
+          <p className="max-w-md text-base leading-7 text-muted-foreground">
+            Sign up with email and password, or with GitHub or Google once their
+            keys are set. A verification link goes to your inbox.
           </p>
         </section>
-        <SignUpForm />
+        <SignUpForm providers={socialProviders} />
       </div>
+      <Suspense fallback={null}>
+        <RedirectIfSignedIn />
+      </Suspense>
     </main>
   );
 }

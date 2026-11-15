@@ -11,7 +11,7 @@ Answer a few prompts, or pass flags, to pick a framework, database, authenticati
 - Backend API templates (Express or NestJS with TypeScript)
 - Full-stack templates (Next.js 16 or TanStack Start with React)
 - Database integration: PostgreSQL (Prisma or Drizzle) or MongoDB (Mongoose)
-- Authentication: JWT for Express and NestJS, Better Auth for Next.js and TanStack Start (requires a database)
+- Authentication: Better Auth for every framework, with email verification, password reset, and GitHub and Google sign-in (Next.js and TanStack Start need a database)
 - Optional Docker support with multi-stage builds
 - TypeScript with strict mode enabled
 - ESLint + Prettier pre-configured
@@ -51,7 +51,7 @@ npx better-ts-stack . --framework nextjs --database drizzle --pm pnpm
 | `--docker` / `--no-docker`         | Add Docker files                                |
 | `--rate-limit` / `--no-rate-limit` | Add rate limiting (Express and NestJS)          |
 | `--ci` / `--no-ci`                 | Add a GitHub Actions workflow                   |
-| `--agents` / `--no-agents`         | Add AGENTS.md for AI coding agents              |
+| `--no-agents`                      | Leave out AGENTS.md (added by default)          |
 | `--vscode` / `--no-vscode`         | Add VS Code settings and recommended extensions |
 | `--git` / `--no-git`               | Initialize a git repository                     |
 | `--install` / `--no-install`       | Install dependencies                            |
@@ -62,7 +62,7 @@ npx better-ts-stack . --framework nextjs --database drizzle --pm pnpm
 
 `--database` names the ORM, which also selects the database: `prisma` and `drizzle` use PostgreSQL, `mongoose` uses MongoDB.
 
-With `--yes`, the defaults are Express, no database, no auth, no rate limiting, no Docker, git initialized, and dependencies not installed. The package manager defaults to the one that ran the CLI: `pnpm` for `pnpm dlx`, `bun` for `bunx`, and `npm` otherwise.
+With `--yes`, the defaults are Express, no database, no auth, no rate limiting, no Docker, no CI, no VS Code settings, an `AGENTS.md`, git initialized, and dependencies not installed. The package manager defaults to the one that ran the CLI: `pnpm` for `pnpm dlx`, `bun` for `bunx`, and `npm` otherwise.
 
 The project path can be a name (`my-app`), a nested path (`apps/api`), or `.` for the current directory. The last folder name becomes the `package.json` name.
 
@@ -81,14 +81,13 @@ The CLI guides you through these questions in order:
 5. **Package manager** — `npm`, `pnpm`, or `bun`
 6. **Docker** — include Docker configuration? (yes/no)
 7. **Authentication** — add auth?
-   - Express / NestJS: JWT-based auth (always available)
-   - Next.js / TanStack Start: Better Auth (only prompted when a database is selected)
+   - Better Auth for every framework
+   - Next.js / TanStack Start: only prompted when a database is selected
 8. **Rate limiting** — Express / NestJS only: limit requests per IP? (yes/no)
 9. **CI** — add a GitHub Actions workflow? (yes/no)
-10. **AI agents** — add an AGENTS.md for coding agents? (yes/no)
-11. **VS Code** — add workspace settings and recommended extensions? (yes/no)
-12. **Git** — initialize a git repository? (yes/no)
-13. **Install dependencies** — run the install command now? (yes/no)
+10. **VS Code** — add workspace settings and recommended extensions? (yes/no)
+11. **Git** — initialize a git repository? (yes/no)
+12. **Install dependencies** — run the install command now? (yes/no)
 
 > **Note**: The CLI does not ask for a port. The server port defaults to `3000` via the `PORT` environment variable.
 
@@ -104,7 +103,7 @@ A generated project includes:
 - Authentication scaffolding (if selected)
 - Docker files (if selected)
 - A GitHub Actions workflow (if selected)
-- An `AGENTS.md` with the stack, commands, and rules for AI coding agents, plus a `CLAUDE.md` that points Claude Code to it (if selected)
+- An `AGENTS.md` with the stack, commands, and rules for AI coding agents, plus a `CLAUDE.md` that points Claude Code to it (always, unless you pass `--no-agents`)
 - VS Code settings that fix lint problems on save, and recommended extensions for the stack (if selected)
 - Optional git repository initialization
 
@@ -127,16 +126,16 @@ A generated project includes:
 ### Frontend — Next.js
 
 - Next.js 16 with React 19 and App Router
-- Tailwind CSS v4
+- Tailwind CSS v4 with shadcn/ui components built on Base UI (`base-vega` style), ready for `npx shadcn add`
 - `dev`, `build`, `start`, `lint` scripts
 - With Better Auth, `proxy.ts` redirects signed-out visitors away from `/dashboard`
 
 ### Frontend — TanStack Start
 
 - TanStack Start (React) with TanStack Router, React Query, and SSR
-- Tailwind CSS v4
+- Tailwind CSS v4 with shadcn/ui components built on Base UI (`base-vega` style), ready for `npx shadcn add`
 - Production server built by Nitro (`node .output/server/index.mjs`), also used in Docker
-- `~/*` path alias and `components.json` (shadcn-style) configured for UI components
+- `~/*` path alias, also used by `components.json`
 - `dev`, `build`, `start`, `preview`, `type:check`, `lint` scripts
 - Auth routes use server functions (`createServerFn`) with cookie-based sessions
 
@@ -154,12 +153,12 @@ A generated project includes:
 
 ### Auth modules
 
-| Context            | Implementation                  | Generated files                                                                                                                           |
-| ------------------ | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| Express backend    | JWT + bcrypt                    | `src/lib/jwt.ts`, `src/middleware/requireAuth.ts`, `src/services/userStore.ts`, `src/routes/auth.ts`, `src/controllers/authController.ts` |
-| NestJS backend     | JWT + bcrypt                    | `src/auth/` (module, controller, service, guard, Zod schemas, users service)                                                              |
-| Next.js fullstack  | Better Auth (requires database) | `lib/auth.ts`, `lib/auth-client.ts`, `app/api/auth/[...all]/route.ts`                                                                     |
-| TanStack fullstack | Better Auth (requires database) | `src/lib/auth.ts`, `src/lib/auth-client.ts`, `src/lib/auth-functions.ts`, `src/routes/api/auth/$.ts`                                      |
+| Context            | Implementation                  | Generated files                                                                                      |
+| ------------------ | ------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Express backend    | Better Auth                     | `src/lib/auth.ts`, `src/lib/email.ts`, `src/middleware/requireAuth.ts`, `src/routes/me.ts`           |
+| NestJS backend     | Better Auth                     | `src/auth/` (auth server, module, emails), `src/me/me.controller.ts`                                 |
+| Next.js fullstack  | Better Auth (requires database) | `lib/auth.ts`, `lib/auth-client.ts`, `app/api/auth/[...all]/route.ts`                                |
+| TanStack fullstack | Better Auth (requires database) | `src/lib/auth.ts`, `src/lib/auth-client.ts`, `src/lib/auth-functions.ts`, `src/routes/api/auth/$.ts` |
 
 ### Docker module
 
@@ -179,7 +178,7 @@ Scripts added: `docker:build`, `docker:up`, `docker:down`, `docker:logs`
 | Backend framework  | Express.js 5 / NestJS 12                                                                             |
 | Frontend framework | Next.js 16 / TanStack Start / React 19                                                               |
 | Database ORMs      | Prisma, Drizzle, Mongoose                                                                            |
-| Auth               | JWT (`jsonwebtoken` + `bcrypt`) / Better Auth                                                        |
+| Auth               | Better Auth                                                                                          |
 | Hot reload         | `tsx watch` (Express) / `nest start --watch` (NestJS) / `next dev` (Next.js) / `vite dev` (TanStack) |
 | Linting            | ESLint 10 with TypeScript plugin                                                                     |
 | Formatting         | Prettier                                                                                             |

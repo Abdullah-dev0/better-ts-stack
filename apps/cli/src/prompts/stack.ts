@@ -119,7 +119,7 @@ export async function collectStackChoices(
   const useAuth = isAuthAvailable
     ? await ask(preset.useAuth, () =>
         confirm({
-          message: isFullstack ? "Add Better Auth?" : "Add JWT authentication?",
+          message: "Add authentication (Better Auth)?",
           initialValue: false,
         })
       )
@@ -142,12 +142,8 @@ export async function collectStackChoices(
     confirm({ message: "Add GitHub Actions CI?", initialValue: false })
   );
 
-  const useAgents = await ask(preset.useAgents, () =>
-    confirm({
-      message: "Add AGENTS.md for AI coding agents?",
-      initialValue: false,
-    })
-  );
+  // AGENTS.md is always added without asking; --no-agents leaves it out
+  const useAgents = preset.useAgents ?? true;
 
   const useVscode = await ask(preset.useVscode, () =>
     confirm({ message: "Add VS Code settings?", initialValue: false })

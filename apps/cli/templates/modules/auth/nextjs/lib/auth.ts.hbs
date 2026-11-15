@@ -1,5 +1,9 @@
+import { after } from "next/server";
 import { betterAuth } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
+
+import type { SocialProvider } from "./auth-schema";
+import { sendEmail } from "./email";
 {{#if (eq database 'prisma')}}
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import client from "./prisma";
@@ -16,6 +20,18 @@ const client = new MongoClient(process.env.MONGODB_URI!);
 const db = client.db();
 {{/if}}
 
+// Sends the email after the response, so the request does not wait for it.
+// after() keeps a serverless function (such as on Vercel) running until the
+// email is sent. A failed email is logged instead of failing the request: the
+// sign-up or reset already happened, and the user can ask for the email again
+function deliver(email: Parameters<typeof sendEmail>[0]): void {
+  after(() =>
+    sendEmail(email).catch((error: unknown) => {
+      console.error(`Could not send "${email.subject}" to ${email.to}:`, error);
+    })
+  );
+}
+
 export const auth = betterAuth({
   {{#if (eq database 'prisma')}}
   database: prismaAdapter(client, { provider: "postgresql" }),
@@ -30,8 +46,57 @@ export const auth = betterAuth({
   {{/if}}
   emailAndPassword: {
     enabled: true,
+    // Set to true to block sign-in until the email address is verified
+    requireEmailVerification: false,
+    // A reset signs the user out everywhere
+    revokeSessionsOnPasswordReset: true,
+    sendResetPassword: async ({ user, url }) => {
+      deliver({
+        to: user.email,
+        subject: "Reset your password",
+        text: `Open this link to choose a new password:
+${url}`,
+      });
+    },
+  },
+  emailVerification: {
+    sendOnSignUp: true,
+    autoSignInAfterVerification: true,
+    sendVerificationEmail: async ({ user, url }) => {
+      deliver({
+        to: user.email,
+        subject: "Verify your email address",
+        text: `Open this link to verify your email address:
+${url}`,
+      });
+    },
+  },
+  // Each provider is turned on once its client ID and secret are set
+  socialProviders: {
+    ...(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET
+      ? {
+          github: {
+            clientId: process.env.GITHUB_CLIENT_ID,
+            clientSecret: process.env.GITHUB_CLIENT_SECRET,
+          },
+        }
+      : {}),
+    ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+      ? {
+          google: {
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+          },
+        }
+      : {}),
   },
   plugins: [nextCookies()],
   secret: process.env.BETTER_AUTH_SECRET,
   baseURL: process.env.BETTER_AUTH_URL,
 });
+
+// The providers turned on above; the sign-in and sign-up pages show a button
+// for each
+export const socialProviders = Object.keys(
+  auth.options.socialProviders
+) as SocialProvider[];

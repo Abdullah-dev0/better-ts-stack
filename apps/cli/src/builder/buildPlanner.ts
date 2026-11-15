@@ -10,14 +10,24 @@ import {
   ProjectConfig,
   TemplateContext,
 } from "../types";
-import { GENERATED_SECRETS, mergeConfigurations } from "./configGenerator";
+import {
+  GENERATED_SECRETS,
+  mergeConfigurations,
+  STACK_FILE,
+} from "./configGenerator";
 import { listModuleFiles } from "./fileProcessor";
 import { isInsideGitRepository } from "./gitInitializer";
 import { selectModules } from "./moduleSelector";
 import { buildTemplateContext } from "./templateContext";
 
 // Files the builder writes itself instead of copying them from a module
-const GENERATED_FILES = ["package.json", ".env", ".env.example", "README.md"];
+const GENERATED_FILES = [
+  "package.json",
+  ".env",
+  ".env.example",
+  "README.md",
+  STACK_FILE,
+];
 
 interface BuildInputs {
   modules: Module[];

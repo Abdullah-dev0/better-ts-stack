@@ -1,438 +1,259 @@
 ﻿---
 title: Auth Module
-description: JWT authentication for Express and NestJS, Better Auth for Next.js and TanStack Start
+description: Better Auth for Express, NestJS, Next.js, and TanStack Start, with email verification, password reset, and GitHub and Google sign-in
 ---
 
 import { Callout } from "fumadocs-ui/components/callout";
-import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 
 ## Overview
 
-The Auth module adds user authentication. Which implementation you get depends on the framework:
+The Auth module adds [Better Auth](https://www.better-auth.com/docs) to every framework. All four get the same features:
 
-| Stack                   | Implementation | Requires database                                      |
-| ----------------------- | -------------- | ------------------------------------------------------ |
-| **Express backend**     | JWT + bcrypt   | No (in-memory user store when no database is selected) |
-| **NestJS backend**      | JWT + bcrypt   | No (in-memory user store when no database is selected) |
-| **Next.js full-stack**  | Better Auth    | **Yes - only prompted when a database is selected**    |
-| **TanStack full-stack** | Better Auth    | **Yes - only prompted when a database is selected**    |
+- Sign-up, sign-in, and sign-out with email and password
+- Email verification: a link is sent after sign-up
+- Password reset by email. A reset signs the user out on every device
+- GitHub and Google sign-in, turned on when their client ID and secret are set in `.env`
+- Emails sent through [Resend](https://resend.com) when `RESEND_API_KEY` is set, and printed to the server log otherwise, so you can copy the links while developing
+
+| Stack                   | Sessions               | Requires database                                   |
+| ----------------------- | ---------------------- | --------------------------------------------------- |
+| **Express backend**     | Bearer token or cookie | No (in-memory store when no database is selected)   |
+| **NestJS backend**      | Bearer token or cookie | No (in-memory store when no database is selected)   |
+| **Next.js full-stack**  | Cookie                 | **Yes - only prompted when a database is selected** |
+| **TanStack full-stack** | Cookie                 | **Yes - only prompted when a database is selected** |
 
 <Callout type="info">
-  For Next.js and TanStack Start projects, the auth prompt is automatically
-  skipped if you chose `none` for the database type. Better Auth requires a
-  database-backed adapter to function.
+  Email verification is not required to sign in. Users can sign in right away
+  and see a "Verify your email" notice. To require it, set
+  `requireEmailVerification: true` in `emailAndPassword` in the auth file.
 </Callout>
 
 ---
 
-## Express - JWT Auth
+## Express and NestJS
 
-NestJS projects get the same endpoints and rules in `src/auth/`. See the [backend docs](/docs/modules/backend#nestjs).
+Better Auth answers every route under `/api/auth`. The main ones:
+
+| Route                                    | What it does                                                |
+| ---------------------------------------- | ----------------------------------------------------------- |
+| `POST /api/auth/sign-up/email`           | Creates a user (`email`, `password`, `name`) and signs in   |
+| `POST /api/auth/sign-in/email`           | Signs in (`email`, `password`)                              |
+| `POST /api/auth/sign-out`                | Ends the session                                            |
+| `GET /api/auth/get-session`              | Returns the current session                                 |
+| `GET /api/auth/verify-email?token=...`   | The link in the verification email                          |
+| `POST /api/auth/send-verification-email` | Sends the verification email again                          |
+| `POST /api/auth/request-password-reset`  | Sends a reset email. Answers `200` for unknown emails too   |
+| `POST /api/auth/reset-password`          | Sets a new password (`token`, `newPassword`)                |
+| `POST /api/auth/change-password`         | Changes the password of the signed-in user                  |
+| `POST /api/auth/sign-in/social`          | Starts GitHub or Google sign-in (`provider`, `callbackURL`) |
+| `GET /api/me`                            | Example protected route: returns the signed-in user         |
+
+Sign-up and sign-in return the session token in the `set-auth-token` response header. API clients send it back as `Authorization: Bearer <token>`. Browser apps can use the session cookie instead.
+
+```bash
+# Sign up, keeping the token
+curl -i -X POST http://localhost:3000/api/auth/sign-up/email \
+  -H "content-type: application/json" \
+  -d '{"email":"ada@example.com","password":"pw123456","name":"Ada"}'
+
+# Call a protected route
+curl http://localhost:3000/api/me -H "authorization: Bearer <set-auth-token>"
+```
+
+<Callout type="warn">
+  Requests from a browser or from `fetch` in Node.js carry an `Origin` header,
+  and Better Auth only accepts them from trusted origins: the server's own URL
+  (`BETTER_AUTH_URL`) and the origins in `CORS_ORIGIN`. Set `CORS_ORIGIN` to
+  your front end's URL. `curl` and mobile apps send no `Origin` and are not
+  affected.
+</Callout>
+
+### Protecting routes
+
+<details>
+<summary>Express</summary>
+
+Add `requireAuth` to a route. It accepts a cookie or a bearer token, answers `401` without one, and `getSession(res)` returns the session:
+
+```typescript
+import { getSession, requireAuth } from "../middleware/requireAuth";
+
+router.get("/", requireAuth, (_req, res) => {
+  const { user } = getSession(res);
+  res.json({ user });
+});
+```
+
+Better Auth is mounted in `src/index.ts` before `express.json()`, because it reads the request body itself.
+
+</details>
+
+<details>
+<summary>NestJS</summary>
+
+The project uses [`@thallesp/nestjs-better-auth`](https://github.com/ThallesP/nestjs-better-auth), the integration the Better Auth docs recommend. Its guard protects **every** route. Mark public routes with `@AllowAnonymous()` (as `HealthController` is), and read the session with `@Session()`:
+
+```typescript
+import { Controller, Get } from "@nestjs/common";
+import { Session, type UserSession } from "@thallesp/nestjs-better-auth";
+
+@Controller("api/me")
+export class MeController {
+  @Get()
+  me(@Session() { user }: UserSession) {
+    return { user };
+  }
+}
+```
+
+`main.ts` creates the app with `bodyParser: false`. The auth module adds the JSON and form parsers back for every route except `/api/auth`.
+
+</details>
 
 ### Generated files
 
 ```text
-src/
-|-- lib/
-|   \-- jwt.ts               # JWT sign/verify utilities
-|-- middleware/
-|   \-- requireAuth.ts       # Bearer token validation middleware
-|-- services/
-|   \-- userStore.ts         # User lookup helper
-|-- controllers/
-|   \-- authController.ts    # Register/login request handlers
-\-- routes/
-    \-- auth.ts              # Router mounted at /auth
+Express                           NestJS
+src/                              src/
+|-- lib/                          |-- auth/
+|   |-- auth.ts    # Better Auth  |   |-- auth.ts         # Better Auth
+|   \-- email.ts   # Emails       |   |-- auth.module.ts  # Mounts it on /api/auth
+|-- middleware/                   |   \-- email.ts        # Emails
+|   \-- requireAuth.ts            \-- me/
+\-- routes/                           \-- me.controller.ts # GET /api/me
+    \-- me.ts      # GET /api/me
 ```
 
-The auth router is registered in `src/index.ts`:
+With Prisma or Drizzle, the schema gets Better Auth's `user`, `session`, `account`, and `verification` tables instead of the sample `users` table. Create them with your usual migration (`prisma:migrate`, or `db:generate` and `db:migrate`). With MongoDB, Better Auth creates its collections on first use and runs without transactions, so a standalone MongoDB server works. Without a database, users and sessions live in memory and are lost on restart.
 
-```typescript
-import authRouter from "./routes/auth";
+### Rate limiting
 
-app.use("/auth", authRouter);
-```
-
-Request bodies are validated with Zod. `POST /auth/register` trims and lowercases the email, requires it to be a valid address, and requires a password of 8 characters to 72 bytes (bcrypt ignores anything longer). Invalid or missing fields return `400`, and an email that is already registered returns `409`, including when two sign-ups for the same email arrive at the same time.
-
----
-
-### JWT utility - src/lib/jwt.ts
-
-```typescript
-import jwt from "jsonwebtoken";
-
-export interface AuthTokenPayload {
-  userId: string;
-}
-
-const JWT_SECRET = process.env.JWT_SECRET!;
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "1h";
-
-export function signToken(payload: AuthTokenPayload): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
-}
-
-export function verifyToken(token: string): AuthTokenPayload {
-  return jwt.verify(token, JWT_SECRET) as AuthTokenPayload;
-}
-```
-
----
-
-### Auth middleware - src/middleware/requireAuth.ts
-
-```typescript
-import { NextFunction, Request, Response } from "express";
-
-import { AuthTokenPayload, verifyToken } from "../lib/jwt";
-
-export interface AuthenticatedRequest extends Request {
-  user?: AuthTokenPayload;
-}
-
-export function requireAuth(
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction
-): void {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    res.status(401).json({ error: "Authorization header missing or invalid" });
-    return;
-  }
-
-  const token = authHeader.substring("Bearer ".length);
-
-  try {
-    const payload = verifyToken(token);
-    req.user = payload;
-    next();
-  } catch (error) {
-    console.error("JWT verification failed:", error);
-    res.status(401).json({ error: "Invalid or expired token" });
-  }
-}
-```
-
----
-
-### Environment variables added
-
-```bash
-JWT_SECRET=please-change-me
-JWT_EXPIRES_IN=1h
-```
+Better Auth limits its own routes in production: 3 sign-ups or sign-ins per 10 seconds per client IP. With `--rate-limit`, sign-up, sign-in, and password reset allow 10 attempts per client IP in 15 minutes. Behind a reverse proxy, enable Express's `trust proxy` setting so the real client IP is used.
 
 ### Dependencies added
 
 ```json
 {
   "dependencies": {
-    "bcrypt": "^6.0.0",
-    "jsonwebtoken": "^9.0.3"
-  },
-  "devDependencies": {
-    "@types/bcrypt": "^6.0.0",
-    "@types/jsonwebtoken": "^9.0.10"
+    "better-auth": "^1.7.18",
+    "@thallesp/nestjs-better-auth": "^2.8.0"
   }
 }
 ```
 
-### Scripts
-
-The auth module does not add any scripts.
+The NestJS package is added to NestJS projects only.
 
 ---
 
-## Next.js - Better Auth
+## Next.js and TanStack Start
+
+Both get the same pages:
+
+| Page               | What it does                                                                                                     |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| `/sign-up`         | Sign up with email and password, or GitHub or Google                                                             |
+| `/sign-in`         | Sign in, with a "Forgot password?" link                                                                          |
+| `/forgot-password` | Sends a reset link                                                                                               |
+| `/reset-password`  | Opened from the reset link; sets a new password                                                                  |
+| `/dashboard`       | Protected: shows whether the email is verified (with a button to send the link again) and a change-password form |
+
+`/sign-in` and `/sign-up` redirect to `/dashboard` when the user already has a session, and `/dashboard` redirects to `/sign-in` without one. The GitHub and Google buttons appear only when their keys are set.
+
+### Server first (Next.js)
+
+The pages never wait for the session before sending HTML. `getSession()` in `lib/session.ts` reads the session on the server, and `cache()` makes it run once per request. Each part of a page that needs the user calls it inside its own `<Suspense>` boundary:
+
+```tsx
+import { Suspense } from "react";
+
+import { redirect } from "next/navigation";
+
+import { getSession } from "@/lib/session";
+
+async function Greeting() {
+  const session = await getSession();
+  if (!session) redirect("/sign-in");
+  return <h1>Welcome {session.user.name}</h1>;
+}
+
+export default function Page() {
+  return (
+    <main>
+      <Suspense fallback={<p>Loading...</p>}>
+        <Greeting />
+      </Suspense>
+      {/* Everything else is sent right away */}
+    </main>
+  );
+}
+```
+
+`proxy.ts` sends visitors without a session cookie from `/dashboard` to `/sign-in` before the page renders, and `getSession()` catches an expired or revoked session. `/reset-password` is a static page: its form reads the token from the URL in the browser.
 
 ### Generated files
 
 ```text
-lib/
-|-- auth.ts                          # Better Auth server configuration
-|-- auth-client.ts                   # createAuthClient() for client components
-|-- auth-schema.ts                   # Zod schemas and auth error helper
-components/
-\-- auth/
-    |-- sign-in-form.tsx             # Client login form
-    |-- sign-up-form.tsx             # Client signup form
-    \-- sign-out-button.tsx          # Client sign-out action
+Next.js                                  TanStack Start
+lib/                                     src/lib/
+|-- auth.ts           # Better Auth      |-- auth.ts
+|-- auth-client.ts    # Browser client   |-- auth-client.ts
+|-- auth-schema.ts    # Form schemas     |-- auth-functions.ts  # Server functions
+|-- email.ts          # Emails           |-- auth-schema.ts
+\-- session.ts        # getSession()     \-- email.ts
+components/auth/                         src/components/auth/   (same forms)
+|-- sign-in-form.tsx                     src/routes/
+|-- sign-up-form.tsx                     |-- sign-in.tsx
+|-- social-buttons.tsx                   |-- sign-up.tsx
+|-- forgot-password-form.tsx             |-- forgot-password.tsx
+|-- reset-password-form.tsx              |-- reset-password.tsx
+|-- email-verification-card.tsx          |-- dashboard.tsx
+|-- change-password-form.tsx             \-- api/auth/$.ts
+\-- sign-out-button.tsx
 app/
-|-- sign-in/page.tsx                 # Session-aware login route
-|-- sign-up/page.tsx                 # Session-aware signup route
-|-- dashboard/page.tsx               # Protected example page
-\-- api/auth/[...all]/route.ts       # Better Auth route handler
+|-- sign-in/, sign-up/, forgot-password/, reset-password/, dashboard/
+\-- api/auth/[...all]/route.ts
 ```
 
-The adapter used in `lib/auth.ts` is determined by your ORM selection:
+The database adapter in the auth file follows your ORM: `prismaAdapter`, `drizzleAdapter`, or `mongodbAdapter`.
 
-- **Prisma** -> `prismaAdapter` from `better-auth/adapters/prisma`
-- **Drizzle** -> `drizzleAdapter` from `better-auth/adapters/drizzle`
-- **MongoDB** -> `mongodbAdapter` from `better-auth/adapters/mongodb`
+<Callout type="warn">
+  Better Auth's MongoDB adapter in Next.js and TanStack Start projects uses
+  transactions, which need a replica set. The Docker Compose database already
+  runs as one. Otherwise see the [database setup](/docs/modules/database).
+</Callout>
 
 ---
 
-### Better Auth configuration - lib/auth.ts
-
-<Tabs items={['Prisma adapter', 'Drizzle adapter', 'MongoDB adapter']}>
-  <Tab value="Prisma adapter">
-    ```typescript
-    import { betterAuth } from "better-auth";
-    import { nextCookies } from "better-auth/next-js";
-    import { prismaAdapter } from "better-auth/adapters/prisma";
-    import client from "./prisma";
-
-    export const auth = betterAuth({
-      database: prismaAdapter(client, { provider: "postgresql" }),
-      emailAndPassword: { enabled: true },
-      plugins: [nextCookies()],
-      secret: process.env.BETTER_AUTH_SECRET,
-      baseURL: process.env.BETTER_AUTH_URL,
-    });
-    ```
-
-  </Tab>
-  <Tab value="Drizzle adapter">
-    ```typescript
-    import { betterAuth } from "better-auth";
-    import { nextCookies } from "better-auth/next-js";
-    import { drizzleAdapter } from "better-auth/adapters/drizzle";
-    import { db } from "./db";
-
-    export const auth = betterAuth({
-      database: drizzleAdapter(db, { provider: "pg" }),
-      emailAndPassword: { enabled: true },
-      plugins: [nextCookies()],
-      secret: process.env.BETTER_AUTH_SECRET,
-      baseURL: process.env.BETTER_AUTH_URL,
-    });
-    ```
-
-  </Tab>
-  <Tab value="MongoDB adapter">
-    ```typescript
-    import { betterAuth } from "better-auth";
-    import { mongodbAdapter } from "better-auth/adapters/mongodb";
-    import { nextCookies } from "better-auth/next-js";
-    import { MongoClient } from "mongodb";
-
-    const client = new MongoClient(process.env.MONGODB_URI!);
-    const db = client.db();
-
-    export const auth = betterAuth({
-      database: mongodbAdapter(db, { client }),
-      emailAndPassword: { enabled: true },
-      plugins: [nextCookies()],
-      secret: process.env.BETTER_AUTH_SECRET,
-      baseURL: process.env.BETTER_AUTH_URL,
-    });
-    ```
-
-  </Tab>
-</Tabs>
-
-### Route handler - app/api/auth/[...all]/route.ts
-
-```typescript
-import { toNextJsHandler } from "better-auth/next-js";
-
-import { auth } from "@/lib/auth";
-
-export const { GET, POST } = toNextJsHandler(auth);
-```
-
-### Client helper - lib/auth-client.ts
-
-```typescript
-import { createAuthClient } from "better-auth/react";
-
-export const authClient = createAuthClient();
-```
-
-Usage in a client component:
-
-```typescript
-const result = await authClient.signIn.email({
-  email: "user@example.com",
-  password: "password",
-});
-
-if (result.error) {
-  console.error(result.error);
-}
-```
-
-### Generated auth routes
-
-- `/sign-in` redirects to `/dashboard` when the user already has a session
-- `/sign-up` redirects to `/dashboard` when the user already has a session
-- `/dashboard` redirects to `/sign-in` when no session exists
-
-The generated forms use React Hook Form + Zod for field validation and Better
-Auth client helpers for the submit actions.
-
-### Schema changes
-
-- **Prisma + Better Auth**: the generated `prisma/schema.prisma` includes Better Auth core tables.
-- **Drizzle + Better Auth**: the generated `lib/schema.ts` contains Better Auth core tables instead of a sample table.
-- **MongoDB + Better Auth**: authentication uses the native MongoDB adapter and its own collections.
-
-### Environment variables added
+## Environment variables
 
 ```bash
-BETTER_AUTH_SECRET=please-change-me-to-a-random-string
+BETTER_AUTH_SECRET=<random, generated for you>
 BETTER_AUTH_URL=http://localhost:3000
+GITHUB_CLIENT_ID=
+GITHUB_CLIENT_SECRET=
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+RESEND_API_KEY=
+EMAIL_FROM=onboarding@resend.dev
 ```
+
+- **`BETTER_AUTH_URL`** is the public URL of the app. Links in emails point to it, and it is always a trusted origin.
+- **GitHub sign-in:** create an OAuth app at [github.com/settings/developers](https://github.com/settings/developers) with the callback URL `<BETTER_AUTH_URL>/api/auth/callback/github`.
+- **Google sign-in:** create an OAuth client in the [Google Cloud console](https://console.cloud.google.com/apis/credentials) with the redirect URI `<BETTER_AUTH_URL>/api/auth/callback/google`.
+- **Emails are sent after the response,** so sign-up and password reset do not wait for them. A failed email is logged and the request still succeeds. In Next.js the send runs in [`after()`](https://nextjs.org/docs/app/api-reference/functions/after), which keeps a serverless function (on Vercel, for example) running until the email is out.
+- **Resend:** create an API key at [resend.com](https://resend.com). `onboarding@resend.dev` only delivers to your own address; [verify a domain](https://resend.com/docs/dashboard/domains/introduction) and set `EMAIL_FROM` to send to anyone.
 
 <Callout type="warn">
-  Do **not** prefix `BETTER_AUTH_SECRET` or `BETTER_AUTH_URL` with
-  `NEXT_PUBLIC_`. These are server-side variables only.
+  These are server-side variables. Never prefix them with `NEXT_PUBLIC_` or
+  `VITE_`, which would put them in the browser bundle.
 </Callout>
-
-### Dependencies added
-
-```json
-{
-  "dependencies": {
-    "@hookform/resolvers": "^5.9.1",
-    "better-auth": "^1.7.3",
-    "mongodb": "^7.6.0",
-    "react-hook-form": "^7.87.0",
-    "zod": "^4.5.4"
-  }
-}
-```
-
----
-
-## TanStack Start - Better Auth
-
-For TanStack Start, sessions use the `tanstackStartCookies()` plugin and server functions (`createServerFn`) instead of Next.js route handlers.
-
-### Generated files
-
-```text
-src/
-|-- lib/
-|   |-- auth.ts                    # Better Auth server configuration
-|   |-- auth-client.ts             # createAuthClient() for client components
-|   |-- auth-functions.ts          # getSession() server function
-|   \-- auth-schema.ts             # Zod schemas and auth error helper
-|-- components/
-|   \-- auth/
-|       |-- sign-in-form.tsx       # Client login form
-|       |-- sign-up-form.tsx       # Client signup form
-|       \-- sign-out-button.tsx    # Client sign-out action
-\-- routes/
-    |-- sign-in.tsx                # Session-aware login route
-    |-- sign-up.tsx                # Session-aware signup route
-    |-- dashboard.tsx              # Protected example page
-    \-- api/auth/$.ts              # Better Auth route handler
-```
-
-The adapter used in `src/lib/auth.ts` is determined by your ORM selection:
-
-- **Prisma** -> `prismaAdapter` from `better-auth/adapters/prisma`
-- **Drizzle** -> `drizzleAdapter` from `better-auth/adapters/drizzle`
-- **MongoDB** -> `mongodbAdapter` from `better-auth/adapters/mongodb`
-
-### Better Auth configuration - src/lib/auth.ts
-
-```typescript
-import { betterAuth } from "better-auth";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { tanstackStartCookies } from "better-auth/tanstack-start";
-
-import { db } from "./db";
-
-export const auth = betterAuth({
-  database: drizzleAdapter(db, { provider: "pg" }),
-  emailAndPassword: { enabled: true },
-  plugins: [tanstackStartCookies()],
-  secret: process.env.BETTER_AUTH_SECRET,
-  baseURL: process.env.BETTER_AUTH_URL,
-});
-```
-
-### Auth route handler - src/routes/api/auth/$.ts
-
-```typescript
-import { createFileRoute } from "@tanstack/react-router";
-
-import { auth } from "../../../lib/auth";
-
-export const Route = createFileRoute("/api/auth/$")({
-  server: {
-    handlers: {
-      GET: ({ request }) => auth.handler(request),
-      POST: ({ request }) => auth.handler(request),
-    },
-  },
-});
-```
-
-### Session server function - src/lib/auth-functions.ts
-
-```typescript
-import { createServerFn } from "@tanstack/react-start";
-import { getRequestHeaders } from "@tanstack/react-start/server";
-
-import { auth } from "./auth";
-
-export const getSession = createServerFn({ method: "GET" }).handler(
-  async () => {
-    return await auth.api.getSession({
-      headers: getRequestHeaders(),
-    });
-  }
-);
-```
-
-Protected routes call `auth.api.getSession` in `beforeLoad` and `redirect({ to: "/sign-in" })` when no session exists. The router is wired with `setupRouterSsrQueryIntegration` in `src/router.tsx`.
-
-### Schema changes
-
-- **Prisma + Better Auth**: the generated `prisma/schema.prisma` includes Better Auth core tables.
-- **Drizzle + Better Auth**: the generated `src/lib/schema.ts` contains Better Auth core tables instead of a sample table.
-- **MongoDB + Better Auth**: authentication uses the native MongoDB adapter and its own collections.
-
-### Environment variables added
-
-```bash
-BETTER_AUTH_SECRET=please-change-me-to-a-random-string
-BETTER_AUTH_URL=http://localhost:3000
-```
-
-<Callout type="warn">
-  Do **not** prefix `BETTER_AUTH_SECRET` or `BETTER_AUTH_URL` with `VITE_`.
-  These are server-side variables only, and a `VITE_` prefix exposes them to the
-  browser bundle.
-</Callout>
-
-### Dependencies added
-
-```json
-{
-  "dependencies": {
-    "@hookform/resolvers": "^5.9.1",
-    "better-auth": "^1.7.3",
-    "dotenv": "^17.4.2",
-    "mongodb": "^7.6.0",
-    "react-hook-form": "^7.87.0",
-    "zod": "^4.5.4"
-  }
-}
-```
 
 ---
 
 ## Security recommendations
 
-1. Set `JWT_SECRET` or `BETTER_AUTH_SECRET` to a long, random string before deploying
-2. Keep tokens short-lived (`JWT_EXPIRES_IN=1h` is the generated default)
-3. Use HTTPS in production - never send tokens over plain HTTP
-4. Add rate limiting to auth endpoints to prevent brute-force attacks
-5. Never log or store plain-text passwords
+1. Keep the generated `BETTER_AUTH_SECRET` secret, and use a different one in each environment
+2. Use HTTPS in production
+3. Set `CORS_ORIGIN` to your real front-end origins instead of `*`
+4. Set `RESEND_API_KEY` in production: without it, reset links are written to the server log
+5. Consider `requireEmailVerification: true` once emails are delivered

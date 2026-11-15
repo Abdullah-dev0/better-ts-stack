@@ -2,11 +2,18 @@ import { Controller, Get } from "@nestjs/common";
 {{#if useRateLimit}}
 import { SkipThrottle } from "@nestjs/throttler";
 {{/if}}
+{{#if useAuth}}
+import { AllowAnonymous } from "@thallesp/nestjs-better-auth";
+{{/if}}
 
 {{#if useRateLimit}}
 // Docker and load balancers call the health check on a schedule, so it is not
 // counted
 @SkipThrottle()
+{{/if}}
+{{#if useAuth}}
+// Every route needs a session unless it is marked public
+@AllowAnonymous()
 {{/if}}
 @Controller("health")
 export class HealthController {

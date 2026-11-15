@@ -36,9 +36,7 @@ export function generateNextSteps(
 
   if (config.useAuth) {
     steps.push(
-      isFullstack
-        ? "Review BETTER_AUTH_SECRET and BETTER_AUTH_URL in .env"
-        : "Review the generated JWT_SECRET in .env"
+      "Review BETTER_AUTH_URL in .env, and add GitHub, Google, or Resend keys when you need them"
     );
   }
 
@@ -93,7 +91,7 @@ export function generateNextSteps(
     steps.push(
       isFullstack
         ? "Visit /sign-up to create your first account"
-        : "Create a user via POST /auth/register then login with /auth/login"
+        : "Create a user with POST /api/auth/sign-up/email, then call GET /api/me with the set-auth-token header as a bearer token"
     );
   }
 

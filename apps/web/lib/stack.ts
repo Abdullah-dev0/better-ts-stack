@@ -28,7 +28,7 @@ export const DEFAULT_CHOICES: StackChoices = {
   useDocker: true,
   useRateLimit: false,
   useCi: false,
-  useAgents: false,
+  useAgents: true,
   useVscode: false,
 };
 
@@ -125,7 +125,8 @@ export function buildCommand(choices: StackChoices): string[] {
   if (choices.useRateLimit) parts.push("--rate-limit");
   if (choices.useDocker) parts.push("--docker");
   if (choices.useCi) parts.push("--ci");
-  if (choices.useAgents) parts.push("--agents");
+  // AGENTS.md is added by default
+  if (!choices.useAgents) parts.push("--no-agents");
   if (choices.useVscode) parts.push("--vscode");
   parts.push("--yes");
   return parts;
@@ -147,7 +148,13 @@ export interface ProjectFile {
 }
 
 // Files the builder writes itself instead of copying them from a module
-const GENERATED_FILES = ["package.json", ".env", ".env.example", "README.md"];
+const GENERATED_FILES = [
+  "package.json",
+  ".env",
+  ".env.example",
+  "README.md",
+  "better-ts-stack.json",
+];
 
 // Mirrors planBuild() in apps/cli/src/builder/buildPlanner.ts
 export function listProjectFiles(choices: StackChoices): ProjectFile[] {

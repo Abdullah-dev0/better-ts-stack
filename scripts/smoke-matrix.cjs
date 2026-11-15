@@ -53,7 +53,7 @@ async function main() {
       checks =
         framework === "express" || framework === "nestjs"
           ? await backendChecks(c.config.useAuth, c.config.useRateLimit)
-          : await fullstackChecks();
+          : await fullstackChecks(c.config.useAuth);
     } catch (error) {
       checks = [["server", "running", error.message]];
     } finally {

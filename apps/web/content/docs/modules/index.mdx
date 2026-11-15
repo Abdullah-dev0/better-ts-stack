@@ -43,8 +43,8 @@ A generated project is built from modules. Each module adds its own template fil
   href="/docs/modules/auth"
   icon={<Shield className="text-yellow-400" />}
 >
-  JWT + bcrypt for Express, Better Auth for Next.js and TanStack Start (requires
-  a database)
+  Better Auth for every framework, with email verification, password reset, and
+  GitHub and Google sign-in (Next.js and TanStack Start need a database)
 </Card>
 
   <Card title="Docker" href="/docs/modules/docker" icon={<Container className="text-blue-400" />}>
@@ -66,7 +66,7 @@ Your prompt answers decide which modules are added:
 | Database = `postgresql` + ORM = `prisma`             | Prisma module for the chosen framework       |
 | Database = `postgresql` + ORM = `drizzle`            | Drizzle module for the chosen framework      |
 | Database = `mongodb` + ORM = `mongoose`              | Mongoose module (Express, Next.js, TanStack) |
-| Auth = `yes` (Express)                               | JWT auth module                              |
+| Auth = `yes` (Express / NestJS)                      | Better Auth module                           |
 | Auth = `yes` (Next.js / TanStack, database selected) | Better Auth module                           |
 | Docker = `yes`                                       | Docker module                                |
 
@@ -87,7 +87,7 @@ Each module has a `config.json`. When you select several modules, the CLI merges
 - **Environment variables**: merged into `.env.example` / `.env`
 - **Template files**: each module's files are copied into the project
 
-### Example: Express + PostgreSQL + Prisma + JWT Auth
+### Example: Express + PostgreSQL + Prisma + Auth
 
 The final `package.json` will include:
 
@@ -101,8 +101,7 @@ The final `package.json` will include:
     "morgan": "^1.12.0",
     "dotenv": "^17.4.2",
     "@prisma/client": "^7.10.0",
-    "bcrypt": "^6.0.0",
-    "jsonwebtoken": "^9.0.3"
+    "better-auth": "^1.7.18"
   },
   "scripts": {
     "dev": "cross-env NODE_ENV=development tsx watch src/index.ts",
@@ -132,8 +131,7 @@ The final `package.json` will include:
 | PostgreSQL + Prisma  | Yes               | Yes              | Yes                  | Yes                   |
 | PostgreSQL + Drizzle | Yes               | Yes              | Yes                  | Yes                   |
 | MongoDB + Mongoose   | Yes               | Yes              | Yes                  | Yes                   |
-| JWT Auth             | Yes               | Yes              | -                    | -                     |
-| Better Auth          | -                 | -                | Yes (requires DB)    | Yes (requires DB)     |
+| Better Auth          | Yes               | Yes              | Yes (requires DB)    | Yes (requires DB)     |
 | Docker               | Yes               | Yes              | Yes                  | Yes                   |
 
 ---

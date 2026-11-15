@@ -78,7 +78,7 @@ export const MODULE_ENTRIES: ModuleEntry[] = [
     flag: "--framework nextjs",
     title: "Next.js",
     description:
-      "Next.js 16 App Router, React 19, Tailwind CSS v4, and shadcn-style components.",
+      "Next.js 16 App Router, React 19, Tailwind CSS v4, and shadcn/ui on Base UI.",
     frameworks: ["nextjs"],
   },
   {
@@ -112,7 +112,7 @@ export const MODULE_ENTRIES: ModuleEntry[] = [
     flag: "--auth",
     title: "Authentication",
     description:
-      "JWT, bcrypt, and Zod for backends. Better Auth with sign-in and sign-up pages for full-stack apps.",
+      "Better Auth for every framework: email verification, password reset, and GitHub and Google sign-in. Full-stack apps get sign-in, sign-up, and reset pages.",
     frameworks: ["express", "nestjs", "nextjs", "tanstack"],
   },
   {

@@ -9,6 +9,7 @@ import {
   generateEnvFile,
   generatePackageJson,
   generatePnpmWorkspace,
+  generateStackFile,
 } from "./configGenerator";
 import { installDependencies } from "./dependencyInstaller";
 import { copyModuleFiles, processTemplateFiles } from "./fileProcessor";
@@ -68,9 +69,10 @@ export async function build(
       await generatePnpmWorkspace(targetDir, mergedConfig.overrides);
     }
 
-    // 7. Generate environment files and the README
+    // 7. Generate environment files, the README, and the stack file
     await generateEnvFile(targetDir, mergedConfig.envVars);
     await generateReadme(targetDir, config, mergedConfig);
+    await generateStackFile(targetDir, config);
 
     // 8. Install dependencies and initialize git (both optional); a failure
     // in either is reported as a warning and does not fail the build

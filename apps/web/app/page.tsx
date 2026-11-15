@@ -29,7 +29,7 @@ export default async function Home() {
         />
 
         {/* On wide screens the builder fills the screen and each pane scrolls */}
-        <div className="border-border grid border-b xl:h-[calc(100svh-5rem)] xl:min-h-[40rem] xl:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] xl:*:min-h-0 xl:*:overflow-hidden">
+        <div className="border-border grid border-b xl:h-[calc(100svh-5rem)] xl:min-h-160 xl:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] xl:*:min-h-0 xl:*:overflow-hidden">
           <StackBuilder />
         </div>
 

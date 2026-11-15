@@ -47,7 +47,7 @@ export function ModuleTable() {
         ))}
       </ol>
       <div className="hidden overflow-x-auto md:block">
-        <table className="w-full min-w-[46rem] border-collapse text-left text-[13px]">
+        <table className="w-full min-w-184 border-collapse text-left text-[13px]">
           <caption className="sr-only">
             Modules, the flag that adds each one, and the frameworks it works
             with

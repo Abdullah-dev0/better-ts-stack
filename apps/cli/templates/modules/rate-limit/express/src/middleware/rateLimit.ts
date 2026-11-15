@@ -13,11 +13,3 @@ export const apiLimiter = rateLimit({
   legacyHeaders: false,
   skip: (req) => req.path === "/health",
 });
-
-// Sign-up and login: 10 attempts per IP in 15 minutes, against password guessing
-export const authLimiter = rateLimit({
-  windowMs: FIFTEEN_MINUTES,
-  limit: 10,
-  standardHeaders: "draft-8",
-  legacyHeaders: false,
-});

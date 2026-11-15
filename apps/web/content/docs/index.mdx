@@ -77,14 +77,13 @@ The CLI asks, in order (every prompt can also be answered with a [flag](/docs/us
 5. **Package manager** - `npm`, `pnpm`, or `bun`
 6. **Docker** - include Docker configuration?
 7. **Authentication** - add auth?
-   - Express / NestJS: JWT-based auth (always available when asked)
-   - Next.js / TanStack: Better Auth (only prompted if a database was selected)
+   - Better Auth for every framework: email and password, email verification, password reset, and GitHub and Google sign-in
+   - Next.js / TanStack: only prompted if a database was selected
 8. **Rate limiting** - Express / NestJS only: limit requests per IP?
 9. **CI** - add a GitHub Actions workflow?
-10. **AI agents** - add an AGENTS.md for coding agents?
-11. **VS Code** - add workspace settings and recommended extensions?
-12. **Git** - initialize a repository?
-13. **Install dependencies** - run the install command now?
+10. **VS Code** - add workspace settings and recommended extensions?
+11. **Git** - initialize a repository?
+12. **Install dependencies** - run the install command now?
 
 <Callout type="info">
   The CLI does not ask for a port number. The server port defaults to `3000`
@@ -123,8 +122,8 @@ npm run dev
     PostgreSQL with Prisma or Drizzle, or MongoDB with Mongoose - your choice
   </Card>
   <Card title="Authentication" icon={<Zap className="text-yellow-400" />}>
-    JWT + bcrypt for Express and NestJS, Better Auth (with Prisma, Drizzle, or
-    MongoDB adapter) for Next.js and TanStack Start
+    Better Auth for every framework, with email verification, password reset,
+    and GitHub and Google sign-in
   </Card>
   <Card title="Docker Ready" icon={<Container className="text-blue-400" />}>
     Multi-stage Dockerfile and docker-compose.yml generated on request

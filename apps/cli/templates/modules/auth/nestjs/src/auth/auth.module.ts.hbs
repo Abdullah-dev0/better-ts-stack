@@ -1,22 +1,72 @@
-import { Module } from "@nestjs/common";
 {{#if (eq database 'mongoose')}}
-import { MongooseModule } from "@nestjs/mongoose";
+import {
+  Injectable,
+  Module,
+  type OnApplicationShutdown,
+} from "@nestjs/common";
+{{/if}}
+import { AuthModule as BetterAuthModule } from "@thallesp/nestjs-better-auth";
+import type { Request, Response } from "express";
+{{#if (eq database 'mongoose')}}
+import { MongoClient } from "mongodb";
 {{/if}}
 
-{{#if (eq database 'mongoose')}}
-import { User, UserSchema } from "../users/user.schema.js";
+{{#if (eq database 'drizzle')}}
+import { type Database, DRIZZLE } from "../database/database.module.js";
 {{/if}}
-import { AuthController } from "./auth.controller.js";
-import { AuthService } from "./auth.service.js";
-import { UsersService } from "./users.service.js";
+{{#if (eq database 'mongoose')}}
+import { env } from "../env.js";
+{{/if}}
+{{#if (eq database 'prisma')}}
+import { PrismaService } from "../prisma/prisma.service.js";
+{{/if}}
+import { createAuth } from "./auth.js";
 
-@Module({
-  {{#if (eq database 'mongoose')}}
-  imports: [
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
-  ],
+{{#if (eq database 'mongoose')}}
+// Better Auth talks to MongoDB through the driver, next to Mongoose
+const mongoClient = new MongoClient(env.MONGODB_URI);
+
+@Injectable()
+class MongoClientShutdown implements OnApplicationShutdown {
+  onApplicationShutdown(): Promise<void> {
+    return mongoClient.close();
+  }
+}
+
+@Module({ providers: [MongoClientShutdown] })
+class MongoClientModule {}
+
+{{/if}}
+// Mounts Better Auth on /api/auth and protects every other route: add
+// @AllowAnonymous() to a controller or route that should stay public
+export const AuthModule = BetterAuthModule.forRootAsync({
+  {{#if (eq database 'prisma')}}
+  inject: [PrismaService],
+  useFactory: (prisma: PrismaService) => ({
+    auth: createAuth(prisma),
   {{/if}}
-  controllers: [AuthController],
-  providers: [AuthService, UsersService],
-})
-export class AuthModule {}
+  {{#if (eq database 'drizzle')}}
+  inject: [DRIZZLE],
+  useFactory: (db: Database) => ({
+    auth: createAuth(db),
+  {{/if}}
+  {{#if (eq database 'mongoose')}}
+  imports: [MongoClientModule],
+  useFactory: () => ({
+    auth: createAuth(mongoClient.db()),
+  {{/if}}
+  {{#if (eq database 'none')}}
+  useFactory: () => ({
+    auth: createAuth(),
+  {{/if}}
+    // CORS stays with app.enableCors() in main.ts, which reads CORS_ORIGIN
+    disableTrustedOriginsCors: true,
+    // Better Auth reads the client IP for its rate limits from this header. It
+    // is set from req.ip on every request, so a client cannot pick its own
+    // value. Behind a reverse proxy, enable "trust proxy" for the real client IP
+    middleware: (req: Request, _res: Response, next: () => void) => {
+      req.headers["x-client-ip"] = req.ip;
+      next();
+    },
+  }),
+});

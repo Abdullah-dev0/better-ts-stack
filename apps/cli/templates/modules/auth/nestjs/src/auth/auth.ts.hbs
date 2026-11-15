@@ -1,0 +1,152 @@
+import { betterAuth } from "better-auth";
+{{#if (eq database 'none')}}
+import { memoryAdapter } from "better-auth/adapters/memory";
+{{/if}}
+{{#if (eq database 'prisma')}}
+import { prismaAdapter } from "better-auth/adapters/prisma";
+{{/if}}
+{{#if (eq database 'drizzle')}}
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
+{{/if}}
+{{#if (eq database 'mongoose')}}
+import { mongodbAdapter } from "better-auth/adapters/mongodb";
+{{/if}}
+import { bearer } from "better-auth/plugins";
+{{#if (eq database 'mongoose')}}
+import type { Db } from "mongodb";
+{{/if}}
+
+{{#if (eq database 'drizzle')}}
+import type { Database } from "../database/database.module.js";
+{{/if}}
+import { env } from "../env.js";
+{{#if (eq database 'prisma')}}
+import type { PrismaService } from "../prisma/prisma.service.js";
+{{/if}}
+import { sendEmail } from "./email.js";
+
+{{#if (eq database 'none')}}
+// In-memory store for trying the API out: users and sessions are lost on
+// restart, so add a database before going to production
+const memoryDb = { user: [], session: [], account: [], verification: [] };
+
+{{/if}}
+// Reports a failed email instead of failing the request: the sign-up or reset
+// already happened, and the user can ask for the email again
+function deliver(email: Parameters<typeof sendEmail>[0]): void {
+  sendEmail(email).catch((error: unknown) => {
+    console.error(`Could not send "${email.subject}" to ${email.to}:`, error);
+  });
+}
+
+// Points a verification link at the API itself when the client gave no page
+// to return to, so opening it answers with JSON instead of a redirect to "/"
+function withoutDefaultCallback(url: string): string {
+  const link = new URL(url);
+  if (link.searchParams.get("callbackURL") === "/") {
+    link.searchParams.delete("callbackURL");
+  }
+  return link.toString();
+}
+
+// Builds the Better Auth server; auth.module.ts calls it with the database
+{{#if (eq database 'none')}}
+export function createAuth() {
+{{/if}}
+{{#if (eq database 'prisma')}}
+export function createAuth(prisma: PrismaService) {
+{{/if}}
+{{#if (eq database 'drizzle')}}
+export function createAuth(db: Database) {
+{{/if}}
+{{#if (eq database 'mongoose')}}
+export function createAuth(db: Db) {
+{{/if}}
+  return betterAuth({
+    {{#if (eq database 'none')}}
+    database: memoryAdapter(memoryDb),
+    {{/if}}
+    {{#if (eq database 'prisma')}}
+    database: prismaAdapter(prisma, { provider: "postgresql" }),
+    {{/if}}
+    {{#if (eq database 'drizzle')}}
+    database: drizzleAdapter(db, { provider: "pg" }),
+    {{/if}}
+    {{#if (eq database 'mongoose')}}
+    // Without the client, writes run without transactions, which a standalone
+    // MongoDB server (no replica set) does not support
+    database: mongodbAdapter(db),
+    {{/if}}
+    secret: env.BETTER_AUTH_SECRET,
+    baseURL: env.BETTER_AUTH_URL,
+    // Browser apps on these origins may call the auth routes with cookies
+    trustedOrigins: typeof env.CORS_ORIGIN === "string" ? [] : env.CORS_ORIGIN,
+    emailAndPassword: {
+      enabled: true,
+      // Set to true to block sign-in until the email address is verified
+      requireEmailVerification: false,
+      // A reset signs the user out everywhere
+      revokeSessionsOnPasswordReset: true,
+      sendResetPassword: ({ user, url, token }) => {
+        deliver({
+          to: user.email,
+          subject: "Reset your password",
+          text: `Open this link to choose a new password:\n${url}\n\nOr send this token to POST /api/auth/reset-password: ${token}`,
+        });
+        return Promise.resolve();
+      },
+    },
+    emailVerification: {
+      sendOnSignUp: true,
+      autoSignInAfterVerification: true,
+      sendVerificationEmail: ({ user, url }) => {
+        deliver({
+          to: user.email,
+          subject: "Verify your email address",
+          text: `Open this link to verify your email address:\n${withoutDefaultCallback(url)}`,
+        });
+        return Promise.resolve();
+      },
+    },
+    // Each provider is turned on once its client ID and secret are set
+    socialProviders: {
+      ...(env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET
+        ? {
+            github: {
+              clientId: env.GITHUB_CLIENT_ID,
+              clientSecret: env.GITHUB_CLIENT_SECRET,
+            },
+          }
+        : {}),
+      ...(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET
+        ? {
+            google: {
+              clientId: env.GOOGLE_CLIENT_ID,
+              clientSecret: env.GOOGLE_CLIENT_SECRET,
+            },
+          }
+        : {}),
+    },
+    // Clients without cookies send "Authorization: Bearer <token>"; the token
+    // comes back in the set-auth-token header of sign-in and sign-up
+    plugins: [bearer()],
+    {{#if useRateLimit}}
+    // Sign-up, sign-in, and password reset: 10 attempts per client IP in 15
+    // minutes, against password guessing
+    rateLimit: {
+      enabled: true,
+      window: 15 * 60,
+      max: 100,
+      customRules: {
+        "/sign-in/*": { window: 15 * 60, max: 10 },
+        "/sign-up/*": { window: 15 * 60, max: 10 },
+        "/request-password-reset": { window: 15 * 60, max: 10 },
+      },
+    },
+    {{/if}}
+    advanced: {
+      // Set from req.ip on every request (see auth.module.ts)
+      ipAddress: { ipAddressHeaders: ["x-client-ip"] },
+    },
+  });
+}

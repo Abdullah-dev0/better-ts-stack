@@ -39,10 +39,27 @@ const DATABASES = {
     env: `DATABASE_URL=postgresql://postgres@${DB_CONTAINER}:5432/postgres`,
     pushSchema: ["prisma", "db", "push"],
   },
+  // A one-node replica set, as in the generated Compose file: Better Auth in
+  // Next.js and TanStack Start uses transactions, which need one. The ready
+  // check starts the replica set and waits until the node can take writes
   mongoose: {
-    runArgs: ["mongo:8"],
-    readyCommand: ["mongosh", "--quiet", "--eval", "db.runCommand({ping:1})"],
-    env: `MONGODB_URI=mongodb://${DB_CONTAINER}:27017/myapp`,
+    runArgs: ["mongo:8", "--replSet", "rs0", "--bind_ip_all"],
+    readyCommand: [
+      "mongosh",
+      "--quiet",
+      "--eval",
+      "try { rs.status() } catch (e) { rs.initiate({ _id: 'rs0', members: [{ _id: 0, host: 'localhost:27017' }] }) }; if (!db.hello().isWritablePrimary) quit(1)",
+    ],
+    env: `MONGODB_URI=mongodb://${DB_CONTAINER}:27017/myapp?directConnection=true`,
+    // Better Auth's collections, created before the first sign-up as the
+    // database docs describe
+    setupCommand: [
+      "mongosh",
+      "myapp",
+      "--quiet",
+      "--eval",
+      "['user', 'session', 'account', 'verification'].forEach((name) => db.createCollection(name))",
+    ],
   },
 };
 DATABASES.drizzle = {
@@ -87,6 +104,12 @@ async function startDatabase(log, c) {
     if (attempt === 60) throw new Error("Database did not become ready");
     await new Promise((resolve) => setTimeout(resolve, 1000));
   }
+
+  if (
+    database.setupCommand &&
+    !run(log, "docker", ["exec", DB_CONTAINER, ...database.setupCommand])
+  )
+    throw new Error("Database setup failed");
 
   if (database.pushSchema) {
     const pushed = run(
@@ -135,7 +158,7 @@ async function checkCase(c, log) {
   await waitForServer(`http://localhost:${PORT}/`);
   return framework === "express" || framework === "nestjs"
     ? backendChecks(c.config.useAuth, c.config.useRateLimit)
-    : fullstackChecks();
+    : fullstackChecks(c.config.useAuth);
 }
 
 async function main() {

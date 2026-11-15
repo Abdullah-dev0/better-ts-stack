@@ -33,7 +33,8 @@ Options left out are asked interactively, unless --yes is given.
   --rate-limit, --no-rate-limit
                           Add rate limiting (Express and NestJS)
   --ci, --no-ci           Add a GitHub Actions workflow
-  --agents, --no-agents   Add AGENTS.md for AI coding agents
+  --no-agents             Leave out AGENTS.md for AI coding agents (added by
+                          default)
   --vscode, --no-vscode   Add VS Code settings and recommended extensions
   --git, --no-git         Initialize a git repository
   --install, --no-install Install dependencies

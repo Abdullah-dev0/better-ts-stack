@@ -1,9 +1,10 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useState, useTransition } from "react";
-import { LoaderCircle, LogOut } from "lucide-react";
+import { LogOut } from "lucide-react";
 
 import { authClient } from "~/lib/auth-client";
 import { Button } from "~/components/ui/button";
+import { Spinner } from "~/components/ui/spinner";
 
 export function SignOutButton() {
   const navigate = useNavigate();
@@ -11,7 +12,7 @@ export function SignOutButton() {
   const [error, setError] = useState<string | null>(null);
 
   return (
-    <div className="space-y-2">
+    <div className="flex flex-col items-start gap-2">
       <Button
         variant="outline"
         onClick={() => {
@@ -31,17 +32,17 @@ export function SignOutButton() {
       >
         {isPending ? (
           <>
-            <LoaderCircle className="mr-2 size-4 animate-spin" />
+            <Spinner data-icon="inline-start" />
             Signing out
           </>
         ) : (
           <>
-            <LogOut className="mr-2 size-4" />
+            <LogOut data-icon="inline-start" />
             Sign out
           </>
         )}
       </Button>
-      {error ? <p className="text-sm text-rose-600">{error}</p> : null}
+      {error ? <p className="text-sm text-destructive">{error}</p> : null}
     </div>
   );
 }

@@ -109,6 +109,8 @@ import { cn } from "@/lib/utils";
 
 - Default: Server Components (no directive needed)
 - Use `"use client"` only when needed (useState, useEffect, event handlers)
+- Server first, in `apps/web` and in the Next.js template: do not `await` data at the top of a page or layout. Await inside the component that needs the data and wrap it in `<Suspense>`, so the rest of the page streams at once. The `vercel-react-best-practices` skill in `.agents/skills/` has the details (`async-suspense-boundaries`, `server-cache-react`)
+- Write Tailwind classes in their canonical form, in `apps/web` and in the Next.js and TanStack templates: the theme utility when one exists (`rounded-4xl`, not `rounded-[2rem]`; `min-h-112`, not `min-h-[28rem]`), and `_` in an arbitrary value only where CSS needs a space, never after a comma (`bg-[linear-gradient(180deg,#f8fafc_0%,#eef2ff_100%)]`). The Tailwind CSS VS Code extension flags the long forms (`tailwindCSS.lint.suggestCanonicalClasses`)
 
 ```typescript
 "use client";

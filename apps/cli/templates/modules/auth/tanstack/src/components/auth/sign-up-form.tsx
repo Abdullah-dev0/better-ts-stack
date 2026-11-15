@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useState, useTransition } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LoaderCircle } from "lucide-react";
+import { CircleAlert } from "lucide-react";
 import { useForm } from "react-hook-form";
 
 import { authClient } from "~/lib/auth-client";
@@ -9,13 +9,14 @@ import {
   getAuthErrorMessage,
   signUpSchema,
   type SignUpValues,
+  type SocialProvider,
 } from "~/lib/auth-schema";
+import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
@@ -27,8 +28,11 @@ import {
   FieldLabel,
 } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
+import { Spinner } from "~/components/ui/spinner";
 
-export function SignUpForm() {
+import { SocialButtons } from "./social-buttons";
+
+export function SignUpForm({ providers }: { providers: SocialProvider[] }) {
   const navigate = useNavigate();
   const [isPending, startTransition] = useTransition();
   const [authError, setAuthError] = useState<string | null>(null);
@@ -49,6 +53,8 @@ export function SignUpForm() {
         name: values.name,
         email: values.email,
         password: values.password,
+        // Where the link in the verification email leads after confirming
+        callbackURL: "/dashboard",
       });
 
       if (result.error) {
@@ -61,8 +67,8 @@ export function SignUpForm() {
   });
 
   return (
-    <Card className="border-white/80 bg-white/90 shadow-2xl shadow-slate-200/70 backdrop-blur">
-      <CardHeader className="space-y-2">
+    <Card>
+      <CardHeader>
         <CardTitle>Create your account</CardTitle>
         <CardDescription>
           Start with a simple email and password sign-up flow powered by Better
@@ -70,8 +76,10 @@ export function SignUpForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form className="space-y-6" onSubmit={onSubmit} noValidate>
+        <form onSubmit={onSubmit} noValidate>
           <FieldGroup>
+            <SocialButtons providers={providers} />
+
             <Field data-invalid={Boolean(form.formState.errors.name)}>
               <FieldLabel htmlFor="name">Full name</FieldLabel>
               <Input
@@ -115,37 +123,32 @@ export function SignUpForm() {
               </FieldDescription>
               <FieldError errors={[form.formState.errors.password]} />
             </Field>
+
+            {authError ? (
+              <Alert variant="destructive">
+                <CircleAlert />
+                <AlertDescription>{authError}</AlertDescription>
+              </Alert>
+            ) : null}
+
+            <Field>
+              <Button type="submit" disabled={isPending}>
+                {isPending ? (
+                  <>
+                    <Spinner data-icon="inline-start" />
+                    Creating account
+                  </>
+                ) : (
+                  "Signup"
+                )}
+              </Button>
+              <FieldDescription className="text-center">
+                Already have an account? <Link to="/sign-in">Login</Link>
+              </FieldDescription>
+            </Field>
           </FieldGroup>
-
-          {authError ? (
-            <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-              {authError}
-            </div>
-          ) : null}
-
-          <Button className="w-full" type="submit" disabled={isPending}>
-            {isPending ? (
-              <>
-                <LoaderCircle className="mr-2 size-4 animate-spin" />
-                Creating account
-              </>
-            ) : (
-              "Signup"
-            )}
-          </Button>
         </form>
       </CardContent>
-      <CardFooter className="justify-center">
-        <p className="text-sm text-slate-600">
-          Already have an account?{" "}
-          <Link
-            className="font-medium text-sky-700 hover:text-sky-800"
-            to="/sign-in"
-          >
-            Login
-          </Link>
-        </p>
-      </CardFooter>
     </Card>
   );
 }

@@ -1,18 +1,20 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
-import { Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { ArrowRight, ShieldCheck } from "lucide-react";
 
+import { ChangePasswordForm } from "~/components/auth/change-password-form";
+import { EmailVerificationCard } from "~/components/auth/email-verification-card";
 import { SignOutButton } from "~/components/auth/sign-out-button";
-import { buttonVariants } from "~/components/ui/button";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
 import { getSession } from "~/lib/auth-functions";
-import { cn } from "~/lib/utils";
 
 export const Route = createFileRoute("/dashboard")({
   beforeLoad: async () => {
@@ -31,40 +33,45 @@ function Dashboard() {
   const user = Route.useRouteContext({ select: (ctx) => ctx.user });
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,_#f8fafc_0%,_#eef2ff_100%)] px-6 py-16 sm:px-10">
-      <div className="mx-auto max-w-5xl space-y-8">
-        <header className="flex flex-col gap-6 rounded-[2rem] border border-white/70 bg-white/85 p-8 shadow-xl shadow-slate-200/60 backdrop-blur md:flex-row md:items-end md:justify-between">
-          <div className="space-y-3">
-            <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium uppercase tracking-[0.24em] text-emerald-700">
-              <ShieldCheck className="size-4" />
+    <main className="min-h-svh bg-muted px-6 py-16 sm:px-10">
+      <div className="mx-auto flex max-w-5xl flex-col gap-8">
+        <header className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+          <div className="flex flex-col gap-3">
+            <Badge variant="secondary">
+              <ShieldCheck data-icon="inline-start" />
               Authenticated session
-            </span>
-            <div className="space-y-1">
-              <h1 className="text-3xl font-semibold tracking-tight text-slate-950">
+            </Badge>
+            <div className="flex flex-col gap-1">
+              <h1 className="text-3xl font-semibold tracking-tight">
                 Welcome {user.name}
               </h1>
-              <p className="text-sm text-slate-600">{user.email}</p>
+              <p className="text-sm text-muted-foreground">{user.email}</p>
             </div>
           </div>
           <SignOutButton />
         </header>
 
         <section className="grid gap-5 md:grid-cols-2">
+          <EmailVerificationCard
+            email={user.email}
+            emailVerified={user.emailVerified}
+          />
+          <ChangePasswordForm />
           <Card>
             <CardHeader>
               <CardTitle>Protected route example</CardTitle>
               <CardDescription>
-                This page verifies the session on the server before rendering any
-                content.
+                This page verifies the session on the server before rendering
+                any content.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4 text-sm text-slate-600">
+            <CardContent className="flex flex-col gap-4 text-muted-foreground">
               <p>
                 The route guard calls{" "}
-                <code className="font-mono text-slate-900">getSession()</code> in
-                <code className="font-mono text-slate-900"> beforeLoad</code>,
+                <code className="font-mono text-foreground">getSession()</code>{" "}
+                in <code className="font-mono text-foreground">beforeLoad</code>,
                 which reads the cookie headers server-side via{" "}
-                <code className="font-mono text-slate-900">
+                <code className="font-mono text-foreground">
                   auth.api.getSession
                 </code>{" "}
                 on every render and navigation.
@@ -84,25 +91,26 @@ function Dashboard() {
                 product.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3 text-sm text-slate-600">
+            <CardContent className="flex flex-col gap-3 text-muted-foreground">
               <p>
                 Replace the demo dashboard with your first authenticated page.
               </p>
               <p>Extend the schema with profile or onboarding fields.</p>
               <p>
-                Add provider-based auth or email verification later if needed.
+                Add a GitHub or Google client ID and secret to .env to turn on
+                social sign-in, and RESEND_API_KEY to send real emails.
               </p>
-              <Link
-                to="/"
-                className={cn(
-                  buttonVariants({ variant: "outline" }),
-                  "w-fit gap-2"
-                )}
+            </CardContent>
+            <CardFooter>
+              <Button
+                variant="outline"
+                nativeButton={false}
+                render={<Link to="/" />}
               >
                 Back to home
-                <ArrowRight className="size-4" />
-              </Link>
-            </CardContent>
+                <ArrowRight data-icon="inline-end" />
+              </Button>
+            </CardFooter>
           </Card>
         </section>
       </div>

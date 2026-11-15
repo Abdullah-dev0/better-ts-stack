@@ -3,6 +3,46 @@ title: Upgrade notes
 description: What changed in each release and what to do when upgrading
 ---
 
+## 2.2.0
+
+Completes authentication: every framework now uses Better Auth, with email verification, password reset, and GitHub and Google sign-in. Projects you already generated are not changed.
+
+### New
+
+- **Better Auth for Express and NestJS.** The backends move from hand-written JWT code to Better Auth on `/api/auth`, the same auth the full-stack templates use. API clients send `Authorization: Bearer <token>`, using the `set-auth-token` header that sign-up and sign-in return. `GET /api/me` is an example of a protected route. NestJS uses [`@thallesp/nestjs-better-auth`](https://github.com/ThallesP/nestjs-better-auth), whose guard protects every route not marked `@AllowAnonymous()`. See the [Auth module](/docs/modules/auth).
+- **Email verification.** A link is sent after sign-up. Signing in does not wait for it; set `requireEmailVerification: true` to require it.
+- **Password reset.** Next.js and TanStack Start get `/forgot-password` and `/reset-password` pages. A reset signs the user out on every device.
+- **GitHub and Google sign-in**, turned on when `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` (or the Google pair) are set in `.env`. The sign-in and sign-up pages show a button for each.
+- **Emails through Resend** when `RESEND_API_KEY` is set. Without it, emails are printed to the server log, so you can copy the links while developing. Emails are sent after the response; in Next.js through `after()`, so they are not cut off on serverless hosts such as Vercel.
+- **A change-password form and a verification notice** on the generated dashboard.
+- **shadcn/ui on Base UI.** Next.js and TanStack Start projects get the stock [shadcn/ui](https://ui.shadcn.com) components (`alert`, `badge`, `button`, `card`, `field`, `input`, `label`, `separator`, `skeleton`, `spinner`), built on [Base UI](https://base-ui.com), and the full shadcn theme. `components.json` uses the `base-vega` style, so `npx shadcn add` adds the Base UI version of a component, styled by the theme. The home and auth pages follow shadcn's conventions: theme color tokens, `Field` forms, `Alert` messages, and `Spinner` in buttons. See [UI components](/docs/modules/frontend#ui-components).
+- **Next.js auth pages render server first.** The dashboard, sign-in, and sign-up pages no longer wait for the session before sending HTML: the parts that need it stream in through `<Suspense>`, and `getSession()` in `lib/session.ts` reads the session once per request. `/reset-password` is now a static page.
+- **Tailwind classes in their canonical form** (`rounded-4xl` instead of `rounded-[2rem]`, no `_` after commas in arbitrary values), so the Tailwind CSS VS Code extension no longer warns about them.
+- **AGENTS.md is added to every project** without a prompt, so AI coding agents get the project's commands and rules from the start. Pass `--no-agents` to leave it out.
+- **`better-ts-stack.json`.** Every new project records the stack it was generated with: framework, database, package manager, and modules.
+
+### Changed in generated projects
+
+- **Express and NestJS auth routes are new.** `POST /auth/register`, `POST /auth/login`, and `GET /auth/me` are replaced by `POST /api/auth/sign-up/email`, `POST /api/auth/sign-in/email`, and `GET /api/me`. `JWT_SECRET` and `JWT_EXPIRES_IN` are replaced by `BETTER_AUTH_SECRET` and `BETTER_AUTH_URL`, and `bcrypt` and `jsonwebtoken` are no longer dependencies.
+- **With Prisma or Drizzle, Express and NestJS get Better Auth's tables** (`user`, `session`, `account`, `verification`) instead of the sample `users` table.
+- **With `--rate-limit`, sign-up, sign-in, and password reset allow 10 attempts per client IP in 15 minutes** through Better Auth's own limiter. Express's `authLimiter` is removed.
+- **Next.js and TanStack Start pages look different.** They use the neutral shadcn/ui look instead of the sky and slate styling, and Next.js uses the Inter font instead of Geist.
+- **Frontend dependencies.** `@base-ui/react` is added. `cn` replaces `clsx` and `tailwind-merge`, and `lib/utils.ts` re-exports it. `shadcn` and `tw-animate-css` are added for the theme CSS, and TanStack Start adds `@fontsource-variable/inter`. The unused `@radix-ui/react-slot` is removed from Next.js.
+
+### Upgrading an existing frontend
+
+Optional. To get Base UI components from `npx shadcn add`, set `"style": "base-vega"` in `components.json`, install `@base-ui/react`, `shadcn`, and `tw-animate-css`, and copy `globals.css` (`src/styles/app.css` in TanStack Start) from a new project. Components you already added keep working; Base UI components use the `render` prop where Radix ones use `asChild`.
+
+### Upgrading an existing backend
+
+There is no automatic migration from the JWT setup: existing password hashes are bcrypt, and Better Auth stores its own. To move, generate a new project with `--auth`, copy `src/lib/auth.ts`, `src/lib/email.ts`, and `src/middleware/requireAuth.ts` (Express) or `src/auth/` (NestJS) into your project, add the schema tables, and ask existing users to reset their password.
+
+### For contributors
+
+- `http-checks.cjs` tests the Better Auth routes on the backends: sign-up, sign-in, bearer tokens, sign-out, password reset, and the auth rate limit. For full-stack apps with auth, `docker-matrix.cjs` now signs up against the real database and loads the dashboard and the auth pages.
+- `generate-matrix.cjs` checks `better-ts-stack.json` in every project.
+- `docker-matrix.cjs` runs MongoDB as a one-node replica set with Better Auth's collections created, as the generated Compose file and the database docs do, so Better Auth's transactions work in the test.
+
 ## 2.1.2
 
 Adds instructions for AI coding agents and VS Code settings, and moves Next.js projects to the November security release. Projects you already generated are not changed.

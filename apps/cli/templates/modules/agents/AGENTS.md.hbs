@@ -11,10 +11,10 @@ Instructions for AI coding agents working in {{projectName}}. Read this before m
 - NestJS 12 REST API in TypeScript, using ES modules
 {{/if}}
 {{#if (eq framework 'nextjs')}}
-- Next.js 16 with the App Router, React 19, Tailwind CSS 4, and shadcn/ui
+- Next.js 16 with the App Router, React 19, Tailwind CSS 4, and shadcn/ui on Base UI
 {{/if}}
 {{#if (eq framework 'tanstack')}}
-- TanStack Start with Vite, Nitro, React 19, Tailwind CSS 4, and shadcn/ui
+- TanStack Start with Vite, Nitro, React 19, Tailwind CSS 4, and shadcn/ui on Base UI
 {{/if}}
 {{#if (eq database 'prisma')}}
 - PostgreSQL through Prisma 7
@@ -26,17 +26,12 @@ Instructions for AI coding agents working in {{projectName}}. Read this before m
 - MongoDB through Mongoose
 {{/if}}
 {{#if useAuth}}
+- Better Auth: email and password, email verification, password reset, and GitHub and Google sign-in when their keys are set. Emails go through Resend when `RESEND_API_KEY` is set and are printed to the log otherwise
 {{#if (eq framework 'express')}}
-- JWT auth: `POST /auth/register`, `POST /auth/login`, and `GET /auth/me`
+- Auth routes under `/api/auth` (`POST /api/auth/sign-up/email`, `POST /api/auth/sign-in/email`, ...). Clients without cookies send `Authorization: Bearer <token>`, using the `set-auth-token` header from sign-in
 {{/if}}
 {{#if (eq framework 'nestjs')}}
-- JWT auth: `POST /auth/register`, `POST /auth/login`, and `GET /auth/me`
-{{/if}}
-{{#if (eq framework 'nextjs')}}
-- Better Auth with email and password
-{{/if}}
-{{#if (eq framework 'tanstack')}}
-- Better Auth with email and password
+- Auth routes under `/api/auth` (`POST /api/auth/sign-up/email`, `POST /api/auth/sign-in/email`, ...). Clients without cookies send `Authorization: Bearer <token>`, using the `set-auth-token` header from sign-in
 {{/if}}
 {{/if}}
 {{#if useRateLimit}}
@@ -76,8 +71,9 @@ Run type-check and lint, and fix every error they report. Run the build too when
 - `src/env.ts`: checks the environment variables with Zod at startup, so a missing one stops the server with a clear message
 - `src/routes/`: one router per resource, mounted in `src/index.ts`
 {{#if useAuth}}
-- `src/controllers/`, `src/services/`: request handlers and data access for auth
-- `src/middleware/requireAuth.ts`: add it to a route to require a valid JWT
+- `src/lib/auth.ts`: the Better Auth server, mounted on `/api/auth` in `src/index.ts`
+- `src/lib/email.ts`: sends the verification and password reset emails
+- `src/middleware/requireAuth.ts`: add it to a route to require a session; `getSession(res)` returns it. `src/routes/me.ts` is an example
 {{/if}}
 {{#if useRateLimit}}
 - `src/middleware/rateLimit.ts`: the rate limiters
@@ -98,7 +94,8 @@ Run type-check and lint, and fix every error they report. Run the build too when
 - `src/env.ts`: checks the environment variables with Zod at startup, so a missing one stops the server with a clear message
 - `src/health/`: `GET /health`
 {{#if useAuth}}
-- `src/auth/`: the auth module. Put `@UseGuards(AuthGuard)` on a route to require a valid JWT
+- `src/auth/`: the Better Auth server (`auth.ts`), the emails it sends (`email.ts`), and the module that mounts it on `/api/auth` (`auth.module.ts`)
+- Every route needs a session unless it has `@AllowAnonymous()` (or `@OptionalAuth()`). Read the session with `@Session()`, as `src/me/me.controller.ts` does
 {{/if}}
 {{#if (eq database 'prisma')}}
 - `src/prisma/`: `PrismaService`, injected wherever the database is needed
@@ -112,10 +109,12 @@ Run type-check and lint, and fix every error they report. Run the build too when
 {{/if}}
 {{#if (eq framework 'nextjs')}}
 - `app/`: routes, layouts, and route handlers. Pages are Server Components unless they need state, effects, or event handlers
-- `components/ui/`: shadcn/ui components. Add new ones with the shadcn CLI instead of writing them by hand
+- `components/ui/`: shadcn/ui components built on Base UI (`@base-ui/react`). Add new ones with the shadcn CLI instead of writing them by hand. Use the `render` prop to change the rendered element, not Radix's `asChild`
 - `lib/utils.ts`: the `cn()` class name helper
+- `app/globals.css`: the shadcn theme. Style with its tokens (`bg-primary`, `text-muted-foreground`), not raw Tailwind colors, and space with `flex` + `gap-*`, not `space-y-*`
 {{#if useAuth}}
-- `lib/auth.ts`: the Better Auth server. `lib/auth-client.ts`: the client for components
+- `lib/auth.ts`: the Better Auth server. `lib/auth-client.ts`: the client for components. `lib/email.ts`: sends the verification and password reset emails
+- `lib/session.ts`: `getSession()` reads the session on the server, once per request
 - `app/api/auth/[...all]/route.ts`: the Better Auth endpoints. Do not rename it
 - `proxy.ts`: sends signed-out visitors from `/dashboard` to `/sign-in`. Add other protected paths to its `matcher`
 {{/if}}
@@ -133,10 +132,11 @@ Run type-check and lint, and fix every error they report. Run the build too when
 - `src/routes/`: file-based routes. A new file becomes a route
 - `src/routeTree.gen.ts`: generated by the dev server and the build. Never edit it
 - `src/router.tsx`, `src/routes/__root.tsx`: the router and the root layout
-- `src/components/ui/`: shadcn/ui components. Add new ones with the shadcn CLI instead of writing them by hand
+- `src/components/ui/`: shadcn/ui components built on Base UI (`@base-ui/react`). Add new ones with the shadcn CLI instead of writing them by hand. Use the `render` prop to change the rendered element, not Radix's `asChild`
 - `src/lib/utils.ts`: the `cn()` class name helper
+- `src/styles/app.css`: the shadcn theme. Style with its tokens (`bg-primary`, `text-muted-foreground`), not raw Tailwind colors, and space with `flex` + `gap-*`, not `space-y-*`
 {{#if useAuth}}
-- `src/lib/auth.ts`: the Better Auth server. `src/lib/auth-client.ts`: the client for components
+- `src/lib/auth.ts`: the Better Auth server. `src/lib/auth-client.ts`: the client for components. `src/lib/email.ts`: sends the verification and password reset emails
 - `src/routes/api/auth/$.ts`: the Better Auth endpoints. Do not rename it
 - `src/routes/dashboard.tsx`: an example of a protected route that redirects in `beforeLoad`
 {{/if}}
@@ -162,6 +162,12 @@ Run type-check and lint, and fix every error they report. Run the build too when
 - The Prisma client is generated into {{#if (eq framework 'express')}}`src/generated/`{{/if}}{{#if (eq framework 'nestjs')}}`src/generated/`{{/if}}{{#if (eq framework 'nextjs')}}`generated/`{{/if}}{{#if (eq framework 'tanstack')}}`generated/`{{/if}}. Never edit or commit it
 {{/if}}
 - Match the existing code style. ESLint settings are in `eslint.config.mjs`{{#if (eq framework 'express')}} and Prettier settings in `.prettierrc`{{/if}}{{#if (eq framework 'nestjs')}} and Prettier settings in `.prettierrc`{{/if}}
+{{#if (eq framework 'nextjs')}}
+- Write Tailwind classes in their canonical form. Use the theme utility when one exists (`rounded-4xl`, not `rounded-[2rem]`), and in an arbitrary value write `_` only where CSS needs a space, never after a comma: `bg-[linear-gradient(180deg,#f8fafc_0%,#eef2ff_100%)]`. The Tailwind CSS VS Code extension warns about the long forms
+{{/if}}
+{{#if (eq framework 'tanstack')}}
+- Write Tailwind classes in their canonical form. Use the theme utility when one exists (`rounded-4xl`, not `rounded-[2rem]`), and in an arbitrary value write `_` only where CSS needs a space, never after a comma: `bg-[linear-gradient(180deg,#f8fafc_0%,#eef2ff_100%)]`. The Tailwind CSS VS Code extension warns about the long forms
+{{/if}}
 - Add a dependency only when the task needs it, and install it with {{packageManager}}
 
 ## Production rules
@@ -178,6 +184,7 @@ Run type-check and lint, and fix every error they report. Run the build too when
 - Keep the security setup in `src/main.ts` and `src/app.module.ts` in place. Set `CORS_ORIGIN` to your real origins in production
 {{/if}}
 {{#if (eq framework 'nextjs')}}
+- Server first: do not `await` data at the top of a page or layout, which holds back the whole page. Move each `await` into the component that needs the data and wrap that component in `<Suspense>` with a fallback, so the rest of the page is sent at once{{#if useAuth}}. `app/dashboard/page.tsx` shows the pattern with `getSession()`{{/if}}
 - Code that reads secrets or the database stays on the server. Only variables prefixed with `NEXT_PUBLIC_` reach the browser, so never put a secret in one
 {{/if}}
 {{#if (eq framework 'tanstack')}}
@@ -192,6 +199,9 @@ Run type-check and lint, and fix every error they report. Run the build too when
 {{/if}}
 {{/if}}
 {{#if (eq framework 'express')}}
+{{#if useAuth}}
+- Check the session on the server in every protected route with `requireAuth`
+{{/if}}
 - Keep `GET /health` fast and free of auth{{#if useRateLimit}} and rate limiting{{/if}}, so hosts can check that the app is up
 {{/if}}
 {{#if (eq framework 'nestjs')}}
@@ -225,11 +235,9 @@ The libraries here may be newer than what you know. When you are not sure how an
 - Mongoose: https://mongoosejs.com/docs
 {{/if}}
 {{#if useAuth}}
-{{#if (eq framework 'nextjs')}}
 - Better Auth: https://www.better-auth.com/docs
-{{/if}}
-{{#if (eq framework 'tanstack')}}
-- Better Auth: https://www.better-auth.com/docs
+{{#if (eq framework 'nestjs')}}
+- NestJS Better Auth integration: https://github.com/ThallesP/nestjs-better-auth
 {{/if}}
 {{/if}}
 - Zod: https://zod.dev

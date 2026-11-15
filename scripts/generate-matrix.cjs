@@ -55,6 +55,20 @@ async function main() {
               assert(!files.some((file) => file.endsWith(".hbs")), name);
               assert(files.includes(".gitignore"), name);
               assert(files.includes("README.md"), name);
+              const stack = JSON.parse(
+                await fs.readFile(path.join(target, "better-ts-stack.json")),
+              );
+              assert.deepEqual(
+                [
+                  stack.framework,
+                  stack.database,
+                  stack.packageManager,
+                  stack.auth,
+                  stack.docker,
+                ],
+                [framework, database, packageManager, useAuth, useDocker],
+                `${name}: better-ts-stack.json`,
+              );
               assert.equal(
                 files.some((file) => file.endsWith("ci.yml")),
                 config.useCi,

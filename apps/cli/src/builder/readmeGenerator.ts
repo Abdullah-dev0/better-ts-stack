@@ -60,8 +60,8 @@ export function renderReadme(
   if (config.useAuth) {
     lines.push(
       isFullstack
-        ? "- **Auth:** Better Auth with email and password"
-        : "- **Auth:** JWT with `/auth/register`, `/auth/login`, and `/auth/me`"
+        ? "- **Auth:** Better Auth with email and password, email verification, password reset, and GitHub and Google sign-in"
+        : "- **Auth:** Better Auth on `/api/auth` with email and password, email verification, password reset, GitHub and Google sign-in, and bearer tokens; `GET /api/me` is a protected example"
     );
   }
   if (config.useRateLimit) {

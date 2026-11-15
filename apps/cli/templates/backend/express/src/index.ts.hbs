@@ -16,9 +16,17 @@ import { connectDB, disconnectDB } from "./lib/db";
 {{#if useRateLimit}}
 import { apiLimiter } from "./middleware/rateLimit";
 {{/if}}
+{{#if useAuth}}
+import { toNodeHandler } from "better-auth/node";
+{{#if (eq database 'mongoose')}}
+import { auth, mongoClient } from "./lib/auth";
+{{else}}
+import { auth } from "./lib/auth";
+{{/if}}
+{{/if}}
 import healthRouter from "./routes/health";
 {{#if useAuth}}
-import authRouter from "./routes/auth";
+import meRouter from "./routes/me";
 {{/if}}
 
 const app: Express = express();
@@ -26,18 +34,35 @@ const port = env.PORT;
 
 // Middleware
 app.use(helmet());
+{{#if useAuth}}
+// Browser clients read the bearer token from the set-auth-token header
+app.use(cors({ origin: env.CORS_ORIGIN, exposedHeaders: ["set-auth-token"] }));
+{{else}}
 app.use(cors({ origin: env.CORS_ORIGIN }));
+{{/if}}
 {{#if useRateLimit}}
 app.use(apiLimiter);
 {{/if}}
 app.use(morgan("dev"));
+{{#if useAuth}}
+// Better Auth reads the client IP for its rate limits from this header. It is
+// set from req.ip on every request, so a client cannot pick its own value.
+// Behind a reverse proxy, set app.set("trust proxy", 1) for the real client IP
+app.use("/api/auth", (req: Request, _res: Response, next: NextFunction) => {
+  req.headers["x-client-ip"] = req.ip;
+  next();
+});
+// Sign-up, sign-in, sessions, email verification, and password reset. Better
+// Auth reads the request body itself, so it is mounted before express.json()
+app.all("/api/auth/*splat", toNodeHandler(auth));
+{{/if}}
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use("/health", healthRouter);
 {{#if useAuth}}
-app.use("/auth", authRouter);
+app.use("/api/me", meRouter);
 {{/if}}
 
 // 404 handler
@@ -73,7 +98,11 @@ function closeDatabase(): Promise<void> {
 {{else if (eq database 'drizzle')}}
   return db.$client.end();
 {{else if (eq database 'mongoose')}}
+{{#if useAuth}}
+  return Promise.all([disconnectDB(), mongoClient.close()]).then(() => undefined);
+{{else}}
   return disconnectDB();
+{{/if}}
 {{else}}
   return Promise.resolve();
 {{/if}}

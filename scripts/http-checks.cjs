@@ -44,75 +44,125 @@ async function backendChecks(useAuth, useRateLimit) {
   ];
   if (!useAuth) return checks;
 
-  const user = JSON.stringify({
-    email: "Smoke@Test.dev",
-    password: "pw123456",
-  });
+  // Better Auth checks the Origin of requests that carry fetch metadata, as
+  // Node.js fetch does; the server's own URL is always trusted
+  const authPost = (pathname, body, headers = {}) =>
+    request(pathname, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        origin: `http://localhost:${PORT}`,
+        ...headers,
+      },
+      body,
+    });
+  const bearer = (token) => ({ authorization: `Bearer ${token}` });
+  const user = { email: "Smoke@Test.dev", password: "pw123456", name: "Smoke" };
+
+  // Without the rate-limit module, Better Auth allows 3 sign-ups and 3
+  // sign-ins per 10 seconds in production, so these stay within that
+  const signUp = await authPost(
+    "/api/auth/sign-up/email",
+    JSON.stringify(user),
+  );
+  const signIn = await authPost(
+    "/api/auth/sign-in/email",
+    JSON.stringify({
+      email: user.email.toLowerCase(),
+      password: user.password,
+    }),
+  );
+  const token = signIn.headers.get("set-auth-token");
   checks.push(
     [
       "rate limit headers",
       Boolean(useRateLimit),
-      hasRateLimitHeaders(await request("/auth/me")),
+      hasRateLimitHeaders(await request("/api/me")),
     ],
-    ["register", 201, (await postJson("/auth/register", user)).status],
+    ["sign up", 200, signUp.status],
     [
-      "register same email, other case",
-      409,
-      (await postJson("/auth/register", user.toLowerCase())).status,
-    ],
-    [
-      "register without body",
-      400,
-      (await request("/auth/register", { method: "POST" })).status,
+      "sign up returns a bearer token",
+      true,
+      Boolean(signUp.headers.get("set-auth-token")),
     ],
     [
-      "register short password",
-      400,
-      (await postJson("/auth/register", '{"email":"a@b.dev","password":"1"}'))
-        .status,
-    ],
-    [
-      "register oversized body",
-      413,
+      "sign up same email, other case",
+      422,
       (
-        await postJson(
-          "/auth/register",
-          JSON.stringify({ email: "a".repeat(200000) }),
+        await authPost(
+          "/api/auth/sign-up/email",
+          JSON.stringify({ ...user, email: "smoke@test.dev" }),
         )
       ).status,
     ],
-    ["login", 200, (await postJson("/auth/login", user)).status],
+    [
+      "sign up short password",
+      400,
+      (
+        await authPost(
+          "/api/auth/sign-up/email",
+          '{"email":"a@b.dev","password":"1","name":"A"}',
+        )
+      ).status,
+    ],
+    ["sign in", 200, signIn.status],
+    ["GET /api/me without a token", 401, (await request("/api/me")).status],
+    [
+      "GET /api/me with the token",
+      200,
+      (await request("/api/me", { headers: bearer(token) })).status,
+    ],
+    [
+      "password reset for an unknown email",
+      200,
+      (
+        await authPost(
+          "/api/auth/request-password-reset",
+          '{"email":"nobody@test.dev"}',
+        )
+      ).status,
+    ],
+    [
+      "password reset with a bad token",
+      400,
+      (
+        await authPost(
+          "/api/auth/reset-password",
+          '{"token":"bad","newPassword":"pw654321"}',
+        )
+      ).status,
+    ],
+    [
+      "sign out",
+      200,
+      (await authPost("/api/auth/sign-out", "{}", bearer(token))).status,
+    ],
+    [
+      "GET /api/me after sign out",
+      401,
+      (await request("/api/me", { headers: bearer(token) })).status,
+    ],
   );
 
-  const race = JSON.stringify({ email: "race@test.dev", password: "pw123456" });
-  const statuses = await Promise.all(
-    [1, 2, 3].map(async () => (await postJson("/auth/register", race)).status),
-  );
-  checks.push([
-    "3 concurrent duplicate registers",
-    "201,409,409",
-    statuses.sort().join(","),
-  ]);
-
-  // Sign-up and login allow 10 attempts per IP in 15 minutes
+  // Sign-up, sign-in, and password reset allow 10 attempts per IP in 15 minutes
   if (useRateLimit) {
     const wrong = JSON.stringify({
       email: "smoke@test.dev",
-      password: "wrong",
+      password: "wrong-password",
     });
     let lastStatus;
     for (let attempt = 0; attempt < 10; attempt++)
-      lastStatus = (await postJson("/auth/login", wrong)).status;
-    checks.push(["login after the auth limit", 429, lastStatus]);
+      lastStatus = (await authPost("/api/auth/sign-in/email", wrong)).status;
+    checks.push(["sign in after the auth limit", 429, lastStatus]);
   }
   return checks;
 }
 
 // Pages must load and so must the first stylesheet they reference
-async function fullstackChecks() {
+async function fullstackChecks(useAuth) {
   const home = await request("/");
   const stylesheet = home.text.match(/href="(\/[^"]+\.css[^"]*)"/)?.[1];
-  return [
+  const checks = [
     ["GET /", 200, home.status],
     ["stylesheet linked from /", true, Boolean(stylesheet)],
     [
@@ -121,6 +171,50 @@ async function fullstackChecks() {
       stylesheet ? (await request(stylesheet)).status : null,
     ],
   ];
+  if (!useAuth) return checks;
+
+  const signUp = await request("/api/auth/sign-up/email", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      origin: `http://localhost:${PORT}`,
+    },
+    body: JSON.stringify({
+      email: "smoke@test.dev",
+      password: "pw123456",
+      name: "Smoke",
+    }),
+  });
+  // The session cookie, without its attributes
+  const cookie = (signUp.headers.get("set-cookie") ?? "").split(";")[0];
+  const dashboard = await request("/dashboard", {
+    headers: { cookie },
+    redirect: "manual",
+  });
+  checks.push(
+    ["GET /sign-in", 200, (await request("/sign-in")).status],
+    ["GET /forgot-password", 200, (await request("/forgot-password")).status],
+    [
+      "GET /reset-password with an expired link",
+      200,
+      (await request("/reset-password?error=INVALID_TOKEN")).status,
+    ],
+    ["sign up", 200, signUp.status],
+    ["GET /dashboard signed in", 200, dashboard.status],
+    [
+      "dashboard asks to verify the email",
+      true,
+      dashboard.text.includes("Verify your email"),
+    ],
+    [
+      "GET /dashboard signed out",
+      true,
+      [302, 307].includes(
+        (await request("/dashboard", { redirect: "manual" })).status,
+      ),
+    ],
+  );
+  return checks;
 }
 
 module.exports = { PORT, backendChecks, fullstackChecks, waitForServer };

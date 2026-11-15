@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LoaderCircle } from "lucide-react";
+import { CircleAlert } from "lucide-react";
 import { useForm } from "react-hook-form";
 
 import { authClient } from "@/lib/auth-client";
@@ -12,13 +12,14 @@ import {
   getAuthErrorMessage,
   signInSchema,
   type SignInValues,
+  type SocialProvider,
 } from "@/lib/auth-schema";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -30,8 +31,11 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 
-export function SignInForm() {
+import { SocialButtons } from "./social-buttons";
+
+export function SignInForm({ providers }: { providers: SocialProvider[] }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [authError, setAuthError] = useState<string | null>(null);
@@ -63,16 +67,18 @@ export function SignInForm() {
   });
 
   return (
-    <Card className="border-white/80 bg-white/90 shadow-2xl shadow-slate-200/70 backdrop-blur">
-      <CardHeader className="space-y-2">
+    <Card>
+      <CardHeader>
         <CardTitle>Login to your account</CardTitle>
         <CardDescription>
           Sign in with your email and password to continue to your dashboard.
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form className="space-y-6" onSubmit={onSubmit} noValidate>
+        <form onSubmit={onSubmit} noValidate>
           <FieldGroup>
+            <SocialButtons providers={providers} />
+
             <Field data-invalid={Boolean(form.formState.errors.email)}>
               <FieldLabel htmlFor="email">Email</FieldLabel>
               <Input
@@ -83,12 +89,22 @@ export function SignInForm() {
                 placeholder="you@example.com"
                 {...form.register("email")}
               />
-              <FieldDescription>Use the email you registered with.</FieldDescription>
+              <FieldDescription>
+                Use the email you registered with.
+              </FieldDescription>
               <FieldError errors={[form.formState.errors.email]} />
             </Field>
 
             <Field data-invalid={Boolean(form.formState.errors.password)}>
-              <FieldLabel htmlFor="password">Password</FieldLabel>
+              <div className="flex items-center">
+                <FieldLabel htmlFor="password">Password</FieldLabel>
+                <Link
+                  className="ml-auto text-sm underline-offset-4 hover:underline"
+                  href="/forgot-password"
+                >
+                  Forgot password?
+                </Link>
+              </div>
               <Input
                 id="password"
                 type="password"
@@ -99,34 +115,32 @@ export function SignInForm() {
               />
               <FieldError errors={[form.formState.errors.password]} />
             </Field>
+
+            {authError ? (
+              <Alert variant="destructive">
+                <CircleAlert />
+                <AlertDescription>{authError}</AlertDescription>
+              </Alert>
+            ) : null}
+
+            <Field>
+              <Button type="submit" disabled={isPending}>
+                {isPending ? (
+                  <>
+                    <Spinner data-icon="inline-start" />
+                    Signing in
+                  </>
+                ) : (
+                  "Login"
+                )}
+              </Button>
+              <FieldDescription className="text-center">
+                Need an account? <Link href="/sign-up">Signup</Link>
+              </FieldDescription>
+            </Field>
           </FieldGroup>
-
-          {authError ? (
-            <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-              {authError}
-            </div>
-          ) : null}
-
-          <Button className="w-full" type="submit" disabled={isPending}>
-            {isPending ? (
-              <>
-                <LoaderCircle className="mr-2 size-4 animate-spin" />
-                Signing in
-              </>
-            ) : (
-              "Login"
-            )}
-          </Button>
         </form>
       </CardContent>
-      <CardFooter className="justify-center">
-        <p className="text-sm text-slate-600">
-          Need an account?{" "}
-          <Link className="font-medium text-sky-700 hover:text-sky-800" href="/sign-up">
-            Signup
-          </Link>
-        </p>
-      </CardFooter>
     </Card>
   );
 }

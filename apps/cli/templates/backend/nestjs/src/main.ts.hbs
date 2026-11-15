@@ -7,11 +7,22 @@ import { AppModule } from "./app.module.js";
 import { env } from "./env.js";
 
 async function bootstrap(): Promise<void> {
+{{#if useAuth}}
+  // Better Auth reads the body of its own routes; the auth module adds the
+  // JSON and form parsers back for every other route
+  const app = await NestFactory.create(AppModule, { bodyParser: false });
+{{else}}
   const app = await NestFactory.create(AppModule);
+{{/if}}
   const port = env.PORT;
 
   app.use(helmet());
+{{#if useAuth}}
+  // Browser clients read the bearer token from the set-auth-token header
+  app.enableCors({ origin: env.CORS_ORIGIN, exposedHeaders: ["set-auth-token"] });
+{{else}}
   app.enableCors({ origin: env.CORS_ORIGIN });
+{{/if}}
   // Lets modules close database connections when the process is stopped
   app.enableShutdownHooks();
 

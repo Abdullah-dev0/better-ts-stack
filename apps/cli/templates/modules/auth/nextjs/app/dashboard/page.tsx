@@ -1,69 +1,117 @@
+import { Suspense } from "react";
+
 import Link from "next/link";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+
 import { ArrowRight, ShieldCheck } from "lucide-react";
 
+import { ChangePasswordForm } from "@/components/auth/change-password-form";
+import { EmailVerificationCard } from "@/components/auth/email-verification-card";
 import { SignOutButton } from "@/components/auth/sign-out-button";
-import { buttonVariants } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { auth } from "@/lib/auth";
-import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getSession } from "@/lib/session";
 
-export default async function DashboardPage() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+// The parts that need the user wait for the session in their own <Suspense>
+// boundary, so the rest of the page is sent without waiting for it
+async function DashboardHeader() {
+  const session = await getSession();
 
+  // proxy.ts already sent visitors without a session cookie to /sign-in; this
+  // catches an expired or revoked session
   if (!session) {
     redirect("/sign-in");
   }
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,_#f8fafc_0%,_#eef2ff_100%)] px-6 py-16 sm:px-10">
-      <div className="mx-auto max-w-5xl space-y-8">
-        <header className="flex flex-col gap-6 rounded-[2rem] border border-white/70 bg-white/85 p-8 shadow-xl shadow-slate-200/60 backdrop-blur md:flex-row md:items-end md:justify-between">
-          <div className="space-y-3">
-            <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium uppercase tracking-[0.24em] text-emerald-700">
-              <ShieldCheck className="size-4" />
-              Authenticated session
-            </span>
-            <div className="space-y-1">
-              <h1 className="text-3xl font-semibold tracking-tight text-slate-950">
-                Welcome {session.user.name}
-              </h1>
-              <p className="text-sm text-slate-600">{session.user.email}</p>
-            </div>
-          </div>
-          <SignOutButton />
-        </header>
+    <header className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+      <div className="flex flex-col gap-3">
+        <Badge variant="secondary">
+          <ShieldCheck data-icon="inline-start" />
+          Authenticated session
+        </Badge>
+        <div className="flex flex-col gap-1">
+          <h1 className="text-3xl font-semibold tracking-tight">
+            Welcome {session.user.name}
+          </h1>
+          <p className="text-sm text-muted-foreground">{session.user.email}</p>
+        </div>
+      </div>
+      <SignOutButton />
+    </header>
+  );
+}
+
+function DashboardHeaderSkeleton() {
+  return (
+    <div className="flex flex-col gap-3" aria-busy="true">
+      <Skeleton className="h-5 w-44" />
+      <Skeleton className="h-9 w-64" />
+      <Skeleton className="h-4 w-40" />
+    </div>
+  );
+}
+
+async function EmailVerification() {
+  const session = await getSession();
+
+  return session ? (
+    <EmailVerificationCard
+      email={session.user.email}
+      emailVerified={session.user.emailVerified}
+    />
+  ) : null;
+}
+
+export default function DashboardPage() {
+  return (
+    <main className="min-h-svh bg-muted px-6 py-16 sm:px-10">
+      <div className="mx-auto flex max-w-5xl flex-col gap-8">
+        <Suspense fallback={<DashboardHeaderSkeleton />}>
+          <DashboardHeader />
+        </Suspense>
 
         <section className="grid gap-5 md:grid-cols-2">
+          <Suspense fallback={<Skeleton className="h-40 rounded-xl" />}>
+            <EmailVerification />
+          </Suspense>
+          <ChangePasswordForm />
           <Card>
             <CardHeader>
               <CardTitle>Protected route example</CardTitle>
               <CardDescription>
-                This page verifies the session on the server before rendering any
-                content.
+                The page is sent right away; the parts that need the user stream
+                in once the server has checked the session.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4 text-sm text-slate-600">
+            <CardContent className="flex flex-col gap-4 text-muted-foreground">
               <p>
-                The generated proxy only performs an optimistic cookie check. The
-                authoritative guard happens here with{" "}
-                <code className="font-mono text-slate-900">
-                  auth.api.getSession({"{"} headers: await headers() {"}"})
-                </code>
-                .
+                <code className="font-mono text-foreground">proxy.ts</code>{" "}
+                sends visitors without a session cookie to the sign-in page.
+                Each part that needs the user calls{" "}
+                <code className="font-mono text-foreground">getSession()</code>{" "}
+                from{" "}
+                <code className="font-mono text-foreground">
+                  lib/session.ts
+                </code>{" "}
+                inside its own{" "}
+                <code className="font-mono text-foreground">
+                  &lt;Suspense&gt;
+                </code>{" "}
+                boundary, and the session is looked up once per request.
               </p>
               <p>
-                That keeps route protection aligned with Better Auth&apos;s
-                Next.js guidance while staying easy to extend.
+                Check the session on the server like this in every protected
+                page, route handler, and server action.
               </p>
             </CardContent>
           </Card>
@@ -76,18 +124,26 @@ export default async function DashboardPage() {
                 product.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3 text-sm text-slate-600">
-              <p>Replace the demo dashboard with your first authenticated page.</p>
+            <CardContent className="flex flex-col gap-3 text-muted-foreground">
+              <p>
+                Replace the demo dashboard with your first authenticated page.
+              </p>
               <p>Extend the schema with profile or onboarding fields.</p>
-              <p>Add provider-based auth or email verification later if needed.</p>
-              <Link
-                href="/"
-                className={cn(buttonVariants({ variant: "outline" }), "w-fit gap-2")}
+              <p>
+                Add a GitHub or Google client ID and secret to .env to turn on
+                social sign-in, and RESEND_API_KEY to send real emails.
+              </p>
+            </CardContent>
+            <CardFooter>
+              <Button
+                variant="outline"
+                nativeButton={false}
+                render={<Link href="/" />}
               >
                 Back to home
-                <ArrowRight className="size-4" />
-              </Link>
-            </CardContent>
+                <ArrowRight data-icon="inline-end" />
+              </Button>
+            </CardFooter>
           </Card>
         </section>
       </div>

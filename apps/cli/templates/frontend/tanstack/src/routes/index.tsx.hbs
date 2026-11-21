@@ -1,4 +1,4 @@
-import { createFileRoute{{#if useAuth}}, Link{{/if}} } from "@tanstack/react-router";
+import { createFileRoute{{#if useAuth}}, Link{{else if useAi}}, Link{{/if}} } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 
 import { Alert, AlertDescription } from "~/components/ui/alert";
@@ -22,6 +22,7 @@ const featureList = [
   "React 19 and TypeScript",
   "Tailwind CSS v4 and shadcn/ui on Base UI",
   {{#if useAuth}}"Better Auth-ready session flow",{{/if}}
+  {{#if useAi}}"Streaming AI chat at /chat",{{/if}}
   {{#if (eq database "prisma")}}"Prisma database tooling",{{/if}}
   {{#if (eq database "drizzle")}}"Drizzle database tooling",{{/if}}
   {{#if (eq database "mongoose")}}"Mongoose database tooling",{{/if}}
@@ -86,6 +87,16 @@ function Home() {
                 }
               >
                 TanStack guide
+              </Button>
+              {{/if}}
+              {{#if useAi}}
+              <Button
+                size="lg"
+                variant="outline"
+                nativeButton={false}
+                render={<Link to="/chat" />}
+              >
+                Open the chat
               </Button>
               {{/if}}
             </div>

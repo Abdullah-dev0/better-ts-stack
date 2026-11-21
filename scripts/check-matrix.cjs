@@ -1,19 +1,37 @@
 const fs = require("node:fs");
+const os = require("node:os");
 const path = require("node:path");
-const { spawnSync } = require("node:child_process");
+const { spawn } = require("node:child_process");
+const { inScope } = require("./samples.cjs");
 const matrix = JSON.parse(fs.readFileSync(process.argv[2]));
 const framework = process.argv[3];
 if (!["express", "nestjs", "nextjs", "tanstack"].includes(framework))
   throw new Error("Choose express, nestjs, nextjs, or tanstack");
 const filter = process.argv[4];
+// Cases are independent folders, so several install and build at once
+const CONCURRENCY = Number(
+  process.env.BTS_CONCURRENCY || Math.min(4, os.availableParallelism()),
+);
 const results = [];
-for (const c of matrix.cases.filter(
-  (c) =>
-    c.config.framework === framework &&
-    c.config.packageManager === "npm" &&
-    !c.config.useDocker &&
-    (!filter || c.name === filter),
-)) {
+
+// One command string: Node.js deprecates arguments passed with shell
+function run(command, cwd, fd) {
+  return new Promise((resolve) => {
+    const child = spawn(command, {
+      cwd,
+      stdio: ["ignore", fd, fd],
+      shell: true,
+      timeout: 600000,
+      env: { ...process.env, NEXT_TELEMETRY_DISABLED: "1" },
+    });
+    child.on("error", (error) =>
+      resolve({ status: null, error: error.message }),
+    );
+    child.on("close", (status) => resolve({ status }));
+  });
+}
+
+async function check(c) {
   const log = path.join(matrix.root, c.name + ".log");
   const fd = fs.openSync(log, "a");
   const checks = [];
@@ -23,19 +41,9 @@ for (const c of matrix.cases.filter(
     ["run", "type:check"],
     ["run", "lint"],
   ]) {
-    // One command string: Node.js deprecates arguments passed with shell
-    const r = spawnSync(`npm ${args.join(" ")}`, {
-      cwd: c.target,
-      stdio: ["ignore", fd, fd],
-      shell: true,
-      timeout: 600000,
-      env: { ...process.env, NEXT_TELEMETRY_DISABLED: "1" },
-    });
-    checks.push({
-      command: "npm " + args.join(" "),
-      status: r.status,
-      error: r.error?.message,
-    });
+    const command = "npm " + args.join(" ");
+    const r = await run(command, c.target, fd);
+    checks.push({ command, status: r.status, error: r.error });
     if (r.status !== 0) break;
   }
   fs.closeSync(fd);
@@ -47,7 +55,29 @@ for (const c of matrix.cases.filter(
   console.log(c.name, JSON.stringify(checks));
 }
 
-if (results.some((result) => result.checks.some((check) => check.status !== 0)))
-  process.exitCode = 1;
+async function main() {
+  const queue = matrix.cases.filter(
+    (c) =>
+      c.config.framework === framework &&
+      // check-monorepo.cjs runs the monorepos
+      !c.config.monorepo &&
+      c.config.packageManager === "npm" &&
+      !c.config.useDocker &&
+      inScope(c, filter),
+  );
+  if (queue.length === 0) throw new Error("No matching matrix cases");
+  await Promise.all(
+    Array.from({ length: Math.min(CONCURRENCY, queue.length) }, async () => {
+      for (let c = queue.shift(); c; c = queue.shift()) await check(c);
+    }),
+  );
+  if (
+    results.some((result) => result.checks.some((check) => check.status !== 0))
+  )
+    process.exitCode = 1;
+}
 
-if (results.length === 0) throw new Error("No matching matrix cases");
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});

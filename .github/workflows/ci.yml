@@ -50,3 +50,29 @@ jobs:
         run: node scripts/check-matrix.cjs "$RUNNER_TEMP/matrix/matrix.json" ${{ matrix.framework }}
       - name: Start the built projects and check HTTP responses
         run: node scripts/smoke-matrix.cjs "$RUNNER_TEMP/matrix/matrix.json" ${{ matrix.framework }}
+      # A sample of images, each against a real database. Linux only: the
+      # Windows runners cannot run Linux containers
+      - name: Build the Docker images and check them
+        if: matrix.os == 'ubuntu-latest'
+        run: node scripts/docker-matrix.cjs "$RUNNER_TEMP/matrix/matrix.json" ${{ matrix.framework }}
+
+  monorepos:
+    name: Monorepos
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: pnpm/action-setup@v4
+        with:
+          version: latest
+      - uses: oven-sh/setup-bun@v2
+      - run: npm ci
+      - run: npm run test:templates -- "$RUNNER_TEMP/matrix"
+      - name: Install, build, type-check, lint, and start the sampled monorepos
+        run: node scripts/check-monorepo.cjs "$RUNNER_TEMP/matrix/matrix.json"

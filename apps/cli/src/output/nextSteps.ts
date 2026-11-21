@@ -40,6 +40,14 @@ export function generateNextSteps(
     );
   }
 
+  if (config.ai === "vercel") {
+    steps.push(
+      "Set AI_GATEWAY_API_KEY in .env (Vercel AI Gateway); AI_MODEL picks the model"
+    );
+  } else if (config.ai === "tanstack") {
+    steps.push("Set OPENAI_API_KEY in .env; AI_MODEL picks the model");
+  }
+
   // Step 3: Install dependencies if not already done
   if (!depsInstalled) {
     steps.push(`${config.packageManager} install`);
@@ -93,6 +101,10 @@ export function generateNextSteps(
         ? "Visit /sign-up to create your first account"
         : "Create a user with POST /api/auth/sign-up/email, then call GET /api/me with the set-auth-token header as a bearer token"
     );
+  }
+
+  if (config.ai !== "none" && isFullstack) {
+    steps.push("Visit /chat to talk to the model");
   }
 
   if (config.useDocker) {

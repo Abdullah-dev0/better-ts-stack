@@ -24,13 +24,21 @@ import { auth, mongoClient } from "./lib/auth";
 import { auth } from "./lib/auth";
 {{/if}}
 {{/if}}
+{{#if useAi}}
+import chatRouter from "./routes/chat";
+{{/if}}
 import healthRouter from "./routes/health";
-{{#if useAuth}}
+{{#if (or useAuth useRemoteAuth)}}
 import meRouter from "./routes/me";
 {{/if}}
 
 const app: Express = express();
 const port = env.PORT;
+{{#if isMonorepoApi}}
+// Requests come through the web app's proxy: take the client IP from the
+// X-Forwarded-For header it sets
+app.set("trust proxy", 1);
+{{/if}}
 
 // Middleware
 app.use(helmet());
@@ -61,7 +69,10 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use("/health", healthRouter);
-{{#if useAuth}}
+{{#if useAi}}
+app.use("/api/chat", chatRouter);
+{{/if}}
+{{#if (or useAuth useRemoteAuth)}}
 app.use("/api/me", meRouter);
 {{/if}}
 

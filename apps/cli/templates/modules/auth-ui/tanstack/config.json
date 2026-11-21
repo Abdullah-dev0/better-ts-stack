@@ -1,0 +1,15 @@
+{
+  "id": "auth-ui",
+  "name": "Better Auth pages",
+  "description": "Sign-in, sign-up, password reset, and dashboard pages for TanStack Start, on the Better Auth client",
+  "type": "feature",
+  "dependencies": {
+    "@hookform/resolvers": "^5.9.2",
+    "better-auth": "^1.7.14",
+    "react-hook-form": "^7.91.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {},
+  "scripts": {},
+  "envVars": {}
+}

@@ -12,11 +12,14 @@ import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 {{#if useAuth}}
 import { AuthModule } from "./auth/auth.module.js";
 {{/if}}
+{{#if useAi}}
+import { ChatController } from "./chat/chat.controller.js";
+{{/if}}
 {{#if (eq database 'drizzle')}}
 import { DatabaseModule } from "./database/database.module.js";
 {{/if}}
 import { HealthController } from "./health/health.controller.js";
-{{#if useAuth}}
+{{#if (or useAuth useRemoteAuth)}}
 import { MeController } from "./me/me.controller.js";
 {{/if}}
 {{#if (eq database 'prisma')}}
@@ -42,7 +45,7 @@ import { PrismaModule } from "./prisma/prisma.module.js";
     ThrottlerModule.forRoot([{ ttl: 15 * 60 * 1000, limit: 100 }]),
     {{/if}}
   ],
-  controllers: [HealthController{{#if useAuth}}, MeController{{/if}}],
+  controllers: [HealthController{{#if (or useAuth useRemoteAuth)}}, MeController{{/if}}{{#if useAi}}, ChatController{{/if}}],
   {{#if useRateLimit}}
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
   {{/if}}

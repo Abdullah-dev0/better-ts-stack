@@ -10,3 +10,7 @@ import { auth } from "./auth";
 export const getSession = cache(async () =>
   auth.api.getSession({ headers: await headers() })
 );
+
+// GitHub and Google, when their keys are set; the sign-in and sign-up pages
+// show a button for each
+export { socialProviders } from "./auth";

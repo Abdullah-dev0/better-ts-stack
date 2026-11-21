@@ -1,0 +1,53 @@
+import { BadRequestException, Body, Controller, Post, Res } from "@nestjs/common";
+import {
+  chat,
+  chatParamsFromRequestBody,
+  toServerSentEventsResponse,
+} from "@tanstack/ai";
+import { openaiText, type OpenAIChatModel } from "@tanstack/ai-openai";
+import type { Response } from "express";
+
+import { env } from "../env.js";
+
+{{#unless useAuth}}
+// Without auth anyone can call this route, and every reply is billed to your
+// key: add auth or rate limiting before deploying
+{{/unless}}
+// Streams the model's reply as Server-Sent Events, the format useChat from
+// @tanstack/ai-react reads.{{#if useAuth}} The global auth guard answers 401
+// without a session.{{/if}}
+@Controller("api/chat")
+export class ChatController {
+  @Post()
+  async chat(@Body() body: unknown, @Res() res: Response): Promise<void> {
+    let params: Awaited<ReturnType<typeof chatParamsFromRequestBody>>;
+    try {
+      params = await chatParamsFromRequestBody(body);
+    } catch (error) {
+      // The body is not a chat request (no messages or thread id)
+      throw new BadRequestException(
+        error instanceof Error ? error.message : "Invalid chat request"
+      );
+    }
+
+    // The client closing the request (the stop button) stops the model call
+    const abortController = new AbortController();
+    res.on("close", () => abortController.abort());
+
+    const stream = chat({
+      // The adapter is typed to the OpenAI model names it knows
+      adapter: openaiText(env.AI_MODEL as OpenAIChatModel),
+      ...params,
+      abortController,
+    });
+    const response = toServerSentEventsResponse(stream, { abortController });
+
+    res.writeHead(response.status, Object.fromEntries(response.headers));
+    if (response.body) {
+      for await (const chunk of response.body) {
+        res.write(chunk);
+      }
+    }
+    res.end();
+  }
+}

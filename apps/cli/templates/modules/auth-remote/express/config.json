@@ -1,0 +1,12 @@
+{
+  "id": "auth-remote",
+  "name": "Sessions from the web app",
+  "description": "Checks each request's session with the monorepo's web app, which runs Better Auth",
+  "type": "feature",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {},
+  "envVars": {
+    "AUTH_URL": "http://localhost:3000"
+  }
+}

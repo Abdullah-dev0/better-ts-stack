@@ -1,0 +1,12 @@
+{
+  "id": "ai-page",
+  "name": "AI chat page (TanStack AI)",
+  "description": "A /chat page that streams the reply from /api/chat, with a stop button",
+  "type": "feature",
+  "dependencies": {
+    "@tanstack/ai-react": "^1.1.1"
+  },
+  "devDependencies": {},
+  "scripts": {},
+  "envVars": {}
+}

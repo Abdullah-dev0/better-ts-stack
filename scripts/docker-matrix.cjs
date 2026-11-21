@@ -6,10 +6,12 @@ const path = require("node:path");
 const { spawnSync } = require("node:child_process");
 const {
   PORT,
+  aiChecks,
   backendChecks,
   fullstackChecks,
   waitForServer,
 } = require("./http-checks.cjs");
+const { inScope } = require("./samples.cjs");
 const matrix = JSON.parse(fs.readFileSync(process.argv[2]));
 const framework = process.argv[3];
 if (!["express", "nestjs", "nextjs", "tanstack"].includes(framework))
@@ -156,9 +158,11 @@ async function checkCase(c, log) {
   if (!started) throw new Error("App container did not start");
 
   await waitForServer(`http://localhost:${PORT}/`);
-  return framework === "express" || framework === "nestjs"
-    ? backendChecks(c.config.useAuth, c.config.useRateLimit)
-    : fullstackChecks(c.config.useAuth);
+  const checks =
+    framework === "express" || framework === "nestjs"
+      ? await backendChecks(c.config.useAuth, c.config.useRateLimit)
+      : await fullstackChecks(c.config.useAuth);
+  return [...checks, ...(await aiChecks(c.config))];
 }
 
 // Fails at once when another program holds the app port: otherwise every
@@ -188,7 +192,7 @@ async function main() {
     (c) =>
       c.config.framework === framework &&
       c.config.useDocker &&
-      (!filter || c.name === filter),
+      inScope(c, filter),
   )) {
     const log = path.join(matrix.root, c.name + ".docker.log");
     removeContainers(log);

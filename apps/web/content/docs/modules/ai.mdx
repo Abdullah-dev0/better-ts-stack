@@ -1,0 +1,86 @@
+---
+title: AI Chat Module
+description: A streaming chat endpoint with a stop button that cancels the model call, on the Vercel AI SDK or TanStack AI, for every framework
+---
+
+import { Callout } from "fumadocs-ui/components/callout";
+
+## Overview
+
+`--ai vercel` or `--ai tanstack` adds a chat that streams the model's reply as it is written. Stopping it cancels the request in the browser, and the server stops calling the model.
+
+| Stack                       | What you get                                           |
+| --------------------------- | ------------------------------------------------------ |
+| **Express, NestJS**         | `POST /api/chat`                                       |
+| **Next.js, TanStack Start** | `POST /api/chat` and a `/chat` page with a Stop button |
+
+With auth, only signed-in users can use the chat: `POST /api/chat` answers `401` without a session, and `/chat` sends visitors to the sign-in page.
+
+<Callout type="warn">
+  Without auth, anyone who finds `POST /api/chat` can send it prompts, and you
+  pay for every reply. Add `--auth`, or put rate limiting or your own check in
+  front of the route, before you deploy it.
+</Callout>
+
+## Pick an SDK
+
+| Flag            | SDK                                                | Key in `.env`        | Default `AI_MODEL`            |
+| --------------- | -------------------------------------------------- | -------------------- | ----------------------------- |
+| `--ai vercel`   | [Vercel AI SDK](https://ai-sdk.dev/docs)           | `AI_GATEWAY_API_KEY` | `anthropic/claude-sonnet-5.5` |
+| `--ai tanstack` | [TanStack AI](https://tanstack.com/ai/latest/docs) | `OPENAI_API_KEY`     | `gpt-6.1-sol`                 |
+
+The Vercel AI SDK goes through the [Vercel AI Gateway](https://vercel.com/ai-gateway), so `AI_MODEL` can be any gateway model id, such as `openai/gpt-6-astra`. TanStack AI uses its OpenAI adapter, so `AI_MODEL` is an OpenAI model name.
+
+<Callout type="info">
+  The server starts without a key, so you can build and deploy first. The first
+  chat request fails until the key is set.
+</Callout>
+
+## Files
+
+| Framework      | Files                                                                      |
+| -------------- | -------------------------------------------------------------------------- |
+| Express        | `src/routes/chat.ts`                                                       |
+| NestJS         | `src/chat/chat.controller.ts`                                              |
+| Next.js        | `app/api/chat/route.ts`, `app/chat/page.tsx`, `components/chat.tsx`        |
+| TanStack Start | `src/routes/api/chat.ts`, `src/routes/chat.tsx`, `src/components/chat.tsx` |
+
+## How stopping works
+
+- **Next.js and TanStack Start:** the page's `stop()` aborts the request. With the Vercel AI SDK, the route passes `request.signal` to `streamText` as `abortSignal`. With TanStack AI, the route gives one `AbortController` to `chat()` and to `toServerSentEventsResponse`.
+- **Express and NestJS:** the route aborts the model call when the response closes, so any client that drops the connection stops it.
+
+<Callout type="warn">
+  On Vercel, a route only sees the client disconnect when cancellation is turned
+  on for it: add `"supportsCancellation": true` for the chat route under
+  `functions` in `vercel.json`. Without it, the page stops but the model keeps
+  writing.
+</Callout>
+
+## Calling the backend from a browser
+
+Express and NestJS have no page. Point the matching React hook at the server, and add your site to `CORS_ORIGIN`:
+
+```tsx
+// Vercel AI SDK
+import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport } from "ai";
+
+const { messages, sendMessage, stop } = useChat({
+  transport: new DefaultChatTransport({
+    api: "http://localhost:3000/api/chat",
+  }),
+});
+```
+
+```tsx
+// TanStack AI
+import { fetchServerSentEvents, useChat } from "@tanstack/ai-react";
+
+const { messages, sendMessage, stop } = useChat({
+  connection: fetchServerSentEvents("http://localhost:3000/api/chat"),
+  threadId: "chat",
+});
+```
+
+With auth, send the bearer token from sign-in in an `Authorization` header (`headers` in `DefaultChatTransport`, or the second argument of `fetchServerSentEvents`).

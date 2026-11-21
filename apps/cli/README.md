@@ -29,23 +29,27 @@ npx better-ts-stack my-api --framework nestjs --database prisma --auth --yes
 npx better-ts-stack . --framework nextjs --database drizzle --pm pnpm
 ```
 
-| Flag                               | Values                                       |
-| ---------------------------------- | -------------------------------------------- |
-| `--framework <name>`               | `express`, `nestjs`, `nextjs`, `tanstack`    |
-| `--database <name>`                | `none`, `prisma`, `drizzle`, `mongoose`      |
-| `--pm <name>`                      | `npm`, `pnpm`, `bun`                         |
-| `--auth` / `--no-auth`             | Add authentication                           |
-| `--docker` / `--no-docker`         | Add Docker files                             |
-| `--rate-limit` / `--no-rate-limit` | Add rate limiting (Express and NestJS)       |
-| `--ci` / `--no-ci`                 | Add a GitHub Actions workflow                |
-| `--no-agents`                      | Leave out AGENTS.md (added by default)       |
-| `--vscode` / `--no-vscode`         | Add VS Code settings and extensions          |
-| `--git` / `--no-git`               | Initialize a git repository                  |
-| `--install` / `--no-install`       | Install dependencies                         |
-| `-y`, `--yes`                      | Use defaults for missing options, no prompts |
-| `--dry-run`                        | List what would be created, write nothing    |
-| `-h`, `--help`                     | Show help                                    |
-| `-v`, `--version`                  | Show the version                             |
+| Flag                               | Values                                            |
+| ---------------------------------- | ------------------------------------------------- |
+| `--framework <name>`               | `express`, `nestjs`, `nextjs`, `tanstack`         |
+| `--database <name>`                | `none`, `prisma`, `drizzle`, `mongoose`           |
+| `--pm <name>`                      | `npm`, `pnpm`, `bun`                              |
+| `--auth` / `--no-auth`             | Add authentication                                |
+| `--ai <name>`                      | `none`, `vercel`, `tanstack`: a streaming AI chat |
+| `--monorepo`                       | Turborepo with `apps/web` and `apps/api`          |
+| `--api <name>`                     | `express`, `nestjs`, `none`: the monorepo api     |
+| `--owner <app>`                    | `web`, `api`: the monorepo app with auth and data |
+| `--docker` / `--no-docker`         | Add Docker files                                  |
+| `--rate-limit` / `--no-rate-limit` | Add rate limiting (Express and NestJS)            |
+| `--ci` / `--no-ci`                 | Add a GitHub Actions workflow                     |
+| `--no-agents`                      | Leave out AGENTS.md (added by default)            |
+| `--vscode` / `--no-vscode`         | Add VS Code settings and extensions               |
+| `--git` / `--no-git`               | Initialize a git repository                       |
+| `--install` / `--no-install`       | Install dependencies                              |
+| `-y`, `--yes`                      | Use defaults for missing options, no prompts      |
+| `--dry-run`                        | List what would be created, write nothing         |
+| `-h`, `--help`                     | Show help                                         |
+| `-v`, `--version`                  | Show the version                                  |
 
 `--database` names the ORM, which also selects the database: `prisma` and `drizzle` use PostgreSQL, `mongoose` uses MongoDB.
 

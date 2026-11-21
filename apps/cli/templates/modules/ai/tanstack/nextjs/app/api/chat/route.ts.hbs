@@ -1,0 +1,46 @@
+import {
+  chat,
+  chatParamsFromRequest,
+  toServerSentEventsResponse,
+} from "@tanstack/ai";
+import { openaiText, type OpenAIChatModel } from "@tanstack/ai-openai";
+{{#if useAuth}}
+
+import { getSession } from "@/lib/session";
+{{/if}}
+
+{{#unless useAuth}}
+// Without auth anyone can call this route, and every reply is billed to your
+// key: add auth or rate limiting before deploying
+{{/unless}}
+// Streams the model's reply to useChat as Server-Sent Events. The stop button
+// cancels the response, and the abort controller stops the model call
+export async function POST(request: Request) {
+{{#if useAuth}}
+  if (!(await getSession())) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+{{/if}}
+  let params: Awaited<ReturnType<typeof chatParamsFromRequest>>;
+  try {
+    params = await chatParamsFromRequest(request);
+  } catch (error) {
+    // A body that is not a chat request is thrown as a 400 Response
+    if (error instanceof Response) return error;
+    throw error;
+  }
+
+  const abortController = new AbortController();
+  const stream = chat({
+    // OPENAI_API_KEY is read from .env; the adapter is typed to the OpenAI
+    // model names it knows
+    adapter: openaiText(
+      (process.env.AI_MODEL ?? "gpt-6.1-sol") as OpenAIChatModel
+    ),
+    ...params,
+    abortController,
+  });
+
+  return toServerSentEventsResponse(stream, { abortController });
+}

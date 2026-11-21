@@ -1,0 +1,12 @@
+{
+  "id": "proxy",
+  "name": "API proxy",
+  "description": "Forwards the /api/* requests the web app does not answer to the monorepo's api",
+  "type": "feature",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {},
+  "envVars": {
+    "API_URL": "http://localhost:3001"
+  }
+}

@@ -84,9 +84,11 @@ export async function generatePackageJson(
 ): Promise<void> {
   try {
     const isFullstack = config.applicationType === "fullstack";
-    const overrides = Object.keys(mergedConfig.overrides).length
-      ? mergedConfig.overrides
-      : undefined;
+    // In a monorepo the overrides go in the root package.json, where they work
+    const overrides =
+      !config.app && Object.keys(mergedConfig.overrides).length
+        ? mergedConfig.overrides
+        : undefined;
     const packageJson = {
       name: config.projectName,
       version: "1.0.0",
@@ -136,9 +138,16 @@ const PNPM_BUILD_DEPENDENCIES = [
 // (it ignores the "pnpm" field in package.json)
 export async function generatePnpmWorkspace(
   targetDir: string,
-  overrides: Record<string, string>
+  overrides: Record<string, string>,
+  // Workspace folders, for a monorepo
+  packages: string[] = []
 ): Promise<void> {
   const lines: string[] = [];
+
+  if (packages.length > 0) {
+    lines.push("packages:");
+    for (const folder of packages) lines.push(`  - "${folder}"`);
+  }
 
   if (Object.keys(overrides).length > 0) {
     lines.push("overrides:");
@@ -192,9 +201,15 @@ export async function generateStackFile(
     const stack = {
       cliVersion: version,
       framework: config.framework,
+      ...(config.monorepo && {
+        monorepo: true,
+        api: config.apiFramework,
+        owner: config.owner,
+      }),
       database: config.database,
       packageManager: config.packageManager,
       auth: config.useAuth,
+      ai: config.ai,
       docker: config.useDocker,
       rateLimit: config.useRateLimit,
       ci: config.useCi,

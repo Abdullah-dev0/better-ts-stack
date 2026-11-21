@@ -61,9 +61,14 @@ export function showBanner(version: string, isInteractive: boolean) {
 // Displays a summary of what will be built
 export function showSummary(config: ProjectConfig, targetDir: string) {
   const stack = [
+    config.monorepo && "monorepo",
     config.framework,
+    config.monorepo &&
+      config.apiFramework !== "none" &&
+      `${config.apiFramework} (${config.owner} owns users and data)`,
     config.database !== "none" && config.database,
     config.useAuth && "auth",
+    config.ai !== "none" && `ai (${config.ai})`,
     config.useRateLimit && "rate limit",
     config.useDocker && "docker",
     config.useCi && "ci",

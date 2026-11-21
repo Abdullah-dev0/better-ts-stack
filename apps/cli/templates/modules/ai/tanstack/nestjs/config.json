@@ -1,0 +1,16 @@
+{
+  "id": "ai",
+  "name": "AI chat (TanStack AI)",
+  "description": "A streaming chat endpoint on TanStack AI, cancelled when the client stops",
+  "type": "feature",
+  "dependencies": {
+    "@tanstack/ai": "^1.8.0",
+    "@tanstack/ai-openai": "^1.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {},
+  "envVars": {
+    "OPENAI_API_KEY": "",
+    "AI_MODEL": "gpt-6.1-sol"
+  }
+}

@@ -1,0 +1,61 @@
+---
+title: Monorepo
+description: A Turborepo with a Next.js or TanStack Start web app and an optional Express or NestJS api, with users and data in whichever app you choose
+---
+
+import { Callout } from "fumadocs-ui/components/callout";
+
+## Overview
+
+`--monorepo` creates a [Turborepo](https://turborepo.com):
+
+| App        | Framework                                       | Port |
+| ---------- | ----------------------------------------------- | ---- |
+| `apps/web` | `--framework nextjs` or `tanstack`              | 3000 |
+| `apps/api` | `--api express` or `nestjs`, left out by `none` | 3001 |
+
+```bash
+npx better-ts-stack my-app --monorepo --framework nextjs --api express --database prisma --auth --owner web --yes
+```
+
+Run `dev`, `build`, `start`, `lint`, and `type:check` at the root. Turborepo runs them in every app.
+
+With an api, browsers only talk to `apps/web`. It forwards every `/api/*` request it does not answer itself to `apps/api` (`API_URL` in `apps/web/.env`), so there is no CORS setup and cookies stay on one origin.
+
+## Without an api server
+
+`--api none` gives you `apps/web` on its own. It runs Better Auth, the database, and the AI chat route, exactly like a single Next.js or TanStack Start project, inside a Turborepo you can add more apps to later.
+
+## Which app owns users and data
+
+With an api, the CLI asks **"Which app owns users and data?"** (`--owner web` or `--owner api`). That app runs Better Auth, holds the database, and serves the AI chat route. The other app asks it for the session of each request.
+
+| `--owner` | `apps/web`                                                          | `apps/api`                                                                                                     |
+| --------- | ------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `web`     | Better Auth, the database, the sign-in pages, `/chat` and its route | Your business logic. `requireAuth` (Express) or `RemoteAuthGuard` (NestJS) checks the session with the web app |
+| `api`     | The sign-in pages and `/chat`. Sessions are read from the api       | Better Auth, the database, `/api/chat`, and rate limiting                                                      |
+
+<Callout type="info">
+  **The web app is the easier owner.** The cookie comes from the same server
+  that renders the pages, so pages read the session and the database in-process,
+  with no extra request to another app. Email links and OAuth callbacks point at
+  the site the user is on, and it is the same setup a single Next.js or TanStack
+  Start project uses. Make the api the owner when one server should hold every
+  user and all business logic, for example when a mobile app will call it too.
+</Callout>
+
+The question is only asked when there is something to own: a database or AI chat. Better Auth in the web app needs a database, so with auth and no database the api owns users and data, and the CLI says so.
+
+With the api as the owner:
+
+- `BETTER_AUTH_URL` in `apps/api/.env` is the web app's URL, so email links land on the site.
+- `CORS_ORIGIN` is the web origin, which Better Auth trusts.
+- Social sign-in buttons are shown for the providers listed in `AUTH_PROVIDERS` in `apps/web/.env`, for example `github,google`. Their keys go in `apps/api/.env`.
+
+## Limits
+
+- `--docker` is not available with `--monorepo` yet.
+- `--ci` adds one workflow at the root, which runs the install, build, type-check, and lint for every app.
+- Each app keeps its own `tsconfig.json` and ESLint config. A shared `packages/db` is planned together with payments.
+- Next.js reads its rewrites at build time, so set `API_URL` before `next build` when the api runs elsewhere. Turborepo includes `API_URL` in the build's cache key, so a new value builds again.
+- The api reads the client IP for its rate limits from the `X-Forwarded-For` header the web app sends. The TanStack Start proxy sets it to the real client IP. Next.js passes on a value the client sent, so deploy `apps/web` behind a host or reverse proxy that overwrites `X-Forwarded-For`, and never expose `apps/api` to the internet directly.

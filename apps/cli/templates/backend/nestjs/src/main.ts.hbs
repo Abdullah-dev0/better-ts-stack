@@ -1,4 +1,7 @@
 import { NestFactory } from "@nestjs/core";
+{{#if isMonorepoApi}}
+import type { NestExpressApplication } from "@nestjs/platform-express";
+{{/if}}
 // Loads .env before app.module.js reads process.env
 import "dotenv/config";
 import helmet from "helmet";
@@ -10,11 +13,16 @@ async function bootstrap(): Promise<void> {
 {{#if useAuth}}
   // Better Auth reads the body of its own routes; the auth module adds the
   // JSON and form parsers back for every other route
-  const app = await NestFactory.create(AppModule, { bodyParser: false });
+  const app = await NestFactory.create{{#if isMonorepoApi}}<NestExpressApplication>{{/if}}(AppModule, { bodyParser: false });
 {{else}}
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create{{#if isMonorepoApi}}<NestExpressApplication>{{/if}}(AppModule);
 {{/if}}
   const port = env.PORT;
+{{#if isMonorepoApi}}
+  // Requests come through the web app's proxy: take the client IP from the
+  // X-Forwarded-For header it sets
+  app.set("trust proxy", 1);
+{{/if}}
 
   app.use(helmet());
 {{#if useAuth}}

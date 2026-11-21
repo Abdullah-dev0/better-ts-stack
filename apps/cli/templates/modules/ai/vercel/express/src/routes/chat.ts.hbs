@@ -1,0 +1,46 @@
+import {
+  convertToModelMessages,
+  pipeUIMessageStreamToResponse,
+  streamText,
+  toUIMessageStream,
+  type UIMessage,
+} from "ai";
+import { Request, Response, Router } from "express";
+
+import { env } from "../env";
+{{#if useAuth}}
+import { requireAuth } from "../middleware/requireAuth";
+{{/if}}
+
+const router: Router = Router();
+
+{{#unless useAuth}}
+// Without auth anyone can call this route, and every reply is billed to your
+// key: add auth or rate limiting before deploying
+{{/unless}}
+// Streams the model's reply as a UI message stream, the format useChat from
+// @ai-sdk/react reads.{{#if useAuth}} Signed-in users only.{{/if}}
+router.post("/", {{#if useAuth}}requireAuth, {{/if}}async (req: Request, res: Response) => {
+  const { messages } = req.body as { messages?: UIMessage[] };
+  if (!Array.isArray(messages)) {
+    res.status(400).json({ error: "messages must be an array" });
+    return;
+  }
+
+  // The client closing the request (the stop button) stops the model call
+  const controller = new AbortController();
+  res.on("close", () => controller.abort());
+
+  const result = streamText({
+    model: env.AI_MODEL,
+    messages: await convertToModelMessages(messages),
+    abortSignal: controller.signal,
+  });
+
+  await pipeUIMessageStreamToResponse({
+    response: res,
+    stream: toUIMessageStream({ stream: result.stream }),
+  });
+});
+
+export default router;

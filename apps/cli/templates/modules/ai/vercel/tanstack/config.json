@@ -1,0 +1,15 @@
+{
+  "id": "ai",
+  "name": "AI chat (Vercel AI SDK)",
+  "description": "A streaming chat endpoint on the Vercel AI SDK, cancelled when the client stops",
+  "type": "feature",
+  "dependencies": {
+    "ai": "^7.0.179"
+  },
+  "devDependencies": {},
+  "scripts": {},
+  "envVars": {
+    "AI_GATEWAY_API_KEY": "",
+    "AI_MODEL": "anthropic/claude-sonnet-5.5"
+  }
+}

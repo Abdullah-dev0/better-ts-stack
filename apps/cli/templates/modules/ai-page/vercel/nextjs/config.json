@@ -1,0 +1,12 @@
+{
+  "id": "ai-page",
+  "name": "AI chat page (Vercel AI SDK)",
+  "description": "A /chat page that streams the reply from /api/chat, with a stop button",
+  "type": "feature",
+  "dependencies": {
+    "@ai-sdk/react": "^4.0.183"
+  },
+  "devDependencies": {},
+  "scripts": {},
+  "envVars": {}
+}

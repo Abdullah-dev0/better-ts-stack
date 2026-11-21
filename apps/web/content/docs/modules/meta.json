@@ -1,4 +1,13 @@
 {
   "title": "Modules",
-  "pages": ["index", "backend", "frontend", "database", "auth", "docker"]
+  "pages": [
+    "index",
+    "backend",
+    "frontend",
+    "database",
+    "auth",
+    "ai",
+    "monorepo",
+    "docker"
+  ]
 }

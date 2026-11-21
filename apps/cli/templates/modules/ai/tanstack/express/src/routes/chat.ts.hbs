@@ -1,0 +1,58 @@
+import type { OpenAIChatModel } from "@tanstack/ai-openai";
+import { Request, Response, Router } from "express";
+
+import { env } from "../env";
+{{#if useAuth}}
+import { requireAuth } from "../middleware/requireAuth";
+{{/if}}
+
+// TanStack AI ships ES modules only, which this CommonJS server loads with
+// import(); Node.js loads each package once and reuses it
+const loadTanStackAi = () =>
+  Promise.all([import("@tanstack/ai"), import("@tanstack/ai-openai")]);
+
+const router: Router = Router();
+
+{{#unless useAuth}}
+// Without auth anyone can call this route, and every reply is billed to your
+// key: add auth or rate limiting before deploying
+{{/unless}}
+// Streams the model's reply as Server-Sent Events, the format useChat from
+// @tanstack/ai-react reads.{{#if useAuth}} Signed-in users only.{{/if}}
+router.post("/", {{#if useAuth}}requireAuth, {{/if}}async (req: Request, res: Response) => {
+  const [{ chat, chatParamsFromRequestBody, toServerSentEventsResponse }, { openaiText }] =
+    await loadTanStackAi();
+
+  let params: Awaited<ReturnType<typeof chatParamsFromRequestBody>>;
+  try {
+    params = await chatParamsFromRequestBody(req.body);
+  } catch (error) {
+    // The body is not a chat request (no messages or thread id)
+    res.status(400).json({
+      error: error instanceof Error ? error.message : "Invalid chat request",
+    });
+    return;
+  }
+
+  // The client closing the request (the stop button) stops the model call
+  const abortController = new AbortController();
+  res.on("close", () => abortController.abort());
+
+  const stream = chat({
+    // The adapter is typed to the OpenAI model names it knows
+    adapter: openaiText(env.AI_MODEL as OpenAIChatModel),
+    ...params,
+    abortController,
+  });
+  const response = toServerSentEventsResponse(stream, { abortController });
+
+  res.writeHead(response.status, Object.fromEntries(response.headers));
+  if (response.body) {
+    for await (const chunk of response.body) {
+      res.write(chunk);
+    }
+  }
+  res.end();
+});
+
+export default router;

@@ -1,0 +1,54 @@
+name: Full matrix
+
+# Every combination, not the sample a pull request runs. Generated projects
+# install the latest dependencies, so an upstream release can break them with no
+# change here: the weekly run catches that. Run it by hand before a release.
+on:
+  schedule:
+    - cron: "0 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  FULL_MATRIX: "1"
+
+jobs:
+  templates:
+    name: ${{ matrix.framework }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      matrix:
+        framework: [express, nestjs, nextjs, tanstack]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run test:templates -- "$RUNNER_TEMP/matrix"
+      - run: node scripts/check-matrix.cjs "$RUNNER_TEMP/matrix/matrix.json" ${{ matrix.framework }}
+      - run: node scripts/smoke-matrix.cjs "$RUNNER_TEMP/matrix/matrix.json" ${{ matrix.framework }}
+      - run: node scripts/docker-matrix.cjs "$RUNNER_TEMP/matrix/matrix.json" ${{ matrix.framework }}
+
+  monorepos:
+    name: Monorepos
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: pnpm/action-setup@v4
+        with:
+          version: latest
+      - uses: oven-sh/setup-bun@v2
+      - run: npm ci
+      - run: npm run test:templates -- "$RUNNER_TEMP/matrix"
+      - run: node scripts/check-monorepo.cjs "$RUNNER_TEMP/matrix/matrix.json"

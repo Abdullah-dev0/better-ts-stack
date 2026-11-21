@@ -2,6 +2,12 @@
 import { parseArgs } from "node:util";
 
 import {
+  aiOptions,
+  AiSdk,
+  DataOwner,
+  ownerOptions,
+  ApiFramework,
+  apiFrameworkOptions,
   backendFrameworkOptions,
   buildError,
   Database,
@@ -17,6 +23,13 @@ const FRAMEWORKS: Framework[] = [
   ...frontendFrameworkOptions,
 ].map((option) => option.value);
 const DATABASES: Database[] = ["none", "prisma", "drizzle", "mongoose"];
+const API_FRAMEWORKS: ApiFramework[] = apiFrameworkOptions.map(
+  (option) => option.value
+);
+const OWNERS: DataOwner[] = ownerOptions.map(
+  (option) => option.value
+);
+const AI_SDKS: AiSdk[] = aiOptions.map((option) => option.value);
 const PACKAGE_MANAGERS: PackageManager[] = packageManagerOptions.map(
   (option) => option.value
 );
@@ -25,10 +38,15 @@ export const HELP_TEXT = `Usage: better-ts-stack [project-path] [options]
 
 Options left out are asked interactively, unless --yes is given.
 
-  --framework <name>      ${FRAMEWORKS.join(" | ")}
+  --framework <name>      ${FRAMEWORKS.join(" | ")} (the web app in a monorepo)
+  --monorepo              Turborepo with apps/web and apps/api
+  --api <name>            ${API_FRAMEWORKS.join(" | ")}: the api of a monorepo
+  --owner <app>           ${OWNERS.join(" | ")}: the monorepo app that owns users and data
+                          (auth, database, AI chat route)
   --database <name>       ${DATABASES.join(" | ")}
   --pm <name>             ${PACKAGE_MANAGERS.join(" | ")}
   --auth, --no-auth       Add authentication
+  --ai <name>             ${AI_SDKS.join(" | ")}: a streaming AI chat endpoint
   --docker, --no-docker   Add Docker files
   --rate-limit, --no-rate-limit
                           Add rate limiting (Express and NestJS)
@@ -47,6 +65,7 @@ Options left out are asked interactively, unless --yes is given.
 Examples:
   better-ts-stack my-api --framework nestjs --database prisma --auth --yes
   better-ts-stack . --framework nextjs --database drizzle --pm pnpm
+  better-ts-stack my-app --monorepo --framework nextjs --api express --database prisma --auth --yes
 `;
 
 export interface CliArgs {
@@ -82,9 +101,13 @@ export function parseCliArgs(argv: string[]): CliArgs {
       allowNegative: true,
       options: {
         framework: { type: "string" },
+        monorepo: { type: "boolean" },
+        api: { type: "string" },
+        owner: { type: "string" },
         database: { type: "string" },
         pm: { type: "string" },
         auth: { type: "boolean" },
+        ai: { type: "string" },
         docker: { type: "boolean" },
         "rate-limit": { type: "boolean" },
         ci: { type: "boolean" },
@@ -112,9 +135,13 @@ export function parseCliArgs(argv: string[]): CliArgs {
 
   const choices: Partial<StackChoices> = {
     framework: parseChoice("framework", values.framework, FRAMEWORKS),
+    monorepo: values.monorepo,
+    apiFramework: parseChoice("api", values.api, API_FRAMEWORKS),
+    owner: parseChoice("owner", values.owner, OWNERS),
     database: parseChoice("database", values.database, DATABASES),
     packageManager: parseChoice("pm", values.pm, PACKAGE_MANAGERS),
     useAuth: values.auth,
+    ai: parseChoice("ai", values.ai, AI_SDKS),
     useDocker: values.docker,
     useRateLimit: values["rate-limit"],
     useCi: values.ci,

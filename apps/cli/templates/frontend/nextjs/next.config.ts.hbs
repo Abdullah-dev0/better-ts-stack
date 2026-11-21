@@ -1,9 +1,27 @@
 import type { NextConfig } from "next";
 
-{{#if useDocker}}
+{{#if (or useDocker useProxy)}}
 const nextConfig: NextConfig = {
+{{#if useDocker}}
   // Standalone output is what the Docker image runs (node server.js)
   output: "standalone",
+{{/if}}
+{{#if useProxy}}
+  // Requests to /api/* that no route here answers go to the api. Rewrites are
+  // read at build time, so set API_URL before next build. Next.js passes on a
+  // client's own X-Forwarded-For, which the api uses for rate limits: deploy
+  // behind a host or proxy that overwrites it
+  async rewrites() {
+    return {
+      fallback: [
+        {
+          source: "/api/:path*",
+          destination: `${process.env.API_URL ?? "http://localhost:3001"}/api/:path*`,
+        },
+      ],
+    };
+  },
+{{/if}}
 };
 {{else}}
 const nextConfig: NextConfig = {};

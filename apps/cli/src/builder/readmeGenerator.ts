@@ -64,6 +64,15 @@ export function renderReadme(
         : "- **Auth:** Better Auth on `/api/auth` with email and password, email verification, password reset, GitHub and Google sign-in, and bearer tokens; `GET /api/me` is a protected example"
     );
   }
+  if (config.ai !== "none") {
+    const sdk = config.ai === "vercel" ? "Vercel AI SDK" : "TanStack AI";
+    const where = isFullstack
+      ? "to the `/chat` page, whose stop button also cancels the model call"
+      : "; closing the request cancels the model call";
+    lines.push(
+      `- **AI chat:** ${sdk} streams replies from \`POST /api/chat\` ${where}${config.useAuth ? ", for signed-in users only" : ""}`
+    );
+  }
   if (config.useRateLimit) {
     lines.push(
       `- **Rate limiting:** 100 requests per client IP in 15 minutes${config.useAuth ? ", and 10 sign-up or login attempts" : ""}`
@@ -145,6 +154,9 @@ export function renderReadme(
   );
   if (config.database !== "none") {
     lines.push(`- [Database guide](${DOCS_URL}/modules/database)`);
+  }
+  if (config.ai !== "none") {
+    lines.push(`- [AI chat guide](${DOCS_URL}/modules/ai)`);
   }
   if (config.useAuth) lines.push(`- [Auth guide](${DOCS_URL}/modules/auth)`);
   if (config.useDocker) {

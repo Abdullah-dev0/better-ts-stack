@@ -1,0 +1,56 @@
+import { createFileRoute } from "@tanstack/react-router";
+import {
+  consumeStream,
+  convertToModelMessages,
+  createUIMessageStreamResponse,
+  streamText,
+  toUIMessageStream,
+  type UIMessage,
+} from "ai";
+{{#if useAuth}}
+
+import { auth } from "~/lib/auth";
+{{/if}}
+
+{{#unless useAuth}}
+// Without auth anyone can call this route, and every reply is billed to your
+// key: add auth or rate limiting before deploying
+{{/unless}}
+// Streams the model's reply to useChat. The stop button aborts the request,
+// and request.signal passes that on to the model call
+export const Route = createFileRoute("/api/chat")({
+  server: {
+    handlers: {
+      POST: async ({ request }: { request: Request }) => {
+{{#if useAuth}}
+        if (!(await auth.api.getSession({ headers: request.headers }))) {
+          return Response.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
+{{/if}}
+        const { messages } = (await request.json().catch(() => ({}))) as {
+          messages?: UIMessage[];
+        };
+        if (!Array.isArray(messages)) {
+          return Response.json(
+            { error: "messages must be an array" },
+            { status: 400 }
+          );
+        }
+
+        const result = streamText({
+          // A Vercel AI Gateway model id; AI_GATEWAY_API_KEY is read from .env
+          model: process.env.AI_MODEL ?? "anthropic/claude-sonnet-5.5",
+          messages: await convertToModelMessages(messages),
+          abortSignal: request.signal,
+        });
+
+        return createUIMessageStreamResponse({
+          stream: toUIMessageStream({ stream: result.stream }),
+          // Reads the stream to the end on abort, so nothing is left hanging
+          consumeSseStream: consumeStream,
+        });
+      },
+    },
+  },
+});

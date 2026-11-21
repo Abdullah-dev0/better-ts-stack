@@ -1,5 +1,6 @@
 import fs from "fs-extra";
 import path from "node:path";
+import { cwd } from "node:process";
 
 import { generateNextSteps } from "../output/nextSteps";
 import { buildError, BuildResult, isBuildError, ProjectConfig } from "../types";
@@ -14,7 +15,14 @@ import {
 import { installDependencies } from "./dependencyInstaller";
 import { copyModuleFiles, processTemplateFiles } from "./fileProcessor";
 import { initializeGitRepository } from "./gitInitializer";
+import {
+  generateMonorepoFiles,
+  generateMonorepoNextSteps,
+  generateMonorepoReadme,
+} from "./monorepo";
+import { getMonorepoApps } from "./monorepoApps";
 import { generateReadme } from "./readmeGenerator";
+import { generateRouteTree } from "./routeTree";
 
 export { planBuild } from "./buildPlanner";
 
@@ -25,6 +33,34 @@ async function removeCreatedEntries(dir: string): Promise<void> {
       await fs.remove(path.join(dir, entry));
     }
   }
+}
+
+// Writes the files of one project: a single app, or one app of a monorepo
+async function buildProjectFiles(
+  config: ProjectConfig,
+  targetDir: string
+): Promise<void> {
+  // Load the selected modules, build the template context, and merge the
+  // module configurations
+  const { modules, templateContext, mergedConfig } =
+    await loadBuildInputs(config);
+
+  for (const module of modules) {
+    await copyModuleFiles(module.path, targetDir);
+  }
+
+  await processTemplateFiles(targetDir, templateContext);
+  if (config.framework === "tanstack") await generateRouteTree(targetDir);
+
+  await generatePackageJson(targetDir, mergedConfig, config);
+  // A monorepo has one pnpm-workspace.yaml and one stack file, at the root
+  if (config.packageManager === "pnpm" && !config.app) {
+    await generatePnpmWorkspace(targetDir, mergedConfig.overrides);
+  }
+
+  await generateEnvFile(targetDir, mergedConfig.envVars);
+  await generateReadme(targetDir, config, mergedConfig);
+  if (!config.app) await generateStackFile(targetDir, config);
 }
 
 // Main function to orchestrate the project construction process
@@ -50,29 +86,18 @@ export async function build(
       );
     });
 
-    // 3. Load the selected modules, build the template context, and merge
-    // the module configurations
-    const { modules, templateContext, mergedConfig } =
-      await loadBuildInputs(config);
-
-    // 4. Copy module files
-    for (const module of modules) {
-      await copyModuleFiles(module.path, targetDir);
+    if (config.monorepo) {
+      // Each app is built as a project of its own, then the root files
+      const apps = getMonorepoApps(config);
+      for (const app of apps) {
+        await build(app.config, path.join(targetDir, app.dir));
+      }
+      await generateMonorepoFiles(targetDir, config, apps);
+      await generateMonorepoReadme(targetDir, config);
+      await generateStackFile(targetDir, config);
+    } else {
+      await buildProjectFiles(config, targetDir);
     }
-
-    // 5. Process Handlebars templates
-    await processTemplateFiles(targetDir, templateContext);
-
-    // 6. Generate package.json
-    await generatePackageJson(targetDir, mergedConfig, config);
-    if (config.packageManager === "pnpm") {
-      await generatePnpmWorkspace(targetDir, mergedConfig.overrides);
-    }
-
-    // 7. Generate environment files, the README, and the stack file
-    await generateEnvFile(targetDir, mergedConfig.envVars);
-    await generateReadme(targetDir, config, mergedConfig);
-    await generateStackFile(targetDir, config);
 
     // 8. Install dependencies and initialize git (both optional); a failure
     // in either is reported as a warning and does not fail the build
@@ -84,7 +109,13 @@ export async function build(
 
     return {
       projectPath: targetDir,
-      nextSteps: generateNextSteps(config, targetDir, depsInstalled),
+      nextSteps: config.monorepo
+        ? generateMonorepoNextSteps(
+            config,
+            path.relative(cwd(), targetDir),
+            depsInstalled
+          )
+        : generateNextSteps(config, targetDir, depsInstalled),
     };
   } catch (error) {
     // Remove the partial project so a retry is not blocked by a non-empty

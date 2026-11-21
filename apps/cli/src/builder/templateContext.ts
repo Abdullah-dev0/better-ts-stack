@@ -44,7 +44,9 @@ const DOCKER_COMMANDS: Record<PackageManager, DockerCommands> = {
 
 // Placeholders for the CI build, the same ones the Dockerfile uses: a build
 // needs these to be set, but never connects to a database
-function getCiBuildEnv(config: ProjectConfig): TemplateContext["ciBuildEnv"] {
+export function getCiBuildEnv(
+  config: ProjectConfig
+): TemplateContext["ciBuildEnv"] {
   const env: TemplateContext["ciBuildEnv"] = [];
   if (config.database === "prisma" || config.database === "drizzle") {
     env.push({
@@ -56,7 +58,11 @@ function getCiBuildEnv(config: ProjectConfig): TemplateContext["ciBuildEnv"] {
     env.push({ name: "MONGODB_URI", value: "mongodb://localhost:27017/build" });
   }
   // next build loads the auth route, which initializes Better Auth
-  if (config.framework === "nextjs" && config.useAuth) {
+  if (
+    config.framework === "nextjs" &&
+    config.useAuth &&
+    config.app?.isOwner !== false
+  ) {
     env.push({
       name: "BETTER_AUTH_SECRET",
       value: "build-only-placeholder-secret-not-used-at-runtime",
@@ -73,13 +79,23 @@ export function buildTemplateContext(config: ProjectConfig): TemplateContext {
     framework: config.framework,
     port: DEFAULT_PORT,
     useDocker: config.useDocker,
-    useAuth: config.useAuth,
+    // A monorepo api asks the web app for sessions instead of running Better
+    // Auth; the web app keeps its auth pages either way
+    useAuth:
+      config.useAuth && !(config.app?.role === "api" && !config.app.isOwner),
+    ai: config.ai,
+    useAi: config.ai !== "none",
     useRateLimit: config.useRateLimit,
     useCi: config.useCi,
+    useProxy: config.app?.role === "web" && config.apiFramework !== "none",
+    useRemoteAuth: config.useAuth && config.app?.isOwner === false,
+    isMonorepoApi: config.app?.role === "api",
     docker: DOCKER_COMMANDS[config.packageManager],
     ciBuildEnv: getCiBuildEnv(config),
     helpers: {
       eq: (a: string, b: string) => a === b,
+      // Handlebars passes its options object last
+      or: (...args: unknown[]) => args.slice(0, -1).some(Boolean),
       runner: () => {
         if (config.packageManager === "bun") return "bun";
         return "node";

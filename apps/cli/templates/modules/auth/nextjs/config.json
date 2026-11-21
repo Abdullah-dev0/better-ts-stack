@@ -1,13 +1,10 @@
 {
   "id": "auth",
   "name": "Better Auth",
-  "description": "Better Auth with email verification, password reset, and GitHub and Google sign-in for Next.js with optional Prisma or Drizzle adapter",
+  "description": "Better Auth server for Next.js: email verification, password reset, and GitHub and Google sign-in, with the database adapter",
   "type": "feature",
   "dependencies": {
-    "@hookform/resolvers": "^5.9.2",
-    "better-auth": "^1.7.14",
-    "react-hook-form": "^7.91.0",
-    "zod": "^4.6.7"
+    "better-auth": "^1.7.14"
   },
   "devDependencies": {},
   "scripts": {},

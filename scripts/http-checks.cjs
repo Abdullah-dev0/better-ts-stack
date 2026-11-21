@@ -226,4 +226,38 @@ async function fullstackChecks(useAuth) {
   return checks;
 }
 
-module.exports = { PORT, backendChecks, fullstackChecks, waitForServer };
+// The tests have no model API key, so the chat route is checked up to the
+// model call: a request without a session or without messages is refused
+async function aiChecks({ ai, useAuth, applicationType }) {
+  if (!ai || ai === "none") return [];
+  const checks = [];
+  if (applicationType === "fullstack") {
+    const page = await request("/chat", { redirect: "manual" });
+    checks.push(
+      useAuth
+        ? [
+            "GET /chat signed out redirects",
+            true,
+            [302, 307].includes(page.status),
+          ]
+        : ["GET /chat", 200, page.status],
+    );
+  }
+  checks.push([
+    useAuth
+      ? "POST /api/chat without a session"
+      : "POST /api/chat without messages",
+    useAuth ? 401 : 400,
+    (await postJson("/api/chat", "{}")).status,
+  ]);
+  return checks;
+}
+
+module.exports = {
+  PORT,
+  request,
+  aiChecks,
+  backendChecks,
+  fullstackChecks,
+  waitForServer,
+};

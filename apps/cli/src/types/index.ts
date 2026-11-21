@@ -24,6 +24,25 @@ export type FrontendFramework = "nextjs" | "tanstack";
 
 export type Framework = BackendFramework | FrontendFramework;
 
+// SDK behind the AI chat endpoint (and page, on Next.js and TanStack Start)
+export type AiSdk = "none" | "vercel" | "tanstack";
+
+// The monorepo app that owns users and data: it runs Better Auth, holds the
+// database, and serves the AI chat route; the other app reaches it over HTTP
+export type DataOwner = "web" | "api";
+
+// The api of a monorepo; "none" leaves the web app on its own
+export type ApiFramework = BackendFramework | "none";
+
+// What the monorepo builder sets on the config of each of its two apps
+export interface MonorepoApp {
+  role: "web" | "api";
+  // Runs auth, the database, and the AI chat route
+  isOwner: boolean;
+  // .env values that differ from the modules' defaults (ports, URLs)
+  envOverrides: Record<string, string>;
+}
+
 // Main configuration object for the build pipeline
 export interface ProjectConfig {
   // Project basics
@@ -34,6 +53,7 @@ export interface ProjectConfig {
   database: Database;
   useDocker: boolean;
   useAuth: boolean;
+  ai: AiSdk;
   // Express and NestJS only; Better Auth limits its own endpoints
   useRateLimit: boolean;
   useCi: boolean;
@@ -41,6 +61,13 @@ export interface ProjectConfig {
   useAgents: boolean;
   // .vscode/settings.json and extensions.json
   useVscode: boolean;
+
+  // Turborepo with apps/web (framework) and apps/api (apiFramework)
+  monorepo: boolean;
+  apiFramework: ApiFramework;
+  owner: DataOwner;
+  // Set on the two app configs a monorepo build creates, never by the user
+  app?: MonorepoApp;
 
   // Tooling
   packageManager: PackageManager;
@@ -53,7 +80,7 @@ export interface ProjectConfig {
 // Stack options that can come from CLI flags or prompts
 export type StackChoices = Omit<
   ProjectConfig,
-  "projectName" | "applicationType"
+  "projectName" | "applicationType" | "app"
 >;
 
 // Used for every choice not given as a flag when --yes is passed
@@ -62,10 +89,14 @@ export const DEFAULT_CHOICES: StackChoices = {
   database: "none",
   useDocker: false,
   useAuth: false,
+  ai: "none",
   useRateLimit: false,
   useCi: false,
   useAgents: true,
   useVscode: false,
+  monorepo: false,
+  apiFramework: "express",
+  owner: "web",
   packageManager: "npm",
   initGit: true,
   installDeps: false,
@@ -166,13 +197,23 @@ export interface TemplateContext {
   port: number;
   useDocker: boolean;
   useAuth: boolean;
+  ai: string;
+  useAi: boolean;
   useRateLimit: boolean;
   useCi: boolean;
+  // Monorepo web app: unknown /api/* requests go to the api
+  useProxy: boolean;
+  // Monorepo app that checks sessions with the app running Better Auth
+  useRemoteAuth: boolean;
+  // The api of a monorepo, which only the web app's proxy calls
+  isMonorepoApi: boolean;
   docker: DockerCommands;
   // Variables the CI build step sets
   ciBuildEnv: { name: string; value: string }[];
   helpers: {
     eq: (a: string, b: string) => boolean;
+    // {{#if (or a b)}}
+    or: (...args: unknown[]) => boolean;
     runner: () => string;
   };
 }
@@ -221,6 +262,30 @@ export const mongodbOrmOptions = [
 export const postgresqlOrmOptions = [
   { value: "prisma" as const, label: "Prisma", hint: "type-safe ORM" },
   { value: "drizzle" as const, label: "Drizzle", hint: "lightweight ORM" },
+];
+
+export const aiOptions = [
+  { value: "none" as const, label: "None" },
+  { value: "vercel" as const, label: "Vercel AI SDK" },
+  { value: "tanstack" as const, label: "TanStack AI" },
+];
+
+export const ownerOptions = [
+  {
+    value: "web" as const,
+    label: "The web app",
+    hint: "easiest: pages read the session and the database in-process",
+  },
+  {
+    value: "api" as const,
+    label: "The api",
+    hint: "one server for users, data, and business logic; the web app reaches it through a proxy",
+  },
+];
+
+export const apiFrameworkOptions = [
+  ...backendFrameworkOptions,
+  { value: "none" as const, label: "None", hint: "the web app runs everything" },
 ];
 
 export const packageManagerOptions = [

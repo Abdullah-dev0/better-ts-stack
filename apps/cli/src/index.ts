@@ -60,6 +60,15 @@ async function main(): Promise<void> {
       ? {
           ...DEFAULT_CHOICES,
           packageManager: detectPackageManager(),
+          // A monorepo's --framework is its web app, which owns users and
+          // data unless it would run auth without a database
+          ...(args.choices.monorepo
+            ? { framework: "nextjs" as const }
+            : { apiFramework: undefined }),
+          owner:
+            args.choices.useAuth && (args.choices.database ?? "none") === "none"
+              ? "api"
+              : "web",
           ...args.choices,
         }
       : args.choices

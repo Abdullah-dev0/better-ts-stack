@@ -8,8 +8,10 @@ const {
   PORT,
   backendChecks,
   fullstackChecks,
+  aiChecks,
   waitForServer,
 } = require("./http-checks.cjs");
+const { inScope } = require("./samples.cjs");
 const matrix = JSON.parse(fs.readFileSync(process.argv[2]));
 const framework = process.argv[3];
 if (!["express", "nestjs", "nextjs", "tanstack"].includes(framework))
@@ -40,10 +42,12 @@ async function main() {
   for (const c of matrix.cases.filter(
     (c) =>
       c.config.framework === framework &&
+      // check-monorepo.cjs runs the monorepos
+      !c.config.monorepo &&
       c.config.packageManager === "npm" &&
       !c.config.useDocker &&
       c.config.database === "none" &&
-      (!filter || c.name === filter),
+      inScope(c, filter),
   )) {
     const log = path.join(matrix.root, c.name + ".smoke.log");
     const stop = startServer(c.target, log);
@@ -54,6 +58,7 @@ async function main() {
         framework === "express" || framework === "nestjs"
           ? await backendChecks(c.config.useAuth, c.config.useRateLimit)
           : await fullstackChecks(c.config.useAuth);
+      checks.push(...(await aiChecks(c.config)));
     } catch (error) {
       checks = [["server", "running", error.message]];
     } finally {

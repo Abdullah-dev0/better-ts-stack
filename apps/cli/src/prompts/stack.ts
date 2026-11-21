@@ -1,16 +1,21 @@
 import { isCancel } from "@clack/core";
 
 import {
+  aiOptions,
+  ApiFramework,
+  apiFrameworkOptions,
   ApplicationType,
   applicationTypeOptions,
   backendFrameworkOptions,
   buildError,
   Database,
   databaseSystemOptions,
+  DataOwner,
   Framework,
   frontendFrameworkOptions,
   getApplicationType,
   mongodbOrmOptions,
+  ownerOptions,
   PackageManager,
   packageManagerOptions,
   postgresqlOrmOptions,
@@ -90,11 +95,91 @@ async function askDatabase(): Promise<Database | symbol> {
   });
 }
 
+// The monorepo app that owns users and data. It is asked only when there is
+// a server and something to own; every other case is settled here and said
+async function askOwner(
+  preset: DataOwner | undefined,
+  {
+    hasServer,
+    hasData,
+    mustBeApi,
+  }: { hasServer: boolean; hasData: boolean; mustBeApi: boolean }
+): Promise<DataOwner> {
+  if (!hasServer) {
+    if (preset === "api") {
+      throw buildError(
+        "--owner api needs an api. Add --api express or --api nestjs",
+        "INVALID_ARGUMENT"
+      );
+    }
+    return "web";
+  }
+  if (mustBeApi) {
+    if (preset === "web") {
+      throw buildError(
+        "Auth in the web app needs a database. Add --database, or use --owner api",
+        "INVALID_ARGUMENT"
+      );
+    }
+    info(
+      "Users and data live in the api: Better Auth in the web app needs a database"
+    );
+    return "api";
+  }
+  if (!hasData) return preset ?? "web";
+  return ask(preset, () =>
+    select<DataOwner>({
+      message: "Which app owns users and data (auth, database, AI)?",
+      options: ownerOptions,
+      initialValue: "web",
+    })
+  );
+}
+
 // Collects the stack choices, prompting only for those missing from the preset
 export async function collectStackChoices(
   preset: Partial<StackChoices>
 ): Promise<StackChoices> {
-  const framework = await ask(preset.framework, askFramework);
+  const monorepo = await ask(preset.monorepo, () =>
+    confirm({
+      message: "Create a monorepo (Turborepo with apps/web and apps/api)?",
+      initialValue: false,
+    })
+  );
+
+  const framework = monorepo
+    ? await ask(preset.framework, () =>
+        select<Framework>({
+          message: "Web app (apps/web)",
+          options: frontendFrameworkOptions,
+          initialValue: "nextjs",
+        })
+      )
+    : await ask(preset.framework, askFramework);
+  const isFullstack = getApplicationType(framework) === "fullstack";
+  if (monorepo && !isFullstack) {
+    throw buildError(
+      `--framework is the web app of a monorepo: use nextjs or tanstack, and --api ${framework}`,
+      "INVALID_ARGUMENT"
+    );
+  }
+  if (!monorepo && preset.apiFramework) {
+    throw buildError(
+      "--api names the api of a monorepo. Add --monorepo",
+      "INVALID_ARGUMENT"
+    );
+  }
+  const apiFramework = monorepo
+    ? await ask(preset.apiFramework, () =>
+        select<ApiFramework>({
+          message: "API server (apps/api)",
+          options: apiFrameworkOptions,
+          initialValue: "express",
+        })
+      )
+    : "none";
+  const hasServer = monorepo && apiFramework !== "none";
+
   const database = await ask(preset.database, askDatabase);
   const packageManager = await ask(preset.packageManager, () =>
     select({
@@ -103,13 +188,24 @@ export async function collectStackChoices(
       initialValue: detectPackageManager(),
     })
   );
-  const useDocker = await ask(preset.useDocker, () =>
-    confirm({ message: "Add Docker?", initialValue: false })
-  );
 
-  // Better Auth stores users and sessions, so full-stack auth needs a database
-  const isFullstack = getApplicationType(framework) === "fullstack";
-  const isAuthAvailable = !isFullstack || database !== "none";
+  // shortcut: each app's Dockerfile installs from its own lockfile, which a
+  // workspace does not have; needs turbo prune and a root Compose file
+  if (monorepo && preset.useDocker) {
+    throw buildError(
+      "Docker is not available for monorepos yet. Leave out --docker",
+      "INVALID_ARGUMENT"
+    );
+  }
+  const useDocker = monorepo
+    ? false
+    : await ask(preset.useDocker, () =>
+        confirm({ message: "Add Docker?", initialValue: false })
+      );
+
+  // Better Auth stores users and sessions, so full-stack auth needs a
+  // database; an api server can run it without one (in memory)
+  const isAuthAvailable = !isFullstack || database !== "none" || hasServer;
   if (preset.useAuth && !isAuthAvailable) {
     throw buildError(
       `Auth for ${framework} needs a database. Add --database prisma, drizzle, or mongoose`,
@@ -125,18 +221,35 @@ export async function collectStackChoices(
       )
     : false;
 
-  // Better Auth limits its own endpoints, so only the backends offer this
-  if (preset.useRateLimit && isFullstack) {
+  const ai = await ask(preset.ai, () =>
+    select({
+      message: "AI chat",
+      options: aiOptions,
+      initialValue: "none",
+    })
+  );
+
+  const owner = await askOwner(preset.owner, {
+    hasServer,
+    hasData: database !== "none" || ai !== "none",
+    // Better Auth in the web app stores its users in the database
+    mustBeApi: useAuth && database === "none",
+  });
+
+  // Better Auth limits its own endpoints, so only the backends offer this; a
+  // monorepo's api limits its own routes
+  const hasApi = !isFullstack || hasServer;
+  if (preset.useRateLimit && !hasApi) {
     throw buildError(
       `Rate limiting is available for Express and NestJS. Better Auth in ${framework} already limits its own endpoints`,
       "INVALID_ARGUMENT"
     );
   }
-  const useRateLimit = isFullstack
-    ? false
-    : await ask(preset.useRateLimit, () =>
+  const useRateLimit = hasApi
+    ? await ask(preset.useRateLimit, () =>
         confirm({ message: "Add rate limiting?", initialValue: false })
-      );
+      )
+    : false;
 
   const useCi = await ask(preset.useCi, () =>
     confirm({ message: "Add GitHub Actions CI?", initialValue: false })
@@ -158,10 +271,14 @@ export async function collectStackChoices(
 
   return {
     framework,
+    monorepo,
+    apiFramework,
+    owner,
     database,
     packageManager,
     useDocker,
     useAuth,
+    ai,
     useRateLimit,
     useCi,
     useAgents,

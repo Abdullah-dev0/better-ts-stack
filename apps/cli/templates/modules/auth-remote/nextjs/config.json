@@ -1,0 +1,12 @@
+{
+  "id": "auth-remote",
+  "name": "Sessions from the api",
+  "description": "Reads the session from the monorepo's api, which runs Better Auth",
+  "type": "feature",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {},
+  "envVars": {
+    "AUTH_PROVIDERS": ""
+  }
+}

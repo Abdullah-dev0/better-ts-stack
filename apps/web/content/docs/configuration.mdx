@@ -37,6 +37,14 @@ GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
 RESEND_API_KEY=
 EMAIL_FROM=onboarding@resend.dev
+
+# + AI chat with the Vercel AI SDK (--ai vercel)
+AI_GATEWAY_API_KEY=
+AI_MODEL=anthropic/claude-sonnet-5.5
+
+# + AI chat with TanStack AI (--ai tanstack)
+OPENAI_API_KEY=
+AI_MODEL=gpt-6.1-sol
 ```
 
 ### Full-stack / Next.js (.env)
@@ -55,7 +63,24 @@ GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
 RESEND_API_KEY=
 EMAIL_FROM=onboarding@resend.dev
+
+# + AI chat: the same AI_GATEWAY_API_KEY or OPENAI_API_KEY and AI_MODEL as above
 ```
+
+### Monorepo (.env in each app)
+
+```bash
+# apps/web: where the /api/* requests it does not answer are forwarded
+API_URL=http://localhost:3001
+# apps/web, when the api owns users and data: the social sign-in buttons to show
+AUTH_PROVIDERS=            # for example github,google
+
+# apps/api: PORT=3001 and CORS_ORIGIN=http://localhost:3000 (the web app).
+# When the web app owns users and data, the api checks sessions there:
+AUTH_URL=http://localhost:3000
+```
+
+See [Monorepo](/docs/modules/monorepo) for which app gets the database, Better Auth, and AI chat variables.
 
 <Callout type="info">
   `.env.example` keeps the placeholder values shown here. In `.env`, the CLI

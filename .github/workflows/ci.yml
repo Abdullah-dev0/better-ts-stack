@@ -1,10 +1,28 @@
 name: CI
 
+# Runs only when the CLI or what it is tested and built with changes. Docs and
+# website changes skip it; Netlify builds their preview
 on:
   pull_request:
+    paths:
+      - "apps/cli/**"
+      - "scripts/**"
+      - "packages/**"
+      - "package.json"
+      - "package-lock.json"
+      - "turbo.json"
+      - ".github/workflows/ci.yml"
   # Releases are pushed straight to main
   push:
     branches: [main]
+    paths:
+      - "apps/cli/**"
+      - "scripts/**"
+      - "packages/**"
+      - "package.json"
+      - "package-lock.json"
+      - "turbo.json"
+      - ".github/workflows/ci.yml"
 
 concurrency:
   group: ci-${{ github.ref }}

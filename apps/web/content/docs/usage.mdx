@@ -117,6 +117,18 @@ You can enter a name (`my-api`), a nested path (`apps/api`), or `.` to use the c
 </Step>
 
 <Step>
+### Monorepo
+
+```
+$ Create a monorepo (Turborepo with apps/web and apps/api)?
+    Yes   › No
+```
+
+**No** gives you one project, and the next prompt asks for the application type. **Yes** creates a Turborepo: the next prompts ask for the web app (`apps/web`, Next.js or TanStack Start) and the api (`apps/api`, Express, NestJS, or none). See [Monorepo](/docs/modules/monorepo).
+
+</Step>
+
+<Step>
 ### Application type
 
 ```
@@ -132,7 +144,8 @@ $ Application type
 
 <Callout type="info">
   **Full-stack** generates a single project at the root of your chosen
-  directory, not a separate `backend/` + `frontend/` monorepo.
+  directory. For a separate web app and api, answer **Yes** to the monorepo
+  prompt instead.
 </Callout>
 </Step>
 
@@ -167,6 +180,22 @@ $ Frontend framework
 | ------------------ | ------------------------------------------------------- |
 | **Next.js 16**     | App Router, `next dev`/`next build`, standalone server  |
 | **TanStack Start** | File-based routing, `vite dev`, Nitro production server |
+
+In a monorepo this prompt reads **Web app (apps/web)**.
+
+</Step>
+
+<Step>
+### API server *(monorepo only)*
+
+```
+$ API server (apps/api)
+  › Express
+    NestJS
+    None  the web app runs everything
+```
+
+The api runs on port `3001`, next to the web app on `3000`. The web app forwards the `/api/*` requests it does not answer to the api, so browsers only talk to the web app. **None** leaves the web app on its own.
 
 </Step>
 
@@ -243,7 +272,7 @@ $ Add Docker?
     Yes   › No
 ```
 
-If yes, three files are added: `Dockerfile`, `docker-compose.yml`, and `.dockerignore`. With a database, Compose also runs PostgreSQL or MongoDB. See [Docker](/docs/modules/docker).
+If yes, three files are added: `Dockerfile`, `docker-compose.yml`, and `.dockerignore`. With a database, Compose also runs PostgreSQL or MongoDB. See [Docker](/docs/modules/docker). Not asked for a monorepo yet.
 
 </Step>
 
@@ -261,10 +290,39 @@ Every framework gets Better Auth with email and password, email verification, pa
 
 **Next.js / TanStack full-stack** - **this prompt only appears if you selected a database.** If you chose `none` for database, auth is skipped automatically.
 
+**Monorepo** - always asked when there is an api: it can run Better Auth without a database.
+
 </Step>
 
 <Step>
-### Rate limiting *(Express and NestJS only)*
+### AI chat
+
+```
+$ AI chat
+  › None
+    Vercel AI SDK
+    TanStack AI
+```
+
+Adds `POST /api/chat`, which streams the model's reply. Next.js and TanStack Start also get a `/chat` page with a thinking indicator and a Stop button that ends the model call. See [AI chat](/docs/modules/ai).
+
+</Step>
+
+<Step>
+### Which app owns users and data *(monorepo with an api only)*
+
+```
+$ Which app owns users and data (auth, database, AI)?
+  › The web app  easiest: pages read the session and the database in-process
+    The api
+```
+
+That app runs Better Auth, holds the database, and serves the AI chat route; the other app asks it for sessions. Only asked when there is a database or AI chat. Auth without a database always goes to the api, and the CLI prints a line saying so. See [which app owns users and data](/docs/modules/monorepo#which-app-owns-users-and-data).
+
+</Step>
+
+<Step>
+### Rate limiting *(Express and NestJS, including a monorepo's api)*
 
 ```
 $ Add rate limiting?

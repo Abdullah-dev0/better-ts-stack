@@ -14,6 +14,10 @@ import { Callout } from "fumadocs-ui/components/callout";
 | **Express, NestJS**         | `POST /api/chat`                                       |
 | **Next.js, TanStack Start** | `POST /api/chat` and a `/chat` page with a Stop button |
 
+The `/chat` page shows three bouncing dots, the way ChatGPT does, from the moment you send until the first words of the reply arrive. Screen readers hear "Thinking", and the dots stay still when reduced motion is on.
+
+In a [monorepo](/docs/modules/monorepo), the route runs in the app that owns users and data, and `apps/web` always has the page.
+
 With auth, only signed-in users can use the chat: `POST /api/chat` answers `401` without a session, and `/chat` sends visitors to the sign-in page.
 
 <Callout type="warn">

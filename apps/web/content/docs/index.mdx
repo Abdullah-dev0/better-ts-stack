@@ -8,9 +8,11 @@ import { Card, Cards } from "fumadocs-ui/components/card";
 import { Step, Steps } from "fumadocs-ui/components/steps";
 import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 import {
+  Boxes,
   Container,
   Database,
   Layout,
+  MessageSquare,
   Shield,
   Terminal,
   Zap,
@@ -18,7 +20,7 @@ import {
 
 ## What is better-ts-stack?
 
-better-ts-stack is an interactive CLI that generates TypeScript projects. You choose the framework, database, authentication, and Docker setup from a few prompts, and the CLI writes a project that is ready to install and run.
+better-ts-stack is an interactive CLI that generates TypeScript projects. You choose the framework, database, authentication, AI chat, and Docker setup from a few prompts, and the CLI writes a project that is ready to install and run: one app, or a Turborepo with a web app and an api.
 
 <Callout type="info" title="Good for">
 
@@ -67,23 +69,27 @@ better-ts-stack is an interactive CLI that generates TypeScript projects. You ch
 The CLI asks, in order (every prompt can also be answered with a [flag](/docs/usage#flags)):
 
 1. **Project name** - becomes your folder name and `package.json` name
-2. **Application type** - `Backend API` or `Full-stack`
+2. **Monorepo** - one project, or a Turborepo with a web app and an api?
+   - **Yes**: select the web app (Next.js or TanStack Start) and the api (Express, NestJS, or none) instead of the application type
+3. **Application type** - `Backend API` or `Full-stack`
    - **Backend**: select a framework (Express or NestJS)
    - **Full-stack**: select a frontend framework (Next.js 16 or TanStack Start)
-3. **Database type** - `none`, `PostgreSQL`, or `MongoDB`
-4. **ORM/ODM** (only shown when a database is selected)
+4. **Database type** - `none`, `PostgreSQL`, or `MongoDB`
+5. **ORM/ODM** (only shown when a database is selected)
    - PostgreSQL -> `Prisma` or `Drizzle`
    - MongoDB -> `Mongoose`
-5. **Package manager** - `npm`, `pnpm`, or `bun`
-6. **Docker** - include Docker configuration?
-7. **Authentication** - add auth?
+6. **Package manager** - `npm`, `pnpm`, or `bun`
+7. **Docker** - include Docker configuration? (not for a monorepo yet)
+8. **Authentication** - add auth?
    - Better Auth for every framework: email and password, email verification, password reset, and GitHub and Google sign-in
    - Next.js / TanStack: only prompted if a database was selected
-8. **Rate limiting** - Express / NestJS only: limit requests per IP?
-9. **CI** - add a GitHub Actions workflow?
-10. **VS Code** - add workspace settings and recommended extensions?
-11. **Git** - initialize a repository?
-12. **Install dependencies** - run the install command now?
+9. **AI chat** - none, Vercel AI SDK, or TanStack AI: a streaming chat route, plus a chat page on Next.js and TanStack Start
+10. **Which app owns users and data** - monorepo with an api only: the web app (easiest) or the api runs auth, the database, and AI chat
+11. **Rate limiting** - Express / NestJS only: limit requests per IP?
+12. **CI** - add a GitHub Actions workflow?
+13. **VS Code** - add workspace settings and recommended extensions?
+14. **Git** - initialize a repository?
+15. **Install dependencies** - run the install command now?
 
 <Callout type="info">
   The CLI does not ask for a port number. The server port defaults to `3000`
@@ -125,6 +131,14 @@ npm run dev
     Better Auth for every framework, with email verification, password reset,
     and GitHub and Google sign-in
   </Card>
+  <Card title="AI Chat" icon={<MessageSquare className="text-pink-400" />}>
+    A streaming chat route on the Vercel AI SDK or TanStack AI, and a chat page
+    with a thinking indicator and a Stop button
+  </Card>
+  <Card title="Monorepo" icon={<Boxes className="text-orange-400" />}>
+    A Turborepo with a Next.js or TanStack Start web app and an optional Express
+    or NestJS api
+  </Card>
   <Card title="Docker Ready" icon={<Container className="text-blue-400" />}>
     Multi-stage Dockerfile and docker-compose.yml generated on request
   </Card>
@@ -152,7 +166,8 @@ npm run dev
     Every prompt and command-line flag
   </Card>
   <Card title="Modules" href="/docs/modules">
-    Backend, frontend, database, auth, and Docker options in detail
+    Backend, frontend, database, auth, AI chat, monorepo, and Docker options in
+    detail
   </Card>
   <Card title="Project Structure" href="/docs/structure">
     Understand the generated file layout

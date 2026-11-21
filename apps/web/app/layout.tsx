@@ -51,10 +51,10 @@ export const metadata: Metadata = {
     description,
     images: [
       {
-        url: "/social-card.png",
+        url: "/social-card-home.png",
         width: 1200,
         height: 630,
-        alt: "better-ts-stack homepage showing its one-command TypeScript stack builder",
+        alt: "better-ts-stack homepage: the pixel-art better-ts-stack logo and the tagline TypeScript projects, ready to run",
       },
     ],
   },
@@ -64,8 +64,8 @@ export const metadata: Metadata = {
     description,
     images: [
       {
-        url: "/social-card.png",
-        alt: "better-ts-stack homepage showing its one-command TypeScript stack builder",
+        url: "/social-card-home.png",
+        alt: "better-ts-stack homepage: the pixel-art better-ts-stack logo and the tagline TypeScript projects, ready to run",
       },
     ],
   },

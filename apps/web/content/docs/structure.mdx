@@ -425,69 +425,99 @@ A TanStack Start project is a **single Vite-based application** at the project r
 
 ---
 
+## Monorepo
+
+`--monorepo` puts each app in its own folder. Each one has the same layout as the single projects above, with its own `package.json`, `tsconfig.json`, `.env`, and ESLint config. The root only holds the workspace files.
+
+<Files>
+  <Folder name="my-app" defaultOpen>
+    <Folder name="apps" defaultOpen>
+      <Folder name="web">
+        <File name="next.config.ts" />
+        <File name="package.json" />
+      </Folder>
+      <Folder name="api">
+        <File name="src/index.ts" />
+        <File name="package.json" />
+      </Folder>
+    </Folder>
+    <File name="package.json" />
+    <File name="turbo.json" />
+    <File name="README.md" />
+    <File name="better-ts-stack.json" />
+  </Folder>
+</Files>
+
+The root `package.json` lists the workspaces (pnpm uses `pnpm-workspace.yaml` instead) and runs `dev`, `build`, `start`, `lint`, and `type:check` in every app through Turborepo. `apps/api` is left out with `--api none`. See [Monorepo](/docs/modules/monorepo).
+
 ## Key File Descriptions
 
 ### Backend
 
-| File                            | Purpose                                                            |
-| ------------------------------- | ------------------------------------------------------------------ |
-| `src/index.ts`                  | Entry point - configures Express, mounts routes, starts the server |
-| `src/env.ts`                    | Validates environment variables with Zod at startup                |
-| `src/middleware/rateLimit.ts`   | Request limits, with `--rate-limit`                                |
-| `src/routes/health.ts`          | `GET /health` endpoint                                             |
-| `src/lib/prisma.ts`             | Prisma client singleton                                            |
-| `src/lib/db.ts`                 | Mongoose connection helper                                         |
-| `src/lib/auth.ts`               | Better Auth server, mounted on `/api/auth`                         |
-| `src/lib/email.ts`              | Sends verification and password reset emails                       |
-| `src/middleware/requireAuth.ts` | Requires a session (cookie or bearer token)                        |
-| `src/routes/me.ts`              | `GET /api/me`, an example of a protected route                     |
-| `prisma/schema.prisma`          | Prisma schema - edit to add your models                            |
+| File                            | Purpose                                                                                           |
+| ------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `src/index.ts`                  | Entry point - configures Express, mounts routes, starts the server                                |
+| `src/env.ts`                    | Validates environment variables with Zod at startup                                               |
+| `src/middleware/rateLimit.ts`   | Request limits, with `--rate-limit`                                                               |
+| `src/routes/health.ts`          | `GET /health` endpoint                                                                            |
+| `src/lib/prisma.ts`             | Prisma client singleton                                                                           |
+| `src/lib/db.ts`                 | Mongoose connection helper                                                                        |
+| `src/lib/auth.ts`               | Better Auth server, mounted on `/api/auth`                                                        |
+| `src/lib/email.ts`              | Sends verification and password reset emails                                                      |
+| `src/middleware/requireAuth.ts` | Requires a session (cookie or bearer token)                                                       |
+| `src/routes/me.ts`              | `GET /api/me`, an example of a protected route                                                    |
+| `src/routes/chat.ts`            | `POST /api/chat`, the streaming AI chat route, with `--ai`. NestJS: `src/chat/chat.controller.ts` |
+| `prisma/schema.prisma`          | Prisma schema - edit to add your models                                                           |
 
 ### Full-stack (Next.js)
 
-| File                 | Purpose                                       |
-| -------------------- | --------------------------------------------- |
-| `app/layout.tsx`     | Root layout with font and metadata            |
-| `app/page.tsx`       | Home page                                     |
-| `app/globals.css`    | Tailwind CSS v4 + the shadcn/ui theme         |
-| `proxy.ts`           | Better Auth redirect for signed-out visitors  |
-| `next.config.ts`     | Next.js configuration                         |
-| `postcss.config.mjs` | PostCSS setup for Tailwind                    |
-| `components.json`    | shadcn CLI config (`base-vega`, Base UI)      |
-| `lib/utils.ts`       | `cn()` class name helper (`cn` package)       |
-| `lib/auth.ts`        | Better Auth server configuration              |
-| `lib/auth-client.ts` | `createAuthClient()` for client components    |
-| `lib/auth-schema.ts` | Shared auth form validation and error parsing |
-| `lib/prisma.ts`      | Prisma client with `@prisma/adapter-pg`       |
-| `lib/db.ts`          | Drizzle database connection                   |
-| `lib/schema.ts`      | Drizzle table definitions                     |
-| `prisma.config.ts`   | Prisma datasource URL configuration           |
-| `drizzle.config.ts`  | Drizzle Kit configuration                     |
+| File                                       | Purpose                                                         |
+| ------------------------------------------ | --------------------------------------------------------------- |
+| `app/layout.tsx`                           | Root layout with font and metadata                              |
+| `app/page.tsx`                             | Home page                                                       |
+| `app/globals.css`                          | Tailwind CSS v4 + the shadcn/ui theme                           |
+| `proxy.ts`                                 | Better Auth redirect for signed-out visitors                    |
+| `next.config.ts`                           | Next.js configuration                                           |
+| `postcss.config.mjs`                       | PostCSS setup for Tailwind                                      |
+| `components.json`                          | shadcn CLI config (`base-vega`, Base UI)                        |
+| `lib/utils.ts`                             | `cn()` class name helper (`cn` package)                         |
+| `lib/auth.ts`                              | Better Auth server configuration                                |
+| `lib/auth-client.ts`                       | `createAuthClient()` for client components                      |
+| `lib/auth-schema.ts`                       | Shared auth form validation and error parsing                   |
+| `lib/prisma.ts`                            | Prisma client with `@prisma/adapter-pg`                         |
+| `lib/db.ts`                                | Drizzle database connection                                     |
+| `lib/schema.ts`                            | Drizzle table definitions                                       |
+| `prisma.config.ts`                         | Prisma datasource URL configuration                             |
+| `drizzle.config.ts`                        | Drizzle Kit configuration                                       |
+| `app/api/chat/route.ts`                    | `POST /api/chat`, the streaming AI chat route, with `--ai`      |
+| `app/chat/page.tsx`, `components/chat.tsx` | The chat page: streamed replies, a thinking indicator, and Stop |
 
 ### Full-stack (TanStack Start)
 
-| File                        | Purpose                                                |
-| --------------------------- | ------------------------------------------------------ |
-| `src/routes/__root.tsx`     | Root route with layout, CSS, and devtools              |
-| `src/routes/index.tsx`      | Home page                                              |
-| `src/routeTree.gen.ts`      | Generated route tree (regenerated by Vite dev/build)   |
-| `src/routes/api/auth/$.ts`  | Better Auth route handler (`auth.handler(request)`)    |
-| `src/routes/sign-in.tsx`    | Login route with `beforeLoad` session guard            |
-| `src/routes/sign-up.tsx`    | Signup route with `beforeLoad` session guard           |
-| `src/routes/dashboard.tsx`  | Protected route example                                |
-| `src/router.tsx`            | `createRouter()` + QueryClient + SSR query integration |
-| `src/lib/auth.ts`           | Better Auth server configuration                       |
-| `src/lib/auth-client.ts`    | `createAuthClient()` for client components             |
-| `src/lib/auth-functions.ts` | `getSession()` server function                         |
-| `src/lib/auth-schema.ts`    | Shared auth form validation and error parsing          |
-| `src/lib/prisma.ts`         | Prisma client with `@prisma/adapter-pg`                |
-| `src/lib/db.ts`             | Drizzle database connection                            |
-| `src/lib/schema.ts`         | Drizzle table definitions                              |
-| `src/components/ui/*`       | shadcn/ui components built on Base UI (`~/*` imports)  |
-| `vite.config.ts`            | `tanstackStart()` + tailwind + react plugins           |
-| `components.json`           | shadcn CLI config (`base-vega`, `~/*` aliases)         |
-| `prisma.config.ts`          | Prisma datasource URL configuration                    |
-| `drizzle.config.ts`         | Drizzle Kit configuration                              |
+| File                                             | Purpose                                                         |
+| ------------------------------------------------ | --------------------------------------------------------------- |
+| `src/routes/__root.tsx`                          | Root route with layout, CSS, and devtools                       |
+| `src/routes/index.tsx`                           | Home page                                                       |
+| `src/routeTree.gen.ts`                           | Generated route tree (regenerated by Vite dev/build)            |
+| `src/routes/api/auth/$.ts`                       | Better Auth route handler (`auth.handler(request)`)             |
+| `src/routes/sign-in.tsx`                         | Login route with `beforeLoad` session guard                     |
+| `src/routes/sign-up.tsx`                         | Signup route with `beforeLoad` session guard                    |
+| `src/routes/dashboard.tsx`                       | Protected route example                                         |
+| `src/router.tsx`                                 | `createRouter()` + QueryClient + SSR query integration          |
+| `src/lib/auth.ts`                                | Better Auth server configuration                                |
+| `src/lib/auth-client.ts`                         | `createAuthClient()` for client components                      |
+| `src/lib/auth-functions.ts`                      | `getSession()` server function                                  |
+| `src/routes/api/chat.ts`                         | `POST /api/chat`, the streaming AI chat route, with `--ai`      |
+| `src/routes/chat.tsx`, `src/components/chat.tsx` | The chat page: streamed replies, a thinking indicator, and Stop |
+| `src/lib/auth-schema.ts`                         | Shared auth form validation and error parsing                   |
+| `src/lib/prisma.ts`                              | Prisma client with `@prisma/adapter-pg`                         |
+| `src/lib/db.ts`                                  | Drizzle database connection                                     |
+| `src/lib/schema.ts`                              | Drizzle table definitions                                       |
+| `src/components/ui/*`                            | shadcn/ui components built on Base UI (`~/*` imports)           |
+| `vite.config.ts`                                 | `tanstackStart()` + tailwind + react plugins                    |
+| `components.json`                                | shadcn CLI config (`base-vega`, `~/*` aliases)                  |
+| `prisma.config.ts`                               | Prisma datasource URL configuration                             |
+| `drizzle.config.ts`                              | Drizzle Kit configuration                                       |
 
 ---
 

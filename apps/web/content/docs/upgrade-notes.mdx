@@ -3,6 +3,36 @@ title: Upgrade notes
 description: What changed in each release and what to do when upgrading
 ---
 
+## 2.3.0
+
+Adds AI chat and monorepos. Projects you already generated are not changed.
+
+### New
+
+- **AI chat** (`--ai vercel` or `--ai tanstack`) on Express, NestJS, Next.js, and TanStack Start. `POST /api/chat` streams the model's reply. Next.js and TanStack Start also get a `/chat` page with a thinking indicator while the model starts, and a Stop button that ends the model call on the server. The Vercel AI SDK goes through the Vercel AI Gateway (`AI_GATEWAY_API_KEY`); TanStack AI uses its OpenAI adapter (`OPENAI_API_KEY`). With auth, only signed-in users can use the chat. See [AI chat](/docs/modules/ai).
+- **Monorepos** (`--monorepo`): a Turborepo with `apps/web` (Next.js or TanStack Start) and an optional `apps/api` (`--api express`, `nestjs`, or `none`). With an api, the CLI asks which app owns users and data (`--owner web` or `--owner api`); that app runs Better Auth, holds the database, and serves the AI chat route. The web app forwards the `/api/*` requests it does not answer to the api, so browsers only talk to one origin. See [Monorepo](/docs/modules/monorepo).
+
+### Fixed
+
+- TanStack Start's `src/routeTree.gen.ts` is generated for the routes each project has, instead of being copied from the template.
+
+### Not yet
+
+- `--docker` with `--monorepo`, and a shared `packages/db` for both apps (planned with payments in 2.4.0).
+
+### Docs
+
+- New pages for [AI chat](/docs/modules/ai) and [Monorepo](/docs/modules/monorepo). Getting Started, Usage, Configuration, Project Structure, Auth, Docker, and Troubleshooting cover the new prompts, flags, and environment variables.
+- Without auth, the chat route is public, and every reply is billed to your key; the AI chat page and the generated route say so.
+- A Next.js monorepo passes on a client's own `X-Forwarded-For`, which the api uses for rate limits: run `apps/web` behind a host or proxy that overwrites it. The TanStack Start proxy sends the real client IP.
+
+### For contributors
+
+- `test:templates` also runs the real CLI with `--yes` for every framework and a monorepo.
+- `check-monorepo.cjs` installs, builds, and starts the monorepo cases and checks them through the web app's proxy. The slow checks run a sample of cases (`scripts/samples.cjs`); the weekly `full-matrix.yml` runs all of them.
+- CI runs only when the CLI, the test scripts, the shared configs, or the dependencies change.
+- A release needs green CI on its pull request and a short manual check of what it adds.
+
 ## 2.2.1
 
 A small patch for 2.2.0. Projects you already generated are not changed.

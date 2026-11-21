@@ -3,6 +3,25 @@ title: Upgrade notes
 description: What changed in each release and what to do when upgrading
 ---
 
+## 2.2.1
+
+A small patch for 2.2.0. Projects you already generated are not changed.
+
+### Fixed
+
+- **NestJS auth uses an exact version of `@thallesp/nestjs-better-auth`** (`2.8.0`) instead of `^2.8.0`. The package is maintained outside Better Auth, so new projects get the version that was tested, and later versions are adopted after testing.
+- **`git` runs without a shell.** The CLI starts `git rev-parse` and `git init` directly instead of through the system shell.
+- **Line endings.** A `.gitattributes` keeps text files in the repository on LF line endings on every operating system, as Prettier expects.
+
+### Docs
+
+- Troubleshooting covers a MongoDB sign-up that fails right after a Next.js or TanStack Start app starts, while Better Auth is still building its indexes.
+
+### For contributors
+
+- `docker-matrix.cjs` stops at once with a clear message when port 3000 is already in use, instead of reporting "App container did not start" for every case.
+- The full-stack auth check signs up again when MongoDB asks for a retry because Better Auth's indexes are still being built.
+
 ## 2.2.0
 
 Completes authentication: every framework now uses Better Auth, with email verification, password reset, and GitHub and Google sign-in. Projects you already generated are not changed.

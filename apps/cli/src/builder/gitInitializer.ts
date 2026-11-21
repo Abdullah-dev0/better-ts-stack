@@ -1,11 +1,11 @@
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 
 import { info, success, warn } from "../ui";
 
 // True when the directory is already tracked by a git repository above it
 export function isInsideGitRepository(cwd: string): boolean {
   try {
-    const output = execSync("git rev-parse --is-inside-work-tree", {
+    const output = execFileSync("git", ["rev-parse", "--is-inside-work-tree"], {
       cwd,
       stdio: ["ignore", "pipe", "ignore"],
     });
@@ -25,7 +25,7 @@ export function initializeGitRepository(cwd: string): boolean {
   }
 
   try {
-    execSync("git init", { cwd, stdio: "ignore" });
+    execFileSync("git", ["init"], { cwd, stdio: "ignore" });
     success("Git repository initialized");
     return true;
   } catch {

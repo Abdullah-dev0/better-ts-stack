@@ -161,7 +161,25 @@ async function checkCase(c, log) {
     : fullstackChecks(c.config.useAuth);
 }
 
+// Fails at once when another program holds the app port: otherwise every
+// case reports only "App container did not start"
+async function assertPortFree(port) {
+  const net = require("node:net");
+  await new Promise((resolve, reject) => {
+    const server = net.createServer();
+    server.once("error", () =>
+      reject(
+        new Error(
+          `Port ${port} is in use. Stop the program using it and run again.`,
+        ),
+      ),
+    );
+    server.listen(port, () => server.close(resolve));
+  });
+}
+
 async function main() {
+  await assertPortFree(PORT);
   const results = [];
   const setupLog = path.join(matrix.root, "docker-setup.log");
   run(setupLog, "docker", ["network", "create", NETWORK]);

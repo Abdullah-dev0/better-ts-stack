@@ -173,18 +173,27 @@ async function fullstackChecks(useAuth) {
   ];
   if (!useAuth) return checks;
 
-  const signUp = await request("/api/auth/sign-up/email", {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      origin: `http://localhost:${PORT}`,
-    },
-    body: JSON.stringify({
-      email: "smoke@test.dev",
-      password: "pw123456",
-      name: "Smoke",
-    }),
-  });
+  const signUpRequest = () =>
+    request("/api/auth/sign-up/email", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        origin: `http://localhost:${PORT}`,
+      },
+      body: JSON.stringify({
+        email: "smoke@test.dev",
+        password: "pw123456",
+        name: "Smoke",
+      }),
+    });
+  let signUp = await signUpRequest();
+  // Better Auth's MongoDB adapter builds its indexes in the background when
+  // the app starts. A sign-up that arrives during the build fails once with
+  // "catalog changes; please retry" (FAILED_TO_CREATE_USER), as MongoDB asks
+  if (signUp.status === 422 && signUp.text.includes("FAILED_TO_CREATE_USER")) {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    signUp = await signUpRequest();
+  }
   // The session cookie, without its attributes
   const cookie = (signUp.headers.get("set-cookie") ?? "").split(";")[0];
   const dashboard = await request("/dashboard", {

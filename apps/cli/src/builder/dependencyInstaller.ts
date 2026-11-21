@@ -8,6 +8,8 @@ export function installDependencies(
   packageManager: PackageManager,
   cwd: string
 ): boolean {
+  // One of three fixed commands. It runs through the shell because npm and
+  // pnpm are .cmd files on Windows, which Node.js only starts through one
   const command = `${packageManager} install`;
 
   info(`Installing dependencies with ${packageManager}`);

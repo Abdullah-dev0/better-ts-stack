@@ -254,6 +254,12 @@ Compose reads `.env`, so make sure it exists and that its database URLs work fro
 
 **Solution:** Without `RESEND_API_KEY`, emails are printed to the server log instead of sent, so copy the link from there. With Resend, the default sender `onboarding@resend.dev` only delivers to your own address: verify a domain and set `EMAIL_FROM`.
 
+### "Failed to create user" right after the app starts (MongoDB)
+
+**Problem:** In Next.js or TanStack Start with MongoDB, the first sign-up after the server starts fails, and the server log shows "Unable to write to collection 'user' due to catalog changes; please retry".
+
+**Solution:** Sign up again. Better Auth builds its MongoDB indexes in the background when the app starts, and MongoDB rejects a sign-up that arrives while a build is still running. It only happens in the first moments after a start; later sign-ups are not affected.
+
 ---
 
 ## Performance Issues

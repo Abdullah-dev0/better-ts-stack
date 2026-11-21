@@ -17,6 +17,15 @@ export function Chat() {
     // Ties the requests of one conversation together on the server
     threadId: "chat",
   });
+  // Dots until the first words of the reply arrive, as the model may take a
+  // while to start
+  const last = messages.at(-1);
+  const isThinking =
+    isLoading &&
+    !(
+      last?.role === "assistant" &&
+      last.parts.some((part) => part.type === "text" && part.content !== "")
+    );
 
   return (
     <div className="flex flex-col gap-4">
@@ -26,8 +35,8 @@ export function Chat() {
             key={message.id}
             className={
               message.role === "user"
-                ? "max-w-[85%] self-end rounded-lg bg-primary px-3 py-2 text-primary-foreground"
-                : "max-w-[85%] self-start rounded-lg bg-muted px-3 py-2"
+                ? "bg-primary text-primary-foreground max-w-[85%] self-end rounded-lg px-3 py-2"
+                : "bg-muted max-w-[85%] self-start rounded-lg px-3 py-2"
             }
           >
             {message.parts.map((part, index) =>
@@ -39,6 +48,17 @@ export function Chat() {
             )}
           </li>
         ))}
+        {isThinking ? (
+          <li
+            role="status"
+            className="bg-muted flex items-center gap-1 self-start rounded-lg px-3 py-3.5"
+          >
+            <span className="sr-only">Thinking</span>
+            <span className="bg-muted-foreground size-1.5 rounded-full motion-safe:animate-bounce" />
+            <span className="bg-muted-foreground size-1.5 rounded-full motion-safe:animate-bounce motion-safe:[animation-delay:150ms]" />
+            <span className="bg-muted-foreground size-1.5 rounded-full motion-safe:animate-bounce motion-safe:[animation-delay:300ms]" />
+          </li>
+        ) : null}
       </ul>
 
       {error ? (

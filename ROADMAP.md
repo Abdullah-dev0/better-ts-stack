@@ -1,6 +1,6 @@
 # Roadmap
 
-One feature per minor release, no betas. Every release must pass `npm run test:templates`, `check-matrix`, `smoke-matrix`, and `docker-matrix`, plus a manual run, before it is published.
+One feature per minor release, no betas. A release ships when CI is green on its pull request (lint, type-check, `test:templates`, and the sampled install, build, smoke, Docker, and monorepo checks), plus a short manual check of only what the release adds, about 10 minutes. The full matrix runs weekly (`full-matrix.yml`) and does not block a release; what it finds becomes a patch release.
 
 ## Released
 
@@ -35,7 +35,7 @@ Built: Express and NestJS get `POST /api/chat`; Next.js and TanStack Start also 
 - The web app forwards the `/api/*` requests it does not answer to the api, so browsers only talk to one origin.
 - Not in 2.3.0: Docker with a monorepo, shared tsconfig and ESLint packages, a docs app (`--docs`, Fumadocs), and two full apps that both sign users in (needs `packages/auth` and `packages/db`, then the `add` command). `packages/db` moves to 2.4.0, where payments needs a table both apps share.
 
-Still to do before release: a manual run with a real model key (streaming, and the stop button ending the model call, including through the monorepo proxy), and the stack builder on the website.
+Still to do before release: green CI on the pull request, and a 10-minute manual check: one chat page with a real model key (streaming, the thinking indicator, and Stop), and one monorepo sign-up through the proxy. The stack builder on the website ships separately.
 
 ### 2.4.0: Payments
 

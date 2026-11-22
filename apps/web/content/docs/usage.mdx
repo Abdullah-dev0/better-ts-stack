@@ -7,7 +7,7 @@ import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
 import { Callout } from "fumadocs-ui/components/callout";
 import { Step, Steps } from "fumadocs-ui/components/steps";
 
-## How the CLI Works
+## How the CLI works
 
 Run the command, answer the prompts, and the CLI generates a project from your answers. Every prompt also has a flag, so scripts and CI can run it without prompts.
 
@@ -86,7 +86,7 @@ Without an interactive terminal (in CI or when input is piped) the CLI cannot as
 
 ---
 
-## Prompt Flow
+## Prompt flow
 
 <Steps>
 
@@ -124,7 +124,7 @@ $ Create a monorepo (Turborepo with apps/web and apps/api)?
     Yes   › No
 ```
 
-**No** gives you one project, and the next prompt asks for the application type. **Yes** creates a Turborepo: the next prompts ask for the web app (`apps/web`, Next.js or TanStack Start) and the api (`apps/api`, Express, NestJS, or none). See [Monorepo](/docs/modules/monorepo).
+**No** gives you one project, and the next prompt asks for the application type. **Yes** creates a Turborepo, and the next prompts ask for the web app (`apps/web`, Next.js or TanStack Start) and the api (`apps/api`, Express, NestJS, or none). See [Monorepo](/docs/modules/monorepo).
 
 </Step>
 
@@ -218,7 +218,7 @@ $ Database
 </Step>
 
 <Step>
-### ORM / ODM *(shown only when a database is selected)*
+### ORM or ODM *(shown only when a database is selected)*
 
 For **PostgreSQL**:
 
@@ -286,11 +286,11 @@ $ Add authentication (Better Auth)?
 
 Every framework gets Better Auth with email and password, email verification, password reset, and GitHub and Google sign-in. See the [Auth module](/docs/modules/auth).
 
-**Express and NestJS** - always prompted. Without a database, users and sessions are kept in memory.
+For **Express and NestJS**, the CLI always asks. Without a database, Better Auth keeps users and sessions in memory.
 
-**Next.js / TanStack full-stack** - **this prompt only appears if you selected a database.** If you chose `none` for database, auth is skipped automatically.
+For **Next.js and TanStack Start**, the CLI asks **only if you selected a database.** With `none` for the database, the CLI skips auth.
 
-**Monorepo** - always asked when there is an api: it can run Better Auth without a database.
+For **a monorepo** with an api, the CLI always asks, because the api can run Better Auth without a database.
 
 </Step>
 
@@ -430,9 +430,9 @@ npm run dev
 
 ---
 
-## After Generation
+## After generation
 
-### Scripts - Backend (Express)
+### Scripts for an Express backend
 
 ```bash
 npm run dev        # tsx watch src/index.ts (hot reload, NODE_ENV=development)
@@ -451,7 +451,7 @@ npm run prisma:migrate
 npm run prisma:studio
 ```
 
-With database (Mongoose): no additional scripts - connection is handled in `src/lib/db.ts`.
+Mongoose adds no scripts. `src/lib/db.ts` opens the connection.
 
 With Docker:
 
@@ -462,7 +462,7 @@ npm run docker:down
 npm run docker:logs
 ```
 
-### Scripts - Full-stack (Next.js)
+### Scripts for full-stack Next.js
 
 ```bash
 npm run dev    # next dev
@@ -471,7 +471,7 @@ npm run start  # next start
 npm run lint   # eslint
 ```
 
-### Scripts - Full-stack (TanStack Start)
+### Scripts for full-stack TanStack Start
 
 ```bash
 npm run dev         # vite dev

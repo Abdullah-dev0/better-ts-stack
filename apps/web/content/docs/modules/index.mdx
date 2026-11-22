@@ -1,5 +1,5 @@
 ﻿---
-title: Modules Overview
+title: Modules overview
 description: The modular architecture of better-ts-stack projects
 ---
 
@@ -21,7 +21,7 @@ A generated project is built from modules. Each module adds its own template fil
 
 ---
 
-## Available Modules
+## Available modules
 
 <Cards>
   <Card title="Backend" href="/docs/modules/backend" icon={<Server className="text-blue-400" />}>
@@ -80,23 +80,23 @@ A generated project is built from modules. Each module adds its own template fil
 
 ---
 
-## How Modules Are Selected
+## How modules are selected
 
 Your prompt answers decide which modules are added:
 
-| Prompt answer                                        | Module(s) activated                                                 |
-| ---------------------------------------------------- | ------------------------------------------------------------------- |
-| App type = `backend`                                 | Express base module                                                 |
-| App type = `fullstack` + framework = `nextjs`        | Next.js base module                                                 |
-| App type = `fullstack` + framework = `tanstack`      | TanStack Start base module                                          |
-| Database = `postgresql` + ORM = `prisma`             | Prisma module for the chosen framework                              |
-| Database = `postgresql` + ORM = `drizzle`            | Drizzle module for the chosen framework                             |
-| Database = `mongodb` + ORM = `mongoose`              | Mongoose module (Express, Next.js, TanStack)                        |
-| Auth = `yes` (Express / NestJS)                      | Better Auth module                                                  |
-| Auth = `yes` (Next.js / TanStack, database selected) | Better Auth module                                                  |
-| AI = `vercel` or `tanstack`                          | AI chat route, plus a /chat page on Next.js and TanStack Start      |
-| Monorepo = `yes`                                     | Turborepo root, `apps/web`, and `apps/api` unless the api is `none` |
-| Docker = `yes`                                       | Docker module                                                       |
+| Prompt answer                                       | Module(s) activated                                                 |
+| --------------------------------------------------- | ------------------------------------------------------------------- |
+| App type = `backend`                                | Express base module                                                 |
+| App type = `fullstack` + framework = `nextjs`       | Next.js base module                                                 |
+| App type = `fullstack` + framework = `tanstack`     | TanStack Start base module                                          |
+| Database = `postgresql` + ORM = `prisma`            | Prisma module for the chosen framework                              |
+| Database = `postgresql` + ORM = `drizzle`           | Drizzle module for the chosen framework                             |
+| Database = `mongodb` + ORM = `mongoose`             | Mongoose module (Express, Next.js, TanStack)                        |
+| Auth = `yes` (Express or NestJS)                    | Better Auth module                                                  |
+| Auth = `yes` (Next.js or TanStack, with a database) | Better Auth module                                                  |
+| AI = `vercel` or `tanstack`                         | AI chat route, plus a /chat page on Next.js and TanStack Start      |
+| Monorepo = `yes`                                    | Turborepo root, `apps/web`, and `apps/api` unless the api is `none` |
+| Docker = `yes`                                      | Docker module                                                       |
 
 <Callout type="info">
   Better Auth is only prompted for Next.js and TanStack Start projects when a
@@ -106,7 +106,7 @@ Your prompt answers decide which modules are added:
 
 ---
 
-## How Module Merging Works
+## How module merging works
 
 Each module has a `config.json`. When you select several modules, the CLI merges them:
 
@@ -148,7 +148,7 @@ The final `package.json` will include:
 
 ---
 
-## Module Availability Matrix
+## Module availability matrix
 
 | Module               | Backend (Express) | Backend (NestJS) | Full-stack (Next.js) | Full-stack (TanStack) |
 | -------------------- | ----------------- | ---------------- | -------------------- | --------------------- |
@@ -164,20 +164,20 @@ The final `package.json` will include:
 
 ---
 
-## Extending After Generation
+## Extending after generation
 
 All generated code is plain TypeScript, so you can edit any file.
 
 ### Adding to the backend
 
-- New routes -> `src/routes/`
-- New middleware -> `src/middleware/`
-- New controllers -> `src/controllers/`
+- New routes go in `src/routes/`
+- New middleware goes in `src/middleware/`
+- New controllers go in `src/controllers/`
 
 ### Adding to the frontend
 
-- Next.js: new pages -> `app/`, API routes -> `app/api/`, components -> `components/`
-- TanStack Start: new routes -> `src/routes/` (Vite regenerates `src/routeTree.gen.ts` during dev/build), server functions -> `createServerFn`, components -> `src/components/`
+- In Next.js, new pages go in `app/`, API routes in `app/api/`, and components in `components/`
+- In TanStack Start, new routes go in `src/routes/`, server functions use `createServerFn`, and components go in `src/components/`. Vite regenerates `src/routeTree.gen.ts` during `dev` and `build`
 
 ### Adding to the database
 

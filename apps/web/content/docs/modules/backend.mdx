@@ -1,5 +1,5 @@
 ﻿---
-title: Backend Module
+title: Backend module
 description: Express and NestJS backends with TypeScript, routing, and middleware
 ---
 
@@ -7,11 +7,11 @@ description: Express and NestJS backends with TypeScript, routing, and middlewar
 
 The Backend module generates an Express 5 or a [NestJS 12](#nestjs) server with TypeScript. Every **Backend API** project starts from one of them. The sections below describe Express first.
 
-## What You Get
+## What you get
 
 ```
 src/
-|-- index.ts          # Entry point - configures middleware, mounts routes, starts server
+|-- index.ts          # Entry point. Configures middleware, mounts routes, starts the server
 |-- env.ts            # Validates environment variables at startup
 \-- routes/
     \-- health.ts     # GET /health endpoint
@@ -21,7 +21,7 @@ The database and auth modules add more files to `src/`.
 
 ---
 
-## Generated Files
+## Generated files
 
 ### src/index.ts
 
@@ -138,7 +138,7 @@ npm run type:check # tsc --noEmit
 
 ---
 
-## Environment Variables
+## Environment variables
 
 ```bash
 PORT=3000
@@ -153,7 +153,7 @@ Additional variables are added by the database and auth modules.
 
 ---
 
-## Integration with Other Modules
+## Integration with other modules
 
 ### + Database module
 
@@ -166,10 +166,10 @@ If a database module is selected, the build adds:
 
 If auth is selected, the build adds:
 
-- `src/lib/auth.ts` - the Better Auth server, mounted on `/api/auth`
-- `src/lib/email.ts` - sends verification and password reset emails
-- `src/middleware/requireAuth.ts` - requires a session (cookie or bearer token)
-- `src/routes/me.ts` - `GET /api/me`, an example of a protected route
+- `src/lib/auth.ts` is the Better Auth server, mounted on `/api/auth`
+- `src/lib/email.ts` sends verification and password reset emails
+- `src/middleware/requireAuth.ts` requires a session, from a cookie or a bearer token
+- `src/routes/me.ts` is `GET /api/me`, an example of a protected route
 - `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, and optional GitHub, Google, and Resend keys
 
 See the [Auth module](/docs/modules/auth) for the routes and how to call them.
@@ -189,7 +189,7 @@ If Docker is selected, the build adds `Dockerfile`, `docker-compose.yml`, and `.
 
 ---
 
-## Extending the Backend
+## Extending the backend
 
 ### Add a route
 
@@ -227,9 +227,9 @@ Select **NestJS** in the framework prompt, or pass `--framework nestjs`. The pro
 
 ```
 src/
-|-- main.ts                 # Entry point - loads .env, enables helmet and CORS, starts the server
+|-- main.ts                 # Entry point. Loads .env, enables helmet and CORS, starts the server
 |-- env.ts                  # Validates environment variables at startup
-|-- app.module.ts           # Root module - imports the database and auth modules you selected
+|-- app.module.ts           # Root module. Imports the database and auth modules you selected
 \-- health/
     \-- health.controller.ts   # GET /health endpoint
 ```
@@ -258,7 +258,7 @@ The Prisma and Drizzle modules are global, so any module can inject them without
 
 Auth adds Better Auth on `/api/auth` through [`@thallesp/nestjs-better-auth`](https://github.com/ThallesP/nestjs-better-auth), with the same routes as Express. `src/auth/` holds the auth server and the module that mounts it, and `src/me/me.controller.ts` serves `GET /api/me`. The module's guard protects every route: mark public ones with `@AllowAnonymous()`, as `HealthController` is. See the [Auth module](/docs/modules/auth).
 
-With rate limiting (`--rate-limit`), the build adds [`@nestjs/throttler`](https://docs.nestjs.com/security/rate-limiting): a global guard allows 100 requests per client IP in 15 minutes. Better Auth limits sign-up, sign-in, and password reset to 10 attempts. Change the limits in `src/app.module.ts` and `src/auth/auth.ts`.
+With rate limiting (`--rate-limit`), the build adds [`@nestjs/throttler`](https://docs.nestjs.com/security/rate-limiting). A global guard allows 100 requests per client IP in 15 minutes. Better Auth limits sign-up, sign-in, and password reset to 10 attempts. Change the limits in `src/app.module.ts` and `src/auth/auth.ts`.
 
 `src/env.ts` and `CORS_ORIGIN` work as they do for Express.
 

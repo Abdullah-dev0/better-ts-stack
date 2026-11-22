@@ -1,11 +1,11 @@
 ---
-title: Docker Module
+title: Docker module
 description: Node.js 24 containers with Docker Compose v2
 ---
 
 The Docker option adds a `Dockerfile`, `docker-compose.yml`, and `.dockerignore`. You need Docker Desktop or Docker Engine with Compose v2 running.
 
-Docker is not available with [`--monorepo`](/docs/modules/monorepo) yet: each app's Dockerfile installs from its own lockfile, which a workspace does not have.
+Docker is not available with [`--monorepo`](/docs/modules/monorepo) yet. Each app's Dockerfile installs from its own lockfile, which a workspace does not have.
 
 ## Build and run
 

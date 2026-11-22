@@ -1,5 +1,5 @@
 ﻿---
-title: Project Structure
+title: Project structure
 description: Understanding the file layout of a generated better-ts-stack project
 ---
 
@@ -13,7 +13,7 @@ The layout of a generated project depends on the options you select. This page s
 
 ---
 
-## Backend API - Express
+## Backend API with Express
 
 ### Base (no optional modules)
 
@@ -42,7 +42,7 @@ The base template has three source files: `src/index.ts`, `src/env.ts`, and
 stack, setup steps, scripts, and environment variables, and a
 `better-ts-stack.json` that records the options it was generated with.
 
-### With PostgreSQL + Prisma + Auth + Docker
+### With PostgreSQL, Prisma, auth, and Docker
 
 <Files>
   <Folder name="my-api" defaultOpen>
@@ -77,7 +77,7 @@ stack, setup steps, scripts, and environment variables, and a
   </Folder>
 </Files>
 
-### With MongoDB + Mongoose + Auth
+### With MongoDB, Mongoose, and auth
 
 <Files>
   <Folder name="my-api" defaultOpen>
@@ -111,7 +111,7 @@ stack, setup steps, scripts, and environment variables, and a
 
 ---
 
-## Full-stack - Next.js
+## Full-stack with Next.js
 
 A full-stack project is a **single Next.js application** at the project root. There is no separate `backend/` or `frontend/` directory.
 
@@ -300,7 +300,7 @@ A full-stack project is a **single Next.js application** at the project root. Th
 
 ---
 
-## Full-stack - TanStack Start
+## Full-stack with TanStack Start
 
 A TanStack Start project is a **single Vite-based application** at the project root. File-based routing lives in `src/routes/`. The CLI includes an initial `src/routeTree.gen.ts`, and TanStack Router regenerates it during Vite development and builds.
 
@@ -450,13 +450,13 @@ A TanStack Start project is a **single Vite-based application** at the project r
 
 The root `package.json` lists the workspaces (pnpm uses `pnpm-workspace.yaml` instead) and runs `dev`, `build`, `start`, `lint`, and `type:check` in every app through Turborepo. `apps/api` is left out with `--api none`. See [Monorepo](/docs/modules/monorepo).
 
-## Key File Descriptions
+## Key file descriptions
 
 ### Backend
 
 | File                            | Purpose                                                                                           |
 | ------------------------------- | ------------------------------------------------------------------------------------------------- |
-| `src/index.ts`                  | Entry point - configures Express, mounts routes, starts the server                                |
+| `src/index.ts`                  | Entry point. Configures Express, mounts routes, starts the server                                 |
 | `src/env.ts`                    | Validates environment variables with Zod at startup                                               |
 | `src/middleware/rateLimit.ts`   | Request limits, with `--rate-limit`                                                               |
 | `src/routes/health.ts`          | `GET /health` endpoint                                                                            |
@@ -467,7 +467,7 @@ The root `package.json` lists the workspaces (pnpm uses `pnpm-workspace.yaml` in
 | `src/middleware/requireAuth.ts` | Requires a session (cookie or bearer token)                                                       |
 | `src/routes/me.ts`              | `GET /api/me`, an example of a protected route                                                    |
 | `src/routes/chat.ts`            | `POST /api/chat`, the streaming AI chat route, with `--ai`. NestJS: `src/chat/chat.controller.ts` |
-| `prisma/schema.prisma`          | Prisma schema - edit to add your models                                                           |
+| `prisma/schema.prisma`          | Prisma schema. Edit it to add your models                                                         |
 
 ### Full-stack (Next.js)
 
@@ -521,18 +521,18 @@ The root `package.json` lists the workspaces (pnpm uses `pnpm-workspace.yaml` in
 
 ---
 
-## Environment Variables
+## Environment variables
 
 Variables are written to `.env.example` (and `.env`) based on selected modules.
 
-### Backend - base
+### Backend base
 
 ```bash
 PORT=3000
 CORS_ORIGIN=*
 ```
 
-### + PostgreSQL (Prisma or Drizzle)
+### With PostgreSQL (Prisma or Drizzle)
 
 ```bash
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/postgres?schema=public"
@@ -544,7 +544,7 @@ DATABASE_URL="postgresql://postgres:postgres@localhost:5432/postgres?schema=publ
 MONGODB_URI="mongodb://localhost:27017/myapp"
 ```
 
-### + Better Auth
+### With Better Auth
 
 ```bash
 BETTER_AUTH_SECRET=please-change-me-to-a-random-string

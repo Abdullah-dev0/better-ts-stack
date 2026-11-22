@@ -1,5 +1,5 @@
 ﻿---
-title: Frontend Module
+title: Frontend module
 description: Next.js 16 or TanStack Start with React 19 and Tailwind CSS v4
 ---
 
@@ -15,7 +15,7 @@ The Frontend module generates a full-stack React application. When you choose th
   are no separate `frontend/` or `backend/` subdirectories.
 </Callout>
 
-## What You Get
+## What you get
 
 ```
 app/
@@ -43,7 +43,7 @@ next-env.d.ts        # Next.js TypeScript environment types
 
 ---
 
-## Technology Stack
+## Technology stack
 
 | Technology       | Version | Purpose                         |
 | ---------------- | ------- | ------------------------------- |
@@ -56,7 +56,7 @@ next-env.d.ts        # Next.js TypeScript environment types
 
 ---
 
-## Generated Files
+## Generated files
 
 ### app/layout.tsx
 
@@ -154,7 +154,7 @@ Dark mode turns on when an ancestor has the `dark` class, for example
 
 ---
 
-## UI Components
+## UI components
 
 `components.json` uses the `base-vega` style, so the shadcn CLI adds the
 [Base UI](https://base-ui.com) version of each component:
@@ -193,18 +193,18 @@ npm run lint   # eslint
 
 ---
 
-## Integration with Auth Module
+## Integration with the auth module
 
 If Better Auth is selected (requires a database), the auth module adds:
 
-- `lib/auth.ts` - server-side Better Auth configuration with the matching adapter
-- `lib/auth-client.ts` - `createAuthClient()` for use in client components
-- `lib/auth-schema.ts` - shared Zod validation and auth error formatting
-- `app/api/auth/[...all]/route.ts` - the Better Auth route handler
-- `app/sign-in/page.tsx` - login route with server-side redirect when signed in
-- `app/sign-up/page.tsx` - signup route with server-side redirect when signed in
-- `app/dashboard/page.tsx` - protected route example with server-side session check
-- `components/auth/*` - login, signup, and sign-out UI components
+- `lib/auth.ts` configures Better Auth on the server with the matching adapter
+- `lib/auth-client.ts` calls `createAuthClient()` for client components
+- `lib/auth-schema.ts` holds the shared Zod validation and auth error formatting
+- `app/api/auth/[...all]/route.ts` is the Better Auth route handler
+- `app/sign-in/page.tsx` is the sign-in page. It redirects on the server when you are signed in
+- `app/sign-up/page.tsx` is the sign-up page. It redirects on the server when you are signed in
+- `app/dashboard/page.tsx` is an example of a protected page that checks the session on the server
+- `components/auth/*` holds the sign-in, sign-up, and sign-out components
 
 <Tabs items={['Prisma adapter', 'Drizzle adapter']}>
   <Tab value="Prisma adapter">
@@ -276,7 +276,7 @@ and call `authClient.signIn.email(...)` / `authClient.signUp.email(...)`.
 
 ---
 
-## Environment Variables
+## Environment variables
 
 The base Next.js project needs no variables. Next.js picks its port before it loads `.env`, so set it in the shell instead, as in `PORT=3001 npm run dev`.
 
@@ -341,17 +341,17 @@ bun run type:check
 bun run lint
 ```
 
-### Integration with Auth Module
+### Integration with the auth module
 
-If Better Auth is selected (requires a database), the auth module additionally generates:
+If Better Auth is selected (requires a database), the auth module also generates:
 
-- `src/lib/auth.ts` - `betterAuth()` with `tanstackStartCookies()` and the matching adapter
-- `src/lib/auth-client.ts` - `createAuthClient()` for client components
-- `src/lib/auth-functions.ts` - `getSession()` server function built on `createServerFn` + `auth.api.getSession`
-- `src/routes/api/auth/$.ts` - the Better Auth route handler via `auth.handler(request)`
-- `src/routes/sign-in.tsx` / `src/routes/sign-up.tsx` - login/signup routes with `beforeLoad` redirect when signed in
-- `src/routes/dashboard.tsx` - protected route example using `redirect({ to: "/sign-in" })` in `beforeLoad`
-- `src/components/auth/*` - login, signup, and sign-out UI components
+- `src/lib/auth.ts` calls `betterAuth()` with `tanstackStartCookies()` and the matching adapter
+- `src/lib/auth-client.ts` calls `createAuthClient()` for client components
+- `src/lib/auth-functions.ts` has the `getSession()` server function, built on `createServerFn` and `auth.api.getSession`
+- `src/routes/api/auth/$.ts` is the Better Auth route handler, through `auth.handler(request)`
+- `src/routes/sign-in.tsx` and `src/routes/sign-up.tsx` are the sign-in and sign-up routes. Their `beforeLoad` redirects when you are signed in
+- `src/routes/dashboard.tsx` is an example of a protected route that calls `redirect({ to: "/sign-in" })` in `beforeLoad`
+- `src/components/auth/*` holds the sign-in, sign-up, and sign-out components
 
 ```typescript
 // src/lib/auth.ts

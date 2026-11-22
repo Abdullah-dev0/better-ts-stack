@@ -1,5 +1,5 @@
 ﻿---
-title: Auth Module
+title: Auth module
 description: Better Auth for Express, NestJS, Next.js, and TanStack Start, with email verification, password reset, and GitHub and Google sign-in
 ---
 
@@ -15,12 +15,12 @@ The Auth module adds [Better Auth](https://www.better-auth.com/docs) to every fr
 - GitHub and Google sign-in, turned on when their client ID and secret are set in `.env`
 - Emails sent through [Resend](https://resend.com) when `RESEND_API_KEY` is set, and printed to the server log otherwise, so you can copy the links while developing
 
-| Stack                   | Sessions               | Requires database                                   |
-| ----------------------- | ---------------------- | --------------------------------------------------- |
-| **Express backend**     | Bearer token or cookie | No (in-memory store when no database is selected)   |
-| **NestJS backend**      | Bearer token or cookie | No (in-memory store when no database is selected)   |
-| **Next.js full-stack**  | Cookie                 | **Yes - only prompted when a database is selected** |
-| **TanStack full-stack** | Cookie                 | **Yes - only prompted when a database is selected** |
+| Stack                   | Sessions               | Requires database                                  |
+| ----------------------- | ---------------------- | -------------------------------------------------- |
+| **Express backend**     | Bearer token or cookie | No (in-memory store when no database is selected)  |
+| **NestJS backend**      | Bearer token or cookie | No (in-memory store when no database is selected)  |
+| **Next.js full-stack**  | Cookie                 | **Yes, prompted only when a database is selected** |
+| **TanStack full-stack** | Cookie                 | **Yes, prompted only when a database is selected** |
 
 <Callout type="info">
   Email verification is not required to sign in. Users can sign in right away

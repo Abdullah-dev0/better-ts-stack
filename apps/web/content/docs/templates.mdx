@@ -1,5 +1,5 @@
 ﻿---
-title: Project Templates
+title: Project templates
 description: What files and code better-ts-stack actually generates
 ---
 
@@ -101,7 +101,7 @@ export default app;
 
 ---
 
-## Full-stack Templates
+## Full-stack templates
 
 Selecting **Full-stack** generates one application at the project root, with no separate `backend/` or `frontend/` folders. You pick the framework in the next prompt.
 
@@ -159,7 +159,7 @@ regenerates it during Vite development and builds.
 
 ---
 
-## With Database Modules
+## With database modules
 
 ### PostgreSQL + Prisma
 
@@ -293,10 +293,10 @@ Environment variable added: `MONGODB_URI`
 
 ---
 
-## With Auth Module
+## With the auth module
 
-<Tabs items={['Express - Better Auth', 'NestJS - Better Auth', 'Next.js - Better Auth', 'TanStack - Better Auth']}>
-  <Tab value="Express - Better Auth">
+<Tabs items={['Express', 'NestJS', 'Next.js', 'TanStack Start']}>
+  <Tab value="Express">
     <Files>
       <Folder name="src" defaultOpen>
         <Folder name="lib">
@@ -317,7 +317,7 @@ Environment variable added: `MONGODB_URI`
     Better Auth is mounted on `/api/auth` in `src/index.ts`, and `GET /api/me` is an example of a protected route. It works without a database too, with an in-memory store.
 
   </Tab>
-  <Tab value="NestJS - Better Auth">
+  <Tab value="NestJS">
     <Files>
       <Folder name="src" defaultOpen>
         <Folder name="auth">
@@ -336,7 +336,7 @@ Environment variable added: `MONGODB_URI`
     `@thallesp/nestjs-better-auth` mounts Better Auth on `/api/auth`, and its guard protects every route not marked `@AllowAnonymous()`.
 
   </Tab>
-  <Tab value="Next.js - Better Auth">
+  <Tab value="Next.js">
     <Files>
       <Folder name="components" defaultOpen>
         <Folder name="auth">
@@ -392,7 +392,7 @@ Environment variable added: `MONGODB_URI`
     </Callout>
 
   </Tab>
-  <Tab value="TanStack - Better Auth">
+  <Tab value="TanStack Start">
     <Files>
       <Folder name="src" defaultOpen>
         <Folder name="components">
@@ -441,7 +441,7 @@ Environment variable added: `MONGODB_URI`
 
 ---
 
-## With Docker Module
+## With the Docker module
 
 <Files>
   <Folder name="project-root" defaultOpen>
@@ -451,7 +451,7 @@ Environment variable added: `MONGODB_URI`
   </Folder>
 </Files>
 
-The `Dockerfile` is framework-aware: it uses a Next.js standalone output stage for Next.js projects, a production stage that runs the Nitro `.output/` server for TanStack Start, and a Node.js multi-stage build for Express backends. Both full-stack images run `npm run build` (and Prisma generate for the database variant) and copy the build output to a non-root Alpine production image.
+The `Dockerfile` depends on the framework. It uses a Next.js standalone output stage for Next.js projects, a production stage that runs the Nitro `.output/` server for TanStack Start, and a Node.js multi-stage build for Express backends. Both full-stack images run `npm run build` (and Prisma generate for the database variant) and copy the build output to a non-root Alpine production image.
 
 Scripts added to `package.json`:
 
@@ -464,7 +464,7 @@ npm run docker:logs   # docker compose logs -f
 
 ---
 
-## Supported Combinations
+## Supported combinations
 
 | Framework | App type   | Database   | ORM/ODM  | Auth        | Status |
 | --------- | ---------- | ---------- | -------- | ----------- | ------ |

@@ -6,7 +6,7 @@ description: Common issues and solutions
 import { Callout } from "fumadocs-ui/components/callout";
 import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 
-## Installation Issues
+## Installation issues
 
 ### "Command not found" after global install
 
@@ -59,7 +59,7 @@ npm install -g better-ts-stack
 
 ---
 
-## Project Generation Issues
+## Project generation issues
 
 ### "Target directory is not empty"
 
@@ -84,7 +84,7 @@ npm install -g better-ts-stack
 
 ---
 
-## Database Issues
+## Database issues
 
 ### "Cannot connect to database"
 
@@ -130,7 +130,7 @@ npx prisma db push
 
 ---
 
-## Runtime Issues
+## Runtime issues
 
 ### "Port 3000 already in use"
 
@@ -146,7 +146,7 @@ lsof -ti:3000 | xargs kill -9
 PORT=3001 npm run dev
 ```
 
-### TanStack Start: CSS and JS return 404 after `npm start` (Windows)
+### TanStack Start returns 404 for CSS and JS after `npm start` on Windows
 
 Projects generated before 2.1.0 serve production builds with `srvx`. On Windows, Node.js 24 releases before 24.20 report different device IDs for the same file depending on how it is read, and `srvx` refuses every static file, so pages load without styles or client JavaScript. Upgrade Node.js to 24.20 or later, or move the project to Nitro as 2.1.0 does (see the [upgrade notes](/docs/upgrade-notes#210)). Projects generated with 2.1.0 or later are not affected.
 
@@ -167,7 +167,7 @@ If the error only shows in your editor, restart the TypeScript server. In VS Cod
 
 ---
 
-## TypeScript Issues
+## TypeScript issues
 
 ### Type errors in generated code
 
@@ -200,7 +200,7 @@ npm run prisma:generate
 
 ---
 
-## Docker Issues
+## Docker issues
 
 ### "Docker daemon not running"
 
@@ -237,7 +237,7 @@ Compose reads `.env`, so make sure it exists and that its database URLs work fro
 
 ---
 
-## Auth Issues
+## Auth issues
 
 ### `401` on protected routes (Express and NestJS)
 
@@ -268,7 +268,7 @@ Compose reads `.env`, so make sure it exists and that its database URLs work fro
 
 ---
 
-## Performance Issues
+## Performance issues
 
 ### Slow TypeScript builds
 
@@ -294,7 +294,7 @@ During development, `npm run dev` uses `tsx watch`, which skips type checking an
 
 ---
 
-## Getting Help
+## Getting help
 
 If you're still stuck:
 

@@ -1,5 +1,5 @@
 ﻿---
-title: Getting Started
+title: Getting started
 description: Quick start guide for better-ts-stack, an interactive CLI for scaffolding TypeScript projects
 ---
 
@@ -31,7 +31,7 @@ better-ts-stack is an interactive CLI that generates TypeScript projects. You ch
 
 </Callout>
 
-## Quick Start
+## Quick start
 
 <Steps>
 
@@ -68,28 +68,28 @@ better-ts-stack is an interactive CLI that generates TypeScript projects. You ch
 
 The CLI asks, in order (every prompt can also be answered with a [flag](/docs/usage#flags)):
 
-1. **Project name** - becomes your folder name and `package.json` name
-2. **Monorepo** - one project, or a Turborepo with a web app and an api?
+1. **Project name.** It becomes your folder name and the `package.json` name.
+2. **Monorepo.** One project, or a Turborepo with a web app and an api?
    - **Yes**: select the web app (Next.js or TanStack Start) and the api (Express, NestJS, or none) instead of the application type
-3. **Application type** - `Backend API` or `Full-stack`
+3. **Application type.** `Backend API` or `Full-stack`.
    - **Backend**: select a framework (Express or NestJS)
    - **Full-stack**: select a frontend framework (Next.js 16 or TanStack Start)
-4. **Database type** - `none`, `PostgreSQL`, or `MongoDB`
+4. **Database type.** `none`, `PostgreSQL`, or `MongoDB`.
 5. **ORM/ODM** (only shown when a database is selected)
-   - PostgreSQL -> `Prisma` or `Drizzle`
-   - MongoDB -> `Mongoose`
-6. **Package manager** - `npm`, `pnpm`, or `bun`
-7. **Docker** - include Docker configuration? (not for a monorepo yet)
-8. **Authentication** - add auth?
-   - Better Auth for every framework: email and password, email verification, password reset, and GitHub and Google sign-in
-   - Next.js / TanStack: only prompted if a database was selected
-9. **AI chat** - none, Vercel AI SDK, or TanStack AI: a streaming chat route, plus a chat page on Next.js and TanStack Start
-10. **Which app owns users and data** - monorepo with an api only: the web app (easiest) or the api runs auth, the database, and AI chat
-11. **Rate limiting** - Express / NestJS only: limit requests per IP?
-12. **CI** - add a GitHub Actions workflow?
-13. **VS Code** - add workspace settings and recommended extensions?
-14. **Git** - initialize a repository?
-15. **Install dependencies** - run the install command now?
+   - PostgreSQL offers `Prisma` or `Drizzle`
+   - MongoDB offers `Mongoose`
+6. **Package manager.** `npm`, `pnpm`, or `bun`.
+7. **Docker.** Include Docker configuration? A monorepo has no Docker option yet.
+8. **Authentication.** Add auth?
+   - Every framework gets Better Auth with email and password, email verification, password reset, and GitHub and Google sign-in
+   - For Next.js and TanStack Start, the CLI asks only if you selected a database
+9. **AI chat.** None, Vercel AI SDK, or TanStack AI. Either SDK adds a streaming chat route, plus a chat page on Next.js and TanStack Start.
+10. **Which app owns users and data.** Asked only for a monorepo with an api. The owner, the web app or the api, runs auth, the database, and AI chat. The web app is the easier choice.
+11. **Rate limiting.** Limit requests per IP? Express and NestJS only.
+12. **CI.** Add a GitHub Actions workflow?
+13. **VS Code.** Add workspace settings and recommended extensions?
+14. **Git.** Initialize a repository?
+15. **Install dependencies.** Run the install command now?
 
 <Callout type="info">
   The CLI does not ask for a port number. The server port defaults to `3000`
@@ -110,28 +110,28 @@ npm run dev
 
 </Steps>
 
-## What's Included
+## What's included
 
 <Cards>
   <Card title="Backend API" icon={<Database className="text-blue-400" />}>
     Express or NestJS server with TypeScript, security headers, CORS, and a
     health check endpoint
   </Card>
-  <Card title="Full-stack App" icon={<Layout className="text-green-400" />}>
+  <Card title="Full-stack app" icon={<Layout className="text-green-400" />}>
     Next.js 16 or TanStack Start with React 19, Tailwind CSS v4, and file-based
     routing
   </Card>
   <Card
-    title="Type-safe Database"
+    title="Type-safe database"
     icon={<Shield className="text-purple-400" />}
   >
-    PostgreSQL with Prisma or Drizzle, or MongoDB with Mongoose - your choice
+    PostgreSQL with Prisma or Drizzle, or MongoDB with Mongoose
   </Card>
   <Card title="Authentication" icon={<Zap className="text-yellow-400" />}>
     Better Auth for every framework, with email verification, password reset,
     and GitHub and Google sign-in
   </Card>
-  <Card title="AI Chat" icon={<MessageSquare className="text-pink-400" />}>
+  <Card title="AI chat" icon={<MessageSquare className="text-pink-400" />}>
     A streaming chat route on the Vercel AI SDK or TanStack AI, and a chat page
     with a thinking indicator and a Stop button
   </Card>
@@ -139,10 +139,10 @@ npm run dev
     A Turborepo with a Next.js or TanStack Start web app and an optional Express
     or NestJS api
   </Card>
-  <Card title="Docker Ready" icon={<Container className="text-blue-400" />}>
+  <Card title="Docker setup" icon={<Container className="text-blue-400" />}>
     Multi-stage Dockerfile and docker-compose.yml generated on request
   </Card>
-  <Card title="Developer Tooling" icon={<Terminal className="text-primary" />}>
+  <Card title="Developer tooling" icon={<Terminal className="text-primary" />}>
     ESLint 10, Prettier, TypeScript strict mode, and hot reload already set up
   </Card>
 </Cards>
@@ -150,17 +150,17 @@ npm run dev
 ## Requirements
 
 - **Node.js** 24.0.0 or higher
-- **Package manager** - npm, pnpm, or bun
+- **Package manager**, one of npm, pnpm, or bun
 
 <Callout type="warn">
   Check your Node.js version before running: `node --version`
 </Callout>
 
-## Next Steps
+## Next steps
 
 <Cards>
-  <Card title="Installation Options" href="/docs/installation">
-    npx vs global install, package manager differences
+  <Card title="Installation options" href="/docs/installation">
+    npx or a global install, and how the package managers differ
   </Card>
   <Card title="Usage" href="/docs/usage">
     Every prompt and command-line flag
@@ -169,14 +169,14 @@ npm run dev
     Backend, frontend, database, auth, AI chat, monorepo, and Docker options in
     detail
   </Card>
-  <Card title="Project Structure" href="/docs/structure">
+  <Card title="Project structure" href="/docs/structure">
     Understand the generated file layout
   </Card>
 </Cards>
 
 ---
 
-## Need Help?
+## Need help?
 
 - Found a bug? [Open an issue on GitHub](https://github.com/abdullah-dev0/better-ts-stack/issues)
 - Enjoying the tool? [Leave a star on GitHub](https://github.com/abdullah-dev0/better-ts-stack)

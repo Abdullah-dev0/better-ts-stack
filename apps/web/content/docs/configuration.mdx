@@ -6,13 +6,13 @@ description: Environment variables, package.json, and TypeScript configuration
 import { Callout } from "fumadocs-ui/components/callout";
 import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 
-## Configuration Overview
+## Configuration overview
 
 This page lists the configuration files a generated project contains and the environment variables you need to set.
 
 ---
 
-## Environment Variables
+## Environment variables
 
 ### Backend (.env)
 
@@ -47,7 +47,7 @@ OPENAI_API_KEY=
 AI_MODEL=gpt-6.1-sol
 ```
 
-### Full-stack / Next.js (.env)
+### Full-stack Next.js (.env)
 
 ```bash
 # TanStack Start only. Next.js picks its port before it loads .env.
@@ -88,13 +88,13 @@ See [Monorepo](/docs/modules/monorepo) for which app gets the database, Better A
   project gets its own secret.
 </Callout>
 
-### Environment-Specific Files
+### Environment-specific files
 
 You can create separate files for different environments:
 
-- `.env.development` - Development-specific
-- `.env.production` - Production-specific
-- `.env.test` - Testing environment
+- `.env.development` for development
+- `.env.production` for production
+- `.env.test` for tests
 
 <Callout type="warn">
   **Never commit `.env` files to version control!** Use `.env.example` as a
@@ -103,7 +103,7 @@ You can create separate files for different environments:
 
 ---
 
-## TypeScript Configuration
+## TypeScript configuration
 
 ### Backend tsconfig.json
 
@@ -171,7 +171,7 @@ The Next.js template ships with this `tsconfig.json`:
 
 ---
 
-## Package.json Scripts
+## package.json scripts
 
 ### Backend (Express) scripts
 
@@ -220,7 +220,7 @@ Docker module adds: `docker:build`, `docker:up`, `docker:down`, `docker:logs`
 
 ---
 
-## ESLint Configuration
+## ESLint configuration
 
 ### Backend eslint.config.mjs
 
@@ -258,7 +258,7 @@ export default tseslint.config(
 
 ---
 
-## Prettier Configuration
+## Prettier configuration
 
 ### .prettierrc
 
@@ -275,9 +275,9 @@ export default tseslint.config(
 
 ---
 
-## Docker Configuration
+## Docker configuration
 
-### Multi-Stage Dockerfile
+### Multi-stage Dockerfile
 
 See full Dockerfile in [Docker Module](/docs/modules/docker).
 
@@ -302,7 +302,7 @@ With a database, Compose also runs PostgreSQL or MongoDB and the app waits until
 
 ---
 
-## Prisma Configuration
+## Prisma configuration
 
 ### schema.prisma
 
@@ -389,7 +389,7 @@ npx prisma migrate reset
 
 ---
 
-## Next.js Configuration
+## Next.js configuration
 
 ### next.config.ts
 
@@ -409,9 +409,9 @@ Add options as you need them. See the [Next.js configuration docs](https://nextj
 
 ---
 
-## Custom Configuration
+## Custom configuration
 
-### Adding Custom Scripts
+### Adding custom scripts
 
 Edit `package.json`:
 
@@ -426,7 +426,7 @@ Edit `package.json`:
 }
 ```
 
-### Custom TypeScript Paths
+### Custom TypeScript paths
 
 Add to `tsconfig.json`:
 

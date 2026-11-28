@@ -5,11 +5,15 @@ import { MODULE_FILES } from "./stack-files";
 export type Framework = "express" | "nestjs" | "nextjs" | "tanstack";
 export type Database = "none" | "prisma" | "drizzle" | "mongoose";
 export type PackageManager = "npm" | "pnpm" | "bun";
+export type Ai = "none" | "vercel" | "tanstack";
+export type Payments = "none" | "polar" | "stripe";
 
 export interface StackChoices {
   framework: Framework;
   database: Database;
   packageManager: PackageManager;
+  ai: Ai;
+  payments: Payments;
   useAuth: boolean;
   useDocker: boolean;
   useRateLimit: boolean;
@@ -24,6 +28,8 @@ export const DEFAULT_CHOICES: StackChoices = {
   framework: "nestjs",
   database: "prisma",
   packageManager: "npm",
+  ai: "none",
+  payments: "none",
   useAuth: true,
   useDocker: true,
   useRateLimit: false,
@@ -74,6 +80,30 @@ export const DATABASE_OPTIONS: StackOption<Database>[] = [
   { value: "mongoose", label: "Mongoose", description: "MongoDB ODM" },
 ];
 
+export const AI_OPTIONS: StackOption<Ai>[] = [
+  { value: "none", label: "None", description: "No AI chat" },
+  {
+    value: "vercel",
+    label: "Vercel AI SDK",
+    description: "Streams through the Vercel AI Gateway",
+  },
+  {
+    value: "tanstack",
+    label: "TanStack AI",
+    description: "Streams through the OpenAI adapter",
+  },
+];
+
+export const PAYMENTS_OPTIONS: StackOption<Payments>[] = [
+  { value: "none", label: "None", description: "No payments" },
+  {
+    value: "polar",
+    label: "Polar",
+    description: "Subscriptions, handles sales tax for you",
+  },
+  { value: "stripe", label: "Stripe", description: "Subscriptions" },
+];
+
 export const PACKAGE_MANAGER_OPTIONS: (StackOption<PackageManager> & {
   runner: string;
 })[] = [
@@ -101,12 +131,18 @@ export function canUseRateLimit(choices: StackChoices): boolean {
   return isBackend(choices.framework);
 }
 
+// The payment plugin runs inside Better Auth and keeps customers in the database
+export function canUsePayments(choices: StackChoices): boolean {
+  return choices.useAuth && canUseAuth(choices) && choices.database !== "none";
+}
+
 // Drops options that the CLI would reject for the chosen framework and database
 export function normalizeChoices(choices: StackChoices): StackChoices {
   return {
     ...choices,
     useAuth: choices.useAuth && canUseAuth(choices),
     useRateLimit: choices.useRateLimit && canUseRateLimit(choices),
+    payments: canUsePayments(choices) ? choices.payments : "none",
   };
 }
 
@@ -125,6 +161,8 @@ export function buildCommand(
   ];
   if (choices.database !== "none") parts.push(`--database ${choices.database}`);
   if (choices.useAuth) parts.push("--auth");
+  if (choices.ai !== "none") parts.push(`--ai ${choices.ai}`);
+  if (choices.payments !== "none") parts.push(`--payments ${choices.payments}`);
   if (choices.useRateLimit) parts.push("--rate-limit");
   if (choices.useDocker) parts.push("--docker");
   if (choices.useCi) parts.push("--ci");
@@ -139,6 +177,7 @@ export type FileSource =
   | "base"
   | "database"
   | "auth"
+  | "ai"
   | "docker"
   | "rate-limit"
   | "ci"
@@ -167,6 +206,11 @@ export function listProjectFiles(choices: StackChoices): ProjectFile[] {
     modules.push([`${choices.database}/${framework}`, "database"]);
   if (choices.useDocker) modules.push(["docker", "docker"]);
   if (choices.useAuth) modules.push([`auth/${framework}`, "auth"]);
+  if (choices.ai !== "none") {
+    if (!isBackend(framework))
+      modules.push([`ai-page/${choices.ai}/${framework}`, "ai"]);
+    modules.push([`ai/${choices.ai}/${framework}`, "ai"]);
+  }
   if (choices.useRateLimit)
     modules.push([`rate-limit/${framework}`, "rate-limit"]);
   if (choices.useCi) modules.push(["ci", "ci"]);
@@ -234,7 +278,7 @@ export function isValidProjectName(name: string): boolean {
   );
 }
 
-type Extra = Exclude<FileSource, "base" | "database">;
+type Extra = Exclude<FileSource, "base" | "database" | "ai">;
 
 const EXTRA_KEYS = {
   auth: "useAuth",
@@ -258,6 +302,8 @@ export function toSearchParams(
     pm: choices.packageManager,
     with: EXTRAS.filter((extra) => choices[EXTRA_KEYS[extra]]).join(","),
   });
+  if (choices.ai !== "none") params.set("ai", choices.ai);
+  if (choices.payments !== "none") params.set("payments", choices.payments);
   if (projectName !== PROJECT_NAME && isValidProjectName(projectName))
     params.set("name", projectName);
   // Commas are safe in a query string and read better unescaped
@@ -296,6 +342,12 @@ export function fromSearchParams(params: SearchParams): {
       params.pm,
       DEFAULT_CHOICES.packageManager
     ),
+    ai: pickOption(AI_OPTIONS, params.ai, DEFAULT_CHOICES.ai),
+    payments: pickOption(
+      PAYMENTS_OPTIONS,
+      params.payments,
+      DEFAULT_CHOICES.payments
+    ),
   };
   if (typeof params.with === "string") {
     const picked = params.with.split(",");
@@ -329,6 +381,8 @@ export const STACK_PRESETS: StackPreset[] = [
     choices: {
       framework: "express",
       database: "none",
+      ai: "none",
+      payments: "none",
       useAuth: false,
       useDocker: false,
       useRateLimit: false,
@@ -345,6 +399,8 @@ export const STACK_PRESETS: StackPreset[] = [
     choices: {
       framework: "nestjs",
       database: "drizzle",
+      ai: "none",
+      payments: "none",
       useAuth: true,
       useDocker: true,
       useRateLimit: true,
@@ -361,6 +417,8 @@ export const STACK_PRESETS: StackPreset[] = [
     choices: {
       framework: "nextjs",
       database: "prisma",
+      ai: "none",
+      payments: "none",
       useAuth: true,
       useDocker: true,
       useRateLimit: false,
@@ -377,6 +435,8 @@ export const STACK_PRESETS: StackPreset[] = [
     choices: {
       framework: "tanstack",
       database: "drizzle",
+      ai: "none",
+      payments: "none",
       useAuth: true,
       useDocker: false,
       useRateLimit: false,

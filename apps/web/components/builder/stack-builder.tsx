@@ -7,6 +7,7 @@ import {
   Bot,
   CircleCheck,
   Code,
+  CreditCard,
   Gauge,
   RotateCcw,
   Share2,
@@ -27,14 +28,18 @@ import {
   siNpm,
   siPnpm,
   siPrisma,
+  siStripe,
   siTanstack,
+  siVercel,
 } from "simple-icons";
 
 import { CopyButton } from "@/components/home/copy-button";
 import {
+  AI_OPTIONS,
   buildCommand,
   buildTree,
   canUseAuth,
+  canUsePayments,
   canUseRateLimit,
   DATABASE_OPTIONS,
   DEFAULT_CHOICES,
@@ -45,6 +50,7 @@ import {
   matchesPreset,
   normalizeChoices,
   PACKAGE_MANAGER_OPTIONS,
+  PAYMENTS_OPTIONS,
   PROJECT_NAME,
   type ProjectFile,
   STACK_PRESETS,
@@ -60,6 +66,7 @@ const SOURCE_STYLES: Record<
 > = {
   database: { label: "database", text: "text-tui-lime" },
   auth: { label: "auth", text: "text-tui-amber" },
+  ai: { label: "ai", text: "text-tui-pink" },
   docker: { label: "docker", text: "text-tui-lavender" },
   "rate-limit": { label: "rate-limit", text: "text-tui-pink" },
   ci: { label: "ci", text: "text-tui-lime" },
@@ -97,6 +104,10 @@ const ICONS = {
   npm: brandIcon(siNpm),
   pnpm: brandIcon(siPnpm),
   bun: brandIcon(siBun),
+  "ai-vercel": brandIcon(siVercel),
+  "ai-tanstack": brandIcon(siTanstack),
+  polar: CreditCard,
+  stripe: brandIcon(siStripe),
   auth: brandIcon(siBetterauth),
   docker: brandIcon(siDocker),
   "rate-limit": Gauge,
@@ -105,7 +116,7 @@ const ICONS = {
   vscode: Code,
 } satisfies Record<string, IconComponent>;
 
-type ExtraId = Exclude<FileSource, "base" | "database">;
+type ExtraId = Exclude<FileSource, "base" | "database" | "ai">;
 
 const EXTRA_OPTIONS: {
   id: ExtraId;
@@ -160,6 +171,8 @@ const EXTRA_OPTIONS: {
 const GROUPS = [
   { id: "framework", label: "framework" },
   { id: "database", label: "database" },
+  { id: "ai", label: "ai chat" },
+  { id: "payments", label: "payments" },
   { id: "extras", label: "extras" },
   { id: "package-manager", label: "package manager" },
 ] as const;
@@ -177,6 +190,8 @@ function randomChoices(): StackChoices {
     framework: pickRandom(FRAMEWORK_OPTIONS).value,
     database: pickRandom(DATABASE_OPTIONS).value,
     packageManager: pickRandom(PACKAGE_MANAGER_OPTIONS).value,
+    ai: pickRandom(AI_OPTIONS).value,
+    payments: pickRandom(PAYMENTS_OPTIONS).value,
     useAuth: Math.random() < 0.5,
     useDocker: Math.random() < 0.5,
     useRateLimit: Math.random() < 0.5,
@@ -292,6 +307,18 @@ export function StackBuilder({
       key: choices.database,
       label: findLabel(DATABASE_OPTIONS, choices.database),
       onRemove: () => update({ database: "none" }),
+    });
+  if (choices.ai !== "none")
+    picks.push({
+      key: `ai-${choices.ai}`,
+      label: findLabel(AI_OPTIONS, choices.ai),
+      onRemove: () => update({ ai: "none" }),
+    });
+  if (choices.payments !== "none")
+    picks.push({
+      key: choices.payments,
+      label: findLabel(PAYMENTS_OPTIONS, choices.payments),
+      onRemove: () => update({ payments: "none" }),
     });
   for (const extra of EXTRA_OPTIONS) {
     if (choices[extra.field])
@@ -556,6 +583,45 @@ export function StackBuilder({
                     description={option.description}
                     isChecked={choices.database === option.value}
                     onChange={() => update({ database: option.value })}
+                  />
+                ))}
+              </OptionGroup>
+
+              <OptionGroup id="ai" label="ai chat">
+                {AI_OPTIONS.map((option) => (
+                  <OptionCard
+                    key={option.value}
+                    type="radio"
+                    name="ai"
+                    icon={
+                      option.value === "none"
+                        ? ICONS.none
+                        : ICONS[`ai-${option.value}`]
+                    }
+                    label={option.label}
+                    description={option.description}
+                    isChecked={choices.ai === option.value}
+                    onChange={() => update({ ai: option.value })}
+                  />
+                ))}
+              </OptionGroup>
+
+              <OptionGroup id="payments" label="payments">
+                {PAYMENTS_OPTIONS.map((option) => (
+                  <OptionCard
+                    key={option.value}
+                    type="radio"
+                    name="payments"
+                    icon={ICONS[option.value]}
+                    label={option.label}
+                    description={option.description}
+                    disabledReason={
+                      option.value !== "none" && !canUsePayments(choices)
+                        ? "Requires auth and a database"
+                        : undefined
+                    }
+                    isChecked={choices.payments === option.value}
+                    onChange={() => update({ payments: option.value })}
                   />
                 ))}
               </OptionGroup>

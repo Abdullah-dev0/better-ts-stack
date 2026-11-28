@@ -32,6 +32,12 @@ export function selectModules(config: ProjectConfig) {
     if (isFullstack) modules.push(`ai-page/${config.ai}/${framework}`);
     if (isOwner) modules.push(`ai/${config.ai}/${framework}`);
   }
+  // The server plugin runs where Better Auth runs; a web app that only asks
+  // the owner for sessions still needs the package for its client plugin
+  if (config.payments !== "none") {
+    if (isOwner) modules.push(`payments/${config.payments}`);
+    else if (isFullstack) modules.push(`payments-client/${config.payments}`);
+  }
   if (config.app?.role === "web" && config.apiFramework !== "none") {
     modules.push(`proxy/${framework}`);
   }

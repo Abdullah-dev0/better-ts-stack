@@ -44,6 +44,7 @@ npx better-ts-stack my-api --framework express --yes --dry-run
 | `--pm <name>`                      | `npm`, `pnpm`, `bun`                                    |
 | `--auth` / `--no-auth`             | Add authentication                                      |
 | `--ai <name>`                      | `none`, `vercel`, `tanstack`: AI chat                   |
+| `--payments <name>`                | `none`, `polar`, `stripe`: subscriptions                |
 | `--docker` / `--no-docker`         | Add Docker files                                        |
 | `--rate-limit` / `--no-rate-limit` | Add rate limiting (Express and NestJS)                  |
 | `--ci` / `--no-ci`                 | Add a GitHub Actions workflow                           |
@@ -305,6 +306,20 @@ $ AI chat
 ```
 
 Adds `POST /api/chat`, which streams the model's reply. Next.js and TanStack Start also get a `/chat` page with a thinking indicator and a Stop button that ends the model call. See [AI chat](/docs/modules/ai).
+
+</Step>
+
+<Step>
+### Payments *(with auth and a database only)*
+
+```
+$ Payments (subscriptions)
+  › None
+    Polar
+    Stripe
+```
+
+Adds the Polar or Stripe plugin to Better Auth: a customer at the provider, checkout, the customer portal, and a webhook. There is no pricing page. See [Payments](/docs/modules/payments).
 
 </Step>
 

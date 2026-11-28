@@ -48,6 +48,16 @@ export function generateNextSteps(
     steps.push("Set OPENAI_API_KEY in .env; AI_MODEL picks the model");
   }
 
+  if (config.payments === "stripe") {
+    steps.push(
+      "Set STRIPE_SECRET_KEY and STRIPE_WEBHOOK_SECRET in .env, and add your prices to plans in the auth config"
+    );
+  } else if (config.payments === "polar") {
+    steps.push(
+      "Set POLAR_ACCESS_TOKEN and POLAR_WEBHOOK_SECRET in .env; POLAR_SERVER stays sandbox until you set it to production"
+    );
+  }
+
   // Step 3: Install dependencies if not already done
   if (!depsInstalled) {
     steps.push(`${config.packageManager} install`);
@@ -86,7 +96,7 @@ export function generateNextSteps(
     if (config.useAuth && isFullstack && !hasDockerDatabase) {
       steps.push(
         "Better Auth uses MongoDB transactions: run MongoDB as a replica set (or use Atlas) " +
-          'and create the "user", "session", "account", and "verification" collections before signing up. ' +
+          `and create the "user", "session", "account", ${config.payments === "stripe" ? '"verification", and "subscription"' : 'and "verification"'} collections before signing up. ` +
           `See ${MONGODB_AUTH_SETUP_URL}`
       );
     }

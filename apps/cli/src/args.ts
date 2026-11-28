@@ -4,17 +4,19 @@ import { parseArgs } from "node:util";
 import {
   aiOptions,
   AiSdk,
-  DataOwner,
-  ownerOptions,
   ApiFramework,
   apiFrameworkOptions,
   backendFrameworkOptions,
   buildError,
   Database,
+  DataOwner,
   Framework,
   frontendFrameworkOptions,
+  ownerOptions,
   PackageManager,
   packageManagerOptions,
+  Payments,
+  paymentsOptions,
   StackChoices,
 } from "./types";
 
@@ -26,10 +28,9 @@ const DATABASES: Database[] = ["none", "prisma", "drizzle", "mongoose"];
 const API_FRAMEWORKS: ApiFramework[] = apiFrameworkOptions.map(
   (option) => option.value
 );
-const OWNERS: DataOwner[] = ownerOptions.map(
-  (option) => option.value
-);
+const OWNERS: DataOwner[] = ownerOptions.map((option) => option.value);
 const AI_SDKS: AiSdk[] = aiOptions.map((option) => option.value);
+const PAYMENTS: Payments[] = paymentsOptions.map((option) => option.value);
 const PACKAGE_MANAGERS: PackageManager[] = packageManagerOptions.map(
   (option) => option.value
 );
@@ -47,6 +48,8 @@ Options left out are asked interactively, unless --yes is given.
   --pm <name>             ${PACKAGE_MANAGERS.join(" | ")}
   --auth, --no-auth       Add authentication
   --ai <name>             ${AI_SDKS.join(" | ")}: a streaming AI chat endpoint
+  --payments <name>       ${PAYMENTS.join(" | ")}: subscriptions (needs --auth and
+                          a database)
   --docker, --no-docker   Add Docker files
   --rate-limit, --no-rate-limit
                           Add rate limiting (Express and NestJS)
@@ -108,6 +111,7 @@ export function parseCliArgs(argv: string[]): CliArgs {
         pm: { type: "string" },
         auth: { type: "boolean" },
         ai: { type: "string" },
+        payments: { type: "string" },
         docker: { type: "boolean" },
         "rate-limit": { type: "boolean" },
         ci: { type: "boolean" },
@@ -142,6 +146,7 @@ export function parseCliArgs(argv: string[]): CliArgs {
     packageManager: parseChoice("pm", values.pm, PACKAGE_MANAGERS),
     useAuth: values.auth,
     ai: parseChoice("ai", values.ai, AI_SDKS),
+    payments: parseChoice("payments", values.payments, PAYMENTS),
     useDocker: values.docker,
     useRateLimit: values["rate-limit"],
     useCi: values.ci,

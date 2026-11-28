@@ -43,103 +43,133 @@ async function main() {
               // get every AI choice; Docker builds the others with one SDK each
               for (const ai of packageManager === "npm" && !useDocker
                 ? ["none", "vercel", "tanstack"]
-                : [AI_BY_PACKAGE_MANAGER[packageManager]]) {
-                const name = `${framework}-${database}-${useAuth ? "auth" : "plain"}${useRateLimit ? "-ratelimit" : ""}${ai === "none" ? "" : `-ai-${ai}`}-${packageManager}-${useDocker ? "docker" : "local"}`;
-                const target = path.join(root, name);
-                const config = {
-                  projectName: name,
-                  framework,
-                  applicationType: BACKEND_ENTRY_FILES[framework]
-                    ? "backend"
-                    : "fullstack",
-                  database,
-                  useAuth,
-                  ai,
-                  useRateLimit,
-                  useDocker,
-                  useCi: !useDocker,
-                  useAgents: useDocker,
-                  useVscode: useDocker,
-                  packageManager,
-                  initGit: false,
-                  installDeps: false,
-                };
-                await build(config, target);
-                const files = await fs.readdir(target, { recursive: true });
-                assert(!files.some((file) => file.endsWith(".hbs")), name);
-                assert(files.includes(".gitignore"), name);
-                assert(files.includes("README.md"), name);
-                const stack = JSON.parse(
-                  await fs.readFile(path.join(target, "better-ts-stack.json")),
-                );
-                assert.deepEqual(
-                  [
-                    stack.framework,
-                    stack.database,
-                    stack.packageManager,
-                    stack.auth,
-                    stack.ai,
-                    stack.docker,
-                  ],
-                  [framework, database, packageManager, useAuth, ai, useDocker],
-                  `${name}: better-ts-stack.json`,
-                );
-                assert.equal(
-                  files.some((file) => file.endsWith("ci.yml")),
-                  config.useCi,
-                  `${name}: ci.yml`,
-                );
-                assert.equal(
-                  files.includes("AGENTS.md"),
-                  config.useAgents,
-                  `${name}: AGENTS.md`,
-                );
-                if (config.useAgents) {
-                  const agents = await fs.readFile(
-                    path.join(target, "AGENTS.md"),
-                    "utf8",
+                : [AI_BY_PACKAGE_MANAGER[packageManager]])
+                // Payments need auth and a database
+                for (const payments of useAuth && database !== "none"
+                  ? ["none", "polar", "stripe"]
+                  : ["none"]) {
+                  const name = `${framework}-${database}-${useAuth ? "auth" : "plain"}${useRateLimit ? "-ratelimit" : ""}${ai === "none" ? "" : `-ai-${ai}`}${payments === "none" ? "" : `-pay-${payments}`}-${packageManager}-${useDocker ? "docker" : "local"}`;
+                  const target = path.join(root, name);
+                  const config = {
+                    projectName: name,
+                    framework,
+                    applicationType: BACKEND_ENTRY_FILES[framework]
+                      ? "backend"
+                      : "fullstack",
+                    database,
+                    useAuth,
+                    ai,
+                    payments,
+                    useRateLimit,
+                    useDocker,
+                    useCi: !useDocker,
+                    useAgents: useDocker,
+                    useVscode: useDocker,
+                    packageManager,
+                    initGit: false,
+                    installDeps: false,
+                  };
+                  await build(config, target);
+                  const files = await fs.readdir(target, { recursive: true });
+                  assert(!files.some((file) => file.endsWith(".hbs")), name);
+                  assert(files.includes(".gitignore"), name);
+                  assert(files.includes("README.md"), name);
+                  const stack = JSON.parse(
+                    await fs.readFile(
+                      path.join(target, "better-ts-stack.json"),
+                    ),
                   );
-                  // Every condition rendered, and none left a run of blank lines
-                  assert(
-                    !agents.includes("{{") && !agents.includes("\n\n\n"),
+                  assert.deepEqual(
+                    [
+                      stack.framework,
+                      stack.database,
+                      stack.packageManager,
+                      stack.auth,
+                      stack.ai,
+                      stack.payments,
+                      stack.docker,
+                    ],
+                    [
+                      framework,
+                      database,
+                      packageManager,
+                      useAuth,
+                      ai,
+                      payments,
+                      useDocker,
+                    ],
+                    `${name}: better-ts-stack.json`,
+                  );
+                  assert.equal(
+                    files.some((file) => file.endsWith("ci.yml")),
+                    config.useCi,
+                    `${name}: ci.yml`,
+                  );
+                  assert.equal(
+                    files.includes("AGENTS.md"),
+                    config.useAgents,
                     `${name}: AGENTS.md`,
                   );
-                }
-                const manifest = JSON.parse(
-                  await fs.readFile(path.join(target, "package.json")),
-                );
-                for (const version of Object.values({
-                  ...manifest.dependencies,
-                  ...manifest.devDependencies,
-                })) {
-                  // A caret range on an exact version; prereleases such as
-                  // Nitro's 3.0.x-beta are allowed
+                  if (config.useAgents) {
+                    const agents = await fs.readFile(
+                      path.join(target, "AGENTS.md"),
+                      "utf8",
+                    );
+                    // Every condition rendered, and none left a run of blank lines
+                    assert(
+                      !agents.includes("{{") && !agents.includes("\n\n\n"),
+                      `${name}: AGENTS.md`,
+                    );
+                  }
+                  const manifest = JSON.parse(
+                    await fs.readFile(path.join(target, "package.json")),
+                  );
+                  for (const version of Object.values({
+                    ...manifest.dependencies,
+                    ...manifest.devDependencies,
+                  })) {
+                    // A caret range on an exact version; prereleases such as
+                    // Nitro's 3.0.x-beta are allowed
+                    assert(
+                      /^\^?\d+\.\d+\.\d+(-[0-9A-Za-z.]+)?$/.test(version),
+                      `${name}: ${version}`,
+                    );
+                  }
                   assert(
-                    /^\^?\d+\.\d+\.\d+(-[0-9A-Za-z.]+)?$/.test(version),
-                    `${name}: ${version}`,
+                    !JSON.stringify(manifest.scripts).includes("{{"),
+                    name,
                   );
-                }
-                assert(!JSON.stringify(manifest.scripts).includes("{{"), name);
-                if (BACKEND_ENTRY_FILES[framework])
+                  if (BACKEND_ENTRY_FILES[framework])
+                    assert.equal(
+                      manifest.scripts.start,
+                      `cross-env NODE_ENV=production ${packageManager === "bun" ? "bun" : "node"} ${BACKEND_ENTRY_FILES[framework]}`,
+                    );
+                  // pnpm 11+ ignores package.json "pnpm" and needs build approvals
+                  assert(!manifest.pnpm, `${name}: package.json pnpm field`);
                   assert.equal(
-                    manifest.scripts.start,
-                    `cross-env NODE_ENV=production ${packageManager === "bun" ? "bun" : "node"} ${BACKEND_ENTRY_FILES[framework]}`,
+                    files.includes("pnpm-workspace.yaml"),
+                    packageManager === "pnpm",
+                    `${name}: pnpm-workspace.yaml`,
                   );
-                // pnpm 11+ ignores package.json "pnpm" and needs build approvals
-                assert(!manifest.pnpm, `${name}: package.json pnpm field`);
-                assert.equal(
-                  files.includes("pnpm-workspace.yaml"),
-                  packageManager === "pnpm",
-                  `${name}: pnpm-workspace.yaml`,
-                );
-                // NODE_ENV comes from the scripts, so .env must not pin it
-                const env = await fs.readFile(
-                  path.join(target, ".env"),
-                  "utf8",
-                );
-                assert(!/^NODE_ENV=/m.test(env), `${name}: NODE_ENV in .env`);
-                cases.push({ name, target, config });
-              }
+                  // NODE_ENV comes from the scripts, so .env must not pin it
+                  const env = await fs.readFile(
+                    path.join(target, ".env"),
+                    "utf8",
+                  );
+                  assert(!/^NODE_ENV=/m.test(env), `${name}: NODE_ENV in .env`);
+                  // The provider's keys are listed for the user to fill in
+                  assert.equal(
+                    /^STRIPE_SECRET_KEY=/m.test(env),
+                    payments === "stripe",
+                    `${name}: STRIPE_SECRET_KEY`,
+                  );
+                  assert.equal(
+                    /^POLAR_ACCESS_TOKEN=/m.test(env),
+                    payments === "polar",
+                    `${name}: POLAR_ACCESS_TOKEN`,
+                  );
+                  cases.push({ name, target, config });
+                }
           }
       }
     }
@@ -229,6 +259,23 @@ const MONOREPO_LAYOUTS = [
     owner: "web",
     database: "drizzle",
   },
+  // The payments plugin runs in the owner; the web app only adds the client
+  {
+    layout: "payapi",
+    api: true,
+    useAuth: true,
+    owner: "api",
+    database: "drizzle",
+    payments: "stripe",
+  },
+  {
+    layout: "payweb",
+    api: true,
+    useAuth: true,
+    owner: "web",
+    database: "prisma",
+    payments: "polar",
+  },
 ];
 
 async function generateMonorepos(root) {
@@ -239,7 +286,7 @@ async function generateMonorepos(root) {
       for (const apiFramework of layout.api
         ? ["express", "nestjs"]
         : ["none"]) {
-        const { useAuth, owner, database } = layout;
+        const { useAuth, owner, database, payments = "none" } = layout;
         // Each package manager and AI SDK comes around in turn
         const packageManager = ["npm", "pnpm", "bun"][index % 3];
         const ai = ["vercel", "tanstack", "none"][
@@ -258,6 +305,7 @@ async function generateMonorepos(root) {
           database,
           useAuth,
           ai,
+          payments,
           useRateLimit: false,
           useDocker: false,
           useCi: true,
@@ -318,6 +366,11 @@ async function generateMonorepos(root) {
           if (app === "apps/web") {
             assert.equal(/^API_URL=/m.test(env), layout.api, `${name}: proxy`);
           }
+          assert.equal(
+            /^(STRIPE_SECRET_KEY|POLAR_ACCESS_TOKEN)=/m.test(env),
+            payments !== "none" && isOwner,
+            `${name}: ${app} payment keys`,
+          );
         }
         cases.push({ name, target, config, layout: layout.layout });
       }

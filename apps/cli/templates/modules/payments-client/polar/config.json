@@ -1,0 +1,12 @@
+{
+  "id": "payments-client-polar",
+  "name": "Polar client",
+  "description": "The Better Auth Polar client plugin for a web app whose auth runs in the api",
+  "type": "feature",
+  "dependencies": {
+    "@polar-sh/better-auth": "2.1.5"
+  },
+  "devDependencies": {},
+  "scripts": {},
+  "envVars": {}
+}

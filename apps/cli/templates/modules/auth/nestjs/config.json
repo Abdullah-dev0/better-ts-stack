@@ -5,7 +5,7 @@
   "type": "feature",
   "dependencies": {
     "@thallesp/nestjs-better-auth": "2.8.0",
-    "better-auth": "^1.7.18"
+    "better-auth": "^1.7.27"
   },
   "devDependencies": {},
   "scripts": {},

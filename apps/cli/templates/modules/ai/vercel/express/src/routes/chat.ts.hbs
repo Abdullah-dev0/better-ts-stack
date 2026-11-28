@@ -37,8 +37,11 @@ router.post("/", {{#if useAuth}}requireAuth, {{/if}}async (req: Request, res: Re
     abortSignal: controller.signal,
   });
 
+  // no-transform keeps a proxy, such as a Next.js rewrite, from gzipping the
+  // stream and holding it back until the reply is finished
   await pipeUIMessageStreamToResponse({
     response: res,
+    headers: { "cache-control": "no-cache, no-transform" },
     stream: toUIMessageStream({ stream: result.stream }),
   });
 });

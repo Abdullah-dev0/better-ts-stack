@@ -1,0 +1,21 @@
+import { createAuthClient } from "better-auth/react";
+{{#if (eq payments 'stripe')}}
+import { stripeClient } from "@better-auth/stripe/client";
+{{/if}}
+{{#if (eq payments 'polar')}}
+import { polarClient } from "@polar-sh/better-auth/client";
+{{/if}}
+
+{{#if (eq payments 'none')}}
+export const authClient = createAuthClient();
+{{/if}}
+{{#if (eq payments 'stripe')}}
+// authClient.subscription.upgrade() opens Stripe Checkout
+export const authClient = createAuthClient({
+  plugins: [stripeClient({ subscription: true })],
+});
+{{/if}}
+{{#if (eq payments 'polar')}}
+// authClient.checkout() and authClient.customer.portal() open Polar's pages
+export const authClient = createAuthClient({ plugins: [polarClient()] });
+{{/if}}

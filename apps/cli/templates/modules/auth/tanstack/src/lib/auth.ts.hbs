@@ -1,6 +1,18 @@
 import "dotenv/config";
 import { betterAuth } from "better-auth";
 import { tanstackStartCookies } from "better-auth/tanstack-start";
+{{#if (eq payments 'stripe')}}
+import { stripe } from "@better-auth/stripe";
+import Stripe from "stripe";
+{{/if}}
+{{#if (eq payments 'polar')}}
+import { checkout, polar, portal, webhooks } from "@polar-sh/better-auth";
+import { createPolarCore } from "@polar-sh/sdk/2026-10";
+import {
+  deleteExternalCustomers,
+  updateExternalCustomers,
+} from "@polar-sh/sdk/2026-10/services/customers";
+{{/if}}
 
 import type { SocialProvider } from "./auth-schema";
 import { sendEmail } from "./email";
@@ -28,7 +40,53 @@ function deliver(email: Parameters<typeof sendEmail>[0]): void {
   });
 }
 
+{{#if (eq payments 'polar')}}
+// Tokens, products, and customers are separate in each Polar environment
+const polarClient = createPolarCore({
+  accessToken: process.env.POLAR_ACCESS_TOKEN!,
+  environment:
+    process.env.POLAR_SERVER === "production" ? "production" : "sandbox",
+});
+
+// Keeps the user's Polar customer in step with the user. A user who has not
+// bought anything has no customer yet (404). Other failures are logged, so a
+// Polar outage never blocks a profile change or an account deletion
+async function syncPolarCustomer(
+  action: string,
+  call: () => Promise<unknown>
+): Promise<void> {
+  try {
+    await call();
+  } catch (error) {
+    if ((error as { statusCode?: number }).statusCode === 404) return;
+    console.error(`Could not ${action} the Polar customer:`, error);
+  }
+}
+
+{{/if}}
 export const auth = betterAuth({
+{{#if (eq payments 'polar')}}
+  // The Polar plugin does this only with createCustomerOnSignUp, which is off
+  databaseHooks: {
+    user: {
+      update: {
+        after: (user) =>
+          syncPolarCustomer("update", () =>
+            updateExternalCustomers(polarClient)(user.id, {
+              email: user.email,
+              name: user.name,
+            })
+          ),
+      },
+      delete: {
+        after: (user) =>
+          syncPolarCustomer("delete", () =>
+            deleteExternalCustomers(polarClient)(user.id)
+          ),
+      },
+    },
+  },
+{{/if}}
   {{#if (eq database 'prisma')}}
   database: prismaAdapter(client, { provider: "postgresql" }),
   {{/if}}
@@ -86,7 +144,47 @@ ${url}`,
         }
       : {}),
   },
+{{#if (eq payments 'none')}}
   plugins: [tanstackStartCookies()],
+{{else}}
+  plugins: [
+{{#if (eq payments 'stripe')}}
+    // Stripe Checkout and the billing portal for subscriptions. The webhook on
+    // /api/auth/stripe/webhook keeps the subscription table in sync
+    stripe({
+      stripeClient: new Stripe(process.env.STRIPE_SECRET_KEY!),
+      stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
+      createCustomerOnSignUp: true,
+      subscription: {
+        enabled: true,
+        // One entry per Stripe price, for example
+        // { name: "pro", priceId: "price_..." }
+        plans: [],
+      },
+    }),
+{{/if}}
+{{#if (eq payments 'polar')}}
+    // Polar checkout and the customer portal. The webhook on
+    // /api/auth/polar/webhooks checks each event's signature
+    polar({
+      client: polarClient,
+      // Checkout creates the Polar customer from the user ID. Creating it at
+      // sign-up would fail the sign-up, after the user is saved, whenever Polar
+      // refuses the email or is down
+      createCustomerOnSignUp: false,
+      use: [
+        // authClient.checkout({ products: ["<product id>"] }) starts a checkout
+        checkout({ authenticatedUsersOnly: true }),
+        portal(),
+        // Add handlers such as onOrderPaid for the events your app needs
+        webhooks({ secret: process.env.POLAR_WEBHOOK_SECRET! }),
+      ],
+    }),
+{{/if}}
+    // Sets the session cookies; it has to stay the last plugin
+    tanstackStartCookies(),
+  ],
+{{/if}}
   secret: process.env.BETTER_AUTH_SECRET,
   baseURL: process.env.BETTER_AUTH_URL,
 });

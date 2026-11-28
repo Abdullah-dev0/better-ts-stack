@@ -1,0 +1,17 @@
+{
+  "id": "payments-polar",
+  "name": "Polar",
+  "description": "Polar through the Better Auth plugin: checkout, the customer portal, and the webhook. The first checkout creates the Polar customer",
+  "type": "feature",
+  "dependencies": {
+    "@polar-sh/better-auth": "2.1.5",
+    "@polar-sh/sdk": "1.3.2"
+  },
+  "devDependencies": {},
+  "scripts": {},
+  "envVars": {
+    "POLAR_ACCESS_TOKEN": "",
+    "POLAR_WEBHOOK_SECRET": "",
+    "POLAR_SERVER": "sandbox"
+  }
+}

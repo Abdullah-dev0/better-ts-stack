@@ -5,7 +5,7 @@
   "type": "feature",
   "dependencies": {
     "@hookform/resolvers": "^5.9.2",
-    "better-auth": "^1.7.14",
+    "better-auth": "^1.7.27",
     "react-hook-form": "^7.91.0",
     "zod": "^4.6.7"
   },

@@ -69,6 +69,7 @@ export function showSummary(config: ProjectConfig, targetDir: string) {
     config.database !== "none" && config.database,
     config.useAuth && "auth",
     config.ai !== "none" && `ai (${config.ai})`,
+    config.payments !== "none" && `payments (${config.payments})`,
     config.useRateLimit && "rate limit",
     config.useDocker && "docker",
     config.useCi && "ci",

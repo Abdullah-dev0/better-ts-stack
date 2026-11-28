@@ -3,7 +3,14 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { spawn, spawnSync } = require("node:child_process");
-const { PORT, aiChecks, request, waitForServer } = require("./http-checks.cjs");
+const {
+  PORT,
+  DUMMY_PAYMENT_ENV,
+  aiChecks,
+  paymentChecks,
+  request,
+  waitForServer,
+} = require("./http-checks.cjs");
 
 const { inScope } = require("./samples.cjs");
 
@@ -49,13 +56,18 @@ function run(command, cwd, fd) {
   });
 }
 
-function start(pm, cwd, port, fd) {
-  return spawnTree(`${pm} run start`, cwd, fd, { PORT: String(port) }).stop;
+function start(pm, cwd, port, fd, payments) {
+  return spawnTree(`${pm} run start`, cwd, fd, {
+    PORT: String(port),
+    AI_GATEWAY_API_KEY: "dummy",
+    OPENAI_API_KEY: "dummy",
+    ...DUMMY_PAYMENT_ENV[payments],
+  }).stop;
 }
 
 // Each check returns [label, expected, actual]; every request goes to the web
 // app, which answers it or forwards it to the api
-async function monorepoChecks({ apiFramework, useAuth, owner }) {
+async function monorepoChecks({ apiFramework, useAuth, owner, database }) {
   const checks = [["GET /", 200, (await request("/")).status]];
   // Without an api there is nothing to forward to
   if (apiFramework === "none") return checks;
@@ -74,8 +86,8 @@ async function monorepoChecks({ apiFramework, useAuth, owner }) {
     401,
     (await request("/api/me")).status,
   ]);
-  // Sign-up needs a database, which only the auth-in-api cases go without
-  if (owner !== "api") return checks;
+  // Only an api on the in-memory store can sign up without a database server
+  if (owner !== "api" || database !== "none") return checks;
 
   const signUp = await request("/api/auth/sign-up/email", {
     method: "POST",
@@ -107,6 +119,52 @@ async function monorepoChecks({ apiFramework, useAuth, owner }) {
   return checks;
 }
 
+// A gzipped reply reaches the browser only once it is complete, so the web app
+// must pass the api's stream on uncompressed. The headers arrive before the
+// model call, which fails here for lack of a real key
+async function streamChecks({ ai, apiFramework, useAuth, owner, database }) {
+  // Only a chat route in the api goes through the proxy, and signing in needs
+  // the in-memory store, as in monorepoChecks
+  if (!ai || ai === "none" || apiFramework === "none" || owner !== "api")
+    return [];
+  if (useAuth && database !== "none") return [];
+  const headers = {
+    "content-type": "application/json",
+    "accept-encoding": "gzip",
+    origin: `http://localhost:${PORT}`,
+  };
+  if (useAuth) {
+    const signIn = await request("/api/auth/sign-in/email", {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ email: "mono@test.dev", password: "pw123456" }),
+    });
+    headers.cookie = (signIn.headers.get("set-cookie") ?? "").split(";")[0];
+  }
+  const message = { id: "m1", role: "user" };
+  const body =
+    ai === "vercel"
+      ? { messages: [{ ...message, parts: [{ type: "text", text: "hi" }] }] }
+      : {
+          threadId: "t1",
+          runId: "r1",
+          state: {},
+          messages: [{ ...message, content: "hi" }],
+          tools: [],
+          context: [],
+          forwardedProps: {},
+        };
+  const reply = await request("/api/chat", {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+  });
+  return [
+    ["POST /api/chat streams", 200, reply.status],
+    ["chat stream not compressed", null, reply.headers.get("content-encoding")],
+  ];
+}
+
 async function main() {
   const results = [];
   for (const c of matrix.cases.filter(
@@ -130,14 +188,30 @@ async function main() {
     if (checks.every(([, expected, actual]) => expected === actual)) {
       const hasApi = c.config.apiFramework !== "none";
       const stopApi = hasApi
-        ? start(pm, path.join(c.target, "apps/api"), API_PORT, fd)
+        ? start(
+            pm,
+            path.join(c.target, "apps/api"),
+            API_PORT,
+            fd,
+            c.config.payments,
+          )
         : () => {};
-      const stopWeb = start(pm, path.join(c.target, "apps/web"), PORT, fd);
+      const stopWeb = start(
+        pm,
+        path.join(c.target, "apps/web"),
+        PORT,
+        fd,
+        c.config.payments,
+      );
       try {
         if (hasApi) await waitForServer(`http://localhost:${API_PORT}/health`);
         await waitForServer(`http://localhost:${PORT}/`);
         checks.push(...(await monorepoChecks(c.config)));
         checks.push(...(await aiChecks(c.config)));
+        checks.push(...(await streamChecks(c.config)));
+        // The provider sends webhooks to the web app, which forwards them to
+        // the api when the api owns users
+        checks.push(...(await paymentChecks(c.config)));
       } catch (error) {
         checks.push(["servers", "running", error.message]);
       } finally {

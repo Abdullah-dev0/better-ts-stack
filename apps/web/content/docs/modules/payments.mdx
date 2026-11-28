@@ -1,0 +1,105 @@
+---
+title: Payments module
+description: Polar or Stripe subscriptions through the Better Auth plugin, with checkout, the customer portal, and the webhook already wired, on every framework
+---
+
+import { Callout } from "fumadocs-ui/components/callout";
+
+## Overview
+
+`--payments polar` or `--payments stripe` adds the provider's [Better Auth](/docs/modules/auth) plugin to the auth config. Payments need `--auth` and a database, because the plugin keeps customers next to your users.
+
+You get:
+
+- a customer at the provider: Stripe creates it when the user signs up, Polar at the user's first checkout
+- checkout and the provider's customer portal, opened from the auth client
+- a webhook route that checks each event's signature
+
+There is no pricing page and no plan list. Add your products in the provider's dashboard, then call checkout from your own button.
+
+| Flag                | Keys in `.env`                                               | Webhook                         |
+| ------------------- | ------------------------------------------------------------ | ------------------------------- |
+| `--payments stripe` | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`                 | `POST /api/auth/stripe/webhook` |
+| `--payments polar`  | `POLAR_ACCESS_TOKEN`, `POLAR_WEBHOOK_SECRET`, `POLAR_SERVER` | `POST /api/auth/polar/webhooks` |
+
+Express and NestJS check the keys at startup and stop with a message when one is missing. Next.js and TanStack Start read them when the auth config loads.
+
+## Stripe
+
+1. Copy the secret key from the Stripe dashboard into `STRIPE_SECRET_KEY`. Use a test mode key (`sk_test_...`) until you go live.
+2. Forward events to your local server with the [Stripe CLI](https://docs.stripe.com/stripe-cli), and copy the `whsec_...` secret it prints into `STRIPE_WEBHOOK_SECRET`:
+
+   ```bash
+   stripe listen --forward-to localhost:3000/api/auth/stripe/webhook
+   ```
+
+3. Add one entry to `plans` in the auth config for each price you sell:
+
+   ```ts
+   subscription: {
+     enabled: true,
+     plans: [{ name: "pro", priceId: "price_..." }],
+   },
+   ```
+
+4. Run the database migration. The plugin adds a `subscription` table and a `stripeCustomerId` column on `user`.
+
+In production, add a webhook endpoint in the Stripe dashboard that points to `https://your-domain/api/auth/stripe/webhook`. Send it `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, and `customer.subscription.deleted`, and put its signing secret in `STRIPE_WEBHOOK_SECRET`.
+
+Start a subscription from the browser:
+
+```ts
+await authClient.subscription.upgrade({
+  plan: "pro",
+  successUrl: "/dashboard",
+  cancelUrl: "/",
+});
+```
+
+<Callout type="info">
+  The Stripe plugin allows one active or trialing subscription per user. If
+  Stripe cannot be reached during sign-up, the sign-up still succeeds and the
+  error is logged.
+</Callout>
+
+## Polar
+
+1. Create an organization access token in the [Polar sandbox](https://sandbox.polar.sh) and put it in `POLAR_ACCESS_TOKEN`.
+2. Add a webhook endpoint in Polar that points to `https://your-domain/api/auth/polar/webhooks`, and put its secret in `POLAR_WEBHOOK_SECRET`.
+3. Leave `POLAR_SERVER=sandbox` while you test. Tokens, products, and customers are separate in each environment, so set it to `production` together with a production token.
+
+Polar stores subscriptions on its side, so it adds no tables.
+
+Start a checkout, or open the customer portal, from the browser:
+
+```ts
+await authClient.checkout({ products: ["<product id from Polar>"] });
+await authClient.customer.portal();
+```
+
+Polar creates the customer when the user's first checkout succeeds, linked to the user's ID. Until then the user has no Polar customer, so `authClient.customer.portal()` returns an error. Show the billing button only to users who have bought something.
+
+<Callout type="info">
+  The template sets `createCustomerOnSignUp: false`. Better Auth runs the
+  plugin's sign-up hook after it saves the user, so with `true` a refused email
+  or a Polar outage fails the sign-up with a 500 and still keeps the new
+  account. Turn it on only if you need the customer before the first purchase.
+</Callout>
+
+With that option off, the plugin also stops copying profile changes to Polar and deleting the Polar customer with the user. The template's `databaseHooks` do both instead: a changed email or name updates the Polar customer, and a deleted user deletes it. A user with no Polar customer yet is skipped, and any other Polar error is logged, so a Polar outage never blocks a profile change or an account deletion.
+
+## Reacting to events
+
+The webhook only checks the signature and lets the plugin update its own records. Add handlers for the events your app needs: `onEvent` in the Stripe plugin options, or handlers such as `onOrderPaid` in `webhooks()` for Polar.
+
+## Backends without a page
+
+Express and NestJS have no auth client. Call the same routes with the bearer token from sign-in, for example `POST /api/auth/subscription/upgrade` for Stripe or `POST /api/auth/checkout` for Polar.
+
+## In a monorepo
+
+The plugin and the webhook run in the app that owns users and data. When that is `apps/api`, `apps/web` still gets the client plugin, and the provider sends webhooks to the web app's URL, which forwards `/api/*` to the api. See [Monorepo](/docs/modules/monorepo).
+
+## MongoDB
+
+With Next.js or TanStack Start on MongoDB, Better Auth uses transactions. Create the `subscription` collection too, next to the auth collections listed in the [database guide](/docs/modules/database).

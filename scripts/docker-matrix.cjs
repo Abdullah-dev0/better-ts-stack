@@ -6,9 +6,11 @@ const path = require("node:path");
 const { spawnSync } = require("node:child_process");
 const {
   PORT,
+  DUMMY_PAYMENT_ENV,
   aiChecks,
   backendChecks,
   fullstackChecks,
+  paymentChecks,
   waitForServer,
 } = require("./http-checks.cjs");
 const { inScope } = require("./samples.cjs");
@@ -60,7 +62,7 @@ const DATABASES = {
       "myapp",
       "--quiet",
       "--eval",
-      "['user', 'session', 'account', 'verification'].forEach((name) => db.createCollection(name))",
+      "['user', 'session', 'account', 'verification', 'subscription'].forEach((name) => db.createCollection(name))",
     ],
   },
 };
@@ -153,6 +155,9 @@ async function checkCase(c, log) {
     "--env-file",
     path.join(c.target, ".env"),
     ...databaseEnv,
+    ...Object.entries(DUMMY_PAYMENT_ENV[c.config.payments] ?? {}).flatMap(
+      ([name, value]) => ["-e", `${name}=${value}`],
+    ),
     IMAGE,
   ]);
   if (!started) throw new Error("App container did not start");
@@ -162,7 +167,11 @@ async function checkCase(c, log) {
     framework === "express" || framework === "nestjs"
       ? await backendChecks(c.config.useAuth, c.config.useRateLimit)
       : await fullstackChecks(c.config.useAuth);
-  return [...checks, ...(await aiChecks(c.config))];
+  return [
+    ...checks,
+    ...(await aiChecks(c.config)),
+    ...(await paymentChecks(c.config)),
+  ];
 }
 
 // Fails at once when another program holds the app port: otherwise every

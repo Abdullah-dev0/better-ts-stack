@@ -4,7 +4,7 @@
   "description": "Better Auth for Express: email and password, email verification, password reset, GitHub and Google sign-in, and bearer tokens",
   "type": "feature",
   "dependencies": {
-    "better-auth": "^1.7.18"
+    "better-auth": "^1.7.27"
   },
   "devDependencies": {},
   "scripts": {},

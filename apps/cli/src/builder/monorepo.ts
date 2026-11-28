@@ -157,6 +157,7 @@ export async function generateMonorepoReadme(
     config.useAuth && "Better Auth",
     config.database !== "none" && "the database",
     config.ai !== "none" && "the AI chat route",
+    config.payments !== "none" && "the payments webhook",
   ].filter(Boolean);
   const lines = [
     `# ${config.projectName}`,
@@ -222,6 +223,15 @@ export function generateMonorepoNextSteps(
     steps.push(`Set AI_GATEWAY_API_KEY in ${owner}/.env`);
   } else if (config.ai === "tanstack") {
     steps.push(`Set OPENAI_API_KEY in ${owner}/.env`);
+  }
+  if (config.payments === "stripe") {
+    steps.push(
+      `Set STRIPE_SECRET_KEY and STRIPE_WEBHOOK_SECRET in ${owner}/.env`
+    );
+  } else if (config.payments === "polar") {
+    steps.push(
+      `Set POLAR_ACCESS_TOKEN and POLAR_WEBHOOK_SECRET in ${owner}/.env`
+    );
   }
   if (!depsInstalled) steps.push(`${pm} install`);
 

@@ -1,0 +1,16 @@
+{
+  "id": "payments-stripe",
+  "name": "Stripe",
+  "description": "Stripe subscriptions through the Better Auth plugin: a Stripe customer on sign-up, checkout, the billing portal, and the webhook",
+  "type": "feature",
+  "dependencies": {
+    "@better-auth/stripe": "1.7.27",
+    "stripe": "23.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {},
+  "envVars": {
+    "STRIPE_SECRET_KEY": "",
+    "STRIPE_WEBHOOK_SECRET": ""
+  }
+}

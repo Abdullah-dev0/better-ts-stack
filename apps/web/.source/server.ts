@@ -1,4 +1,5 @@
 // @ts-nocheck
+import * as __fd_glob_18 from "../content/docs/modules/payments.mdx?collection=docs"
 import * as __fd_glob_17 from "../content/docs/modules/monorepo.mdx?collection=docs"
 import * as __fd_glob_16 from "../content/docs/modules/index.mdx?collection=docs"
 import * as __fd_glob_15 from "../content/docs/modules/frontend.mdx?collection=docs"
@@ -25,4 +26,4 @@ const create = server<typeof Config, import("fumadocs-mdx/runtime/types").Intern
   }
 }>();
 
-export const docs = await create.docs("docs", "content/docs", {"meta.json": __fd_glob_0, "modules/meta.json": __fd_glob_1, }, {"configuration.mdx": __fd_glob_2, "index.mdx": __fd_glob_3, "installation.mdx": __fd_glob_4, "structure.mdx": __fd_glob_5, "templates.mdx": __fd_glob_6, "troubleshooting.mdx": __fd_glob_7, "upgrade-notes.mdx": __fd_glob_8, "usage.mdx": __fd_glob_9, "modules/ai.mdx": __fd_glob_10, "modules/auth.mdx": __fd_glob_11, "modules/backend.mdx": __fd_glob_12, "modules/database.mdx": __fd_glob_13, "modules/docker.mdx": __fd_glob_14, "modules/frontend.mdx": __fd_glob_15, "modules/index.mdx": __fd_glob_16, "modules/monorepo.mdx": __fd_glob_17, });
+export const docs = await create.docs("docs", "content/docs", {"meta.json": __fd_glob_0, "modules/meta.json": __fd_glob_1, }, {"configuration.mdx": __fd_glob_2, "index.mdx": __fd_glob_3, "installation.mdx": __fd_glob_4, "structure.mdx": __fd_glob_5, "templates.mdx": __fd_glob_6, "troubleshooting.mdx": __fd_glob_7, "upgrade-notes.mdx": __fd_glob_8, "usage.mdx": __fd_glob_9, "modules/ai.mdx": __fd_glob_10, "modules/auth.mdx": __fd_glob_11, "modules/backend.mdx": __fd_glob_12, "modules/database.mdx": __fd_glob_13, "modules/docker.mdx": __fd_glob_14, "modules/frontend.mdx": __fd_glob_15, "modules/index.mdx": __fd_glob_16, "modules/monorepo.mdx": __fd_glob_17, "modules/payments.mdx": __fd_glob_18, });

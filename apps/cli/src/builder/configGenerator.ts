@@ -210,6 +210,7 @@ export async function generateStackFile(
       packageManager: config.packageManager,
       auth: config.useAuth,
       ai: config.ai,
+      payments: config.payments,
       docker: config.useDocker,
       rateLimit: config.useRateLimit,
       ci: config.useCi,

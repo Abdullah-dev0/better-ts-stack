@@ -253,9 +253,51 @@ async function aiChecks({ ai, useAuth, applicationType }) {
   return checks;
 }
 
+// The tests have no provider account: the apps start with these keys, and the
+// webhook is checked up to its signature check
+const DUMMY_PAYMENT_ENV = {
+  stripe: {
+    STRIPE_SECRET_KEY: "sk_test_dummy",
+    STRIPE_WEBHOOK_SECRET: "whsec_dummy",
+  },
+  polar: {
+    POLAR_ACCESS_TOKEN: "polar_oat_dummy",
+    POLAR_WEBHOOK_SECRET: "dummy",
+  },
+};
+
+// An event with a wrong signature is refused before the plugin reads it
+async function paymentChecks({ payments }) {
+  if (!payments || payments === "none") return [];
+  const [pathname, expected, headers] =
+    payments === "stripe"
+      ? ["/api/auth/stripe/webhook", 400, { "stripe-signature": "t=1,v1=bad" }]
+      : [
+          "/api/auth/polar/webhooks",
+          403,
+          {
+            "webhook-id": "msg_smoke",
+            "webhook-timestamp": String(Math.floor(Date.now() / 1000)),
+            "webhook-signature": "v1,bad",
+          },
+        ];
+  const response = await request(pathname, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      origin: `http://localhost:${PORT}`,
+      ...headers,
+    },
+    body: '{"type":"smoke.test","data":{}}',
+  });
+  return [[`POST ${pathname} with a bad signature`, expected, response.status]];
+}
+
 module.exports = {
   PORT,
   request,
+  DUMMY_PAYMENT_ENV,
+  paymentChecks,
   aiChecks,
   backendChecks,
   fullstackChecks,

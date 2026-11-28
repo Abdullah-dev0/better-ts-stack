@@ -27,6 +27,9 @@ export type Framework = BackendFramework | FrontendFramework;
 // SDK behind the AI chat endpoint (and page, on Next.js and TanStack Start)
 export type AiSdk = "none" | "vercel" | "tanstack";
 
+// Subscriptions through a Better Auth plugin; needs auth and a database
+export type Payments = "none" | "polar" | "stripe";
+
 // The monorepo app that owns users and data: it runs Better Auth, holds the
 // database, and serves the AI chat route; the other app reaches it over HTTP
 export type DataOwner = "web" | "api";
@@ -54,6 +57,7 @@ export interface ProjectConfig {
   useDocker: boolean;
   useAuth: boolean;
   ai: AiSdk;
+  payments: Payments;
   // Express and NestJS only; Better Auth limits its own endpoints
   useRateLimit: boolean;
   useCi: boolean;
@@ -90,6 +94,7 @@ export const DEFAULT_CHOICES: StackChoices = {
   useDocker: false,
   useAuth: false,
   ai: "none",
+  payments: "none",
   useRateLimit: false,
   useCi: false,
   useAgents: true,
@@ -199,6 +204,7 @@ export interface TemplateContext {
   useAuth: boolean;
   ai: string;
   useAi: boolean;
+  payments: string;
   useRateLimit: boolean;
   useCi: boolean;
   // Monorepo web app: unknown /api/* requests go to the api
@@ -270,6 +276,16 @@ export const aiOptions = [
   { value: "tanstack" as const, label: "TanStack AI" },
 ];
 
+export const paymentsOptions = [
+  { value: "none" as const, label: "None" },
+  {
+    value: "polar" as const,
+    label: "Polar",
+    hint: "handles sales tax for you",
+  },
+  { value: "stripe" as const, label: "Stripe" },
+];
+
 export const ownerOptions = [
   {
     value: "web" as const,
@@ -285,7 +301,11 @@ export const ownerOptions = [
 
 export const apiFrameworkOptions = [
   ...backendFrameworkOptions,
-  { value: "none" as const, label: "None", hint: "the web app runs everything" },
+  {
+    value: "none" as const,
+    label: "None",
+    hint: "the web app runs everything",
+  },
 ];
 
 export const packageManagerOptions = [

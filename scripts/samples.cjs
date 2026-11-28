@@ -6,8 +6,15 @@
 // monorepos, plus one project with everything on. Set FULL_MATRIX=1 to run all
 // of them, BTS_CASES=<regex> to run only the cases whose name matches, e.g.
 // BTS_CASES=-auth- after changing auth.
-const LOCAL = ["database", "useAuth", "useRateLimit", "ai"];
-const DOCKER = ["database", "useAuth", "useRateLimit", "packageManager", "ai"];
+const LOCAL = ["database", "useAuth", "useRateLimit", "ai", "payments"];
+const DOCKER = [
+  "database",
+  "useAuth",
+  "useRateLimit",
+  "packageManager",
+  "ai",
+  "payments",
+];
 const MONOREPO = [
   "layout",
   "framework",
@@ -17,6 +24,7 @@ const MONOREPO = [
   "useAuth",
   "packageManager",
   "ai",
+  "payments",
 ];
 
 // Keys a case covers: each option value, or each pair of option values
@@ -57,6 +65,7 @@ function featureCount({ config }) {
     Number(config.useAuth) +
     Number(config.useRateLimit) +
     Number(config.ai !== "none") +
+    Number(config.payments !== "none") +
     Number(config.database !== "none")
   );
 }

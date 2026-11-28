@@ -85,6 +85,7 @@ export function buildTemplateContext(config: ProjectConfig): TemplateContext {
       config.useAuth && !(config.app?.role === "api" && !config.app.isOwner),
     ai: config.ai,
     useAi: config.ai !== "none",
+    payments: config.payments,
     useRateLimit: config.useRateLimit,
     useCi: config.useCi,
     useProxy: config.app?.role === "web" && config.apiFramework !== "none",

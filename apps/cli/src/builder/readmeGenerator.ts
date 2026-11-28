@@ -73,6 +73,15 @@ export function renderReadme(
       `- **AI chat:** ${sdk} streams replies from \`POST /api/chat\` ${where}${config.useAuth ? ", for signed-in users only" : ""}`
     );
   }
+  if (config.payments === "stripe") {
+    lines.push(
+      "- **Payments:** Stripe subscriptions through the Better Auth plugin, with a Stripe customer created on sign-up and the webhook on `POST /api/auth/stripe/webhook`"
+    );
+  } else if (config.payments === "polar") {
+    lines.push(
+      "- **Payments:** Polar checkout, customer portal, and webhooks through the Better Auth plugin, with the Polar customer created at the first checkout and the webhook on `POST /api/auth/polar/webhooks`"
+    );
+  }
   if (config.useRateLimit) {
     lines.push(
       `- **Rate limiting:** 100 requests per client IP in 15 minutes${config.useAuth ? ", and 10 sign-up or login attempts" : ""}`
@@ -157,6 +166,9 @@ export function renderReadme(
   }
   if (config.ai !== "none") {
     lines.push(`- [AI chat guide](${DOCS_URL}/modules/ai)`);
+  }
+  if (config.payments !== "none") {
+    lines.push(`- [Payments guide](${DOCS_URL}/modules/payments)`);
   }
   if (config.useAuth) lines.push(`- [Auth guide](${DOCS_URL}/modules/auth)`);
   if (config.useDocker) {

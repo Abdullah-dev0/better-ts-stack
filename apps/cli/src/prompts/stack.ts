@@ -18,6 +18,7 @@ import {
   ownerOptions,
   PackageManager,
   packageManagerOptions,
+  paymentsOptions,
   postgresqlOrmOptions,
   StackChoices,
 } from "../types";
@@ -229,6 +230,24 @@ export async function collectStackChoices(
     })
   );
 
+  // The plugins store customers and subscriptions next to the users
+  const isPaymentsAvailable = useAuth && database !== "none";
+  if (preset.payments && preset.payments !== "none" && !isPaymentsAvailable) {
+    throw buildError(
+      "Payments need auth and a database. Add --auth and --database prisma, drizzle, or mongoose",
+      "INVALID_ARGUMENT"
+    );
+  }
+  const payments = isPaymentsAvailable
+    ? await ask(preset.payments, () =>
+        select({
+          message: "Payments (subscriptions)",
+          options: paymentsOptions,
+          initialValue: "none",
+        })
+      )
+    : "none";
+
   const owner = await askOwner(preset.owner, {
     hasServer,
     hasData: database !== "none" || ai !== "none",
@@ -279,6 +298,7 @@ export async function collectStackChoices(
     useDocker,
     useAuth,
     ai,
+    payments,
     useRateLimit,
     useCi,
     useAgents,

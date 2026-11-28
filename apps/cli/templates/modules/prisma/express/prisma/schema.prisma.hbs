@@ -19,6 +19,9 @@ model User {
   email         String
   emailVerified Boolean   @default(false)
   image         String?
+{{#if (eq payments 'stripe')}}
+  stripeCustomerId String?
+{{/if}}
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
@@ -77,6 +80,33 @@ model Verification {
   @@map("verification")
 }
 
+{{#if (eq payments 'stripe')}}
+// Stripe subscriptions; the webhook keeps them in sync. referenceId is the
+// user ID
+model Subscription {
+  id                   String    @id
+  plan                 String
+  referenceId          String
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  status               String    @default("incomplete")
+  periodStart          DateTime?
+  periodEnd            DateTime?
+  trialStart           DateTime?
+  trialEnd             DateTime?
+  cancelAtPeriodEnd    Boolean?  @default(false)
+  cancelAt             DateTime?
+  canceledAt           DateTime?
+  endedAt              DateTime?
+  seats                Int?
+  billingInterval      String?
+  stripeScheduleId     String?
+
+  @@index([referenceId])
+  @@map("subscription")
+}
+
+{{/if}}
 {{else}}
 // Sample User model
 model User {

@@ -4,7 +4,7 @@
   "description": "Better Auth server for Next.js: email verification, password reset, and GitHub and Google sign-in, with the database adapter",
   "type": "feature",
   "dependencies": {
-    "better-auth": "^1.7.14"
+    "better-auth": "^1.7.27"
   },
   "devDependencies": {},
   "scripts": {},

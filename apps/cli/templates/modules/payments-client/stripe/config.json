@@ -1,0 +1,12 @@
+{
+  "id": "payments-client-stripe",
+  "name": "Stripe client",
+  "description": "The Better Auth Stripe client plugin for a web app whose auth runs in the api",
+  "type": "feature",
+  "dependencies": {
+    "@better-auth/stripe": "1.7.27"
+  },
+  "devDependencies": {},
+  "scripts": {},
+  "envVars": {}
+}

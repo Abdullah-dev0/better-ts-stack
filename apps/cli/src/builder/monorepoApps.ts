@@ -40,6 +40,8 @@ export function getMonorepoApps(config: ProjectConfig): MonorepoApp[] {
     database: isWebOwner ? config.database : "none",
     // The web app shows the chat page; the route runs in the owner
     ai: config.ai,
+    // The web app adds the client plugin; the server plugin runs in the owner
+    payments: config.payments,
     useRateLimit: false,
     app: { role: "web", isOwner: isWebOwner, envOverrides: {} },
   };
@@ -53,6 +55,7 @@ export function getMonorepoApps(config: ProjectConfig): MonorepoApp[] {
     framework: apiFramework,
     database: isWebOwner ? "none" : config.database,
     ai: isWebOwner ? "none" : config.ai,
+    payments: isWebOwner ? "none" : config.payments,
     useRateLimit: config.useRateLimit,
     app: {
       role: "api",

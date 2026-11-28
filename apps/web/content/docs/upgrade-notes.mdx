@@ -3,6 +3,40 @@ title: Upgrade notes
 description: What changed in each release and what to do when upgrading
 ---
 
+## 2.4.0
+
+Adds subscriptions with Polar or Stripe. Projects you already generated are not changed.
+
+### New
+
+- **Payments** (`--payments polar` or `--payments stripe`) on Express, NestJS, Next.js, and TanStack Start, through the provider's Better Auth plugin. You get checkout, the provider's customer portal, and a webhook route that checks each event's signature. Payments need `--auth` and a database. In a monorepo the plugin runs in the app that owns users and data, and `apps/web` gets the client plugin. See [Payments](/docs/modules/payments).
+- **Stripe** creates the Stripe customer when the user signs up, and adds a `subscription` table and a `stripeCustomerId` column on `user`. Add one entry to `plans` for each price you sell.
+- **Polar** creates the customer at the user's first checkout and adds no tables. When a user changes their email or name, the template updates the Polar customer, and when a user is deleted, it deletes the Polar customer. A Polar outage is logged and never blocks sign-up, a profile change, or an account deletion.
+- Express and NestJS stop at startup with a message when a payment key is missing. The keys are listed in `.env.example`, and Docker passes them to the app through `env_file`.
+
+### Fixed
+
+- An AI chat route in `apps/api` streams through the web app's proxy as the model writes it, instead of arriving all at once. The api sends `cache-control: no-cache, no-transform`, so the Next.js proxy no longer gzips the reply and holds it back until it ends.
+
+### Changed in generated projects
+
+- `better-auth` is `^1.7.27`, the version the payment plugins need.
+- The Next.js and TanStack Start auth client is rendered from a template, so it includes the payment client plugin when you choose payments.
+
+### Not yet
+
+- A shared `packages/db` for both monorepo apps, and `--docker` with `--monorepo`.
+
+### Docs
+
+- New [Payments](/docs/modules/payments) page. Usage, Configuration, and the modules overview cover the `--payments` flag and its keys.
+
+### For contributors
+
+- The matrix has a payments dimension, and the monorepo layouts include Stripe with `--owner api` and Polar with `--owner web`.
+- The Docker and monorepo checks start the apps with dummy payment keys and send a webhook with a bad signature, which must be refused. The Docker check signs up with Polar too.
+- `check-monorepo.cjs` checks that the chat stream reaches the browser through the proxy without compression.
+
 ## 2.3.0
 
 Adds AI chat and monorepos. Projects you already generated are not changed.

@@ -42,7 +42,12 @@ export class ChatController {
     });
     const response = toServerSentEventsResponse(stream, { abortController });
 
-    res.writeHead(response.status, Object.fromEntries(response.headers));
+    // no-transform keeps a proxy, such as a Next.js rewrite, from gzipping the
+    // stream and holding it back until the reply is finished
+    res.writeHead(response.status, {
+      ...Object.fromEntries(response.headers),
+      "cache-control": "no-cache, no-transform",
+    });
     if (response.body) {
       for await (const chunk of response.body) {
         res.write(chunk);

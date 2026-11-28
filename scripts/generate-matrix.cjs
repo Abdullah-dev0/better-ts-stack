@@ -199,6 +199,9 @@ async function checkCliDefaults(root) {
       ["--framework", framework],
     ]),
     ["monorepo", ["--monorepo"]],
+    // Auth without a database: in memory on its own, in the api in a monorepo
+    ["express-auth", ["--framework", "express", "--auth"]],
+    ["monorepo-auth", ["--monorepo", "--auth"]],
   ];
   for (const [name, flags] of runs) {
     const r = spawnSync(

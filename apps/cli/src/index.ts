@@ -65,8 +65,12 @@ async function main(): Promise<void> {
           ...(args.choices.monorepo
             ? { framework: "nextjs" as const }
             : { apiFramework: undefined }),
+          // Only a monorepo has an owner to pick; a lone Express or NestJS
+          // app keeps auth in memory without a database
           owner:
-            args.choices.useAuth && (args.choices.database ?? "none") === "none"
+            args.choices.monorepo &&
+            args.choices.useAuth &&
+            (args.choices.database ?? "none") === "none"
               ? "api"
               : "web",
           ...args.choices,

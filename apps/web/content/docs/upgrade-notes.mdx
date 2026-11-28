@@ -3,6 +3,22 @@ title: Upgrade notes
 description: What changed in each release and what to do when upgrading
 ---
 
+## 2.4.1
+
+Fixes `--yes` with auth on Express and NestJS, and adds monorepos to the stack builder. Projects you already generated are not changed.
+
+### Fixed
+
+- `--framework express --auth --yes` and `--framework nestjs --auth --yes` without a database stopped with "--owner api needs an api". The `--yes` default now picks the api as the owner only in a monorepo with auth and no database. This failed in 2.3.0 and 2.4.0.
+
+### Docs
+
+- The [stack builder](/builder) offers monorepos with an Express, NestJS, or no api, and lets you pick the app that owns users and data. Its file list shows the root files and both apps.
+
+### For contributors
+
+- The matrix has `--yes` runs for Express with auth and a monorepo with auth.
+
 ## 2.4.0
 
 Adds subscriptions with Polar or Stripe. Projects you already generated are not changed.

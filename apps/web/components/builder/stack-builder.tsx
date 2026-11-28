@@ -30,12 +30,14 @@ import {
   siPrisma,
   siStripe,
   siTanstack,
+  siTurborepo,
   siVercel,
 } from "simple-icons";
 
 import { CopyButton } from "@/components/home/copy-button";
 import {
   AI_OPTIONS,
+  API_OPTIONS,
   buildCommand,
   buildTree,
   canUseAuth,
@@ -45,10 +47,13 @@ import {
   DEFAULT_CHOICES,
   type FileSource,
   FRAMEWORK_OPTIONS,
+  isBackend,
   isValidProjectName,
   listProjectFiles,
   matchesPreset,
+  mustApiOwn,
   normalizeChoices,
+  OWNER_OPTIONS,
   PACKAGE_MANAGER_OPTIONS,
   PAYMENTS_OPTIONS,
   PROJECT_NAME,
@@ -67,6 +72,7 @@ const SOURCE_STYLES: Record<
   database: { label: "database", text: "text-tui-lime" },
   auth: { label: "auth", text: "text-tui-amber" },
   ai: { label: "ai", text: "text-tui-pink" },
+  monorepo: { label: "monorepo", text: "text-tui-lavender" },
   docker: { label: "docker", text: "text-tui-lavender" },
   "rate-limit": { label: "rate-limit", text: "text-tui-pink" },
   ci: { label: "ci", text: "text-tui-lime" },
@@ -104,6 +110,7 @@ const ICONS = {
   npm: brandIcon(siNpm),
   pnpm: brandIcon(siPnpm),
   bun: brandIcon(siBun),
+  monorepo: brandIcon(siTurborepo),
   "ai-vercel": brandIcon(siVercel),
   "ai-tanstack": brandIcon(siTanstack),
   polar: CreditCard,
@@ -116,7 +123,7 @@ const ICONS = {
   vscode: Code,
 } satisfies Record<string, IconComponent>;
 
-type ExtraId = Exclude<FileSource, "base" | "database" | "ai">;
+type ExtraId = Exclude<FileSource, "base" | "database" | "ai" | "monorepo">;
 
 const EXTRA_OPTIONS: {
   id: ExtraId;
@@ -170,6 +177,7 @@ const EXTRA_OPTIONS: {
 
 const GROUPS = [
   { id: "framework", label: "framework" },
+  { id: "monorepo", label: "monorepo" },
   { id: "database", label: "database" },
   { id: "ai", label: "ai chat" },
   { id: "payments", label: "payments" },
@@ -192,6 +200,9 @@ function randomChoices(): StackChoices {
     packageManager: pickRandom(PACKAGE_MANAGER_OPTIONS).value,
     ai: pickRandom(AI_OPTIONS).value,
     payments: pickRandom(PAYMENTS_OPTIONS).value,
+    monorepo: Math.random() < 0.3,
+    apiFramework: pickRandom(API_OPTIONS).value,
+    owner: pickRandom(OWNER_OPTIONS).value,
     useAuth: Math.random() < 0.5,
     useDocker: Math.random() < 0.5,
     useRateLimit: Math.random() < 0.5,
@@ -266,6 +277,14 @@ export function StackBuilder({
   };
   const update = (patch: Partial<StackChoices>) =>
     apply({ ...choices, ...patch });
+  // A monorepo's framework is its web app, so a backend framework becomes the
+  // api and Next.js the web app
+  const pickMonorepo = (apiFramework: StackChoices["apiFramework"]) =>
+    update({
+      monorepo: true,
+      apiFramework,
+      framework: isBackend(choices.framework) ? "nextjs" : choices.framework,
+    });
 
   const rename = (value: string) => {
     const name = value.toLowerCase().replace(/\s+/g, "-");
@@ -302,6 +321,15 @@ export function StackBuilder({
       label: findLabel(FRAMEWORK_OPTIONS, choices.framework),
     },
   ];
+  if (choices.monorepo)
+    picks.push({
+      key: "monorepo",
+      label:
+        choices.apiFramework === "none"
+          ? "Monorepo"
+          : `Monorepo, ${findLabel(API_OPTIONS, choices.apiFramework)}`,
+      onRemove: () => update({ monorepo: false }),
+    });
   if (choices.database !== "none")
     picks.push({
       key: choices.database,
@@ -333,7 +361,9 @@ export function StackBuilder({
   const disabledReasons: Partial<Record<ExtraId, string>> = {};
   if (!canUseAuth(choices)) disabledReasons.auth = "Requires a database";
   if (!canUseRateLimit(choices))
-    disabledReasons["rate-limit"] = "Requires a backend framework";
+    disabledReasons["rate-limit"] = "Requires Express or NestJS";
+  if (choices.monorepo)
+    disabledReasons.docker = "Not available for monorepos yet";
 
   return (
     <>
@@ -571,6 +601,70 @@ export function StackBuilder({
                   />
                 ))}
               </OptionGroup>
+
+              <OptionGroup id="monorepo" label="monorepo">
+                <OptionCard
+                  type="radio"
+                  name="monorepo"
+                  icon={ICONS.none}
+                  label="One project"
+                  description="A single app"
+                  isChecked={!choices.monorepo}
+                  onChange={() => update({ monorepo: false })}
+                />
+                {API_OPTIONS.map((option) => (
+                  <OptionCard
+                    key={option.value}
+                    type="radio"
+                    name="monorepo"
+                    icon={
+                      option.value === "none"
+                        ? ICONS.monorepo
+                        : ICONS[option.value]
+                    }
+                    label={
+                      option.value === "none"
+                        ? "Monorepo, no api"
+                        : `Monorepo, ${option.label}`
+                    }
+                    description={
+                      option.value === "none"
+                        ? "A Turborepo with only apps/web"
+                        : `A Turborepo with apps/web and ${option.description}`
+                    }
+                    isChecked={
+                      choices.monorepo && choices.apiFramework === option.value
+                    }
+                    onChange={() => pickMonorepo(option.value)}
+                  />
+                ))}
+              </OptionGroup>
+
+              {choices.monorepo && choices.apiFramework !== "none" && (
+                <OptionGroup id="owner" label="owns users and data">
+                  {OWNER_OPTIONS.map((option) => (
+                    <OptionCard
+                      key={option.value}
+                      type="radio"
+                      name="owner"
+                      icon={
+                        option.value === "web"
+                          ? ICONS[choices.framework]
+                          : ICONS[choices.apiFramework as "express" | "nestjs"]
+                      }
+                      label={option.label}
+                      description={option.description}
+                      disabledReason={
+                        option.value === "web" && mustApiOwn(choices)
+                          ? "Auth in the web app needs a database"
+                          : undefined
+                      }
+                      isChecked={choices.owner === option.value}
+                      onChange={() => update({ owner: option.value })}
+                    />
+                  ))}
+                </OptionGroup>
+              )}
 
               <OptionGroup id="database" label="database">
                 {DATABASE_OPTIONS.map((option) => (

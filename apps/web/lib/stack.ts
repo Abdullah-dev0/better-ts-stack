@@ -7,6 +7,8 @@ export type Database = "none" | "prisma" | "drizzle" | "mongoose";
 export type PackageManager = "npm" | "pnpm" | "bun";
 export type Ai = "none" | "vercel" | "tanstack";
 export type Payments = "none" | "polar" | "stripe";
+export type ApiFramework = "express" | "nestjs" | "none";
+export type Owner = "web" | "api";
 
 export interface StackChoices {
   framework: Framework;
@@ -14,6 +16,11 @@ export interface StackChoices {
   packageManager: PackageManager;
   ai: Ai;
   payments: Payments;
+  // A Turborepo with this framework in apps/web and apiFramework in apps/api
+  monorepo: boolean;
+  apiFramework: ApiFramework;
+  // The monorepo app that runs auth, the database, AI chat, and payments
+  owner: Owner;
   useAuth: boolean;
   useDocker: boolean;
   useRateLimit: boolean;
@@ -30,6 +37,9 @@ export const DEFAULT_CHOICES: StackChoices = {
   packageManager: "npm",
   ai: "none",
   payments: "none",
+  monorepo: false,
+  apiFramework: "express",
+  owner: "web",
   useAuth: true,
   useDocker: true,
   useRateLimit: false,
@@ -104,6 +114,33 @@ export const PAYMENTS_OPTIONS: StackOption<Payments>[] = [
   { value: "stripe", label: "Stripe", description: "Subscriptions" },
 ];
 
+export const API_OPTIONS: StackOption<ApiFramework>[] = [
+  {
+    value: "express",
+    label: "Express api",
+    description: "apps/api on Express 5",
+  },
+  {
+    value: "nestjs",
+    label: "NestJS api",
+    description: "apps/api on NestJS 12",
+  },
+  { value: "none", label: "No api", description: "apps/web on its own" },
+];
+
+export const OWNER_OPTIONS: StackOption<Owner>[] = [
+  {
+    value: "web",
+    label: "Web app",
+    description: "apps/web runs auth, the database, AI chat, and payments",
+  },
+  {
+    value: "api",
+    label: "Api",
+    description: "apps/api runs them, and apps/web asks it for sessions",
+  },
+];
+
 export const PACKAGE_MANAGER_OPTIONS: (StackOption<PackageManager> & {
   runner: string;
 })[] = [
@@ -121,14 +158,30 @@ export function isBackend(framework: Framework): boolean {
   return framework === "express" || framework === "nestjs";
 }
 
-// Better Auth stores users and sessions, so full-stack auth needs a database
-export function canUseAuth(choices: StackChoices): boolean {
-  return isBackend(choices.framework) || choices.database !== "none";
+// A monorepo with an Express or NestJS app in apps/api
+export function hasApiApp(choices: StackChoices): boolean {
+  return choices.monorepo && choices.apiFramework !== "none";
 }
 
-// Rate limiting is offered for the backends only
+// Better Auth stores users and sessions, so full-stack auth needs a database,
+// unless a monorepo api runs it
+export function canUseAuth(choices: StackChoices): boolean {
+  return (
+    isBackend(choices.framework) ||
+    choices.database !== "none" ||
+    hasApiApp(choices)
+  );
+}
+
+// Rate limiting is offered for Express and NestJS, alone or as a monorepo api
 export function canUseRateLimit(choices: StackChoices): boolean {
-  return isBackend(choices.framework);
+  return isBackend(choices.framework) || hasApiApp(choices);
+}
+
+// Better Auth in the web app stores its users in the database, so without one
+// the api has to own them
+export function mustApiOwn(choices: StackChoices): boolean {
+  return choices.useAuth && choices.database === "none";
 }
 
 // The payment plugin runs inside Better Auth and keeps customers in the database
@@ -138,11 +191,30 @@ export function canUsePayments(choices: StackChoices): boolean {
 
 // Drops options that the CLI would reject for the chosen framework and database
 export function normalizeChoices(choices: StackChoices): StackChoices {
-  return {
+  // The web app of a monorepo is Next.js or TanStack Start
+  const monorepo = choices.monorepo && !isBackend(choices.framework);
+  const base: StackChoices = {
     ...choices,
-    useAuth: choices.useAuth && canUseAuth(choices),
-    useRateLimit: choices.useRateLimit && canUseRateLimit(choices),
-    payments: canUsePayments(choices) ? choices.payments : "none",
+    monorepo,
+    apiFramework: monorepo
+      ? choices.apiFramework
+      : DEFAULT_CHOICES.apiFramework,
+    // Docker is not available for monorepos yet
+    useDocker: choices.useDocker && !monorepo,
+  };
+  const normalized: StackChoices = {
+    ...base,
+    useAuth: base.useAuth && canUseAuth(base),
+    useRateLimit: base.useRateLimit && canUseRateLimit(base),
+  };
+  return {
+    ...normalized,
+    payments: canUsePayments(normalized) ? normalized.payments : "none",
+    owner: !hasApiApp(normalized)
+      ? "web"
+      : mustApiOwn(normalized)
+        ? "api"
+        : normalized.owner,
   };
 }
 
@@ -159,10 +231,14 @@ export function buildCommand(
     `${runner} better-ts-stack ${projectName}`,
     `--framework ${choices.framework}`,
   ];
+  if (choices.monorepo)
+    parts.push("--monorepo", `--api ${choices.apiFramework}`);
   if (choices.database !== "none") parts.push(`--database ${choices.database}`);
   if (choices.useAuth) parts.push("--auth");
   if (choices.ai !== "none") parts.push(`--ai ${choices.ai}`);
   if (choices.payments !== "none") parts.push(`--payments ${choices.payments}`);
+  // The web app owns users and data unless told otherwise
+  if (choices.owner === "api") parts.push("--owner api");
   if (choices.useRateLimit) parts.push("--rate-limit");
   if (choices.useDocker) parts.push("--docker");
   if (choices.useCi) parts.push("--ci");
@@ -178,6 +254,7 @@ export type FileSource =
   | "database"
   | "auth"
   | "ai"
+  | "monorepo"
   | "docker"
   | "rate-limit"
   | "ci"
@@ -198,36 +275,113 @@ const GENERATED_FILES = [
   "better-ts-stack.json",
 ];
 
-// Mirrors planBuild() in apps/cli/src/builder/buildPlanner.ts
-export function listProjectFiles(choices: StackChoices): ProjectFile[] {
-  const { framework } = choices;
-  const modules: [string, FileSource][] = [[`base/${framework}`, "base"]];
-  if (choices.database !== "none")
-    modules.push([`${choices.database}/${framework}`, "database"]);
-  if (choices.useDocker) modules.push(["docker", "docker"]);
-  if (choices.useAuth) modules.push([`auth/${framework}`, "auth"]);
-  if (choices.ai !== "none") {
-    if (!isBackend(framework))
-      modules.push([`ai-page/${choices.ai}/${framework}`, "ai"]);
-    modules.push([`ai/${choices.ai}/${framework}`, "ai"]);
-  }
-  if (choices.useRateLimit)
-    modules.push([`rate-limit/${framework}`, "rate-limit"]);
-  if (choices.useCi) modules.push(["ci", "ci"]);
-  if (choices.useAgents) modules.push(["agents", "agents"]);
-  if (choices.useVscode) modules.push(["vscode", "vscode"]);
+// One app of the project: the whole project, or apps/web or apps/api
+interface AppChoices extends Omit<StackChoices, "framework"> {
+  framework: Framework;
+  // The app that runs auth, the database, and AI chat
+  isOwner: boolean;
+  // A web app that forwards /api/* to the monorepo api
+  hasProxy: boolean;
+}
 
+// Mirrors selectModules() in apps/cli/src/builder/moduleSelector.ts. The
+// payment modules only add packages, so they list no files
+function selectModules(app: AppChoices): [string, FileSource][] {
+  const { framework } = app;
+  const isFullstack = !isBackend(framework);
+  const modules: [string, FileSource][] = [[`base/${framework}`, "base"]];
+  if (app.database !== "none")
+    modules.push([`${app.database}/${framework}`, "database"]);
+  if (app.useDocker) modules.push(["docker", "docker"]);
+  if (app.useAuth) {
+    if (isFullstack) modules.push([`auth-ui/${framework}`, "auth"]);
+    modules.push([
+      `${app.isOwner ? "auth" : "auth-remote"}/${framework}`,
+      "auth",
+    ]);
+  }
+  if (app.ai !== "none") {
+    if (isFullstack) modules.push([`ai-page/${app.ai}/${framework}`, "ai"]);
+    if (app.isOwner) modules.push([`ai/${app.ai}/${framework}`, "ai"]);
+  }
+  if (app.hasProxy) modules.push([`proxy/${framework}`, "monorepo"]);
+  if (app.useRateLimit) modules.push([`rate-limit/${framework}`, "rate-limit"]);
+  if (app.useCi) modules.push(["ci", "ci"]);
+  if (app.useAgents) modules.push(["agents", "agents"]);
+  if (app.useVscode) modules.push(["vscode", "vscode"]);
+  return modules;
+}
+
+// Mirrors planBuild() in apps/cli/src/builder/buildPlanner.ts
+function listAppFiles(app: AppChoices): Map<string, FileSource> {
   // Later modules overwrite files of earlier ones, so each path is listed once
   const files = new Map<string, FileSource>();
   for (const file of GENERATED_FILES) files.set(file, "base");
-  if (choices.packageManager === "pnpm")
-    files.set("pnpm-workspace.yaml", "base");
-  for (const [id, source] of modules) {
+  if (app.packageManager === "pnpm") files.set("pnpm-workspace.yaml", "base");
+  // The CLI writes TanStack Start's route tree for the routes the project has
+  if (app.framework === "tanstack") files.set("src/routeTree.gen.ts", "base");
+  for (const [id, source] of selectModules(app)) {
     for (const file of MODULE_FILES[id] ?? []) {
       if (!files.has(file)) files.set(file, source);
     }
   }
+  return files;
+}
 
+// Mirrors getMonorepoApps() in apps/cli/src/builder/monorepoApps.ts and
+// planMonorepo() in buildPlanner.ts
+function listMonorepoFiles(choices: StackChoices): Map<string, FileSource> {
+  const isWebOwner = !hasApiApp(choices) || choices.owner === "web";
+  const shared = { ...choices, useDocker: false, useCi: false };
+  const apps: [string, AppChoices][] = [
+    [
+      "apps/web",
+      {
+        ...shared,
+        database: isWebOwner ? choices.database : "none",
+        useRateLimit: false,
+        isOwner: isWebOwner,
+        hasProxy: hasApiApp(choices),
+      },
+    ],
+  ];
+  if (choices.apiFramework !== "none")
+    apps.push([
+      "apps/api",
+      {
+        ...shared,
+        framework: choices.apiFramework,
+        database: isWebOwner ? "none" : choices.database,
+        ai: isWebOwner ? "none" : choices.ai,
+        isOwner: !isWebOwner,
+        hasProxy: false,
+      },
+    ]);
+
+  const files = new Map<string, FileSource>();
+  for (const file of ROOT_FILES) files.set(file, "monorepo");
+  if (choices.packageManager === "pnpm")
+    files.set("pnpm-workspace.yaml", "monorepo");
+  if (choices.useCi) files.set(".github/workflows/ci.yml", "ci");
+  for (const [dir, app] of apps)
+    for (const [file, source] of listAppFiles(app))
+      files.set(`${dir}/${file}`, source);
+  return files;
+}
+
+// The files a monorepo has at its root, next to apps/
+const ROOT_FILES = [
+  "package.json",
+  "turbo.json",
+  ".gitignore",
+  "README.md",
+  "better-ts-stack.json",
+];
+
+export function listProjectFiles(choices: StackChoices): ProjectFile[] {
+  const files = choices.monorepo
+    ? listMonorepoFiles(choices)
+    : listAppFiles({ ...choices, isOwner: true, hasProxy: false });
   return [...files].map(([path, source]) => ({ path, source }));
 }
 
@@ -278,7 +432,7 @@ export function isValidProjectName(name: string): boolean {
   );
 }
 
-type Extra = Exclude<FileSource, "base" | "database" | "ai">;
+type Extra = Exclude<FileSource, "base" | "database" | "ai" | "monorepo">;
 
 const EXTRA_KEYS = {
   auth: "useAuth",
@@ -302,6 +456,8 @@ export function toSearchParams(
     pm: choices.packageManager,
     with: EXTRAS.filter((extra) => choices[EXTRA_KEYS[extra]]).join(","),
   });
+  if (choices.monorepo) params.set("monorepo", choices.apiFramework);
+  if (choices.owner === "api") params.set("owner", "api");
   if (choices.ai !== "none") params.set("ai", choices.ai);
   if (choices.payments !== "none") params.set("payments", choices.payments);
   if (projectName !== PROJECT_NAME && isValidProjectName(projectName))
@@ -348,6 +504,13 @@ export function fromSearchParams(params: SearchParams): {
       params.payments,
       DEFAULT_CHOICES.payments
     ),
+    monorepo: API_OPTIONS.some((option) => option.value === params.monorepo),
+    apiFramework: pickOption(
+      API_OPTIONS,
+      params.monorepo,
+      DEFAULT_CHOICES.apiFramework
+    ),
+    owner: pickOption(OWNER_OPTIONS, params.owner, DEFAULT_CHOICES.owner),
   };
   if (typeof params.with === "string") {
     const picked = params.with.split(",");
@@ -383,6 +546,9 @@ export const STACK_PRESETS: StackPreset[] = [
       database: "none",
       ai: "none",
       payments: "none",
+      monorepo: false,
+      apiFramework: "express",
+      owner: "web",
       useAuth: false,
       useDocker: false,
       useRateLimit: false,
@@ -401,6 +567,9 @@ export const STACK_PRESETS: StackPreset[] = [
       database: "drizzle",
       ai: "none",
       payments: "none",
+      monorepo: false,
+      apiFramework: "express",
+      owner: "web",
       useAuth: true,
       useDocker: true,
       useRateLimit: true,
@@ -419,6 +588,9 @@ export const STACK_PRESETS: StackPreset[] = [
       database: "prisma",
       ai: "none",
       payments: "none",
+      monorepo: false,
+      apiFramework: "express",
+      owner: "web",
       useAuth: true,
       useDocker: true,
       useRateLimit: false,
@@ -437,6 +609,9 @@ export const STACK_PRESETS: StackPreset[] = [
       database: "drizzle",
       ai: "none",
       payments: "none",
+      monorepo: false,
+      apiFramework: "express",
+      owner: "web",
       useAuth: true,
       useDocker: false,
       useRateLimit: false,

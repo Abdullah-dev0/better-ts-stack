@@ -115,6 +115,41 @@ export const MODULE_ENTRIES: ModuleEntry[] = [
     frameworks: ["express", "nestjs", "nextjs", "tanstack"],
   },
   {
+    flag: "--ai vercel",
+    title: "AI chat (Vercel AI SDK)",
+    description:
+      "A streaming chat route through the Vercel AI Gateway, and a chat page with a Stop button on Next.js and TanStack Start.",
+    frameworks: ["express", "nestjs", "nextjs", "tanstack"],
+  },
+  {
+    flag: "--ai tanstack",
+    title: "AI chat (TanStack AI)",
+    description:
+      "The same chat route and page on TanStack AI with its OpenAI adapter.",
+    frameworks: ["express", "nestjs", "nextjs", "tanstack"],
+  },
+  {
+    flag: "--payments polar",
+    title: "Payments (Polar)",
+    description:
+      "Subscriptions through the Better Auth plugin: checkout, the customer portal, and a signed webhook. Needs auth and a database.",
+    frameworks: ["express", "nestjs", "nextjs", "tanstack"],
+  },
+  {
+    flag: "--payments stripe",
+    title: "Payments (Stripe)",
+    description:
+      "Stripe Checkout, the billing portal, a signed webhook, and a subscription table. Needs auth and a database.",
+    frameworks: ["express", "nestjs", "nextjs", "tanstack"],
+  },
+  {
+    flag: "--monorepo",
+    title: "Monorepo",
+    description:
+      "A Turborepo with this web app in apps/web and an optional Express or NestJS api in apps/api.",
+    frameworks: ["nextjs", "tanstack"],
+  },
+  {
     flag: "--rate-limit",
     title: "Rate limiting",
     description: "Per-IP limits with express-rate-limit or @nestjs/throttler.",

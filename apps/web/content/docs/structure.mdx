@@ -557,6 +557,29 @@ RESEND_API_KEY=
 EMAIL_FROM=onboarding@resend.dev
 ```
 
+### With AI chat
+
+```bash
+# --ai vercel
+AI_GATEWAY_API_KEY=
+AI_MODEL=anthropic/claude-sonnet-5.5
+# --ai tanstack
+OPENAI_API_KEY=
+AI_MODEL=gpt-6.1-sol
+```
+
+### With payments
+
+```bash
+# --payments stripe
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+# --payments polar
+POLAR_ACCESS_TOKEN=
+POLAR_WEBHOOK_SECRET=
+POLAR_SERVER=sandbox
+```
+
 <Callout type="warn">
   The CLI creates both `.env` and `.env.example`. Replace placeholder values in
   `.env`, such as database URLs, before starting the server. Never commit `.env`

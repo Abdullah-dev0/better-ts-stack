@@ -2,7 +2,7 @@
 
 > A CLI that scaffolds TypeScript backend and full-stack projects.
 
-`better-ts-stack` creates an Express, NestJS, Next.js, or TanStack Start project with TypeScript, ESLint, and Prettier set up. Database, authentication, Docker, and git are optional.
+`better-ts-stack` creates an Express, NestJS, Next.js, or TanStack Start project with TypeScript, ESLint, and Prettier set up. Database, authentication, AI chat, payments, Docker, a Turborepo monorepo, and git are optional.
 
 ## Quick Start
 
@@ -29,27 +29,28 @@ npx better-ts-stack my-api --framework nestjs --database prisma --auth --yes
 npx better-ts-stack . --framework nextjs --database drizzle --pm pnpm
 ```
 
-| Flag                               | Values                                            |
-| ---------------------------------- | ------------------------------------------------- |
-| `--framework <name>`               | `express`, `nestjs`, `nextjs`, `tanstack`         |
-| `--database <name>`                | `none`, `prisma`, `drizzle`, `mongoose`           |
-| `--pm <name>`                      | `npm`, `pnpm`, `bun`                              |
-| `--auth` / `--no-auth`             | Add authentication                                |
-| `--ai <name>`                      | `none`, `vercel`, `tanstack`: a streaming AI chat |
-| `--monorepo`                       | Turborepo with `apps/web` and `apps/api`          |
-| `--api <name>`                     | `express`, `nestjs`, `none`: the monorepo api     |
-| `--owner <app>`                    | `web`, `api`: the monorepo app with auth and data |
-| `--docker` / `--no-docker`         | Add Docker files                                  |
-| `--rate-limit` / `--no-rate-limit` | Add rate limiting (Express and NestJS)            |
-| `--ci` / `--no-ci`                 | Add a GitHub Actions workflow                     |
-| `--no-agents`                      | Leave out AGENTS.md (added by default)            |
-| `--vscode` / `--no-vscode`         | Add VS Code settings and extensions               |
-| `--git` / `--no-git`               | Initialize a git repository                       |
-| `--install` / `--no-install`       | Install dependencies                              |
-| `-y`, `--yes`                      | Use defaults for missing options, no prompts      |
-| `--dry-run`                        | List what would be created, write nothing         |
-| `-h`, `--help`                     | Show help                                         |
-| `-v`, `--version`                  | Show the version                                  |
+| Flag                               | Values                                                               |
+| ---------------------------------- | -------------------------------------------------------------------- |
+| `--framework <name>`               | `express`, `nestjs`, `nextjs`, `tanstack`                            |
+| `--database <name>`                | `none`, `prisma`, `drizzle`, `mongoose`                              |
+| `--pm <name>`                      | `npm`, `pnpm`, `bun`                                                 |
+| `--auth` / `--no-auth`             | Add authentication                                                   |
+| `--ai <name>`                      | `none`, `vercel`, `tanstack`: a streaming AI chat                    |
+| `--payments <name>`                | `none`, `polar`, `stripe`: subscriptions (needs auth and a database) |
+| `--monorepo`                       | Turborepo with `apps/web` and `apps/api`                             |
+| `--api <name>`                     | `express`, `nestjs`, `none`: the monorepo api                        |
+| `--owner <app>`                    | `web`, `api`: the monorepo app with auth and data                    |
+| `--docker` / `--no-docker`         | Add Docker files                                                     |
+| `--rate-limit` / `--no-rate-limit` | Add rate limiting (Express and NestJS)                               |
+| `--ci` / `--no-ci`                 | Add a GitHub Actions workflow                                        |
+| `--no-agents`                      | Leave out AGENTS.md (added by default)                               |
+| `--vscode` / `--no-vscode`         | Add VS Code settings and extensions                                  |
+| `--git` / `--no-git`               | Initialize a git repository                                          |
+| `--install` / `--no-install`       | Install dependencies                                                 |
+| `-y`, `--yes`                      | Use defaults for missing options, no prompts                         |
+| `--dry-run`                        | List what would be created, write nothing                            |
+| `-h`, `--help`                     | Show help                                                            |
+| `-v`, `--version`                  | Show the version                                                     |
 
 `--database` names the ORM, which also selects the database: `prisma` and `drizzle` use PostgreSQL, `mongoose` uses MongoDB.
 
@@ -59,38 +60,39 @@ The project path can be a name (`my-app`), a nested path (`apps/api`), or `.` fo
 
 ## What It Can Scaffold
 
-| Project type   | Stack                                   | Optional setup                                                           |
-| -------------- | --------------------------------------- | ------------------------------------------------------------------------ |
-| Backend API    | Express 5 or NestJS 12 + TypeScript     | PostgreSQL, MongoDB, Prisma, Drizzle, Mongoose, Better Auth, Docker, git |
-| Full-stack app | Next.js 16 or TanStack Start + React 19 | PostgreSQL, MongoDB, Prisma, Drizzle, Mongoose, Better Auth, Docker, git |
+| Project type   | Stack                                                                    | Optional setup                                                                                     |
+| -------------- | ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
+| Backend API    | Express 5 or NestJS 12 + TypeScript                                      | PostgreSQL, MongoDB, Prisma, Drizzle, Mongoose, Better Auth, AI chat, Polar or Stripe, Docker, git |
+| Full-stack app | Next.js 16 or TanStack Start + React 19                                  | PostgreSQL, MongoDB, Prisma, Drizzle, Mongoose, Better Auth, AI chat, Polar or Stripe, Docker, git |
+| Monorepo       | Next.js or TanStack Start in `apps/web`, Express or NestJS in `apps/api` | The same, without Docker for now                                                                   |
 
 Notes:
 
 - Better Auth is offered for every framework; full-stack projects need a database for it.
+- Payments need auth and a database.
 
 ## Interactive Prompt Flow
 
 Without flags, the CLI asks, in order:
 
-1. Project name or path
-2. Application type: `Backend API` or `Full-stack App`
-3. Framework
-   - Backend: `Express` or `NestJS`
-   - Full-stack: `Next.js` or `TanStack Start`
-4. Database: `none`, `PostgreSQL`, or `MongoDB`
-5. ORM/ODM when a database is selected
-   - PostgreSQL: `Prisma` or `Drizzle`
-   - MongoDB: `Mongoose`
-6. Package manager: `npm`, `pnpm`, or `bun`
-7. Docker setup
-8. Authentication
-   - Better Auth for every framework
-   - Next.js and TanStack Start apps: only when a database is selected
-9. Rate limiting (Express and NestJS)
-10. GitHub Actions CI
-11. VS Code settings
-12. Git initialization
-13. Dependency installation
+1. **Project name.** A name or a path. The folder name becomes the `package.json` name.
+2. **Monorepo.** One project, or a Turborepo with `apps/web` and `apps/api`?
+3. **Framework.**
+   - In a monorepo: the web app (`Next.js` or `TanStack Start`) and the api (`Express`, `NestJS`, or none)
+   - Otherwise: `Backend API` (`Express` or `NestJS`) or `Full-stack` (`Next.js` or `TanStack Start`)
+4. **Database.** `none`, `PostgreSQL`, or `MongoDB`.
+5. **ORM or ODM**, when a database is selected: `Prisma` or `Drizzle` for PostgreSQL, `Mongoose` for MongoDB.
+6. **Package manager.** `npm`, `pnpm`, or `bun`.
+7. **Docker.** Not offered for a monorepo yet.
+8. **Authentication.** Better Auth for every framework. Next.js and TanStack Start need a database, unless a monorepo api runs auth.
+9. **AI chat.** `None`, `Vercel AI SDK`, or `TanStack AI`.
+10. **Payments.** `None`, `Polar`, or `Stripe`. Asked only with auth and a database.
+11. **Owner.** In a monorepo with an api: the app that runs auth, the database, AI chat, and payments.
+12. **Rate limiting.** Express, NestJS, or a monorepo api.
+13. **CI.** A GitHub Actions workflow.
+14. **VS Code.** Workspace settings and recommended extensions.
+15. **Git.** Initialize a repository.
+16. **Install dependencies.** Run the install command now.
 
 `AGENTS.md` and `CLAUDE.md` are added without a question; pass `--no-agents` to leave them out.
 
@@ -108,6 +110,8 @@ Every generated project includes:
 - shadcn/ui components built on Base UI for Next.js and TanStack Start projects
 - Database wiring and schema setup when selected
 - Authentication scaffolding when selected
+- A streaming AI chat route, and a chat page on Next.js and TanStack Start, when selected
+- Polar or Stripe checkout, customer portal, and webhook when selected
 - Docker files when selected
 - Optional git repository initialization
 

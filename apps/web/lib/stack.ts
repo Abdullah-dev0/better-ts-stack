@@ -458,16 +458,22 @@ export function matchesPreset(
 
 // How many combinations scripts/generate-matrix.cjs builds and CI checks
 export function countMatrixCases(): number {
+  // Every package manager with and without Docker; npm without Docker gets
+  // each AI choice, the other five one AI choice each
+  const aiVariants = AI_OPTIONS.length + PACKAGE_MANAGER_OPTIONS.length * 2 - 1;
   let count = 0;
   for (const { value: framework } of FRAMEWORK_OPTIONS) {
     for (const { value: database } of DATABASE_OPTIONS) {
       for (const useAuth of [false, true]) {
         if (!isBackend(framework) && database === "none" && useAuth) continue;
         const rateLimitVariants = isBackend(framework) ? 2 : 1;
-        // Each one with and without Docker, on every package manager
-        count += rateLimitVariants * PACKAGE_MANAGER_OPTIONS.length * 2;
+        const paymentVariants =
+          useAuth && database !== "none" ? PAYMENTS_OPTIONS.length : 1;
+        count += rateLimitVariants * aiVariants * paymentVariants;
       }
     }
   }
-  return count;
+  // shortcut: mirrors MONOREPO_LAYOUTS by hand (two web frameworks, each alone
+  // and in six layouts with Express or NestJS); update it with that list
+  return count + 2 * (1 + 6 * 2);
 }

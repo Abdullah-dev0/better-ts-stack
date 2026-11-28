@@ -6,6 +6,8 @@ One feature per minor release, no betas. A release ships when CI is green on its
 
 - **2.2.0** Better Auth on Express, NestJS, Next.js, and TanStack Start: email verification, password reset, GitHub and Google sign-in, Resend emails. shadcn/ui on Base UI, server-first Next.js pages, `better-ts-stack.json`, and AGENTS.md added by default.
 - **2.2.1** Exact `@thallesp/nestjs-better-auth` version, `git` run without a shell, `.gitattributes` for LF line endings, a MongoDB sign-up troubleshooting note, and a port check and MongoDB retry in the Docker tests. Generated projects already declared Node 24 in `engines`; `npm install` still runs through the shell because npm and pnpm are `.cmd` files on Windows.
+- **2.3.0** AI chat (`--ai vercel|tanstack`) on all four frameworks, and monorepos (`--monorepo`): a Turborepo with `apps/web` and an optional `apps/api`, where `--owner` picks the app that runs auth and data.
+- **2.4.0** Payments (`--payments polar|stripe`) through the Better Auth plugins on all four frameworks and in monorepos. Stripe creates the customer at sign-up; Polar creates it at the first checkout and keeps it in step with user updates and deletions. The stack builder offers AI chat and payments.
 
 ## Planned
 
@@ -14,36 +16,10 @@ One feature per minor release, no betas. A release ships when CI is green on its
 - **Manual checks nobody has done yet:** click through the Next.js and TanStack Start pages in a browser, run GitHub and Google sign-in, send a real email through Resend, and use the reset-password link.
 - Decide whether `.agents/` and `skills-lock.json` are committed or ignored.
 
-### 2.3.0: AI chat and monorepo
+### Not built yet
 
-Two features in one release.
-
-**AI chat (Vercel AI SDK and TanStack AI):** `--ai none|vercel|tanstack`, on all four frameworks: Express, NestJS, Next.js, and TanStack Start.
-
-- A chat endpoint that streams the model's reply as it is generated, and a chat page that shows it.
-- A stop button that cancels the request: the browser aborts the stream and the server stops calling the model.
-- Vercel AI SDK and TanStack AI, each offered on every framework where it works.
-- The model provider and API key come from `.env`. The chat route needs a signed-in user when auth is selected.
-- Check the current Vercel AI SDK and TanStack AI APIs before building, since both change often.
-
-Built: Express and NestJS get `POST /api/chat`; Next.js and TanStack Start also get a `/chat` page. Vercel uses the AI Gateway (`AI_GATEWAY_API_KEY`, `AI_MODEL`), TanStack AI uses its OpenAI adapter (`OPENAI_API_KEY`, `AI_MODEL`).
-
-**Monorepo:** `--monorepo`, opt-in. A Turborepo with `apps/web` (`--framework nextjs|tanstack`) and an optional `apps/api` (`--api express|nestjs|none`). The AI chat module has to work in both layouts.
-
-- With an api, the CLI asks which app owns users and data (`--owner web|api`, web by default and easier): that app runs Better Auth, holds the database, and serves the AI chat route. The other app asks it for sessions. Auth without a database forces the api, and the CLI says so.
-- `--api none` leaves the web app on its own, owning everything.
-- The web app forwards the `/api/*` requests it does not answer to the api, so browsers only talk to one origin.
-- Not in 2.3.0: Docker with a monorepo, shared tsconfig and ESLint packages, a docs app (`--docs`, Fumadocs), and two full apps that both sign users in (needs `packages/auth` and `packages/db`, then the `add` command). `packages/db` moves to 2.4.0, where payments needs a table both apps share.
-
-Still to do before release: green CI on the pull request, and a 10-minute manual check: one chat page with a real model key (streaming, the thinking indicator, and Stop), and one monorepo sign-up through the proxy. The stack builder on the website ships separately.
-
-### 2.4.0: Payments
-
-`--payments none|polar|stripe`. Needs auth and a database. Built on the monorepo layout from 2.3.0, with the `packages/db` package both apps share.
-
-- Next.js and TanStack Start use the Better Auth plugins; Express and NestJS use the Polar and Stripe SDKs.
-- A shared subscription table and UI.
-- The Stripe webhook needs the raw request body.
+- Docker with a monorepo, and a `packages/db` that both monorepo apps share.
+- A live sandbox check that Polar's first checkout creates the customer, now that `createCustomerOnSignUp` is off.
 
 ### 2.5.0: `add` command (modules)
 

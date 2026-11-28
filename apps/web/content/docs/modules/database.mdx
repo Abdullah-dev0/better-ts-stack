@@ -83,6 +83,8 @@ db.createCollection("user");
 db.createCollection("session");
 db.createCollection("account");
 db.createCollection("verification");
+// With --payments stripe, also:
+db.createCollection("subscription");
 ```
 
 If you run a standalone MongoDB server locally, you can turn transactions off in `lib/auth.ts` (Next.js) or `src/lib/auth.ts` (TanStack Start) with `mongodbAdapter(db, { client, transaction: false })`. See the [MongoDB adapter docs](https://better-auth.com/docs/adapters/mongo). Writes are then not atomic, so keep transactions on in production.

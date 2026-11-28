@@ -10,6 +10,7 @@ import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 import {
   Boxes,
   Container,
+  CreditCard,
   Database,
   Layout,
   MessageSquare,
@@ -20,7 +21,7 @@ import {
 
 ## What is better-ts-stack?
 
-better-ts-stack is an interactive CLI that generates TypeScript projects. You choose the framework, database, authentication, AI chat, and Docker setup from a few prompts, and the CLI writes a project that is ready to install and run: one app, or a Turborepo with a web app and an api.
+better-ts-stack is an interactive CLI that generates TypeScript projects. You choose the framework, database, authentication, AI chat, payments, and Docker setup from a few prompts, and the CLI writes a project that is ready to install and run: one app, or a Turborepo with a web app and an api.
 
 <Callout type="info" title="Good for">
 
@@ -84,12 +85,13 @@ The CLI asks, in order (every prompt can also be answered with a [flag](/docs/us
    - Every framework gets Better Auth with email and password, email verification, password reset, and GitHub and Google sign-in
    - For Next.js and TanStack Start, the CLI asks only if you selected a database
 9. **AI chat.** None, Vercel AI SDK, or TanStack AI. Either SDK adds a streaming chat route, plus a chat page on Next.js and TanStack Start.
-10. **Which app owns users and data.** Asked only for a monorepo with an api. The owner, the web app or the api, runs auth, the database, and AI chat. The web app is the easier choice.
-11. **Rate limiting.** Limit requests per IP? Express and NestJS only.
-12. **CI.** Add a GitHub Actions workflow?
-13. **VS Code.** Add workspace settings and recommended extensions?
-14. **Git.** Initialize a repository?
-15. **Install dependencies.** Run the install command now?
+10. **Payments.** None, Polar, or Stripe. Asked only with auth and a database. Either one adds the provider's Better Auth plugin, with checkout, the customer portal, and a webhook.
+11. **Which app owns users and data.** Asked only for a monorepo with an api. The owner, the web app or the api, runs auth, the database, AI chat, and payments. The web app is the easier choice.
+12. **Rate limiting.** Limit requests per IP? Express and NestJS only.
+13. **CI.** Add a GitHub Actions workflow?
+14. **VS Code.** Add workspace settings and recommended extensions?
+15. **Git.** Initialize a repository?
+16. **Install dependencies.** Run the install command now?
 
 <Callout type="info">
   The CLI does not ask for a port number. The server port defaults to `3000`
@@ -135,6 +137,10 @@ npm run dev
     A streaming chat route on the Vercel AI SDK or TanStack AI, and a chat page
     with a thinking indicator and a Stop button
   </Card>
+  <Card title="Payments" icon={<CreditCard className="text-green-400" />}>
+    Polar or Stripe subscriptions through the Better Auth plugin, with checkout,
+    the customer portal, and a signed webhook
+  </Card>
   <Card title="Monorepo" icon={<Boxes className="text-orange-400" />}>
     A Turborepo with a Next.js or TanStack Start web app and an optional Express
     or NestJS api
@@ -166,8 +172,8 @@ npm run dev
     Every prompt and command-line flag
   </Card>
   <Card title="Modules" href="/docs/modules">
-    Backend, frontend, database, auth, AI chat, monorepo, and Docker options in
-    detail
+    Backend, frontend, database, auth, AI chat, payments, monorepo, and Docker
+    options in detail
   </Card>
   <Card title="Project structure" href="/docs/structure">
     Understand the generated file layout
